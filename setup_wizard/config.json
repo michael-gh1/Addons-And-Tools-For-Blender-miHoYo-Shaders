@@ -1,0 +1,140 @@
+{
+    "0": {
+        "component_name": "import_python_dependencies/genshin_setup_wizard",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "note": "This is here for caching/documentation, but is not actually called by import_order",
+            "description": "Need to set sys.path so that all components can access import_order",
+            "requires": "Folder of Addons and Tool's project"
+        }
+    },
+    "1": {
+        "component_name": "import_character_model",
+        "enabled": true,
+        "cache_key": "character_model_folder_file_path",
+        "metadata": {
+            "description": "Import character model",
+            "requires": "Folder with character model fbx file in it"
+        }
+    },
+    "2": {
+        "component_name": "delete_empties",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Delete empties",
+            "requires": "None"
+        }
+    },
+    "3": {
+        "component_name": "import_materials",
+        "enabled": true,
+        "cache_key": "festivity_root_folder_file_path",
+        "metadata": {
+            "description": "Import Genshin Materials (Hair, Face, Body, Outline)",
+            "requires": "Folder of Festivity's project"
+        }
+    },
+    "4": {
+        "component_name": "replace_default_materials",
+        "enabled": true,
+        "cache_key": "character_model_folder_file_path",
+        "metadata": {
+            "description": "Replaces default materials and separates them out accordingly",
+            "requires": "Folder with character model fbx file in it"
+        }
+    },
+    "5": {
+        "component_name": "import_character_textures",
+        "enabled": true,
+        "cache_key": "character_model_folder_file_path",
+        "metadata": {
+            "description": "Import character textures",
+            "requires": "Folder with character textures (lightmaps, difuses, etc.) in it"
+        }
+    },
+    "6": {
+        "component_name": "import_outlines",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Import 'miHoYo - Outlines'",
+            "requires": "File named 'miHoYo - Outlines'"
+        }
+    },
+    "7": {
+        "component_name": "setup_geometry_nodes",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Sets up outlines (geometry nodes modifiers)",
+            "requires": "None"
+        }
+    },
+    "8": {
+        "component_name": "import_outline_lightmaps",
+        "enabled": true,
+        "cache_key": "character_model_folder_file_path",
+        "metadata": {
+            "description": "Import lightmaps for outlines (Hair and Body)",
+            "requires": "Folder with lightmap files in it"
+        }
+    },
+    "9": {
+        "component_name": "import_material_data",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Import material model (outline colors, shininess, metallic specular color, etc.",
+            "requires": "Select all files (shift + click) of a character's material json"
+        }
+    },
+    "10": {
+        "component_name": "fix_mouth_outlines",
+        "enabled": false,
+        "cache_key": "",
+        "metadata": {
+            "note": "Disabled by default. Experimental. Use when your face/mouth has outlines sticking out of it.",
+            "description": "Fixes mouth outlines -- assigns 'Camera' to Face outlines and applies a Depth Offset",
+            "requires": "None"
+        }
+    },
+    "11": {
+        "component_name": "delete_specific_objects",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Delete objects in the objects_to_delete list",
+            "requires": "None"
+        }
+    },
+    "12": {
+        "component_name": "make_character_upright",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "note": "Do this BEFORE setup_head_driver (otherwise some more logic needs to be written to Set Inverse)",
+            "description": "Sets character armature to 90 degrees on x-axis (upright)",
+            "requires": "None"
+        }
+    },
+    "13": {
+        "component_name": "set_color_management_to_standard",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Set color management to Standard",
+            "requires": "None"
+        }
+    },
+    "14": {
+        "component_name": "setup_head_driver",
+        "enabled": true,
+        "cache_key": "",
+        "metadata": {
+            "description": "Sets up Head Driver constraint for face shadows",
+            "requires": "None"
+        }
+    }
+}
