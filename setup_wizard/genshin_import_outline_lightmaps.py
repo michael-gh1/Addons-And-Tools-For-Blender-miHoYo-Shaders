@@ -11,8 +11,8 @@ from bpy.types import Operator
 import os
 
 try:
-    from scripts.setup_wizard.import_order import invoke_next_step
-    from scripts.setup_wizard.import_order import get_actual_material_name_for_dress
+    from setup_wizard.import_order import invoke_next_step
+    from setup_wizard.import_order import get_actual_material_name_for_dress
 except Exception:
     print('Error! Run the first step of setup_wizard! Need to set up python script paths')
 

@@ -3,7 +3,7 @@
 import bpy
 
 try:
-    import scripts.setup_wizard.import_order
+    import setup_wizard.import_order
 except:
     print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
 
@@ -22,7 +22,7 @@ def setup_head_driver(next_step_index):
     set_inverse(head_driver_object)
 
     if next_step_index:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_index)
+        setup_wizard.import_order.invoke_next_step(next_step_index)
 
 
 def set_contraint_target_and_bone(constraint, armature, bone_name):

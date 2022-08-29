@@ -35,7 +35,7 @@ class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
         invoke_next_step(
             1, 
             file_path_to_cache = self.filepath, 
-            path_to_streamlined_setup=os.path.join(self.filepath, 'scripts/' 'setup_wizard/')
+            path_to_streamlined_setup=os.path.join(self.filepath, 'setup_wizard/')
         )
 
         return {'FINISHED'}
@@ -57,50 +57,50 @@ def setup_dependencies(filepath):
     # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
     # having to restart Blender.
     import importlib
-    import scripts.setup_wizard.import_order
-    import scripts.setup_wizard.genshin_import_character_model
-    import scripts.setup_wizard.genshin_import_material_data
-    import scripts.setup_wizard.genshin_import_materials
-    import scripts.setup_wizard.genshin_import_outline_lightmaps
-    import scripts.setup_wizard.genshin_import_outlines
-    import scripts.setup_wizard.genshin_import_textures
-    import scripts.setup_wizard.genshin_replace_default_materials
+    import setup_wizard.import_order
+    import setup_wizard.genshin_import_character_model
+    import setup_wizard.genshin_import_material_data
+    import setup_wizard.genshin_import_materials
+    import setup_wizard.genshin_import_outline_lightmaps
+    import setup_wizard.genshin_import_outlines
+    import setup_wizard.genshin_import_textures
+    import setup_wizard.genshin_replace_default_materials
 
-    importlib.reload(scripts.setup_wizard.import_order)
-    importlib.reload(scripts.setup_wizard.genshin_import_character_model)
-    importlib.reload(scripts.setup_wizard.genshin_import_material_data)
-    importlib.reload(scripts.setup_wizard.genshin_import_materials)
-    importlib.reload(scripts.setup_wizard.genshin_import_outline_lightmaps)
-    importlib.reload(scripts.setup_wizard.genshin_import_outlines)
-    importlib.reload(scripts.setup_wizard.genshin_import_textures)
-    importlib.reload(scripts.setup_wizard.genshin_replace_default_materials)
+    importlib.reload(setup_wizard.import_order)
+    importlib.reload(setup_wizard.genshin_import_character_model)
+    importlib.reload(setup_wizard.genshin_import_material_data)
+    importlib.reload(setup_wizard.genshin_import_materials)
+    importlib.reload(setup_wizard.genshin_import_outline_lightmaps)
+    importlib.reload(setup_wizard.genshin_import_outlines)
+    importlib.reload(setup_wizard.genshin_import_textures)
+    importlib.reload(setup_wizard.genshin_replace_default_materials)
 
     for class_to_register in [
-        scripts.setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
-        scripts.setup_wizard.genshin_import_material_data.GI_OT_GenshinImportMaterialData,
-        scripts.setup_wizard.genshin_import_materials.GI_OT_GenshinImportMaterials,
-        scripts.setup_wizard.genshin_import_outline_lightmaps.GI_OT_GenshinImportOutlineLightmaps,
-        scripts.setup_wizard.genshin_import_outlines.GI_OT_GenshinImportOutlines,
-        scripts.setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
-        scripts.setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
+        setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
+        setup_wizard.genshin_import_material_data.GI_OT_GenshinImportMaterialData,
+        setup_wizard.genshin_import_materials.GI_OT_GenshinImportMaterials,
+        setup_wizard.genshin_import_outline_lightmaps.GI_OT_GenshinImportOutlineLightmaps,
+        setup_wizard.genshin_import_outlines.GI_OT_GenshinImportOutlines,
+        setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
+        setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
         ]:
         try:
             bpy.utils.register_class(class_to_register)
         except ValueError:
             pass  # expected if class is already registered
-    return scripts.setup_wizard.import_order.invoke_next_step
+    return setup_wizard.import_order.invoke_next_step
 
 
 # Need to have run setup_dependencies in order to unregister, otherwise sys.path 
 # will be missing the filepath to the scripts folder
 def unregister():
-    from scripts.setup_wizard.genshin_import_materials import GI_OT_GenshinImportMaterials
-    from scripts.setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel
-    from scripts.setup_wizard.genshin_replace_default_materials import GI_OT_GenshinReplaceDefaultMaterials
-    from scripts.setup_wizard.genshin_import_textures import GI_OT_GenshinImportTextures
-    from scripts.setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
-    from scripts.setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
-    from scripts.setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
+    from setup_wizard.genshin_import_materials import GI_OT_GenshinImportMaterials
+    from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel
+    from setup_wizard.genshin_replace_default_materials import GI_OT_GenshinReplaceDefaultMaterials
+    from setup_wizard.genshin_import_textures import GI_OT_GenshinImportTextures
+    from setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
+    from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
+    from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
 
     bpy.utils.unregister_class(GI_OT_GenshinImportMaterials)
     bpy.utils.unregister_class(GI_OT_GenshinImportModel)

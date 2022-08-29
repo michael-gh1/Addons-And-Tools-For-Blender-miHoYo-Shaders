@@ -3,7 +3,7 @@
 import bpy
 
 try:
-    import scripts.setup_wizard.import_order
+    import setup_wizard.import_order
 except:
     print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
 
@@ -35,14 +35,14 @@ def make_character_upright(next_step_index):
     # )  # from @M4urlcl0
 
     if next_step_index:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_index)
+        setup_wizard.import_order.invoke_next_step(next_step_index)
 
 
 def set_color_management_to_standard(next_step_index):
     bpy.context.scene.view_settings.view_transform = 'Standard'
 
     if next_step_index:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_index)
+        setup_wizard.import_order.invoke_next_step(next_step_index)
 
 
 if __name__ == '__main__':

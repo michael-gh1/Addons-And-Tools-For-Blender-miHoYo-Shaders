@@ -13,7 +13,7 @@ from bpy.types import Operator, PropertyGroup
 import os
 
 try:
-    from scripts.setup_wizard.import_order import invoke_next_step
+    from setup_wizard.import_order import invoke_next_step
 except Exception:
     print('Error! Run the first step of setup_wizard! Need to set up python script paths')
 

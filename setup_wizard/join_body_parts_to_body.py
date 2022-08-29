@@ -4,7 +4,7 @@
 import bpy
 
 try:
-    import scripts.setup_wizard.import_order
+    import setup_wizard.import_order
 except:
     print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
 
@@ -25,7 +25,7 @@ def join_body_parts_to_body(next_step_idx):
     bpy.ops.object.join()
 
     if next_step_idx:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_idx)
+        setup_wizard.import_order.invoke_next_step(next_step_idx)
 
 
 if __name__ == '__main__':

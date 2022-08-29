@@ -3,7 +3,7 @@
 import bpy
 
 try:
-    import scripts.setup_wizard.import_order
+    import setup_wizard.import_order
 except:
     print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
 
@@ -30,7 +30,7 @@ def fix_face_mouth_outlines_protruding_out(next_step_idx):
         fix_meshes_by_setting_genshin_materials(face_object.name)
 
     if next_step_idx:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_idx)
+        setup_wizard.import_order.invoke_next_step(next_step_idx)
 
 
 def set_camera_and_depth_offset(outline_modifiers, camera):

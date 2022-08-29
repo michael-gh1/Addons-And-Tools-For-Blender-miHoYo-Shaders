@@ -8,21 +8,21 @@ try:
     # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
     # having to restart Blender (not quite sure if this works yet in this module!!)
     import importlib
-    import scripts.setup_wizard.join_body_parts_to_body
-    import scripts.setup_wizard.genshin_setup_geometry_nodes
-    import scripts.setup_wizard.fix_mouth_outlines
-    import scripts.setup_wizard.delete_empties
-    import scripts.setup_wizard.delete_specific_objects
-    import scripts.setup_wizard.misc_final_steps
-    import scripts.setup_wizard.setup_head_driver
+    import setup_wizard.join_body_parts_to_body
+    import setup_wizard.genshin_setup_geometry_nodes
+    import setup_wizard.fix_mouth_outlines
+    import setup_wizard.delete_empties
+    import setup_wizard.delete_specific_objects
+    import setup_wizard.misc_final_steps
+    import setup_wizard.setup_head_driver
 
-    importlib.reload(scripts.setup_wizard.join_body_parts_to_body)
-    importlib.reload(scripts.setup_wizard.genshin_setup_geometry_nodes)
-    importlib.reload(scripts.setup_wizard.fix_mouth_outlines)
-    importlib.reload(scripts.setup_wizard.delete_empties)
-    importlib.reload(scripts.setup_wizard.delete_specific_objects)
-    importlib.reload(scripts.setup_wizard.misc_final_steps)
-    importlib.reload(scripts.setup_wizard.setup_head_driver)
+    importlib.reload(setup_wizard.join_body_parts_to_body)
+    importlib.reload(setup_wizard.genshin_setup_geometry_nodes)
+    importlib.reload(setup_wizard.fix_mouth_outlines)
+    importlib.reload(setup_wizard.delete_empties)
+    importlib.reload(setup_wizard.delete_specific_objects)
+    importlib.reload(setup_wizard.misc_final_steps)
+    importlib.reload(setup_wizard.setup_head_driver)
 except:
     print('Exception when trying to import required dependency scripts!')
 
@@ -108,7 +108,7 @@ class ComponentFunctionFactory:
         if component_name == 'import_materials':
             return bpy.ops.file.genshin_import_materials
         elif component_name == 'join_body_parts_to_body':
-            return scripts.setup_wizard.join_body_parts_to_body.join_body_parts_to_body
+            return setup_wizard.join_body_parts_to_body.join_body_parts_to_body
         elif component_name == 'import_character_model':
             return bpy.ops.file.genshin_import_model
         elif component_name == 'replace_default_materials':
@@ -118,22 +118,22 @@ class ComponentFunctionFactory:
         elif component_name == 'import_outlines':
             return bpy.ops.file.genshin_import_outlines
         elif component_name == 'setup_geometry_nodes':
-            return scripts.setup_wizard.genshin_setup_geometry_nodes.setup_geometry_nodes
+            return setup_wizard.genshin_setup_geometry_nodes.setup_geometry_nodes
         elif component_name == 'import_outline_lightmaps':
             return bpy.ops.file.genshin_import_outline_lightmaps
         elif component_name == 'import_material_data':
             return bpy.ops.file.genshin_import_material_data
         elif component_name == 'fix_mouth_outlines':
-            return scripts.setup_wizard.fix_mouth_outlines.fix_face_mouth_outlines_protruding_out
+            return setup_wizard.fix_mouth_outlines.fix_face_mouth_outlines_protruding_out
         elif component_name == 'delete_empties':
-            return scripts.setup_wizard.delete_empties.delete_empties
+            return setup_wizard.delete_empties.delete_empties
         elif component_name ==  'delete_specific_objects':
-            return scripts.setup_wizard.delete_specific_objects.delete_specified_objects
+            return setup_wizard.delete_specific_objects.delete_specified_objects
         elif component_name == 'make_character_upright':
-            return scripts.setup_wizard.misc_final_steps.make_character_upright
+            return setup_wizard.misc_final_steps.make_character_upright
         elif component_name == 'set_color_management_to_standard':
-            return scripts.setup_wizard.misc_final_steps.set_color_management_to_standard
+            return setup_wizard.misc_final_steps.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
-            return scripts.setup_wizard.setup_head_driver.setup_head_driver
+            return setup_wizard.setup_head_driver.setup_head_driver
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

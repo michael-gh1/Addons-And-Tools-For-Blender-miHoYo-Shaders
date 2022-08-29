@@ -3,7 +3,7 @@
 import bpy
 
 try:
-    import scripts.setup_wizard.import_order
+    import setup_wizard.import_order
 except:
     print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
 
@@ -20,7 +20,7 @@ def delete_specified_objects(next_step_idx):
             bpy.data.objects.remove(object)
 
     if next_step_idx:
-        scripts.setup_wizard.import_order.invoke_next_step(next_step_idx)
+        setup_wizard.import_order.invoke_next_step(next_step_idx)
 
 
 if __name__ == '__main__':
