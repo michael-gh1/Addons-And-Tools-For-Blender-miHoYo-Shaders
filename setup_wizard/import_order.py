@@ -4,16 +4,6 @@
 import bpy
 import json
 
-try:
-    # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
-    # having to restart Blender (not quite sure if this works yet in this module!!)
-    import importlib
-    import setup_wizard.join_body_parts_to_body
-
-    importlib.reload(setup_wizard.join_body_parts_to_body)
-except:
-    print('Exception when trying to import required dependency scripts!')
-
 # Config Constants
 COMPONENT_NAME = 'component_name'
 ENABLED = 'enabled'
@@ -95,8 +85,6 @@ class ComponentFunctionFactory:
     def create_component_function(component_name):
         if component_name == 'import_materials':
             return bpy.ops.file.genshin_import_materials
-        elif component_name == 'join_body_parts_to_body':
-            return setup_wizard.join_body_parts_to_body.join_body_parts_to_body  # Deprecated
         elif component_name == 'import_character_model':
             return bpy.ops.file.genshin_import_model
         elif component_name == 'replace_default_materials':
