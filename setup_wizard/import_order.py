@@ -9,15 +9,11 @@ try:
     # having to restart Blender (not quite sure if this works yet in this module!!)
     import importlib
     import setup_wizard.join_body_parts_to_body
-    import setup_wizard.fix_mouth_outlines
     import setup_wizard.delete_empties
-    import setup_wizard.misc_final_steps
     import setup_wizard.setup_head_driver
 
     importlib.reload(setup_wizard.join_body_parts_to_body)
-    importlib.reload(setup_wizard.fix_mouth_outlines)
     importlib.reload(setup_wizard.delete_empties)
-    importlib.reload(setup_wizard.misc_final_steps)
     importlib.reload(setup_wizard.setup_head_driver)
 except:
     print('Exception when trying to import required dependency scripts!')
@@ -126,7 +122,7 @@ class ComponentFunctionFactory:
         elif component_name ==  'delete_specific_objects':
             return bpy.ops.file.delete_specific_objects
         elif component_name == 'make_character_upright':
-            return setup_wizard.misc_final_steps.make_character_upright
+            return bpy.ops.file.make_character_upright
         elif component_name == 'set_color_management_to_standard':
             return bpy.ops.file.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
