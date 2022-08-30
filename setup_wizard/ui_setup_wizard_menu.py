@@ -102,4 +102,4 @@ class GI_PT_UI_Misc_Menu(Panel):
         
         box = layout.box()
         box.label(text='Set Color Mgmt to Standard')
-        box.label(text='Delete EyeMesh & Other Objs')
+        box.label(text='Delete EffectMesh & Other Objs')

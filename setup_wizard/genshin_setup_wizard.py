@@ -68,6 +68,7 @@ def setup_dependencies(filepath=None):
     import setup_wizard.genshin_import_textures
     import setup_wizard.genshin_replace_default_materials
     import setup_wizard.fix_mouth_outlines
+    import setup_wizard.misc_operations
 
     importlib.reload(setup_wizard.import_order)
     importlib.reload(setup_wizard.genshin_import_character_model)
@@ -79,6 +80,7 @@ def setup_dependencies(filepath=None):
     importlib.reload(setup_wizard.genshin_import_textures)
     importlib.reload(setup_wizard.genshin_replace_default_materials)
     importlib.reload(setup_wizard.fix_mouth_outlines)
+    importlib.reload(setup_wizard.misc_operations)
 
     for class_to_register in [
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
@@ -90,6 +92,8 @@ def setup_dependencies(filepath=None):
         setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
         setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
         setup_wizard.fix_mouth_outlines.GI_OT_FixMouthOutlines,
+        setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
+        setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
     ]:
         try:
             bpy.utils.register_class(class_to_register)
@@ -109,6 +113,7 @@ def unregister():
     from setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
     from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
+    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
 
     for class_to_unregister in [
         GI_OT_GenshinImportModel,
@@ -118,7 +123,9 @@ def unregister():
         GI_OT_SetupGeometryNodes,
         GI_OT_GenshinImportOutlines,
         GI_OT_GenshinImportOutlineLightmaps,
-        GI_OT_GenshinImportMaterialData
+        GI_OT_GenshinImportMaterialData,
+        GI_OT_SetColorManagementToStandard,
+        GI_OT_DeleteSpecificObjects,
     ]:
         try:
             bpy.utils.unregister_class(class_to_unregister)
