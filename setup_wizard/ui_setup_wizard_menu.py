@@ -30,16 +30,15 @@ class GI_PT_UI_Character_Model_Menu(Panel):
         
         box = layout.box()
         box.operator(
-            operator='file.genshin_import_model', 
+            operator='genshin.import_model', 
             text='Import Character Model',
             icon='OUTLINER_OB_ARMATURE'
         )
-        box.label(text='Delete Empties (!!!)')
-        # box.operator(
-        #     operator='file.genshin_import_model',
-        #     text='Delete Empties (!!!)',
-        #     icon='TRASH'
-        # )
+        box.operator(
+            operator='genshin.delete_empties',
+            text='Delete Empties',
+            icon='TRASH'
+        )
 
 
 class GI_PT_UI_Materials_Menu(Panel):
