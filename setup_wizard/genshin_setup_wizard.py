@@ -47,12 +47,13 @@ def register():
 
 # Specifically done this way because path is dependent on where Blender is started
 # We ask for the filepath to Festivity's shaders that way we can set up the scripts in the path
-def setup_dependencies(filepath):
-    directory = os.path.dirname(filepath)
+def setup_dependencies(filepath=None):
+    if filepath:
+        directory = os.path.dirname(filepath)
 
-    import sys
-    if filepath not in sys.path:
-        sys.path.append(directory)
+        import sys
+        if filepath not in sys.path:
+            sys.path.append(directory)
 
     # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
     # having to restart Blender.
