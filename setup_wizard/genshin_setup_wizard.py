@@ -40,17 +40,8 @@ class GI_OT_GenshinSetupWizard(Operator):
 def register():
     bpy.utils.register_class(GI_OT_GenshinSetupWizard)
 
-
-# Specifically done this way because path is dependent on where Blender is started
-# We ask for the filepath to Festivity's shaders that way we can set up the scripts in the path
-def setup_dependencies(filepath=None):
-    if filepath:
-        directory = os.path.dirname(filepath)
-
-        import sys
-        if filepath not in sys.path:
-            sys.path.append(directory)
-
+# Legacy import system before this became an Addon. Refactoring necessary.
+def setup_dependencies():
     # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
     # having to restart Blender.
     import importlib
