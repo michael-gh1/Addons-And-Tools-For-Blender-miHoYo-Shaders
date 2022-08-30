@@ -9,11 +9,9 @@ try:
     # having to restart Blender (not quite sure if this works yet in this module!!)
     import importlib
     import setup_wizard.join_body_parts_to_body
-    import setup_wizard.delete_empties
     import setup_wizard.setup_head_driver
 
     importlib.reload(setup_wizard.join_body_parts_to_body)
-    importlib.reload(setup_wizard.delete_empties)
     importlib.reload(setup_wizard.setup_head_driver)
 except:
     print('Exception when trying to import required dependency scripts!')
@@ -118,7 +116,7 @@ class ComponentFunctionFactory:
         elif component_name == 'fix_mouth_outlines':
             return bpy.ops.file.genshin_fix_mouth_outlines
         elif component_name == 'delete_empties':
-            return setup_wizard.delete_empties.delete_empties
+            return bpy.ops.file.delete_empties
         elif component_name ==  'delete_specific_objects':
             return bpy.ops.file.delete_specific_objects
         elif component_name == 'make_character_upright':

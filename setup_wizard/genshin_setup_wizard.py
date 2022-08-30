@@ -86,6 +86,7 @@ def setup_dependencies(filepath=None):
 
     for class_to_register in [
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
+        setup_wizard.genshin_import_character_model.GI_OT_DeleteEmpties,
         setup_wizard.genshin_import_material_data.GI_OT_GenshinImportMaterialData,
         setup_wizard.genshin_import_materials.GI_OT_GenshinImportMaterials,
         setup_wizard.genshin_setup_geometry_nodes.GI_OT_SetupGeometryNodes,
@@ -109,7 +110,7 @@ def setup_dependencies(filepath=None):
 # will be missing the filepath to the scripts folder
 def unregister():
     from setup_wizard.genshin_import_materials import GI_OT_GenshinImportMaterials
-    from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel
+    from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel, GI_OT_DeleteEmpties
     from setup_wizard.genshin_replace_default_materials import GI_OT_GenshinReplaceDefaultMaterials
     from setup_wizard.genshin_import_textures import GI_OT_GenshinImportTextures
     from setup_wizard.genshin_setup_geometry_nodes import GI_OT_SetupGeometryNodes
@@ -121,6 +122,7 @@ def unregister():
 
     for class_to_unregister in [
         GI_OT_GenshinImportModel,
+        GI_OT_DeleteEmpties,
         GI_OT_GenshinImportMaterials,
         GI_OT_GenshinReplaceDefaultMaterials,
         GI_OT_GenshinImportTextures,
