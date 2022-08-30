@@ -14,7 +14,7 @@ from setup_wizard.import_order import invoke_next_step
 from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
-class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
+class GI_OT_GenshinReplaceDefaultMaterials(Operator):
     """Select the folder with the desired model to import"""
     bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
@@ -39,10 +39,9 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
-        character_model_folder_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
         self.replace_default_materials_with_genshin_materials()
 
-        invoke_next_step(self.next_step_idx, character_model_folder_file_path)
+        invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
     
     def replace_default_materials_with_genshin_materials(self):
