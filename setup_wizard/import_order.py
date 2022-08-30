@@ -106,7 +106,7 @@ class ComponentFunctionFactory:
         if component_name == 'import_materials':
             return bpy.ops.file.genshin_import_materials
         elif component_name == 'join_body_parts_to_body':
-            return setup_wizard.join_body_parts_to_body.join_body_parts_to_body
+            return setup_wizard.join_body_parts_to_body.join_body_parts_to_body  # Deprecated
         elif component_name == 'import_character_model':
             return bpy.ops.file.genshin_import_model
         elif component_name == 'replace_default_materials':
@@ -122,7 +122,7 @@ class ComponentFunctionFactory:
         elif component_name == 'import_material_data':
             return bpy.ops.file.genshin_import_material_data
         elif component_name == 'fix_mouth_outlines':
-            return setup_wizard.fix_mouth_outlines.fix_face_mouth_outlines_protruding_out
+            return bpy.ops.file.genshin_fix_mouth_outlines
         elif component_name == 'delete_empties':
             return setup_wizard.delete_empties.delete_empties
         elif component_name ==  'delete_specific_objects':
