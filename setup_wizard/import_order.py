@@ -3,6 +3,7 @@
 
 import bpy
 import json
+import os
 
 # Config Constants
 COMPONENT_NAME = 'component_name'
@@ -13,16 +14,9 @@ CACHE_KEY = 'cache_key'
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
-path_to_setup_wizard_folder = ''
+def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
-def invoke_next_step(current_step_idx: int, file_path_to_cache=None, path_to_streamlined_setup=''):
-    if path_to_streamlined_setup:
-        global path_to_setup_wizard_folder
-        path_to_setup_wizard_folder = path_to_streamlined_setup
-
-    # We use a config.json so that we can make changes without having to restart Blender
-    # TODO: Make this a class that gets instantiated in each component? 
-    # TOOD: Making a class may allow us to move config.json data back into this module?
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
 

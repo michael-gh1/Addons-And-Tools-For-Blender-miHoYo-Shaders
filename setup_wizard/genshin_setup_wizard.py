@@ -9,7 +9,7 @@ from bpy.types import Operator
 import os
 
 
-class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
+class GI_OT_GenshinSetupWizard(Operator):
     """Setup Wizard Process"""
     bl_idname = "genshin.setup_wizard"
     bl_label = "Genshin: Setup Wizard - Select Festivity's Shaders Folder"
@@ -31,12 +31,8 @@ class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
     )
 
     def execute(self, context):
-        invoke_next_step = setup_dependencies(self.filepath)
-        invoke_next_step(
-            1, 
-            file_path_to_cache = self.filepath, 
-            path_to_streamlined_setup=os.path.join(self.filepath, 'setup_wizard/')
-        )
+        invoke_next_step = setup_dependencies()
+        invoke_next_step(1)
 
         return {'FINISHED'}
 
