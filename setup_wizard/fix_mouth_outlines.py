@@ -4,10 +4,7 @@ import bpy
 from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-try:
-    import setup_wizard.import_order
-except:
-    print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
+from setup_wizard.import_order import invoke_next_step
 
 CAMERA_INPUT = 'Input_4'
 DEPTH_OFFSET_INPUT = 'Input_8'
@@ -44,7 +41,7 @@ class GI_OT_FixMouthOutlines(Operator):
             self.fix_meshes_by_setting_genshin_materials(face_object.name)
 
         if next_step_idx:
-            setup_wizard.import_order.invoke_next_step(next_step_idx)
+            invoke_next_step(next_step_idx)
 
 
     def set_camera_and_depth_offset(self, outline_modifiers, camera):

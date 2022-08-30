@@ -4,10 +4,7 @@ import bpy
 from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except:
-    print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
+from setup_wizard.import_order import invoke_next_step
 
 HEAD_DRIVER_OBJECT_NAME = 'Head Driver'
 

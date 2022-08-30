@@ -4,10 +4,7 @@ import bpy
 from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-try:
-    import setup_wizard.import_order
-except:
-    print("ERROR: Couldn't import invoke_next_step, but it's not needed if running this as a standalone")
+from setup_wizard.import_order import invoke_next_step
 
 # Constants
 NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
@@ -64,7 +61,7 @@ class GI_OT_SetUpGeometryNodes(Operator):
             self.fix_meshes_by_setting_genshin_materials(mesh_name)
 
         if next_step_idx:
-            setup_wizard.import_order.invoke_next_step(next_step_idx)
+            invoke_next_step(next_step_idx)
 
 
     def create_geometry_nodes_modifier(self, mesh_name):

@@ -8,10 +8,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
 
 
 class GI_OT_SetColorManagementToStandard(Operator):
