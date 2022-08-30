@@ -3,28 +3,7 @@
 
 import bpy
 import json
-
-try:
-    # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
-    # having to restart Blender (not quite sure if this works yet in this module!!)
-    import importlib
-    import setup_wizard.join_body_parts_to_body
-    import setup_wizard.genshin_setup_geometry_nodes
-    import setup_wizard.fix_mouth_outlines
-    import setup_wizard.delete_empties
-    import setup_wizard.delete_specific_objects
-    import setup_wizard.misc_final_steps
-    import setup_wizard.setup_head_driver
-
-    importlib.reload(setup_wizard.join_body_parts_to_body)
-    importlib.reload(setup_wizard.genshin_setup_geometry_nodes)
-    importlib.reload(setup_wizard.fix_mouth_outlines)
-    importlib.reload(setup_wizard.delete_empties)
-    importlib.reload(setup_wizard.delete_specific_objects)
-    importlib.reload(setup_wizard.misc_final_steps)
-    importlib.reload(setup_wizard.setup_head_driver)
-except:
-    print('Exception when trying to import required dependency scripts!')
+import os
 
 # Config Constants
 COMPONENT_NAME = 'component_name'
@@ -35,16 +14,9 @@ CACHE_KEY = 'cache_key'
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
-path_to_setup_wizard_folder = ''
+def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
-def invoke_next_step(current_step_idx: int, file_path_to_cache=None, path_to_streamlined_setup=''):
-    if path_to_streamlined_setup:
-        global path_to_setup_wizard_folder
-        path_to_setup_wizard_folder = path_to_streamlined_setup
-
-    # We use a config.json so that we can make changes without having to restart Blender
-    # TODO: Make this a class that gets instantiated in each component? 
-    # TOOD: Making a class may allow us to move config.json data back into this module?
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
 
@@ -106,34 +78,32 @@ class ComponentFunctionFactory:
     @staticmethod
     def create_component_function(component_name):
         if component_name == 'import_materials':
-            return bpy.ops.file.genshin_import_materials
-        elif component_name == 'join_body_parts_to_body':
-            return setup_wizard.join_body_parts_to_body.join_body_parts_to_body
+            return bpy.ops.genshin.import_materials
         elif component_name == 'import_character_model':
-            return bpy.ops.file.genshin_import_model
+            return bpy.ops.genshin.import_model
         elif component_name == 'replace_default_materials':
-            return bpy.ops.file.genshin_replace_default_materials
+            return bpy.ops.genshin.replace_default_materials
         elif component_name == 'import_character_textures':
-            return bpy.ops.file.genshin_import_textures
+            return bpy.ops.genshin.import_textures
         elif component_name == 'import_outlines':
-            return bpy.ops.file.genshin_import_outlines
+            return bpy.ops.genshin.import_outlines
         elif component_name == 'setup_geometry_nodes':
-            return setup_wizard.genshin_setup_geometry_nodes.setup_geometry_nodes
+            return bpy.ops.genshin.setup_geometry_nodes
         elif component_name == 'import_outline_lightmaps':
-            return bpy.ops.file.genshin_import_outline_lightmaps
+            return bpy.ops.genshin.import_outline_lightmaps
         elif component_name == 'import_material_data':
-            return bpy.ops.file.genshin_import_material_data
+            return bpy.ops.genshin.import_material_data
         elif component_name == 'fix_mouth_outlines':
-            return setup_wizard.fix_mouth_outlines.fix_face_mouth_outlines_protruding_out
+            return bpy.ops.genshin.fix_mouth_outlines
         elif component_name == 'delete_empties':
-            return setup_wizard.delete_empties.delete_empties
+            return bpy.ops.genshin.delete_empties
         elif component_name ==  'delete_specific_objects':
-            return setup_wizard.delete_specific_objects.delete_specified_objects
+            return bpy.ops.genshin.delete_specific_objects
         elif component_name == 'make_character_upright':
-            return setup_wizard.misc_final_steps.make_character_upright
+            return bpy.ops.genshin.make_character_upright
         elif component_name == 'set_color_management_to_standard':
-            return setup_wizard.misc_final_steps.set_color_management_to_standard
+            return bpy.ops.genshin.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
-            return setup_wizard.setup_head_driver.setup_head_driver
+            return bpy.ops.genshin.setup_head_driver
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

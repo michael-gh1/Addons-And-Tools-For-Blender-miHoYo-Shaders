@@ -13,15 +13,12 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
 
 
 class GI_OT_GenshinImportModel(Operator, ImportHelper):
     """Select the folder with the desired model to import"""
-    bl_idname = "file.genshin_import_model"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_model"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Character Model - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
@@ -86,13 +83,35 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
                     return os.path.join(root, file_name)
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportModel)
+'''
+    This Operator should be executed AFTER importing the character model and 
+    BEFORE importing Genshin materials.
+    That way there is no chance of deleting empties used by Festivity's shaders.
+'''
+class GI_OT_DeleteEmpties(Operator):
+    '''Deletes Empties (except Head Driver's empties)'''
+    bl_idname = 'genshin.delete_empties'
+    bl_label = "Genshin: Delete empties (except Head Driver's empties)"
+
+    next_step_idx: IntProperty()
+    file_directory: StringProperty()  # Unused, but ncessary for import_order to execute/invoke
+    
+    def execute(self, context):
+        scene = bpy.context.scene
+        empties_to_not_delete = [
+            'Head Forward',
+            'Head Up'
+        ]
+        for object in scene.objects:
+            if object.type == 'EMPTY' and object.name not in empties_to_not_delete:
+                bpy.data.objects.remove(object)
+
+        if self.next_step_idx:
+            invoke_next_step(self.next_step_idx)
+        return {'FINISHED'}
 
 
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportModel)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory([
+    GI_OT_GenshinImportModel,
+    GI_OT_DeleteEmpties,
+])

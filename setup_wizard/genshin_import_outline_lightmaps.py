@@ -10,16 +10,13 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-    from setup_wizard.import_order import get_actual_material_name_for_dress
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
 class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
     """Select the folder with the lightmaps to import"""
-    bl_idname = "file.genshin_import_outline_lightmaps"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_outline_lightmaps"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Lightmaps - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
@@ -66,13 +63,5 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
         invoke_next_step(self.next_step_idx, character_model_folder_file_path)
         return {'FINISHED'}
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportOutlineLightmaps)
 
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlineLightmaps)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportOutlineLightmaps)

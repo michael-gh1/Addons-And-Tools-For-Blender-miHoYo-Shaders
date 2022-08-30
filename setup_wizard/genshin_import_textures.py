@@ -10,16 +10,13 @@ from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-    from setup_wizard.import_order import get_actual_material_name_for_dress
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
 class GI_OT_GenshinImportTextures(Operator, ImportHelper):
     """Select the folder with the model's textures to import"""
-    bl_idname = "file.genshin_import_textures"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_textures"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Textures - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
@@ -136,13 +133,4 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
                 return
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportTextures)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportTextures)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportTextures)

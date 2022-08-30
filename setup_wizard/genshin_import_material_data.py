@@ -12,15 +12,12 @@ from bpy.props import StringProperty, IntProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
 
 
 class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
     """Select Material Json Data Files"""
-    bl_idname = "file.genshin_import_material_data"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select Material Json Data Files"
 
     # ImportHelper mixin class uses this
@@ -150,13 +147,4 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
         return (r, g, b, a)
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportMaterialData)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterialData)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)

@@ -10,16 +10,13 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-    from setup_wizard.import_order import get_actual_material_name_for_dress
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
 class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
     """Select the folder with the desired model to import"""
-    bl_idname = "file.genshin_replace_default_materials"  # important since its how we chain file dialogs
+    bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
@@ -95,13 +92,4 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
         return new_shader_node_tree
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinReplaceDefaultMaterials)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinReplaceDefaultMaterials)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinReplaceDefaultMaterials)

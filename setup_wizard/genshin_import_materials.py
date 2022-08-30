@@ -10,10 +10,7 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
 
 BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
@@ -28,7 +25,7 @@ NAMES_OF_GENSHIN_MATERIALS = [
 
 class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
     """Select Festivity's Shaders folder to import materials"""
-    bl_idname = "file.genshin_import_materials"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Materials - Select Festivity's Shaders Folder"
 
     # ImportHelper mixin class uses this
@@ -68,13 +65,4 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         return {'FINISHED'}
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportMaterials)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterials)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterials)

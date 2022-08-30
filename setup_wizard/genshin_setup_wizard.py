@@ -9,9 +9,9 @@ from bpy.types import Operator
 import os
 
 
-class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
+class GI_OT_GenshinSetupWizard(Operator):
     """Setup Wizard Process"""
-    bl_idname = "file.genshin_setup_wizard"
+    bl_idname = "genshin.setup_wizard"
     bl_label = "Genshin: Setup Wizard - Select Festivity's Shaders Folder"
 
     # ImportHelper mixin class uses this
@@ -31,12 +31,8 @@ class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
     )
 
     def execute(self, context):
-        invoke_next_step = setup_dependencies(self.filepath)
-        invoke_next_step(
-            1, 
-            file_path_to_cache = self.filepath, 
-            path_to_streamlined_setup=os.path.join(self.filepath, 'setup_wizard/')
-        )
+        invoke_next_step = setup_dependencies()
+        invoke_next_step(1)
 
         return {'FINISHED'}
 
@@ -44,16 +40,8 @@ class GI_OT_GenshinSetupWizard(Operator, ImportHelper):
 def register():
     bpy.utils.register_class(GI_OT_GenshinSetupWizard)
 
-
-# Specifically done this way because path is dependent on where Blender is started
-# We ask for the filepath to Festivity's shaders that way we can set up the scripts in the path
-def setup_dependencies(filepath):
-    directory = os.path.dirname(filepath)
-
-    import sys
-    if filepath not in sys.path:
-        sys.path.append(directory)
-
+# Legacy import system before this became an Addon. Refactoring necessary.
+def setup_dependencies():
     # Really ugly in my opinion, but this let's us reload modules when we make changes to them without
     # having to restart Blender.
     import importlib
@@ -61,29 +49,46 @@ def setup_dependencies(filepath):
     import setup_wizard.genshin_import_character_model
     import setup_wizard.genshin_import_material_data
     import setup_wizard.genshin_import_materials
+    import setup_wizard.genshin_set_up_geometry_nodes
     import setup_wizard.genshin_import_outline_lightmaps
     import setup_wizard.genshin_import_outlines
     import setup_wizard.genshin_import_textures
     import setup_wizard.genshin_replace_default_materials
+    import setup_wizard.misc_final_steps
+    import setup_wizard.set_up_head_driver
+    import setup_wizard.fix_mouth_outlines
+    import setup_wizard.misc_operations
 
     importlib.reload(setup_wizard.import_order)
     importlib.reload(setup_wizard.genshin_import_character_model)
     importlib.reload(setup_wizard.genshin_import_material_data)
     importlib.reload(setup_wizard.genshin_import_materials)
+    importlib.reload(setup_wizard.genshin_set_up_geometry_nodes)
     importlib.reload(setup_wizard.genshin_import_outline_lightmaps)
     importlib.reload(setup_wizard.genshin_import_outlines)
     importlib.reload(setup_wizard.genshin_import_textures)
     importlib.reload(setup_wizard.genshin_replace_default_materials)
+    importlib.reload(setup_wizard.misc_final_steps)
+    importlib.reload(setup_wizard.set_up_head_driver)
+    importlib.reload(setup_wizard.fix_mouth_outlines)
+    importlib.reload(setup_wizard.misc_operations)
 
     for class_to_register in [
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
+        setup_wizard.genshin_import_character_model.GI_OT_DeleteEmpties,
         setup_wizard.genshin_import_material_data.GI_OT_GenshinImportMaterialData,
         setup_wizard.genshin_import_materials.GI_OT_GenshinImportMaterials,
+        setup_wizard.genshin_set_up_geometry_nodes.GI_OT_SetUpGeometryNodes,
         setup_wizard.genshin_import_outline_lightmaps.GI_OT_GenshinImportOutlineLightmaps,
         setup_wizard.genshin_import_outlines.GI_OT_GenshinImportOutlines,
         setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
         setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
-        ]:
+        setup_wizard.fix_mouth_outlines.GI_OT_FixMouthOutlines,
+        setup_wizard.misc_final_steps.GI_OT_MakeCharacterUpright,
+        setup_wizard.set_up_head_driver.GI_OT_SetUpHeadDriver,
+        setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
+        setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
+    ]:
         try:
             bpy.utils.register_class(class_to_register)
         except ValueError:
@@ -95,20 +100,36 @@ def setup_dependencies(filepath):
 # will be missing the filepath to the scripts folder
 def unregister():
     from setup_wizard.genshin_import_materials import GI_OT_GenshinImportMaterials
-    from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel
+    from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel, GI_OT_DeleteEmpties
     from setup_wizard.genshin_replace_default_materials import GI_OT_GenshinReplaceDefaultMaterials
     from setup_wizard.genshin_import_textures import GI_OT_GenshinImportTextures
+    from setup_wizard.genshin_set_up_geometry_nodes import GI_OT_SetUpGeometryNodes
     from setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
     from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
+    from setup_wizard.misc_final_steps import GI_OT_MakeCharacterUpright
+    from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
+    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
 
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterials)
-    bpy.utils.unregister_class(GI_OT_GenshinImportModel)
-    bpy.utils.unregister_class(GI_OT_GenshinReplaceDefaultMaterials)
-    bpy.utils.unregister_class(GI_OT_GenshinImportTextures)
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlines)
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlineLightmaps)
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterialData)
+    for class_to_unregister in [
+        GI_OT_GenshinImportModel,
+        GI_OT_DeleteEmpties,
+        GI_OT_GenshinImportMaterials,
+        GI_OT_GenshinReplaceDefaultMaterials,
+        GI_OT_GenshinImportTextures,
+        GI_OT_SetUpGeometryNodes,
+        GI_OT_GenshinImportOutlines,
+        GI_OT_GenshinImportOutlineLightmaps,
+        GI_OT_GenshinImportMaterialData,
+        GI_OT_MakeCharacterUpright,
+        GI_OT_SetUpHeadDriver,
+        GI_OT_SetColorManagementToStandard,
+        GI_OT_DeleteSpecificObjects,
+    ]:
+        try:
+            bpy.utils.unregister_class(class_to_unregister)
+        except ValueError:
+            pass  # expected if class is already registered
 
 
 if __name__ == "__main__":

@@ -10,15 +10,12 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-try:
-    from setup_wizard.import_order import invoke_next_step
-except Exception:
-    print('Error! Run the first step of setup_wizard! Need to set up python script paths')
+from setup_wizard.import_order import invoke_next_step
 
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
     """Select the `miHoYo - Outlines` to import Outlines"""
-    bl_idname = "file.genshin_import_outlines"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select with `miHoYo - Outlines`"
 
     # ImportHelper mixin class uses this
@@ -54,13 +51,4 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
         return {'FINISHED'}
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportOutlines)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlines)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportOutlines)
