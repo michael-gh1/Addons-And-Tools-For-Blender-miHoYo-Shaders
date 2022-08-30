@@ -9,10 +9,8 @@ try:
     # having to restart Blender (not quite sure if this works yet in this module!!)
     import importlib
     import setup_wizard.join_body_parts_to_body
-    import setup_wizard.setup_head_driver
 
     importlib.reload(setup_wizard.join_body_parts_to_body)
-    importlib.reload(setup_wizard.setup_head_driver)
 except:
     print('Exception when trying to import required dependency scripts!')
 
@@ -124,6 +122,6 @@ class ComponentFunctionFactory:
         elif component_name == 'set_color_management_to_standard':
             return bpy.ops.file.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
-            return setup_wizard.setup_head_driver.setup_head_driver
+            return bpy.ops.file.setup_head_driver
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

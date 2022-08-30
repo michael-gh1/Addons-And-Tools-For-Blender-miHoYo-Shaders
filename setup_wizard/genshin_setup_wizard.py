@@ -68,6 +68,7 @@ def setup_dependencies(filepath=None):
     import setup_wizard.genshin_import_textures
     import setup_wizard.genshin_replace_default_materials
     import setup_wizard.misc_final_steps
+    import setup_wizard.setup_head_driver
     import setup_wizard.fix_mouth_outlines
     import setup_wizard.misc_operations
 
@@ -81,6 +82,7 @@ def setup_dependencies(filepath=None):
     importlib.reload(setup_wizard.genshin_import_textures)
     importlib.reload(setup_wizard.genshin_replace_default_materials)
     importlib.reload(setup_wizard.misc_final_steps)
+    importlib.reload(setup_wizard.setup_head_driver)
     importlib.reload(setup_wizard.fix_mouth_outlines)
     importlib.reload(setup_wizard.misc_operations)
 
@@ -96,6 +98,7 @@ def setup_dependencies(filepath=None):
         setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
         setup_wizard.fix_mouth_outlines.GI_OT_FixMouthOutlines,
         setup_wizard.misc_final_steps.GI_OT_MakeCharacterUpright,
+        setup_wizard.setup_head_driver.GI_OT_SetUpHeadDriver,
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
     ]:
@@ -118,6 +121,7 @@ def unregister():
     from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
     from setup_wizard.misc_final_steps import GI_OT_MakeCharacterUpright
+    from setup_wizard.setup_head_driver import GI_OT_SetUpHeadDriver
     from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
 
     for class_to_unregister in [
@@ -131,6 +135,7 @@ def unregister():
         GI_OT_GenshinImportOutlineLightmaps,
         GI_OT_GenshinImportMaterialData,
         GI_OT_MakeCharacterUpright,
+        GI_OT_SetUpHeadDriver,
         GI_OT_SetColorManagementToStandard,
         GI_OT_DeleteSpecificObjects,
     ]:
