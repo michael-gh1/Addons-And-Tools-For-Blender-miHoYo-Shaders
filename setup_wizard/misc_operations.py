@@ -16,8 +16,8 @@ except Exception:
 
 class GI_OT_SetColorManagementToStandard(Operator):
     '''Sets Color Management to Standard'''
-    bl_idname = 'file.set_color_management_to_standard'
-    bl_label = 'Set Color Management to Standard'
+    bl_idname = 'genshin.set_color_management_to_standard'
+    bl_label = 'Genshin: Set Color Management to Standard'
 
     next_step_idx: IntProperty()
     file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
@@ -32,8 +32,8 @@ class GI_OT_SetColorManagementToStandard(Operator):
 
 class GI_OT_DeleteSpecificObjects(Operator):
     '''Deletes EffectMesh'''
-    bl_idname = 'file.delete_specific_objects'
-    bl_label = 'Delete EffectMesh'
+    bl_idname = 'genshin.delete_specific_objects'
+    bl_label = 'Genshin: Delete EffectMesh'
 
     next_step_idx: IntProperty()
     file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke

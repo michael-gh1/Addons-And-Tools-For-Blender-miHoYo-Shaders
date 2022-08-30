@@ -21,7 +21,7 @@ except Exception:
 
 class GI_OT_GenshinImportModel(Operator, ImportHelper):
     """Select the folder with the desired model to import"""
-    bl_idname = "file.genshin_import_model"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_model"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Character Model - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
@@ -93,7 +93,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
 '''
 class GI_OT_DeleteEmpties(Operator):
     '''Deletes Empties (except Head Driver's empties)'''
-    bl_idname = 'file.delete_empties'
+    bl_idname = 'genshin.delete_empties'
     bl_label = "Genshin: Delete empties (except Head Driver's empties)"
 
     next_step_idx: IntProperty()

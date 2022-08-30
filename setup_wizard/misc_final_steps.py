@@ -12,8 +12,8 @@ except Exception:
 
 class GI_OT_MakeCharacterUpright(Operator):
     '''Makes the Character Upright'''
-    bl_idname = 'file.make_character_upright'
-    bl_label = 'Makes Character Upright'
+    bl_idname = 'genshin.make_character_upright'
+    bl_label = 'Genshin: Makes Character Upright'
 
     next_step_idx: IntProperty()
     file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke

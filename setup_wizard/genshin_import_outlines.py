@@ -18,7 +18,7 @@ except Exception:
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
     """Select the `miHoYo - Outlines` to import Outlines"""
-    bl_idname = "file.genshin_import_outlines"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select with `miHoYo - Outlines`"
 
     # ImportHelper mixin class uses this

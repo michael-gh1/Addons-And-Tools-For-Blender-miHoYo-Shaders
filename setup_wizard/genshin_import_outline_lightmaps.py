@@ -19,7 +19,7 @@ except Exception:
 
 class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
     """Select the folder with the lightmaps to import"""
-    bl_idname = "file.genshin_import_outline_lightmaps"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_outline_lightmaps"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Lightmaps - Select Character Model Folder"
 
     # ImportHelper mixin class uses this

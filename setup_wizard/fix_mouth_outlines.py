@@ -20,7 +20,7 @@ GEOMETRY_NODES_PREFIX = 'GeometryNodes'
 
 class GI_OT_FixMouthOutlines(Operator):
     '''Fixes mouth outlines by assigning 'Camera' to Face outlines and applies a Depth Offset'''
-    bl_idname = 'file.genshin_fix_mouth_outlines'
+    bl_idname = 'genshin.fix_mouth_outlines'
     bl_label = 'Genshin: Fix Mouth Outlines'
 
     next_step_idx: IntProperty()

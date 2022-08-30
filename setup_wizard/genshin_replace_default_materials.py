@@ -19,7 +19,7 @@ except Exception:
 
 class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
     """Select the folder with the desired model to import"""
-    bl_idname = "file.genshin_replace_default_materials"  # important since its how we chain file dialogs
+    bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
 
     # ImportHelper mixin class uses this

@@ -84,32 +84,32 @@ class ComponentFunctionFactory:
     @staticmethod
     def create_component_function(component_name):
         if component_name == 'import_materials':
-            return bpy.ops.file.genshin_import_materials
+            return bpy.ops.genshin.import_materials
         elif component_name == 'import_character_model':
-            return bpy.ops.file.genshin_import_model
+            return bpy.ops.genshin.import_model
         elif component_name == 'replace_default_materials':
-            return bpy.ops.file.genshin_replace_default_materials
+            return bpy.ops.genshin.replace_default_materials
         elif component_name == 'import_character_textures':
-            return bpy.ops.file.genshin_import_textures
+            return bpy.ops.genshin.import_textures
         elif component_name == 'import_outlines':
-            return bpy.ops.file.genshin_import_outlines
+            return bpy.ops.genshin.import_outlines
         elif component_name == 'setup_geometry_nodes':
-            return bpy.ops.file.genshin_setup_geometry_nodes
+            return bpy.ops.genshin.setup_geometry_nodes
         elif component_name == 'import_outline_lightmaps':
-            return bpy.ops.file.genshin_import_outline_lightmaps
+            return bpy.ops.genshin.import_outline_lightmaps
         elif component_name == 'import_material_data':
-            return bpy.ops.file.genshin_import_material_data
+            return bpy.ops.genshin.import_material_data
         elif component_name == 'fix_mouth_outlines':
-            return bpy.ops.file.genshin_fix_mouth_outlines
+            return bpy.ops.genshin.fix_mouth_outlines
         elif component_name == 'delete_empties':
-            return bpy.ops.file.delete_empties
+            return bpy.ops.genshin.delete_empties
         elif component_name ==  'delete_specific_objects':
-            return bpy.ops.file.delete_specific_objects
+            return bpy.ops.genshin.delete_specific_objects
         elif component_name == 'make_character_upright':
-            return bpy.ops.file.make_character_upright
+            return bpy.ops.genshin.make_character_upright
         elif component_name == 'set_color_management_to_standard':
-            return bpy.ops.file.set_color_management_to_standard
+            return bpy.ops.genshin.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
-            return bpy.ops.file.setup_head_driver
+            return bpy.ops.genshin.setup_head_driver
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

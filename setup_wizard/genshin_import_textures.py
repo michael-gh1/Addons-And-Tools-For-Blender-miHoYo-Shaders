@@ -19,7 +19,7 @@ except Exception:
 
 class GI_OT_GenshinImportTextures(Operator, ImportHelper):
     """Select the folder with the model's textures to import"""
-    bl_idname = "file.genshin_import_textures"  # important since its how we chain file dialogs
+    bl_idname = "genshin.import_textures"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Textures - Select Character Model Folder"
 
     # ImportHelper mixin class uses this
