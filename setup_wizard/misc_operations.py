@@ -20,7 +20,7 @@ class GI_OT_SetColorManagementToStandard(Operator):
     bl_label = 'Set Color Management to Standard'
 
     next_step_idx: IntProperty()
-    file_directory: StringProperty()
+    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         bpy.context.scene.view_settings.view_transform = 'Standard'
@@ -36,7 +36,7 @@ class GI_OT_DeleteSpecificObjects(Operator):
     bl_label = 'Delete EffectMesh'
 
     next_step_idx: IntProperty()
-    file_directory: StringProperty()
+    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         scene = bpy.context.scene
