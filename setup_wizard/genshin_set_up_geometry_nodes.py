@@ -45,7 +45,7 @@ face_meshes = [
     'Face_Eye'
 ]
 
-class GI_OT_SetupGeometryNodes(Operator):
+class GI_OT_SetUpGeometryNodes(Operator):
     '''Setup Geometry Nodes for Outlines'''
     bl_idname = 'file.genshin_setup_geometry_nodes'
     bl_label = 'Genshin: Setup Geometry Nodes'
@@ -77,7 +77,7 @@ class GI_OT_SetupGeometryNodes(Operator):
             geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
             geometry_nodes_modifier.node_group = outlines_node_group
 
-        self.setup_modifier_default_values(geometry_nodes_modifier, mesh)
+        self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier
 
 
@@ -93,7 +93,7 @@ class GI_OT_SetupGeometryNodes(Operator):
                 new_outline_material.name = new_outline_name
 
 
-    def setup_modifier_default_values(self, modifier, mesh):
+    def set_up_modifier_default_values(self, modifier, mesh):
         if modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute'] == 0:
             # Important! Override object key so we don't use the context (ex. selected object)
             bpy.ops.object.geometry_nodes_input_attribute_toggle(
@@ -123,4 +123,4 @@ class GI_OT_SetupGeometryNodes(Operator):
             bpy.context.scene.objects[mesh_name].material_slots.get(material_slot_name).material = material_slot.material
 
 
-register, unregister = bpy.utils.register_classes_factory(GI_OT_SetupGeometryNodes)
+register, unregister = bpy.utils.register_classes_factory(GI_OT_SetUpGeometryNodes)
