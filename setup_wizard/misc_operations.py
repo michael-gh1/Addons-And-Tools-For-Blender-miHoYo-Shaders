@@ -25,8 +25,8 @@ class GI_OT_SetColorManagementToStandard(Operator):
     def execute(self, context):
         bpy.context.scene.view_settings.view_transform = 'Standard'
 
-        if self.next_step_index:
-            invoke_next_step(self.next_step_index)
+        if self.next_step_idx:
+            invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
 
 
