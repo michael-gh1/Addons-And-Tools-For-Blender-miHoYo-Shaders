@@ -62,6 +62,7 @@ def setup_dependencies(filepath=None):
     import setup_wizard.genshin_import_character_model
     import setup_wizard.genshin_import_material_data
     import setup_wizard.genshin_import_materials
+    import setup_wizard.genshin_setup_geometry_nodes
     import setup_wizard.genshin_import_outline_lightmaps
     import setup_wizard.genshin_import_outlines
     import setup_wizard.genshin_import_textures
@@ -71,6 +72,7 @@ def setup_dependencies(filepath=None):
     importlib.reload(setup_wizard.genshin_import_character_model)
     importlib.reload(setup_wizard.genshin_import_material_data)
     importlib.reload(setup_wizard.genshin_import_materials)
+    importlib.reload(setup_wizard.genshin_setup_geometry_nodes)
     importlib.reload(setup_wizard.genshin_import_outline_lightmaps)
     importlib.reload(setup_wizard.genshin_import_outlines)
     importlib.reload(setup_wizard.genshin_import_textures)
@@ -80,6 +82,7 @@ def setup_dependencies(filepath=None):
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
         setup_wizard.genshin_import_material_data.GI_OT_GenshinImportMaterialData,
         setup_wizard.genshin_import_materials.GI_OT_GenshinImportMaterials,
+        setup_wizard.genshin_setup_geometry_nodes.GI_OT_SetupGeometryNodes,
         setup_wizard.genshin_import_outline_lightmaps.GI_OT_GenshinImportOutlineLightmaps,
         setup_wizard.genshin_import_outlines.GI_OT_GenshinImportOutlines,
         setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
@@ -99,6 +102,7 @@ def unregister():
     from setup_wizard.genshin_import_character_model import GI_OT_GenshinImportModel
     from setup_wizard.genshin_replace_default_materials import GI_OT_GenshinReplaceDefaultMaterials
     from setup_wizard.genshin_import_textures import GI_OT_GenshinImportTextures
+    from setup_wizard.genshin_setup_geometry_nodes import GI_OT_SetupGeometryNodes
     from setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
     from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
@@ -107,6 +111,7 @@ def unregister():
     bpy.utils.unregister_class(GI_OT_GenshinImportModel)
     bpy.utils.unregister_class(GI_OT_GenshinReplaceDefaultMaterials)
     bpy.utils.unregister_class(GI_OT_GenshinImportTextures)
+    bpy.utils.unregister_class(GI_OT_SetupGeometryNodes)
     bpy.utils.unregister_class(GI_OT_GenshinImportOutlines)
     bpy.utils.unregister_class(GI_OT_GenshinImportOutlineLightmaps)
     bpy.utils.unregister_class(GI_OT_GenshinImportMaterialData)

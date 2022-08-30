@@ -9,7 +9,6 @@ try:
     # having to restart Blender (not quite sure if this works yet in this module!!)
     import importlib
     import setup_wizard.join_body_parts_to_body
-    import setup_wizard.genshin_setup_geometry_nodes
     import setup_wizard.fix_mouth_outlines
     import setup_wizard.delete_empties
     import setup_wizard.delete_specific_objects
@@ -17,7 +16,6 @@ try:
     import setup_wizard.setup_head_driver
 
     importlib.reload(setup_wizard.join_body_parts_to_body)
-    importlib.reload(setup_wizard.genshin_setup_geometry_nodes)
     importlib.reload(setup_wizard.fix_mouth_outlines)
     importlib.reload(setup_wizard.delete_empties)
     importlib.reload(setup_wizard.delete_specific_objects)
@@ -118,7 +116,7 @@ class ComponentFunctionFactory:
         elif component_name == 'import_outlines':
             return bpy.ops.file.genshin_import_outlines
         elif component_name == 'setup_geometry_nodes':
-            return setup_wizard.genshin_setup_geometry_nodes.setup_geometry_nodes
+            return bpy.ops.file.genshin_setup_geometry_nodes
         elif component_name == 'import_outline_lightmaps':
             return bpy.ops.file.genshin_import_outline_lightmaps
         elif component_name == 'import_material_data':
