@@ -65,13 +65,4 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         return {'FINISHED'}
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportMaterials)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterials)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterials)

@@ -75,9 +75,4 @@ class GI_OT_FixMouthOutlines(Operator):
             bpy.context.scene.objects[mesh_name].material_slots.get(material_slot_name).material = material_slot.material
 
 
-def register():
-    bpy.utils.register_classes_factory(GI_OT_FixMouthOutlines)
-
-
-if __name__ == '__main__':
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_FixMouthOutlines)

@@ -63,13 +63,5 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
         invoke_next_step(self.next_step_idx, character_model_folder_file_path)
         return {'FINISHED'}
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportOutlineLightmaps)
 
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlineLightmaps)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportOutlineLightmaps)

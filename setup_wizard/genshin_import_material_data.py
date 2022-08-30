@@ -147,13 +147,4 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
         return (r, g, b, a)
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportMaterialData)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportMaterialData)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)

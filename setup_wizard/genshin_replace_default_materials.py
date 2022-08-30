@@ -92,13 +92,4 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, ImportHelper):
         return new_shader_node_tree
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinReplaceDefaultMaterials)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinReplaceDefaultMaterials)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinReplaceDefaultMaterials)

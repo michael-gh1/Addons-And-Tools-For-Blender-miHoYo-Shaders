@@ -51,13 +51,4 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
         return {'FINISHED'}
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportOutlines)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportOutlines)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportOutlines)

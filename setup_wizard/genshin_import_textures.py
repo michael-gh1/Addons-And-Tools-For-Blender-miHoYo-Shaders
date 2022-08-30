@@ -133,13 +133,4 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
                 return
 
 
-def register():
-    bpy.utils.register_class(GI_OT_GenshinImportTextures)
-
-
-def unregister():
-    bpy.utils.unregister_class(GI_OT_GenshinImportTextures)
-
-
-if __name__ == "__main__":
-    register()
+register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportTextures)
