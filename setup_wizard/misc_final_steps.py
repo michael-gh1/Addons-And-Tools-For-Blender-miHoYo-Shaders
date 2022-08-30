@@ -38,12 +38,5 @@ def make_character_upright(next_step_index):
         setup_wizard.import_order.invoke_next_step(next_step_index)
 
 
-def set_color_management_to_standard(next_step_index):
-    bpy.context.scene.view_settings.view_transform = 'Standard'
-
-    if next_step_index:
-        setup_wizard.import_order.invoke_next_step(next_step_index)
-
-
 if __name__ == '__main__':
     make_character_upright(None)
