@@ -51,3 +51,9 @@ class GI_OT_DeleteSpecificObjects(Operator):
         if self.next_step_idx:
             invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
+
+
+register, unregister = bpy.utils.register_classes_factory([
+    GI_OT_SetColorManagementToStandard,
+    GI_OT_DeleteSpecificObjects
+])
