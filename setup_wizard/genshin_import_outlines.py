@@ -54,6 +54,8 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
             )
             if cache_enabled:
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_OUTLINES_FILE_PATH, filepath)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
 

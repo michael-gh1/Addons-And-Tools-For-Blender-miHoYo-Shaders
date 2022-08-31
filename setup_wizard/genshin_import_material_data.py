@@ -120,6 +120,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
             self.setup_outline_colors(json_material_data, body_part)
 
         self.report({'INFO'}, 'Imported material data')
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
 

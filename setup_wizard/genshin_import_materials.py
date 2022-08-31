@@ -71,6 +71,8 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         self.report({'INFO'}, 'Imported Shader/Genshin Materials...')
         if not self.next_step_idx and cache_enabled:  # executed from UI
             cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         invoke_next_step(self.next_step_idx, project_root_directory_file_path)
         return {'FINISHED'}
 

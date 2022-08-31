@@ -122,6 +122,8 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
         self.report({'INFO'}, 'Imported textures')
         if not self.next_step_idx and cache_enabled:  # executed from UI
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         invoke_next_step(self.next_step_idx, directory)
         return {'FINISHED'}
     

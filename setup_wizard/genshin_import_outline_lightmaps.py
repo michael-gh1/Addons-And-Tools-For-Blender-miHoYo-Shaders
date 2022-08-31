@@ -69,6 +69,8 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
 
         if not self.next_step_idx and cache_enabled:  # executed from UI
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         invoke_next_step(self.next_step_idx, character_model_folder_file_path)
         return {'FINISHED'}
 
