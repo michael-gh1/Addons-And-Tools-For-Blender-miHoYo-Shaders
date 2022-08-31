@@ -39,8 +39,9 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
+        cache_enabled = context.window_manager.cache_enabled
         directory = self.file_directory \
-            or get_cache().get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
             or os.path.dirname(self.filepath)
 
         if not directory:
@@ -119,8 +120,8 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         self.report({'INFO'}, 'Imported textures')
-        if not self.next_step_idx:  # executed from UI
-            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
+        if not self.next_step_idx and cache_enabled:  # executed from UI
+            cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
         invoke_next_step(self.next_step_idx, directory)
         return {'FINISHED'}
     

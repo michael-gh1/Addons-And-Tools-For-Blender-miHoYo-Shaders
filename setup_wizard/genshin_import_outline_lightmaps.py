@@ -39,8 +39,9 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
+        cache_enabled = context.window_manager.cache_enabled
         character_model_folder_file_path = self.file_directory \
-            or get_cache().get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
             or os.path.dirname(self.filepath)
 
         if not character_model_folder_file_path:
@@ -66,8 +67,8 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
                     bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get('Image Texture').image = img
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
-        if not self.next_step_idx:  # executed from UI
-            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+        if not self.next_step_idx and cache_enabled:  # executed from UI
+            cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
         invoke_next_step(self.next_step_idx, character_model_folder_file_path)
         return {'FINISHED'}
 

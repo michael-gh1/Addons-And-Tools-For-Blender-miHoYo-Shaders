@@ -1,5 +1,13 @@
-from setup_wizard.import_order import get_cache
+import bpy
 from bpy.types import Panel, UILayout
+
+class UI_Properties:
+    @staticmethod
+    def create_custom_ui_properties():
+        bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
+            name = "Cache Enabled",
+            default = False
+        )
 
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
@@ -11,6 +19,16 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
 
     def draw(self, context):
         layout = self.layout
+        window_manager = context.window_manager
+        layout.prop(window_manager, 'cache_enabled')
+
+        box = layout.box()
+        OperatorFactory.create(
+            box,
+            'genshin.clear_cache_operator',
+            'Clear Cache',
+            'TRASH'
+        )
 
 
 class GI_PT_UI_Character_Model_Menu(Panel):
@@ -33,7 +51,7 @@ class GI_PT_UI_Character_Model_Menu(Panel):
             box,
             'genshin.import_model',
             'Import Character Model',
-            'OUTLINER_OB_ARMATURE'
+            'OUTLINER_OB_ARMATURE',
         )
         OperatorFactory.create(
             box,

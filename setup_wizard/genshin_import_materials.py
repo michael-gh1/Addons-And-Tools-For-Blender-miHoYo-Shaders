@@ -48,8 +48,9 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
+        cache_enabled = context.window_manager.cache_enabled
         project_root_directory_file_path = self.file_directory \
-            or get_cache().get(FESTIVITY_ROOT_FOLDER_FILE_PATH) \
+            or get_cache(cache_enabled).get(FESTIVITY_ROOT_FOLDER_FILE_PATH) \
             or os.path.dirname(self.filepath)
 
         if not project_root_directory_file_path:
@@ -68,8 +69,8 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         )
 
         self.report({'INFO'}, 'Imported Shader/Genshin Materials...')
-        if not self.next_step_idx:  # executed from UI
-            cache_using_cache_key(get_cache(), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
+        if not self.next_step_idx and cache_enabled:  # executed from UI
+            cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
         invoke_next_step(self.next_step_idx, project_root_directory_file_path)
         return {'FINISHED'}
 

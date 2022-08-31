@@ -39,9 +39,10 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
 
     def execute(self, context):
         if not bpy.data.node_groups.get('miHoYo - Outlines'):
+            cache_enabled = context.window_manager.cache_enabled
             inner_path = 'NodeTree'
             object_name = 'miHoYo - Outlines'
-            filepath = get_cache().get(FESTIVITY_OUTLINES_FILE_PATH) or self.filepath
+            filepath = get_cache(cache_enabled).get(FESTIVITY_OUTLINES_FILE_PATH) or self.filepath
 
             if not filepath:
                 bpy.ops.genshin.import_outlines('INVOKE_DEFAULT')
@@ -51,7 +52,8 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
                 directory=os.path.join(filepath, inner_path),
                 filename=object_name
             )
-            cache_using_cache_key(get_cache(), FESTIVITY_OUTLINES_FILE_PATH, filepath)
+            if cache_enabled:
+                cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_OUTLINES_FILE_PATH, filepath)
         invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
 

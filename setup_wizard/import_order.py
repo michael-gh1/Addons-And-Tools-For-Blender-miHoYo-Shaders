@@ -23,8 +23,7 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
 
     cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
     if current_step_idx == 1:
-        with open(cache_file_path, 'w') as f:
-            json.dump({}, f)
+        clear_cache()
     cache = get_cache()
 
     if current_step_idx <= 0 or current_step_idx + 1 > len(config):  # +1 because we have a step 0
@@ -54,7 +53,9 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         invoke_next_step(current_step_idx + 1)
 
 
-def get_cache():
+def get_cache(cache_enabled=True):
+    if not cache_enabled:
+        return {}
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
     cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
@@ -88,6 +89,13 @@ def cache_using_cache_key(cache, cache_key, file_path_for_cache):
     cache[cache_key] = file_path_for_cache
     with open(cache_file_path, 'w', encoding='utf-8') as f:
         json.dump(cache, f, ensure_ascii=False, indent=4)
+
+
+def clear_cache():
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
+    with open(cache_file_path, 'w') as f:
+        json.dump({}, f)
 
 
 def get_actual_material_name_for_dress(material_name):
