@@ -12,6 +12,7 @@ CACHE_KEY = 'cache_key'
 
 # Cache Constants
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
+FESTIVITY_OUTLINES_FILE_PATH = 'festivity_outlines_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
 def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
@@ -24,18 +25,15 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
     if current_step_idx == 1:
         with open(cache_file_path, 'w') as f:
             json.dump({}, f)
-    cache_file = open(cache_file_path)
-    cache = json.load(cache_file)
-
+    cache = get_cache()
 
     if current_step_idx <= 0 or current_step_idx + 1 > len(config):  # +1 because we have a step 0
         return
 
+    # Cache only if running SetupWizard using F3 search menu. It should return before reaching here.
     previous_step = config.get(str(current_step_idx - 1))
     if file_path_to_cache and previous_step and previous_step[CACHE_KEY]:
         cache_previous_step_file_path(cache, previous_step, file_path_to_cache)
-        with open(cache_file_path, 'w', encoding='utf-8') as f:
-            json.dump(cache, f, ensure_ascii=False, indent=4)
     
     if config[str(current_step_idx)][ENABLED]:
         cached_file_directory = cache.get(config[str(current_step_idx)][CACHE_KEY], '')
@@ -56,11 +54,40 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         invoke_next_step(current_step_idx + 1)
 
 
+def get_cache():
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
+    if not os.path.exists(cache_file_path):
+        return {}
+    cache_file = open(cache_file_path)
+    cache = json.load(cache_file)
+    return cache
+
+
 def cache_previous_step_file_path(cache, last_step, file_path_to_cache):
+    if not file_path_to_cache:
+        return
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
     step_cache_key = last_step.get(CACHE_KEY)
 
     print(f'Assigning `{step_cache_key}:{file_path_to_cache}` in cache')
     cache[step_cache_key] = file_path_to_cache
+    with open(cache_file_path, 'w', encoding='utf-8') as f:
+        json.dump(cache, f, ensure_ascii=False, indent=4)
+
+
+def cache_using_cache_key(cache, cache_key, file_path_for_cache):
+    if not file_path_for_cache:
+        return
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
+
+    print(f'Assigning `{cache_key}:{file_path_for_cache}` in cache')
+    cache[cache_key] = file_path_for_cache
+    with open(cache_file_path, 'w', encoding='utf-8') as f:
+        json.dump(cache, f, ensure_ascii=False, indent=4)
 
 
 def get_actual_material_name_for_dress(material_name):

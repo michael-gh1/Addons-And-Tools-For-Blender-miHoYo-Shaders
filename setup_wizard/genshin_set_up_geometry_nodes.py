@@ -52,6 +52,7 @@ class GI_OT_SetUpGeometryNodes(Operator):
 
     def execute(self, context):
         self.setup_geometry_nodes(self.next_step_idx)
+        self.report({'INFO'}, 'Successfully set up geometry nodes (for outlines)')
         return {'FINISHED'}
 
     def setup_geometry_nodes(self, next_step_idx):

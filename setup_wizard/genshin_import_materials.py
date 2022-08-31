@@ -10,7 +10,7 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
 
 BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
@@ -48,7 +48,14 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
-        project_root_directory_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
+        project_root_directory_file_path = self.file_directory \
+            or get_cache().get(FESTIVITY_ROOT_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.filepath)
+
+        if not project_root_directory_file_path:
+            bpy.ops.genshin.import_materials('INVOKE_DEFAULT')
+            return {'FINISHED'}
+
         directory_with_blend_file_path = os.path.join(
             project_root_directory_file_path,
             BLEND_FILE_WITH_GENSHIN_MATERIALS,
@@ -61,6 +68,8 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         )
 
         self.report({'INFO'}, 'Imported Shader/Genshin Materials...')
+        if not self.next_step_idx:  # executed from UI
+            cache_using_cache_key(get_cache(), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
         invoke_next_step(self.next_step_idx, project_root_directory_file_path)
         return {'FINISHED'}
 

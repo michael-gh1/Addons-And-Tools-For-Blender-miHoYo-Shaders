@@ -10,7 +10,7 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
 
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
@@ -41,12 +41,17 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
         if not bpy.data.node_groups.get('miHoYo - Outlines'):
             inner_path = 'NodeTree'
             object_name = 'miHoYo - Outlines'
+            filepath = get_cache().get(FESTIVITY_OUTLINES_FILE_PATH) or self.filepath
 
+            if not filepath:
+                bpy.ops.genshin.import_outlines('INVOKE_DEFAULT')
+                return {'FINISHED'}
             bpy.ops.wm.append(
-                filepath=os.path.join(self.filepath, inner_path, object_name),
-                directory=os.path.join(self.filepath, inner_path),
+                filepath=os.path.join(filepath, inner_path, object_name),
+                directory=os.path.join(filepath, inner_path),
                 filename=object_name
             )
+            cache_using_cache_key(get_cache(), FESTIVITY_OUTLINES_FILE_PATH, filepath)
         invoke_next_step(self.next_step_idx)
         return {'FINISHED'}
 

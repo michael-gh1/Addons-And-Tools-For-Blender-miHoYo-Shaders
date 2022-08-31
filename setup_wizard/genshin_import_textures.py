@@ -10,7 +10,7 @@ from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
 from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
@@ -39,7 +39,13 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
-        directory = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
+        directory = self.file_directory \
+            or get_cache().get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.filepath)
+
+        if not directory:
+            bpy.ops.genshin.import_textures('INVOKE_DEFAULT')
+            return {'FINISHED'}
         
         for name, folder, files in os.walk(directory):
             for file in files :
@@ -113,6 +119,8 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper):
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         self.report({'INFO'}, 'Imported textures')
+        if not self.next_step_idx:  # executed from UI
+            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
         invoke_next_step(self.next_step_idx, directory)
         return {'FINISHED'}
     

@@ -13,7 +13,8 @@ from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import cache_using_cache_key, invoke_next_step
+from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
 
 
 class GI_OT_GenshinImportModel(Operator, ImportHelper):
@@ -41,7 +42,11 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
     file_directory: StringProperty()
 
     def execute(self, context):
-        character_model_folder_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
+        character_model_folder_file_path = self.file_directory or os.path.dirname(self.filepath)
+
+        if not character_model_folder_file_path:
+            bpy.ops.genshin.import_model('INVOKE_DEFAULT')
+            return {'FINISHED'}
 
         self.import_character_model(character_model_folder_file_path)
         self.reset_pose_location_and_rotation()
@@ -55,6 +60,8 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
             if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
                 object.data.uv_layers.new(name='UV1')
 
+        if not self.next_step_idx:  # executed from UI
+            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
         invoke_next_step(self.next_step_idx, character_model_folder_file_path)
         return {'FINISHED'}
 

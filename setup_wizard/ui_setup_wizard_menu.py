@@ -1,4 +1,4 @@
-import bpy
+from setup_wizard.import_order import get_cache
 from bpy.types import Panel, UILayout
 
 
@@ -167,8 +167,15 @@ class GI_PT_UI_Misc_Menu(Panel):
 '''
 class OperatorFactory:
     @staticmethod
-    def create(ui_object: UILayout, operator: str, text: str, icon: str):
-        ui_object.operator(
+    def create(
+        ui_object: UILayout,
+        operator: str,
+        text: str,
+        icon: str,
+        operator_context='EXEC_DEFAULT'
+    ):
+        ui_object.operator_context = operator_context
+        ui_object = ui_object.operator(
             operator=operator,
             text=text,
             icon=icon,

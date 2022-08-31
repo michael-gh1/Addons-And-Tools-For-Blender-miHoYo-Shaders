@@ -76,8 +76,11 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
     }
 
     def execute(self, context):
-        material_data_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
         directory_file_path = os.path.dirname(self.filepath)
+
+        if not self.filepath or not self.files:
+            bpy.ops.genshin.import_material_data('INVOKE_DEFAULT')
+            return {'FINISHED'}
 
         for file in self.files:
             body_part = PurePosixPath(file.name).stem.split('_')[-1]
