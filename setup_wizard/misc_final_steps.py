@@ -3,8 +3,14 @@
 import bpy
 from bpy.types import Operator
 
-from setup_wizard.import_order import invoke_next_step
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.import_order import NextStepInvoker
+from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+
+
+class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
+    '''Finish Setup'''
+    bl_idname = 'genshin.finish_setup'
+    bl_label = 'Genshin: Finish Setup (UI)'
 
 
 class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
@@ -39,7 +45,11 @@ class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
         # )  # from @M4urlcl0
 
         if self.next_step_idx:
-            invoke_next_step(self.next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
         return {'FINISHED'}
 
 

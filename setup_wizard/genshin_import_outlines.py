@@ -10,8 +10,14 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
+from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+
+
+class GI_OT_SetUpOutlines(Operator, BasicSetupUIOperator):
+    '''Sets Up Outlines'''
+    bl_idname = 'genshin.set_up_outlines'
+    bl_label = 'Genshin: Set Up Outlines (UI)'
 
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperties):
@@ -43,7 +49,13 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
             filepath = get_cache(cache_enabled).get(FESTIVITY_OUTLINES_FILE_PATH) or self.filepath
 
             if not filepath:
-                bpy.ops.genshin.import_outlines('INVOKE_DEFAULT')
+                bpy.ops.genshin.import_outlines(
+                    'INVOKE_DEFAULT',
+                    next_step_idx=self.next_step_idx, 
+                    file_directory=self.file_directory,
+                    invoker_type=self.invoker_type,
+                    high_level_step_name=self.high_level_step_name
+                )
                 return {'FINISHED'}
             bpy.ops.wm.append(
                 filepath=os.path.join(filepath, inner_path, object_name),
@@ -54,7 +66,11 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_OUTLINES_FILE_PATH, filepath)
 
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
-        invoke_next_step(self.next_step_idx)
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type,
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
 

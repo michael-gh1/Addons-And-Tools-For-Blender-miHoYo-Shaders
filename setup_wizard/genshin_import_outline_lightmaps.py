@@ -10,7 +10,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
+from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.models import CustomOperatorProperties
 
@@ -43,7 +43,13 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
             or os.path.dirname(self.filepath)
 
         if not character_model_folder_file_path:
-            bpy.ops.genshin.import_outline_lightmaps('INVOKE_DEFAULT')
+            bpy.ops.genshin.import_outline_lightmaps(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.next_step_idx, 
+                file_directory=self.file_directory,
+                invoker_type=self.invoker_type,
+                high_level_step_name=self.high_level_step_name
+            )
             return {'FINISHED'}
         
         for name, folder, files in os.walk(character_model_folder_file_path):
@@ -69,7 +75,12 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
 
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
-        invoke_next_step(self.next_step_idx, character_model_folder_file_path)
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            file_path_to_cache=character_model_folder_file_path,
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
 

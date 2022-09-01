@@ -1,11 +1,9 @@
 # Written by Mken from Discord
 
 import bpy
-
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
 
 
@@ -18,17 +16,18 @@ class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
         bpy.context.scene.view_settings.view_transform = 'Standard'
 
         if self.next_step_idx:
-            invoke_next_step(self.next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
         return {'FINISHED'}
 
 
-class GI_OT_DeleteSpecificObjects(Operator):
+class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
     '''Deletes EffectMesh'''
     bl_idname = 'genshin.delete_specific_objects'
     bl_label = 'Genshin: Delete EffectMesh'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         scene = bpy.context.scene
@@ -41,7 +40,11 @@ class GI_OT_DeleteSpecificObjects(Operator):
                 bpy.data.objects.remove(object)
 
         if self.next_step_idx:
-            invoke_next_step(self.next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
         return {'FINISHED'}
 
 

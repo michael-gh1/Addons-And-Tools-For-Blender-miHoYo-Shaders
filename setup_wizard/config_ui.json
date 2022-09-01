@@ -1,0 +1,29 @@
+{
+    "ui_order": {
+        "GENSHIN_OT_set_up_character": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_character",
+            "import_character_model", 
+            "delete_empties"
+        ],
+        "GENSHIN_OT_set_up_materials": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_materials",
+            "import_materials",
+            "replace_default_materials",
+            "import_character_textures"
+        ],
+        "GENSHIN_OT_set_up_outlines": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_outlines",
+            "import_outlines",
+            "setup_geometry_nodes",
+            "import_outline_lightmaps",
+            "import_material_data"
+        ],
+        "GENSHIN_OT_finish_setup": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_final_steps",
+            "make_character_upright",
+            "setup_head_driver",
+            "set_color_management_to_standard",
+            "delete_specific_objects"
+        ]
+    }
+}

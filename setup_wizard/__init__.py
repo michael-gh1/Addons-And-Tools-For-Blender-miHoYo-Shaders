@@ -17,9 +17,14 @@ import bpy
 import importlib
 import setup_wizard.cache_operator
 from setup_wizard.cache_operator import ClearCacheOperator
+from setup_wizard.genshin_import_materials import GI_OT_SetUpMaterials
+from setup_wizard.genshin_import_outlines import GI_OT_SetUpOutlines
+from setup_wizard.misc_final_steps import GI_OT_FinishSetup
 
 import setup_wizard.ui_setup_wizard_menu
 from setup_wizard.ui_setup_wizard_menu import UI_Properties, GI_PT_Setup_Wizard_UI_Layout, GI_PT_UI_Character_Model_Menu, GI_PT_UI_Materials_Menu, GI_PT_UI_Outlines_Menu, GI_PT_UI_Misc_Setup_Menu, GI_PT_UI_Misc_Menu
+
+from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
 import setup_wizard.genshin_setup_wizard
 from setup_wizard.genshin_setup_wizard import register as register_genshin_setup_wizard, setup_dependencies
@@ -40,6 +45,10 @@ classes = [
     GI_PT_UI_Outlines_Menu, 
     GI_PT_UI_Misc_Setup_Menu,
     GI_PT_UI_Misc_Menu,
+    GI_OT_SetUpCharacter,
+    GI_OT_SetUpMaterials,
+    GI_OT_SetUpOutlines,
+    GI_OT_FinishSetup,
     ClearCacheOperator
 ]
 

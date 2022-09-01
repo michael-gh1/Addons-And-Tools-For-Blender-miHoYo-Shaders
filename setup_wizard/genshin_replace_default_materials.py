@@ -7,7 +7,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.models import CustomOperatorProperties
 
@@ -36,7 +36,11 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
     def execute(self, context):
         self.replace_default_materials_with_genshin_materials()
 
-        invoke_next_step(self.next_step_idx)
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
     
     def replace_default_materials_with_genshin_materials(self):

@@ -42,7 +42,7 @@ class GI_PT_UI_Character_Model_Menu(Panel):
         layout = self.layout
         OperatorFactory.create(
             layout,
-            'genshin.import_model',  # TODO:  Update
+            'genshin.set_up_character',
             'Set Up Character',
             icon='OUTLINER_OB_ARMATURE'
         )
@@ -75,7 +75,7 @@ class GI_PT_UI_Materials_Menu(Panel):
 
         OperatorFactory.create(
             layout,
-            'genshin.import_model',
+            'genshin.set_up_materials',
             'Set Up Materials',
             icon='MATERIAL'
         )
@@ -113,7 +113,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
         layout = self.layout
         OperatorFactory.create(
             layout,
-            'genshin.import_model',  # TODO: Update
+            'genshin.set_up_outlines',
             'Set Up Outlines',
             icon='GEOMETRY_NODES'
         )
@@ -157,7 +157,7 @@ class GI_PT_UI_Misc_Setup_Menu(Panel):
         layout = self.layout
         OperatorFactory.create(
             layout,
-            'genshin.import_model',  # TODO: Update
+            'genshin.finish_setup',
             'Finish Setup',
             icon='CHECKMARK'
         )

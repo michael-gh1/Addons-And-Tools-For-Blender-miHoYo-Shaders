@@ -12,7 +12,7 @@ from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
 
 
@@ -78,7 +78,13 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         directory_file_path = os.path.dirname(self.filepath)
 
         if not self.filepath or not self.files:
-            bpy.ops.genshin.import_material_data('INVOKE_DEFAULT')
+            bpy.ops.genshin.import_material_data(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.next_step_idx, 
+                file_directory=self.file_directory,
+                invoker_type=self.invoker_type,
+                high_level_step_name=self.high_level_step_name
+            )
             return {'FINISHED'}
 
         for file in self.files:
@@ -120,7 +126,11 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
 
         self.report({'INFO'}, 'Imported material data')
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
-        invoke_next_step(self.next_step_idx)
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
     def setup_outline_colors(self, json_material_data, body_part):
