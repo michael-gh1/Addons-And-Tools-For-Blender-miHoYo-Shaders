@@ -85,7 +85,6 @@ class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.active = False
 
 
 class GI_PT_UI_Character_Model_Menu(Panel):
