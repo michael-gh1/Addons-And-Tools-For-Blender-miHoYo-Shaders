@@ -21,14 +21,64 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         layout = self.layout
         window_manager = context.window_manager
         layout.prop(window_manager, 'cache_enabled')
+        sub_layout = layout.box()
 
-        box = layout.box()
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.clear_cache_operator',
             'Clear Cache',
             'TRASH'
         )
+
+
+class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
+    bl_label = 'Basic Setup'
+    bl_idname = 'GI_PT_UI_Basic_Setup_Layout'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+
+    def draw(self, context):
+        layout = self.layout
+        sub_layout = layout
+
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.set_up_character',
+            'Set Up Character',
+            icon='OUTLINER_OB_ARMATURE'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.set_up_materials',
+            'Set Up Materials',
+            icon='MATERIAL'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.set_up_outlines',
+            'Set Up Outlines',
+            icon='GEOMETRY_NODES'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.finish_setup',
+            'Finish Setup',
+            icon='CHECKMARK'
+        )
+
+
+class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
+    bl_label = 'Advanced Setup'
+    bl_idname = 'GI_PT_UI_Advanced_Setup_Layout'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.active = False
 
 
 class GI_PT_UI_Character_Model_Menu(Panel):
@@ -36,27 +86,20 @@ class GI_PT_UI_Character_Model_Menu(Panel):
     bl_idname = 'GI_PT_UI_Character_Model_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
 
     def draw(self, context):
         layout = self.layout
-        OperatorFactory.create(
-            layout,
-            'genshin.set_up_character',
-            'Set Up Character',
-            icon='OUTLINER_OB_ARMATURE'
-        )
-        layout.label(text='Character Model Actions:')
+        sub_layout = layout.column()
 
-        box = layout.box()
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_model',
             'Import Character Model',
             'OUTLINER_OB_ARMATURE',
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.delete_empties',
             'Delete Empties',
             'TRASH'
@@ -68,34 +111,26 @@ class GI_PT_UI_Materials_Menu(Panel):
     bl_idname = 'GI_PT_UI_Materials_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
 
     def draw(self, context):
         layout = self.layout
+        sub_layout = layout.column()
 
         OperatorFactory.create(
-            layout,
-            'genshin.set_up_materials',
-            'Set Up Materials',
-            icon='MATERIAL'
-        )
-        layout.label(text='Material Actions:')
-
-        box = layout.box()
-        OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_materials',
             'Import Genshin Materials',
             'MATERIAL'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.replace_default_materials',
             'Replace Default Materials',
             'ARROW_LEFTRIGHT'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_textures',
             'Import Character Textures',
             'TEXTURE'
@@ -107,100 +142,74 @@ class GI_PT_UI_Outlines_Menu(Panel):
     bl_idname = 'GI_PT_UI_Outlines_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
 
     def draw(self, context):
         layout = self.layout
-        OperatorFactory.create(
-            layout,
-            'genshin.set_up_outlines',
-            'Set Up Outlines',
-            icon='GEOMETRY_NODES'
-        )
-        layout.label(text='Outline Actions:')
+        sub_layout = layout.column()
 
-        box = layout.box()
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_outlines',
             'Import Outlines',
             'FILE_FOLDER'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.setup_geometry_nodes',
             'Set Up Geometry Nodes',
             'GEOMETRY_NODES'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_outline_lightmaps',
             'Import Outline Lightmaps',
             'FILE_FOLDER'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.import_material_data',
             'Import Material Data',
             'FILE'
         )
 
 
-class GI_PT_UI_Misc_Setup_Menu(Panel):
+class GI_PT_UI_Finish_Setup_Menu(Panel):
     bl_label = 'Misc Setup Menu'
     bl_idname = 'GI_PT_UI_Misc_Setup_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
 
     def draw(self, context):
         layout = self.layout
-        OperatorFactory.create(
-            layout,
-            'genshin.finish_setup',
-            'Finish Setup',
-            icon='CHECKMARK'
-        )
-        layout.label(text='Misc Setup Actions:')
+        sub_layout = layout.column()
 
-        box = layout.box()
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.make_character_upright',
             'Fix Transformations',
             'OBJECT_DATA'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.setup_head_driver',
             'Set Up Head Driver',
             'CONSTRAINT'
         )
-
-
-class GI_PT_UI_Misc_Menu(Panel):
-    bl_label = 'Misc Menu'
-    bl_idname = 'GI_PT_UI_Misc_Menu'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
-
-    def draw(self, context):
-        layout = self.layout
-        
-        box = layout.box()
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.set_color_management_to_standard',
             'Set Color Mgmt to Standard',
             'SCENE'
         )
         OperatorFactory.create(
-            box,
+            sub_layout,
             'genshin.delete_specific_objects',
             'Delete EffectMesh',
             'TRASH'
         )
+
 
 
 '''
