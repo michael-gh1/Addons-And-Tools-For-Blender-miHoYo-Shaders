@@ -40,12 +40,14 @@ class GI_PT_UI_Character_Model_Menu(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # layout.operator(
-        #     operator='', 
-        #     text='Setup Character Model',
-        #     icon='OUTLINER_OB_ARMATURE'
-        # )
-        
+        OperatorFactory.create(
+            layout,
+            'genshin.import_model',  # TODO:  Update
+            'Set Up Character',
+            icon='OUTLINER_OB_ARMATURE'
+        )
+        layout.label(text='Character Model Actions:')
+
         box = layout.box()
         OperatorFactory.create(
             box,
@@ -70,7 +72,15 @@ class GI_PT_UI_Materials_Menu(Panel):
 
     def draw(self, context):
         layout = self.layout
-        
+
+        OperatorFactory.create(
+            layout,
+            'genshin.import_model',
+            'Set Up Materials',
+            icon='MATERIAL'
+        )
+        layout.label(text='Material Actions:')
+
         box = layout.box()
         OperatorFactory.create(
             box,
@@ -101,7 +111,14 @@ class GI_PT_UI_Outlines_Menu(Panel):
 
     def draw(self, context):
         layout = self.layout
-        
+        OperatorFactory.create(
+            layout,
+            'genshin.import_model',  # TODO: Update
+            'Set Up Outlines',
+            icon='GEOMETRY_NODES'
+        )
+        layout.label(text='Outline Actions:')
+
         box = layout.box()
         OperatorFactory.create(
             box,
@@ -138,7 +155,14 @@ class GI_PT_UI_Misc_Setup_Menu(Panel):
 
     def draw(self, context):
         layout = self.layout
-        
+        OperatorFactory.create(
+            layout,
+            'genshin.import_model',  # TODO: Update
+            'Finish Setup',
+            icon='CHECKMARK'
+        )
+        layout.label(text='Misc Setup Actions:')
+
         box = layout.box()
         OperatorFactory.create(
             box,
