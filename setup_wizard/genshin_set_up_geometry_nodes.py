@@ -1,10 +1,10 @@
 # Written by Mken from Discord
 
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 # Constants
 NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
@@ -42,13 +42,10 @@ face_meshes = [
     'Face_Eye'
 ]
 
-class GI_OT_SetUpGeometryNodes(Operator):
+class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
     '''Sets Up Geometry Nodes for Outlines'''
     bl_idname = 'genshin.setup_geometry_nodes'
     bl_label = 'Genshin: Setup Geometry Nodes'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         self.setup_geometry_nodes(self.next_step_idx)

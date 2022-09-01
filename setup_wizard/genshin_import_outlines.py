@@ -6,14 +6,15 @@ import bpy
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
 from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
+class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperties):
     """Select the `miHoYo - Outlines.blend` file to import Outlines"""
     bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select `miHoYo - Outlines.blend`"
@@ -33,9 +34,6 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
 
     def execute(self, context):
         if not bpy.data.node_groups.get('miHoYo - Outlines'):

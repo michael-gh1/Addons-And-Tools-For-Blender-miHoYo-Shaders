@@ -1,21 +1,18 @@
 # Written by Mken from Discord
 
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 HEAD_DRIVER_OBJECT_NAME = 'Head Driver'
 
 
-class GI_OT_SetUpHeadDriver(Operator):
+class GI_OT_SetUpHeadDriver(Operator, CustomOperatorProperties):
     '''Sets up Head Driver'''
     bl_idname = 'genshin.setup_head_driver'
     bl_label = 'Genshin: Setup HeadDriver'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         head_driver_object = bpy.data.objects.get(HEAD_DRIVER_OBJECT_NAME)

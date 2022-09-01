@@ -6,15 +6,16 @@ import bpy
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
 from setup_wizard.import_order import get_actual_material_name_for_dress
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
+class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperatorProperties):
     """Select the folder with the character's lightmaps to import"""
     bl_idname = "genshin.import_outline_lightmaps"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Lightmaps - Select Character Model Folder"
@@ -34,9 +35,6 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled

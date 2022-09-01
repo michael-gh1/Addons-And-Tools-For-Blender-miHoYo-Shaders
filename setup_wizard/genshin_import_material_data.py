@@ -8,14 +8,15 @@ from pathlib import PurePosixPath
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty, CollectionProperty
+from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
+class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProperties):
     """Select the Character Material Data Json Files for Outlines"""
     bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select Material Json Data Files"
@@ -36,8 +37,6 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
     files: CollectionProperty(type=PropertyGroup)
 
     local_material_mapping = {

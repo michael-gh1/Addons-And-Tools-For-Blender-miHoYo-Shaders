@@ -6,11 +6,12 @@ import bpy
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
 from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, cache_using_cache_key, get_cache, invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
@@ -23,7 +24,7 @@ NAMES_OF_GENSHIN_MATERIALS = [
 ]
 
 
-class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
+class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorProperties):
     """Select Festivity's Shaders folder to import materials"""
     bl_idname = "genshin.import_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Materials - Select Festivity's Shaders Folder"
@@ -43,9 +44,6 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled

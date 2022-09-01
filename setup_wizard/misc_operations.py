@@ -2,22 +2,17 @@
 
 import bpy
 
-# ImportHelper is a helper class, defines filename and
-# invoke() function which calls the file selector.
-from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_SetColorManagementToStandard(Operator):
+class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
     '''Sets Color Management to Standard'''
     bl_idname = 'genshin.set_color_management_to_standard'
     bl_label = 'Genshin: Set Color Management to Standard'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         bpy.context.scene.view_settings.view_transform = 'Standard'

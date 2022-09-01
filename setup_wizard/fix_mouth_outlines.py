@@ -1,10 +1,10 @@
 # Written by Mken from Discord
 
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 CAMERA_INPUT = 'Input_4'
 DEPTH_OFFSET_INPUT = 'Input_8'
@@ -15,13 +15,10 @@ FACE_EYE_MESH_NAME = 'Face_Eye'
 GEOMETRY_NODES_PREFIX = 'GeometryNodes'
 
 
-class GI_OT_FixMouthOutlines(Operator):
+class GI_OT_FixMouthOutlines(Operator, CustomOperatorProperties):
     '''Fixes mouth outlines by assigning 'Camera' to Face outlines and applies a Depth Offset'''
     bl_idname = 'genshin.fix_mouth_outlines'
     bl_label = 'Genshin: Fix Mouth Outlines'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
 
     def execute(self, context):
         self.fix_face_mouth_outlines_protruding_out(self.next_step_idx)

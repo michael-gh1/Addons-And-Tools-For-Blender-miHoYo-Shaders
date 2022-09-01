@@ -3,18 +3,16 @@
 
 import bpy
 
-# ImportHelper is a helper class, defines filename and
-# invoke() function which calls the file selector.
-from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
 from setup_wizard.import_order import invoke_next_step
 from setup_wizard.import_order import get_actual_material_name_for_dress
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_GenshinReplaceDefaultMaterials(Operator):
+class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
     """Swaps out the default character materials with Festivity's Shaders materials"""
     bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
@@ -34,9 +32,6 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator):
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
 
     def execute(self, context):
         self.replace_default_materials_with_genshin_materials()

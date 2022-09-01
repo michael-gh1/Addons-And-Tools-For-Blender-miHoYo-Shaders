@@ -1,19 +1,16 @@
 # Written by Mken from Discord with support from M4urlcl0!
 
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
 from setup_wizard.import_order import invoke_next_step
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_FixTransformations(Operator):
+class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
     '''Makes the Character Upright and Fixes Scale'''
     bl_idname = 'genshin.make_character_upright'
     bl_label = 'Genshin: Makes Character Upright and Fixes Scale'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
 
     def execute(self, context):
         bpy.ops.object.select_all(action='DESELECT')
