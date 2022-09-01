@@ -15,7 +15,7 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
 class GI_OT_GenshinReplaceDefaultMaterials(Operator):
-    """Select the folder with the desired model to import"""
+    """Swaps out the default character materials with Festivity's Shaders materials"""
     bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
 

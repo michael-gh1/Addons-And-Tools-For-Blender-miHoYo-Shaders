@@ -16,7 +16,7 @@ from setup_wizard.import_order import invoke_next_step
 
 
 class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
-    """Select Material Json Data Files"""
+    """Select the Character Material Data Json Files for Outlines"""
     bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select Material Json Data Files"
 

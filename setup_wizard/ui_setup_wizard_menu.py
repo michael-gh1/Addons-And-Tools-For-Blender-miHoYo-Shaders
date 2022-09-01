@@ -6,7 +6,7 @@ class UI_Properties:
     def create_custom_ui_properties():
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
-            default = False
+            default = True
         )
 
 
@@ -143,7 +143,7 @@ class GI_PT_UI_Misc_Setup_Menu(Panel):
         OperatorFactory.create(
             box,
             'genshin.make_character_upright',
-            'Make Character Upright',
+            'Fix Transformations',
             'OBJECT_DATA'
         )
         OperatorFactory.create(

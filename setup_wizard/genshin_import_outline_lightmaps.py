@@ -15,7 +15,7 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 
 
 class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper):
-    """Select the folder with the lightmaps to import"""
+    """Select the folder with the character's lightmaps to import"""
     bl_idname = "genshin.import_outline_lightmaps"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Lightmaps - Select Character Model Folder"
 

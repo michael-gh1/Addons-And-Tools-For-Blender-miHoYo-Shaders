@@ -14,9 +14,9 @@ from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, cache_using_
 
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper):
-    """Select the `miHoYo - Outlines` to import Outlines"""
+    """Select the `miHoYo - Outlines.blend` file to import Outlines"""
     bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Select with `miHoYo - Outlines`"
+    bl_label = "Genshin: Select `miHoYo - Outlines.blend`"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"

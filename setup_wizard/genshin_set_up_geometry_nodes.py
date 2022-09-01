@@ -43,7 +43,7 @@ face_meshes = [
 ]
 
 class GI_OT_SetUpGeometryNodes(Operator):
-    '''Setup Geometry Nodes for Outlines'''
+    '''Sets Up Geometry Nodes for Outlines'''
     bl_idname = 'genshin.setup_geometry_nodes'
     bl_label = 'Genshin: Setup Geometry Nodes'
 

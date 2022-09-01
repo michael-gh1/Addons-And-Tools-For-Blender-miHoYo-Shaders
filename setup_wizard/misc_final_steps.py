@@ -7,10 +7,10 @@ from bpy.types import Operator
 from setup_wizard.import_order import invoke_next_step
 
 
-class GI_OT_MakeCharacterUpright(Operator):
-    '''Makes the Character Upright'''
+class GI_OT_FixTransformations(Operator):
+    '''Makes the Character Upright and Fixes Scale'''
     bl_idname = 'genshin.make_character_upright'
-    bl_label = 'Genshin: Makes Character Upright'
+    bl_label = 'Genshin: Makes Character Upright and Fixes Scale'
 
     next_step_idx: IntProperty()
     file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
@@ -46,4 +46,4 @@ class GI_OT_MakeCharacterUpright(Operator):
         return {'FINISHED'}
 
 
-register, unregister = bpy.utils.register_classes_factory(GI_OT_MakeCharacterUpright)
+register, unregister = bpy.utils.register_classes_factory(GI_OT_FixTransformations)

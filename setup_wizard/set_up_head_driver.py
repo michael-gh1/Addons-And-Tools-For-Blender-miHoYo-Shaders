@@ -10,7 +10,7 @@ HEAD_DRIVER_OBJECT_NAME = 'Head Driver'
 
 
 class GI_OT_SetUpHeadDriver(Operator):
-    '''Set up Head Driver'''
+    '''Sets up Head Driver'''
     bl_idname = 'genshin.setup_head_driver'
     bl_label = 'Genshin: Setup HeadDriver'
 
