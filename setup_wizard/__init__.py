@@ -29,7 +29,7 @@ from setup_wizard.ui_setup_wizard_menu import UI_Properties, GI_PT_Setup_Wizard_
 from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
 import setup_wizard.genshin_setup_wizard
-from setup_wizard.genshin_setup_wizard import register as register_genshin_setup_wizard, setup_dependencies
+from setup_wizard.genshin_setup_wizard import GI_OT_GenshinSetupWizardUI, register as register_genshin_setup_wizard, setup_dependencies
 
 register_genshin_setup_wizard()
 setup_dependencies()
@@ -48,6 +48,7 @@ classes = [
     GI_PT_UI_Materials_Menu, 
     GI_PT_UI_Outlines_Menu, 
     GI_PT_UI_Finish_Setup_Menu,
+    GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,
     GI_OT_SetUpMaterials,
     GI_OT_SetUpOutlines,

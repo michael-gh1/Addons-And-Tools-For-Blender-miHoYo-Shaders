@@ -20,11 +20,18 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
     def draw(self, context):
         layout = self.layout
         window_manager = context.window_manager
-        layout.prop(window_manager, 'cache_enabled')
-        sub_layout = layout.box()
 
+        sub_layout = layout.box()
+        row = layout.row()
+        row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             sub_layout,
+            'genshin.setup_wizard_ui',
+            'Run Entire Setup',
+            'PLAY'
+        )
+        OperatorFactory.create(
+            row,
             'genshin.clear_cache_operator',
             'Clear Cache',
             'TRASH'
@@ -36,11 +43,11 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_category = "Genshin"
 
     def draw(self, context):
         layout = self.layout
-        sub_layout = layout
+        sub_layout = layout.box()
 
         OperatorFactory.create(
             sub_layout,
@@ -73,7 +80,7 @@ class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_parent_id = 'GI_PT_Setup_Wizard_UI_Layout'
+    bl_category = "Genshin"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -82,7 +89,7 @@ class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
 
 
 class GI_PT_UI_Character_Model_Menu(Panel):
-    bl_label = 'Character Model Menu'
+    bl_label = 'Set Up Character Menu'
     bl_idname = 'GI_PT_UI_Character_Model_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -107,7 +114,7 @@ class GI_PT_UI_Character_Model_Menu(Panel):
 
 
 class GI_PT_UI_Materials_Menu(Panel):
-    bl_label = 'Materials Menu'
+    bl_label = 'Set Up Materials Menu'
     bl_idname = 'GI_PT_UI_Materials_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -138,7 +145,7 @@ class GI_PT_UI_Materials_Menu(Panel):
 
 
 class GI_PT_UI_Outlines_Menu(Panel):
-    bl_label = 'Outlines Menu'
+    bl_label = 'Set Up Outlines Menu'
     bl_idname = 'GI_PT_UI_Outlines_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -175,7 +182,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
 
 
 class GI_PT_UI_Finish_Setup_Menu(Panel):
-    bl_label = 'Misc Setup Menu'
+    bl_label = 'Finish Setup Menu'
     bl_idname = 'GI_PT_UI_Misc_Setup_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

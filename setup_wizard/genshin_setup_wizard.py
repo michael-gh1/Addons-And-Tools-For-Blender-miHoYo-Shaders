@@ -6,7 +6,13 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 
-import os
+from setup_wizard.models import BasicSetupUIOperator
+
+
+class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
+    '''Runs through entire setup process'''
+    bl_idname = 'genshin.setup_wizard_ui'
+    bl_label = 'Genshin: Setup Wizard (UI)'
 
 
 class GI_OT_GenshinSetupWizard(Operator):
