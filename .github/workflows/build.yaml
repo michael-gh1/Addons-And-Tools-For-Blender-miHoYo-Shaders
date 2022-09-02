@@ -15,10 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Zip Setup Wizard to package the Blender Addon
-        run: zip -r setup_wizard_ui_addon.zip ./setup_wizard
-      - name: Upload Setup Wizard Zip
-        uses: actions/upload-artifact@v2
+      - name: Upload Setup Wizard Package
+        uses: actions/upload-artifact@v3
         with:
           name: Setup_Wizard_UI_Addon
-          path: setup_wizard_ui_addon.zip
+          path: setup_wizard/*
