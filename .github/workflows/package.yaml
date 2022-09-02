@@ -1,0 +1,26 @@
+name: Package Addons
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**/.tmp'
+      - '**/.gitignore'
+      - '**/.gitattributes'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Up Addon Folder Structure
+        run: |
+          mkdir -p dist/setup_wizard/setup_wizard
+          mv setup_wizard dist/setup_wizard
+      - name: Upload Setup Wizard Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: Setup_Wizard_UI_Addon
+          path: dist/setup_wizard/
