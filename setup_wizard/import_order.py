@@ -31,7 +31,6 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
 
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
     if current_step_idx == 1:
         clear_cache()
     cache = get_cache()
@@ -82,7 +81,6 @@ def invoke_next_step_ui(high_level_step_name, current_step_index):
         invoker_type='invoke_next_step_ui',
         high_level_step_name=high_level_step_name
     )
-    # invoke_next_step_ui(high_level_step_name, current_step_index + 1)
 
 
 def get_cache(cache_enabled=True):
