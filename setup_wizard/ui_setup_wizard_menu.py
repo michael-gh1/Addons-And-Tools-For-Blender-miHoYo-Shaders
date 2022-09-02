@@ -23,13 +23,13 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
 
         sub_layout = layout.box()
         row = layout.row()
-        row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             sub_layout,
             'genshin.setup_wizard_ui',
             'Run Entire Setup',
             'PLAY'
         )
+        row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
             'genshin.clear_cache_operator',
