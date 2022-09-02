@@ -19,4 +19,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Setup_Wizard_UI_Addon
-          path: setup_wizard
+          path: setup_wizard/
