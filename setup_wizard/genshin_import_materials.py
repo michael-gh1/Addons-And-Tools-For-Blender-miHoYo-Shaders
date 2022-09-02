@@ -1,16 +1,14 @@
-# Structure for file comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
 
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
+from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
 BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
@@ -23,7 +21,13 @@ NAMES_OF_GENSHIN_MATERIALS = [
 ]
 
 
-class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
+class GI_OT_SetUpMaterials(Operator, BasicSetupUIOperator):
+    '''Sets Up Materials'''
+    bl_idname = 'genshin.set_up_materials'
+    bl_label = 'Genshin: Set Up Materials (UI)'
+
+
+class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorProperties):
     """Select Festivity's Shaders folder to import materials"""
     bl_idname = "genshin.import_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Materials - Select Festivity's Shaders Folder"
@@ -44,11 +48,22 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
-
     def execute(self, context):
-        project_root_directory_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
+        cache_enabled = context.window_manager.cache_enabled
+        project_root_directory_file_path = self.file_directory \
+            or get_cache(cache_enabled).get(FESTIVITY_ROOT_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.filepath)
+
+        if not project_root_directory_file_path:
+            bpy.ops.genshin.import_materials(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.next_step_idx, 
+                file_directory=self.file_directory,
+                invoker_type=self.invoker_type,
+                high_level_step_name=self.high_level_step_name
+            )
+            return {'FINISHED'}
+
         directory_with_blend_file_path = os.path.join(
             project_root_directory_file_path,
             BLEND_FILE_WITH_GENSHIN_MATERIALS,
@@ -61,7 +76,16 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper):
         )
 
         self.report({'INFO'}, 'Imported Shader/Genshin Materials...')
-        invoke_next_step(self.next_step_idx, project_root_directory_file_path)
+        if not self.next_step_idx and cache_enabled:  # executed from UI
+            cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
 

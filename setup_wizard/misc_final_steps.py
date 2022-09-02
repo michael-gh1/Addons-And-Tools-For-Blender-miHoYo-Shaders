@@ -1,19 +1,20 @@
-# Written by Mken from Discord with support from M4urlcl0!
-
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
+from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
 
-class GI_OT_MakeCharacterUpright(Operator):
-    '''Makes the Character Upright'''
+class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
+    '''Finish Setup'''
+    bl_idname = 'genshin.finish_setup'
+    bl_label = 'Genshin: Finish Setup (UI)'
+
+
+class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
+    '''Makes the Character Upright and Fixes Scale'''
     bl_idname = 'genshin.make_character_upright'
-    bl_label = 'Genshin: Makes Character Upright'
-
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
+    bl_label = 'Genshin: Makes Character Upright and Fixes Scale'
 
     def execute(self, context):
         bpy.ops.object.select_all(action='DESELECT')
@@ -42,8 +43,12 @@ class GI_OT_MakeCharacterUpright(Operator):
         # )  # from @M4urlcl0
 
         if self.next_step_idx:
-            invoke_next_step(self.next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
         return {'FINISHED'}
 
 
-register, unregister = bpy.utils.register_classes_factory(GI_OT_MakeCharacterUpright)
+register, unregister = bpy.utils.register_classes_factory(GI_OT_FixTransformations)

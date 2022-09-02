@@ -39,10 +39,10 @@
     "4": {
         "component_name": "replace_default_materials",
         "enabled": true,
-        "cache_key": "character_model_folder_file_path",
+        "cache_key": "",
         "metadata": {
             "description": "Replaces default materials and separates them out accordingly",
-            "requires": "Folder with character model fbx file in it"
+            "requires": ""
         }
     },
     "5": {

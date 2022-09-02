@@ -1,10 +1,8 @@
-# Written by Mken from Discord
-
 import bpy
-from bpy.props import StringProperty, IntProperty
 from bpy.types import Operator
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
+from setup_wizard.models import CustomOperatorProperties
 
 # Constants
 NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
@@ -42,16 +40,14 @@ face_meshes = [
     'Face_Eye'
 ]
 
-class GI_OT_SetUpGeometryNodes(Operator):
-    '''Setup Geometry Nodes for Outlines'''
+class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
+    '''Sets Up Geometry Nodes for Outlines'''
     bl_idname = 'genshin.setup_geometry_nodes'
     bl_label = 'Genshin: Setup Geometry Nodes'
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but necessary for import_order to execute/invoke
-
     def execute(self, context):
         self.setup_geometry_nodes(self.next_step_idx)
+        self.report({'INFO'}, 'Successfully set up geometry nodes (for outlines)')
         return {'FINISHED'}
 
     def setup_geometry_nodes(self, next_step_idx):
@@ -61,7 +57,11 @@ class GI_OT_SetUpGeometryNodes(Operator):
             self.fix_meshes_by_setting_genshin_materials(mesh_name)
 
         if next_step_idx:
-            invoke_next_step(next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
 
 
     def create_geometry_nodes_modifier(self, mesh_name):

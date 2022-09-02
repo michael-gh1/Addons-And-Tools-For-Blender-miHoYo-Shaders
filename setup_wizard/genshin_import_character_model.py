@@ -1,5 +1,3 @@
-# Structure for file comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
 # Kudos to M4urlcl0 for bringing up adding the UV map (UV1) and 
 # the armature bone settings when importing the FBX model
 
@@ -9,14 +7,22 @@ import pathlib
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty
+from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key
+from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
+from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
 
-class GI_OT_GenshinImportModel(Operator, ImportHelper):
+class GI_OT_SetUpCharacter(Operator, BasicSetupUIOperator):
+    '''Sets Up Character'''
+    bl_idname = 'genshin.set_up_character'
+    bl_label = 'Genshin: Set Up Character (UI)'
+
+
+class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties):
     """Select the folder with the desired model to import"""
     bl_idname = "genshin.import_model"  # important since its how we chain file dialogs
     bl_label = "Genshin: Import Character Model - Select Character Model Folder"
@@ -37,11 +43,18 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
-
     def execute(self, context):
-        character_model_folder_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
+        character_model_folder_file_path = self.file_directory or os.path.dirname(self.filepath)
+
+        if not character_model_folder_file_path:
+            bpy.ops.genshin.import_model(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.next_step_idx, 
+                file_directory=self.file_directory,
+                invoker_type=self.invoker_type,
+                high_level_step_name=self.high_level_step_name
+                )
+            return {'FINISHED'}
 
         self.import_character_model(character_model_folder_file_path)
         self.reset_pose_location_and_rotation()
@@ -55,7 +68,16 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
             if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
                 object.data.uv_layers.new(name='UV1')
 
-        invoke_next_step(self.next_step_idx, character_model_folder_file_path)
+        if not self.next_step_idx and context.window_manager.cache_enabled:  # executed from UI
+            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            file_path_to_cache=character_model_folder_file_path,
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
     def import_character_model(self, character_model_file_path_directory):
@@ -88,14 +110,11 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper):
     BEFORE importing Genshin materials.
     That way there is no chance of deleting empties used by Festivity's shaders.
 '''
-class GI_OT_DeleteEmpties(Operator):
+class GI_OT_DeleteEmpties(Operator, CustomOperatorProperties):
     '''Deletes Empties (except Head Driver's empties)'''
     bl_idname = 'genshin.delete_empties'
     bl_label = "Genshin: Delete empties (except Head Driver's empties)"
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()  # Unused, but ncessary for import_order to execute/invoke
-    
     def execute(self, context):
         scene = bpy.context.scene
         empties_to_not_delete = [
@@ -106,8 +125,13 @@ class GI_OT_DeleteEmpties(Operator):
             if object.type == 'EMPTY' and object.name not in empties_to_not_delete:
                 bpy.data.objects.remove(object)
 
+        self.report({'INFO'}, 'Deleted Empties')
         if self.next_step_idx:
-            invoke_next_step(self.next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
         return {'FINISHED'}
 
 

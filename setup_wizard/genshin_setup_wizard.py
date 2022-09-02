@@ -1,12 +1,15 @@
-# Structure for class comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
-from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
+from setup_wizard.import_order import NextStepInvoker
 
-import os
+from setup_wizard.models import BasicSetupUIOperator
+
+
+class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
+    '''Runs through entire setup process'''
+    bl_idname = 'genshin.setup_wizard_ui'
+    bl_label = 'Genshin: Setup Wizard (UI)'
 
 
 class GI_OT_GenshinSetupWizard(Operator):
@@ -32,7 +35,10 @@ class GI_OT_GenshinSetupWizard(Operator):
 
     def execute(self, context):
         invoke_next_step = setup_dependencies()
-        invoke_next_step(1)
+        NextStepInvoker().invoke(
+            1,
+            'invoke_next_step'
+        )
 
         return {'FINISHED'}
 
@@ -84,7 +90,7 @@ def setup_dependencies():
         setup_wizard.genshin_import_textures.GI_OT_GenshinImportTextures,
         setup_wizard.genshin_replace_default_materials.GI_OT_GenshinReplaceDefaultMaterials,
         setup_wizard.fix_mouth_outlines.GI_OT_FixMouthOutlines,
-        setup_wizard.misc_final_steps.GI_OT_MakeCharacterUpright,
+        setup_wizard.misc_final_steps.GI_OT_FixTransformations,
         setup_wizard.set_up_head_driver.GI_OT_SetUpHeadDriver,
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
@@ -107,7 +113,7 @@ def unregister():
     from setup_wizard.genshin_import_outlines import GI_OT_GenshinImportOutlines
     from setup_wizard.genshin_import_outline_lightmaps import GI_OT_GenshinImportOutlineLightmaps
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
-    from setup_wizard.misc_final_steps import GI_OT_MakeCharacterUpright
+    from setup_wizard.misc_final_steps import GI_OT_FixTransformations
     from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
     from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
 
@@ -121,7 +127,7 @@ def unregister():
         GI_OT_GenshinImportOutlines,
         GI_OT_GenshinImportOutlineLightmaps,
         GI_OT_GenshinImportMaterialData,
-        GI_OT_MakeCharacterUpright,
+        GI_OT_FixTransformations,
         GI_OT_SetUpHeadDriver,
         GI_OT_SetColorManagementToStandard,
         GI_OT_DeleteSpecificObjects,

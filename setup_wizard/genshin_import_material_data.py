@@ -1,6 +1,3 @@
-# Structure for class comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
 import json
 from pathlib import PurePosixPath
@@ -8,15 +5,16 @@ from pathlib import PurePosixPath
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, IntProperty, CollectionProperty
+from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
+from setup_wizard.models import CustomOperatorProperties
 
 
-class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
-    """Select Material Json Data Files"""
+class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProperties):
+    """Select the Character Material Data Json Files for Outlines"""
     bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select Material Json Data Files"
 
@@ -36,8 +34,6 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    next_step_idx: IntProperty()
-    file_directory: StringProperty()
     files: CollectionProperty(type=PropertyGroup)
 
     local_material_mapping = {
@@ -76,8 +72,17 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
     }
 
     def execute(self, context):
-        material_data_file_path = self.file_directory if self.file_directory else os.path.dirname(self.filepath)
         directory_file_path = os.path.dirname(self.filepath)
+
+        if not self.filepath or not self.files:
+            bpy.ops.genshin.import_material_data(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.next_step_idx, 
+                file_directory=self.file_directory,
+                invoker_type=self.invoker_type,
+                high_level_step_name=self.high_level_step_name
+            )
+            return {'FINISHED'}
 
         for file in self.files:
             body_part = PurePosixPath(file.name).stem.split('_')[-1]
@@ -117,7 +122,12 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper):
             self.setup_outline_colors(json_material_data, body_part)
 
         self.report({'INFO'}, 'Imported material data')
-        invoke_next_step(self.next_step_idx)
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
+        NextStepInvoker().invoke(
+            self.next_step_idx, 
+            self.invoker_type, 
+            high_level_step_name=self.high_level_step_name
+        )
         return {'FINISHED'}
 
     def setup_outline_colors(self, json_material_data, body_part):

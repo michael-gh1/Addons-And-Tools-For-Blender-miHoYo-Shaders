@@ -155,12 +155,20 @@ You can disable the cache for any step by changing `"cache_key": "<whatever valu
     - Created UV1 UV map which allows for underskirt textures (Zhongli, Lumine, etc.)
     - No BetterFBX support still at this time though... 
 - [X] Color Management Filmic -> Standard
+- [X] Turn Setup Wizard into an Addon
+- [X] UI Setup Wizard Addon
+- [ ] Update Configuration from UI (checkboxes that enable/disable steps)
 ### Refactoring
 - [X] Refactor Material Assignment Mapping (externalize/centralize it to one locaiton)
 - [ ] Refactor Import Outline Lightmaps component
 - [ ] Refactor config.json from a dictionary to a List of dictionaries?
+- [ ] Cache Service
+- [ ] Invoker Class
+- [ ] import_order.py is becoming too big
+- [ ] invoke_next_step may not need to cache anymore since we can cache directly in Operators
 ### Misc.
 - [X] Crude design diagram depicting how this tool and the components interact and work
+- [ ] A refreshed design diagram with the UI Addon flow
 
 ![alt text](https://user-images.githubusercontent.com/8632035/183316362-8a47f471-0fa4-4a3d-8e17-ea2c2a9a852e.png)
 
