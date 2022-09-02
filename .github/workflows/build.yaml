@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Set Up Addon Folder Structure
+        run: |
+          mv setup_wizard setup_wizard/setup_wizard
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
         with:
