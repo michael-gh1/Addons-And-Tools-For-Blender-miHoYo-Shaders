@@ -59,7 +59,7 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
                 directory=os.path.join(filepath, inner_path),
                 filename=object_name
             )
-            if cache_enabled:
+            if cache_enabled and filepath:
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_OUTLINES_FILE_PATH, filepath)
 
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance

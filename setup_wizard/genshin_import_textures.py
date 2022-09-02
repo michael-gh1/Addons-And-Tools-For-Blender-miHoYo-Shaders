@@ -123,7 +123,7 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         self.report({'INFO'}, 'Imported textures')
-        if cache_enabled:
+        if cache_enabled and directory:
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
 
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
