@@ -1,8 +1,4 @@
-# Structure for class comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
-from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 

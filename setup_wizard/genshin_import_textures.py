@@ -1,5 +1,4 @@
-# Contributed by Zekium and Modder4869 from Discord - huge thanks to him!
-# Minor changes by Mken
+# Originally contributed by Zekium and Modder4869 from Discord
 
 import bpy
 

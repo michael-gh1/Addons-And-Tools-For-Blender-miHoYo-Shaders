@@ -1,11 +1,7 @@
-# Structure for file comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
 
 from bpy.props import StringProperty
 from bpy.types import Operator
-import os
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.import_order import get_actual_material_name_for_dress

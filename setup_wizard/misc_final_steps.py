@@ -1,5 +1,3 @@
-# Written by Mken from Discord with support from M4urlcl0!
-
 import bpy
 from bpy.types import Operator
 

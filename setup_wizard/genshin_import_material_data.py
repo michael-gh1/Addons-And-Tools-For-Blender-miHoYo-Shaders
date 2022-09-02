@@ -1,6 +1,3 @@
-# Structure for class comes from a script initially written by Zekium from Discord
-# Written by Mken from Discord
-
 import bpy
 import json
 from pathlib import PurePosixPath
