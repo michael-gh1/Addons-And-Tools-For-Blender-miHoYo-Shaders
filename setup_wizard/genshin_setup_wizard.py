@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
+from setup_wizard.import_order import NextStepInvoker
 
 from setup_wizard.models import BasicSetupUIOperator
 
@@ -34,7 +35,10 @@ class GI_OT_GenshinSetupWizard(Operator):
 
     def execute(self, context):
         invoke_next_step = setup_dependencies()
-        invoke_next_step(1)
+        NextStepInvoker().invoke(
+            1,
+            'invoke_next_step'
+        )
 
         return {'FINISHED'}
 

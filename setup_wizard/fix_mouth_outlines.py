@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Operator
 
-from setup_wizard.import_order import invoke_next_step
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
 
 CAMERA_INPUT = 'Input_4'
@@ -36,7 +36,11 @@ class GI_OT_FixMouthOutlines(Operator, CustomOperatorProperties):
             self.fix_meshes_by_setting_genshin_materials(face_object.name)
 
         if next_step_idx:
-            invoke_next_step(next_step_idx)
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name
+            )
 
 
     def set_camera_and_depth_offset(self, outline_modifiers, camera):
