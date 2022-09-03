@@ -17,7 +17,24 @@ The goal of this tool is to streamline the character setup process. Whether it's
 8. [Credits](#credits)
 
 ## Demo/Screenshots
-* To be added...
+### Screenshot of the Tool
+
+![alt text](https://cdn.discordapp.com/attachments/890116796034711595/1014970456572436530/unknown.png)
+
+### Demos
+
+Download Demos/Tutorials:
+- Installation and "One Click" Simplified Setup (First Time Setup, No Cached Data) 
+  - https://cdn.discordapp.com/attachments/1015585109639974922/1015585432026763284/SetupWizardUI_v1-0_Installation_and_Simplified_Setup.mp4
+- 4 Step Menu: Basic Setup (First Time Setup, No Cached Data)
+  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587153058746499/SetupWizardUI_v1-0_Basic_Setup_-_No_Cache.mp4
+- 4 Step Menu: Basic Setup (Post-First Time Setup, with Cached Data)
+  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587226752659556/SetupWizardUI_v1-0_Basic_Setup_with_Cache.mp4
+- Advanced Setup (Post-First Time Setup, with Cached Data)
+  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587532362223698/SetupWizardUI_v1-0_Advanced_Setup_with_Cache.mp4
+
+
+
 
 
 ## Quick Start Guide
