@@ -7,7 +7,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 **Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
 
 ## Table of Contents
-1. [Demo](#demoscreenshots)
+1. [Tutorials/Screenshots](#demoscreenshots)
 2. [Quick Start Guide](#quick-start-guide)
 3. [How to Disable Components](#how-to-disable-components-on-the-ui)
 4. [Features/Components](#featurescomponents)
@@ -21,9 +21,9 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 ![alt text](https://cdn.discordapp.com/attachments/890116796034711595/1014970456572436530/unknown.png)
 
-### Demos
+### Tutorials
 
-Download Demos/Tutorials:
+Download Tutorials:
 - Installation and "One Click" Simplified Setup (First Time Setup, No Cached Data) 
   - https://cdn.discordapp.com/attachments/1015585109639974922/1015585432026763284/SetupWizardUI_v1-0_Installation_and_Simplified_Setup.mp4
 - 4 Step Menu: Basic Setup (First Time Setup, No Cached Data)
