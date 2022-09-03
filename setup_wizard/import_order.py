@@ -164,8 +164,8 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.delete_empties
         elif component_name ==  'delete_specific_objects':
             return bpy.ops.genshin.delete_specific_objects
-        elif component_name == 'make_character_upright':
-            return bpy.ops.genshin.make_character_upright
+        elif component_name == 'fix_transformations':
+            return bpy.ops.genshin.fix_transformations
         elif component_name == 'set_color_management_to_standard':
             return bpy.ops.genshin.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
