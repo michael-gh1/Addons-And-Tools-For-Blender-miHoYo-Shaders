@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 # Kudos to M4urlcl0 for bringing up adding the UV map (UV1) and 
 # the armature bone settings when importing the FBX model
 

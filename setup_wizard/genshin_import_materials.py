@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 import bpy
 
 # ImportHelper is a helper class, defines filename and

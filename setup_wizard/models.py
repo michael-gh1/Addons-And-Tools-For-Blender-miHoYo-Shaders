@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 from bpy.props import IntProperty, StringProperty
 
 from setup_wizard.import_order import NextStepInvoker

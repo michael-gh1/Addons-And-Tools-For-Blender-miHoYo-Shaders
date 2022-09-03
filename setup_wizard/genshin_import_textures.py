@@ -1,3 +1,4 @@
+# Author: michael-gh1
 # Originally contributed by Zekium and Modder4869 from Discord
 
 import bpy

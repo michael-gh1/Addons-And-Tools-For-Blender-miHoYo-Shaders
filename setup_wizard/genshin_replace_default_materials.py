@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 import bpy
 
 from bpy.props import StringProperty

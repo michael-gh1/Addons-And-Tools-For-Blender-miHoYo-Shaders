@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 import bpy
 import json
 from pathlib import PurePosixPath

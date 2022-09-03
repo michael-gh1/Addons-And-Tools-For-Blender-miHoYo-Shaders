@@ -1,3 +1,5 @@
+# Author: michael-gh1
+
 # Kudos to Modder4869 for introducing another way to get the real material name for Dress materials
 
 import bpy
