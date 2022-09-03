@@ -19,7 +19,7 @@ If you are downloading an Addon, simply download the zipped file and install the
 
 ## Table of Contents
 1. Setup Wizard UI Addon
-    * [Click here for the README/instructions for the Setup Wizard UI Addon]((https://github.com/michael-gh1/Addons-And-Tools-For-Blender-miHoYo-Shaders/tree/main/setup_wizard))
+    * [Click here for the README/instructions for the Setup Wizard UI Addon](https://github.com/michael-gh1/Addons-And-Tools-For-Blender-miHoYo-Shaders/tree/main/setup_wizard)
 
 
 # Credits
