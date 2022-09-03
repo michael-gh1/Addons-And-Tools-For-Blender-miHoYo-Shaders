@@ -7,7 +7,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 **Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
 
 ## Table of Contents
-1. [Tutorials/Screenshots](#demoscreenshots)
+1. [Tutorials/Screenshots](#tutorialsscreenshots)
 2. [Quick Start Guide](#quick-start-guide)
 3. [How to Disable Components](#how-to-disable-components-on-the-ui)
 4. [Features/Components](#featurescomponents)
