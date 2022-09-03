@@ -193,7 +193,7 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
 
         OperatorFactory.create(
             sub_layout,
-            'genshin.make_character_upright',
+            'genshin.fix_transformations',
             'Fix Transformations',
             'OBJECT_DATA'
         )

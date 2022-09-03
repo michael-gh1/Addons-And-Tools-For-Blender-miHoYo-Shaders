@@ -110,7 +110,7 @@
         }
     },
     "12": {
-        "component_name": "make_character_upright",
+        "component_name": "fix_transformations",
         "enabled": true,
         "cache_key": "",
         "metadata": {

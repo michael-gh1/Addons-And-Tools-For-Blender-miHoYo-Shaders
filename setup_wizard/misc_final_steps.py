@@ -13,7 +13,7 @@ class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
 
 class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
     '''Makes the Character Upright and Fixes Scale'''
-    bl_idname = 'genshin.make_character_upright'
+    bl_idname = 'genshin.fix_transformations'
     bl_label = 'Genshin: Makes Character Upright and Fixes Scale'
 
     def execute(self, context):
