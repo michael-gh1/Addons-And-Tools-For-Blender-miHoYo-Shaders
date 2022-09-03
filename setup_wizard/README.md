@@ -29,7 +29,7 @@ Download Tutorials:
 - 4 Step Menu: Basic Setup (First Time Setup, No Cached Data)
   - https://cdn.discordapp.com/attachments/1015585109639974922/1015587153058746499/SetupWizardUI_v1-0_Basic_Setup_-_No_Cache.mp4
 - 4 Step Menu: Basic Setup (Post-First Time Setup, with Cached Data)
-  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587226752659556/SetupWizardUI_v1-0_Basic_Setup_with_Cache.mp4
+  - https://cdn.discordapp.com/attachments/1015585109639974922/1015746432482943057/SetupWizardUI_v1-0_Basic_Setup_with_Cache.mp4
 - Advanced Setup (Post-First Time Setup, with Cached Data)
   - https://cdn.discordapp.com/attachments/1015585109639974922/1015587532362223698/SetupWizardUI_v1-0_Advanced_Setup_with_Cache.mp4
 
