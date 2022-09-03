@@ -11,11 +11,11 @@ If you are downloading an Addon, simply download the zipped file and install the
 1. Download the Addon's zip file
     * Ex. `Setup_Wizard_UI_Addon.zip`
 2. Open Blender
-3. Edit
-4. Preferences
-5. Add-Ons
-6. Install
-7. Select `The_Addon_Name_Goes_Here.zip`
+3. Select Edit > Preferences > Add-Ons > Install
+4. Select `The_Addon_Name_Goes_Here.zip`
+    * Ex. `Setup_Wizard_UI_Addon.zip`
+5. Enable the Addon
+6. Follow further instructions found on the README for the Addon
 
 ## Table of Contents
 1. Setup Wizard UI Addon
