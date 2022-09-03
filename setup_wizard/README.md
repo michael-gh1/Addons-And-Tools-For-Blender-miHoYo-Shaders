@@ -258,6 +258,4 @@ Thanks to all those who helped answer the questions I had while building out thi
 <br>
 Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0 and @Modder4869!
 
-Cheers and Happy Blending,
-
-~Mken
+Cheers and Happy Blending
