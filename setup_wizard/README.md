@@ -4,6 +4,8 @@
 
 The goal of this tool is to streamline the character setup process. Whether it's importing the materials, importing the character model, setting up the outlines (geometry nodes) or configuring the outline colors to be game accurate, this tool has got it all! Your one-stop-shop for setting up your characters in Blender!
 
+**Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
+
 ## Table of Contents
 1. [Demo](#demo)
 2. [Quick Start Guide](#quick-start-guide)
@@ -26,6 +28,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 4. Open up the N-Panel (Hit the 'N' key)
 5. Select the `Genshin` tab
 6. Click the `Run Entire Setup` button
+    * Outlines are supported for Blender Version >= 3.3 (you can either disable the outline-related components or use the Basic Setup instead)
 7. Select the folder with the character model and textures (lightmaps, diffuses, etc.)
 8. Select the root/base folder with Festivity's Shaders 
     * **This only needs to be done the first time you run this tool.** This is because the filepath gets cached for future usage (click the clear cache button if you want to reset this value).
@@ -59,7 +62,7 @@ Example of Disabling Outlines from `Run Entire Setup`:
         ],
 ```
 
-In the example above, these were removed:
+In the example above, these were removed from the original `config_ui.json`:
 ```
             "import_outlines",
             "setup_geometry_nodes",
@@ -69,6 +72,8 @@ In the example above, these were removed:
 
 You can disable any step (component) in the Setup Wizard UI by removing the step from the list in `config_ui.json`.
 * This may be handy in the scenario that you use BetterFBX or are not on a Blender version that works with Outlines/Geometry Nodes.
+
+<br>
 
 You can disable the cache for any step by unchecking the `Cache Enabled` checkbox.
 * The cache (`cache.json.tmp`) is used to "save" your previous choice for future usage that uses the same folder/file
@@ -86,7 +91,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 
 ### Other Notes:
 * The `component_name` or names in the `config.json` or `config_ui.json` should NOT be renamed. This is how the Setup Wizard identifies and triggers the next step/component.
-* Metadata found in `config.json` is simply there to help provide human readable information and what each component requires (what should be selected on the file explorer window). (`config.json` is also used for the Legacy Setup Wizard which is run through the F3 search)
+* Metadata found in `config.json` is simply there to help provide human readable information and what each component requires (what should be selected on the file explorer window). (`config.json` is used by the Legacy Setup Wizard which is run through the F3 search)
 
 ## Features/Components
 
@@ -95,10 +100,10 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 0. ~~Setup Wizard~~ (Legacy)
 1. Import Character Model
 2. Delete Empties
-3. Import Materials
+3. Import Materials (`miHoYo - Genshin Impact.blend`)
 4. Replace/Re-Assign Default Character Model Materials (and rename)
 5. Import Character Textures
-6. Import `miHoYo - Outlines`
+6. Import Outlines (`miHoYo - Outlines.blend`)
 7. Setup Outlines (Geometry Nodes)
 8. Import Lightmaps for Outlines
 9. Import Material Data
@@ -113,6 +118,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 <details>
     <summary>Expand</summary>
     <br>
+
 > Note: Ideally these steps won't change too much between releases! If they do, I will make note of it in the release notes.
 
 0. ~~Setup Wizard~~ (Legacy)
@@ -126,27 +132,29 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
         * Hide EffectMesh (gets deleted in a later step) and EyeStar
         * Add 'UV1' UV Map to ALL meshes (I think the important one is just Body though?)
         * Resets the location and rotation bones in pose mode and sets the armature into an A-pose (this is is done because we import with `force_connect_children`)
-        * Connect the Normal Map if the texture exists for the character model
+        * Connects the Normal Map if the texture exists for the character model
     * Select the folder that contains the character model and textures. **It is assumed that the textures for the character are also in this folder.**
 2. Delete Empties
     * This step deletes Empty type objects in the scene
     * No selection needed.
 3. Import Materials
     * This step imports `miHoYo - Genshin Hair`, `miHoYo - Genshin Face`, `miHoYo - Genshin Body` and `miHoYo - Genshin Outlines`.
+    * **This step uses the cache (if enabled)** so you do not need to re-select the `miHoYo - Genshin Impact.blend` after selecting it on first use.
     * Select the root folder that contains Festivity's Shaders.
 4. Replace Default Character Model Materials (and rename)
     * This step replaces/re-assigns the default character model materials to the shader's materials.
     * Naming Convention of Genshin Materials (and their Shader nodes): `miHoYo - Genshin {Body Part}` 
         * `{Body Part}` can be `Hair`, `Body`, `Dress`, `Dress1`, `Dress2`, etc.
     * Yes, this tool also handles special exceptions for characters like: `Yelan`, `Collei` and `Rosaria` who may have their `Dress` set to `Hair` instead of the usual `Body`.
-    * Select the folder that contains the character model and textures. **It is assumed that the textures for the character are also in this folder.** (Needed purely to get the character name)
+    * No selection needed.
 5. Import Character Textures
     * This step imports the character textures and assigns them to the materials imported in Step `Import Materials`.
     * Yes, this tool also handles special exceptions for characters like: `Yelan`, `Collei` and `Rosaria` who may have their `Dress` set to `Hair` instead of the usual `Body`.
-    * **This step uses the cache** so you do not need to select a folder. It uses what was selected in Step `Import Character Model` (unless you've disabled it).
+    * **This step uses the cache (if enabled)** so you do not need to select a folder. It uses what was selected in Step `Import Character Model` (unless you've disabled it).
 6. Import `miHoYo - Outlines`
     * This step imports the `miHoYo - Outlines` node group, which is found in the `experimental-blender-3.3` folder.
     * Select the `miHoYo - Outlines.blend` file.
+    * **This step uses the cache (if enabled)** so you do not need to re-select the `miHoYo - Outlines.blend` after selecting it on first use.
 7. Setup Outlines (Geometry Nodes)
     * This step creates and sets up the Outlines (Geometry Nodes modifier)
     * Naming Convention of Geometry Nodes: `GeometryNodes {Mesh Name}`
@@ -157,7 +165,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 8. Import Lightmaps for Outlines
     * This step imports Lightmap textures and assigns them to to materials.
     * Yes, this tool also handles special exceptions for characters like: `Yelan`, `Collei` and `Rosaria` who may have their `Dress` set to `Hair` instead of the usual `Body`.
-    * **This step uses the cache** so you do not need to select a folder. It uses what was selected in Step `Import Character Model` or Step `Import Character Textures` (unless you've disabled them).
+    * **This step uses the cache (if enabled)** so you do not need to select a folder. It uses what was selected in Step `Import Character Model` or Step `Import Character Textures` (unless you've disabled them).
 9. Import Material Data
     * This step imports JSON files containing material data with useful information for shader accuracy, such as specular colors, metalmap scale, metallic colors, outline colors, shininess values, etc.
     * Select the JSON files with the material data (Ctrl + Click or Shift + Click).
