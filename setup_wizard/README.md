@@ -149,7 +149,7 @@ You can disable the cache for any step by changing `"cache_key": "<whatever valu
 - [X] Head Driver Setup
 - [X] Make model upright if not upright (?)
 - [X] ~~Scale up x100~~ Reset Scale (scaled to 1.0)
-- [ ] Character Ramp Type Mapping (automatically plug correct Body Ramp Type from Global Material Properties)
+- [X] Character Ramp Type Mapping (automatically plug correct Body Ramp Type from Global Material Properties)
     - Requires knowing all characters who have a different the Body Ramp Type than the default
 - [X] BetterFBX Support/Fix UV map imports (only one UV map is imported)
     - Created UV1 UV map which allows for underskirt textures (Zhongli, Lumine, etc.)
