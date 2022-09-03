@@ -16,7 +16,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 7. ["Tested" Character Models](#tested-character-models)
 8. [Credits](#credits)
 
-## Demo/Screenshots
+## Tutorials/Screenshots
 ### Screenshot of the Tool
 
 ![alt text](https://cdn.discordapp.com/attachments/890116796034711595/1014970456572436530/unknown.png)
