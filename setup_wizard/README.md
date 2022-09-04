@@ -6,6 +6,9 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 **Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
 
+**Compatibility**: This tool has been tested on Blender Version 3.3.0 and attempts to support older versions of Blender, but working functionality is not guaranteed.
+
+
 ## Table of Contents
 1. [Tutorials/Screenshots](#tutorialsscreenshots)
 2. [Quick Start Guide](#quick-start-guide)
@@ -62,6 +65,8 @@ Download Tutorials:
 
 ## How to Disable Components on the UI
 This tool is broken up into many different components. The `config_ui.json` file can be used to enable or disable specific steps when running the `Run Entire Setup` or `Basic Setup`.
+
+Note: Outlines Setup is automatically disabled when running Blender Versions < v3.3.0
 
 Example of Disabling Outlines from `Run Entire Setup`:
 ```

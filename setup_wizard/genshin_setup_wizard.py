@@ -6,12 +6,24 @@ from bpy.types import Operator
 from setup_wizard.import_order import NextStepInvoker
 
 from setup_wizard.models import BasicSetupUIOperator
+from setup_wizard.ui_setup_wizard_menu import version_number_above_or_equal
 
 
 class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
     '''Runs through entire setup process'''
     bl_idname = 'genshin.setup_wizard_ui'
     bl_label = 'Genshin: Setup Wizard (UI)'
+
+    def execute(self, context):
+        next_step_index = 0
+
+        NextStepInvoker().invoke(
+            next_step_index,
+            'invoke_next_step_ui', 
+            high_level_step_name=self.bl_idname if version_number_above_or_equal((3, 3, 0)) \
+                else self.bl_idname + '_no_outlines'
+        )
+        return {'FINISHED'}
 
 
 class GI_OT_GenshinSetupWizard(Operator):

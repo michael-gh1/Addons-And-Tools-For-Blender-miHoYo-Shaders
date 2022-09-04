@@ -63,12 +63,15 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             'Set Up Materials',
             icon='MATERIAL'
         )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.set_up_outlines',
-            'Set Up Outlines',
-            icon='GEOMETRY_NODES'
-        )
+        if version_number_above_or_equal((3, 3, 0)):
+            OperatorFactory.create(
+                sub_layout,
+                'genshin.set_up_outlines',
+                'Set Up Outlines',
+                icon='GEOMETRY_NODES'
+            )
+        else:
+            layout.label(text='(Outlines Disabled < v3.3.0)')
         OperatorFactory.create(
             sub_layout,
             'genshin.finish_setup',
@@ -156,30 +159,33 @@ class GI_PT_UI_Outlines_Menu(Panel):
         layout = self.layout
         sub_layout = layout.column()
 
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.import_outlines',
-            'Import Outlines',
-            'FILE_FOLDER'
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.setup_geometry_nodes',
-            'Set Up Geometry Nodes',
-            'GEOMETRY_NODES'
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.import_outline_lightmaps',
-            'Import Outline Lightmaps',
-            'FILE_FOLDER'
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.import_material_data',
-            'Import Material Data',
-            'FILE'
-        )
+        if version_number_above_or_equal((3, 3, 0)):
+            OperatorFactory.create(
+                sub_layout,
+                'genshin.import_outlines',
+                'Import Outlines',
+                'FILE_FOLDER'
+            )
+            OperatorFactory.create(
+                sub_layout,
+                'genshin.setup_geometry_nodes',
+                'Set Up Geometry Nodes',
+                'GEOMETRY_NODES'
+            )
+            OperatorFactory.create(
+                sub_layout,
+                'genshin.import_outline_lightmaps',
+                'Import Outline Lightmaps',
+                'FILE_FOLDER'
+            )
+            OperatorFactory.create(
+                sub_layout,
+                'genshin.import_material_data',
+                'Import Material Data',
+                'FILE'
+            )
+        else:
+            layout.label(text='(Outlines Disabled < v3.3.0)')
 
 
 class GI_PT_UI_Finish_Setup_Menu(Panel):
@@ -218,6 +224,16 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'TRASH'
         )
 
+
+def version_number_above_or_equal(required_version_number_tuple):
+    current_version = bpy.app.version
+
+    for index in range(0, len(required_version_number_tuple)):
+        if current_version[index] < required_version_number_tuple[index]:
+            return False
+        elif current_version[index] > required_version_number_tuple[index]:
+            return True
+    return True
 
 
 '''
