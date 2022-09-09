@@ -149,7 +149,8 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         for material_json_name, material_node_name in material_mapping.items():
             material_json_value = self.__get_value_in_json_parser(material_data_parser, material_json_name)
             if not material_json_value:
-                self.__raise_material_value_not_found(body_part, material_json_name)
+                self.__handle_material_value_not_found(body_part, material_json_name)
+                continue
 
             node_input = node_inputs.get(material_node_name)
             node_input.default_value = material_json_value
@@ -168,9 +169,9 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     def __get_value_in_json_parser(self, parser, key):
         return getattr(parser.m_floats, key, None) or getattr(parser.m_colors, key, None)
 
-    def __raise_material_value_not_found(self, body_part, material_json_name):
-        self.filepath = ''
-        raise MaterialDataValueNotFoundException(body_part, material_json_name)
+    def __handle_material_value_not_found(self, body_part, material_json_name):
+        self.report({'WARNING'}, f'Unable to find material data: {material_json_name} on {body_part}. \n' \
+            'This may or may not be expected. Continuing to apply other material data.')
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)
