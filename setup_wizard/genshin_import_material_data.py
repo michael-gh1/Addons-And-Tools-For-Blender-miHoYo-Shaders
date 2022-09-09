@@ -125,10 +125,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                 if not material_json_value:
                     self.__raise_material_value_not_found(body_part, material_json_name)
 
-                if type(material_node) is bpy.types.NodeSocketColor:
-                    material_node.default_value = material_json_value
-                else:
-                    material_node.default_value = material_json_value
+                material_node.default_value = material_json_value
             
             # Not sure, should we only apply Global Material Properties from Body .dat file?
             if body_part == 'Body':
@@ -139,10 +136,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                     if not material_json_value:
                         self.__raise_material_value_not_found(body_part, material_json_name)
 
-                    if type(material_node) is bpy.types.NodeSocketColor:
-                        material_node.default_value = material_json_value
-                    else:
-                        material_node.default_value = material_json_value
+                    material_node.default_value = material_json_value
 
 
     def set_up_outline_colors(self, material_data_parser, body_part):
