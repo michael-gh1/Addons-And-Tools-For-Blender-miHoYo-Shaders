@@ -10,7 +10,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
-from setup_wizard.exceptions import MaterialDataValueNotFoundException, UnsupportedMaterialDataJsonFormatException
+from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
