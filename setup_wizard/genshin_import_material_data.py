@@ -170,8 +170,9 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         return getattr(parser.m_floats, key, None) or getattr(parser.m_colors, key, None)
 
     def __handle_material_value_not_found(self, body_part, material_json_name):
-        self.report({'WARNING'}, f'Unable to find material data: {material_json_name} on {body_part}. \n' \
-            'This may or may not be expected. Continuing to apply other material data.')
+        # Log at INFO level because otherwise it may become "just another warning" and get ignored
+        self.report({'INFO'}, f'Unable to find material data: {material_json_name} on {body_part} JSON. \n' \
+            '* This may or may not be expected. Continuing to apply other material data.')
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)
