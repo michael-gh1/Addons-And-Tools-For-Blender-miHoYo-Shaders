@@ -10,9 +10,11 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
 import os
+from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
 
 
 class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProperties):
@@ -73,6 +75,11 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         '_FaceBlushColor': 'Blush Color',
     }
 
+    parsers = [
+        HoyoStudioMaterialDataJsonParser,
+        UABEMaterialDataJsonParser,
+    ]
+
     def execute(self, context):
         directory_file_path = os.path.dirname(self.filepath)
 
@@ -89,39 +96,12 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         for file in self.files:
             body_part = PurePosixPath(file.name).stem.split('_')[-1]
 
-            node_tree_group001_inputs = bpy.data.materials[f'miHoYo - Genshin {body_part}'].node_tree.nodes["Group.001"].inputs
-            global_material_properties_node_inputs = bpy.data.node_groups["GLOBAL MATERIAL PROPERTIES"].nodes["Group Output"].inputs
-
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
+            material_data_parser = self.__get_material_data_json_parser(json_material_data)
 
-            if body_part != 'Face':
-                for material_json_name, material_node_name in self.local_material_mapping.items():
-                    material_json_value = self.__get_value_in_json(json_material_data, material_json_name)
-                    material_node = node_tree_group001_inputs.get(self.local_material_mapping.get(material_json_name))
-
-                    if not material_json_value:
-                        continue
-
-                    if type(material_node) is bpy.types.NodeSocketColor:
-                        material_node.default_value = self.__get_rgba_colors(material_json_value)
-                    else:
-                        material_node.default_value = material_json_value
-                
-                # Not sure, should we only apply Global Material Properties from Body .dat file?
-                if body_part == 'Body':
-                    for material_json_name, material_node_name in self.global_material_mapping.items():
-                        material_json_value = self.__get_value_in_json(json_material_data, material_json_name)
-                        material_node = global_material_properties_node_inputs.get(self.global_material_mapping.get(material_json_name))
-
-                        if not material_json_value:
-                            continue
-
-                        if type(material_node) is bpy.types.NodeSocketColor:
-                            material_node.default_value = self.__get_rgba_colors(material_json_value)
-                        else:
-                            material_node.default_value = material_json_value
-            self.setup_outline_colors(json_material_data, body_part)
+            self.set_up_mesh_material_data(material_data_parser, body_part)
+            self.set_up_outline_colors(material_data_parser, body_part)
 
         self.report({'INFO'}, 'Imported material data')
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
@@ -132,31 +112,68 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         )
         return {'FINISHED'}
 
-    def setup_outline_colors(self, json_material_data, body_part):
+    def set_up_mesh_material_data(self, material_data_parser, body_part):
+        if body_part != 'Face':
+            node_tree_group001_inputs = bpy.data.materials[f'miHoYo - Genshin {body_part}'].node_tree.nodes["Group.001"].inputs
+
+            self.__apply_material_data(
+                self.local_material_mapping,
+                node_tree_group001_inputs,
+                material_data_parser,
+                body_part
+            )
+            
+        # Not sure, should we only apply Global Material Properties from Body .dat file?
+        if body_part == 'Body':
+            global_material_properties_node_inputs = \
+                bpy.data.node_groups["GLOBAL MATERIAL PROPERTIES"].nodes["Group Output"].inputs
+
+            self.__apply_material_data(
+                self.global_material_mapping,
+                global_material_properties_node_inputs,
+                material_data_parser,
+                body_part
+            )
+
+    def set_up_outline_colors(self, material_data_parser, body_part):
         outlines_material = bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
         outlines_shader_node_inputs = outlines_material.node_tree.nodes.get('Group.002').inputs
 
-        for material_json_name, material_node_name in self.outline_mapping.items():
-            material_json_value = self.__get_value_in_json(json_material_data, material_json_name)
-            shader_node_input = outlines_shader_node_inputs.get(material_node_name)
+        self.__apply_material_data(
+            self.outline_mapping, 
+            outlines_shader_node_inputs,
+            material_data_parser,
+            body_part
+        )
+
+    def __get_material_data_json_parser(self, json_material_data):
+        for index, parser_class in enumerate(self.parsers):
+            try:
+                parser: MaterialDataJsonParser  = parser_class(json_material_data)
+                parser.parse()
+                return parser
+            except AttributeError:
+                if index == len(self.parsers) - 1:
+                    raise UnsupportedMaterialDataJsonFormatException(self.parsers)
+
+    def __apply_material_data(self, material_mapping, node_inputs, material_data_parser, body_part):
+        for material_json_name, material_node_name in material_mapping.items():
+            material_json_value = self.__get_value_in_json_parser(material_data_parser, material_json_name)
 
             if not material_json_value:
+                self.__handle_material_value_not_found(body_part, material_json_name)
                 continue
 
-            shader_node_input.default_value = self.__get_rgba_colors(material_json_value)
-    
-    def __get_value_in_json(self, json_material_data, key):
-        return json_material_data.get('m_SavedProperties').get('m_Floats').get(key) or \
-            json_material_data.get('m_SavedProperties').get('m_Colors').get(key)
+            node_input = node_inputs.get(material_node_name)
+            node_input.default_value = material_json_value
 
-    def __get_rgba_colors(self, material_json_value):
-        # check lowercase for backwards compatibility
-        # explicitly check 'is not None' because rgba values could be Falsy
-        r = material_json_value.get('R') if material_json_value.get('R') is not None else material_json_value.get('r')
-        g = material_json_value.get('G') if material_json_value.get('G') is not None else material_json_value.get('g')
-        b = material_json_value.get('B') if material_json_value.get('B') is not None else material_json_value.get('b')
-        a = material_json_value.get('A') if material_json_value.get('A') is not None else material_json_value.get('a')
-        return (r, g, b, a)
+    def __get_value_in_json_parser(self, parser, key):
+        return getattr(parser.m_floats, key, None) or getattr(parser.m_colors, key, None)
+
+    def __handle_material_value_not_found(self, body_part, material_json_name):
+        # Log at INFO level because otherwise it may become "just another warning" and get ignored
+        self.report({'INFO'}, f'Unable to find material data: {material_json_name} on {body_part} JSON. \n' \
+            '* This may or may not be expected. Continuing to apply other material data.')
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)
