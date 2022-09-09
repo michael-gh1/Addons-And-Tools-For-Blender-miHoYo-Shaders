@@ -155,7 +155,6 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             except AttributeError:
                 if index == len(self.parsers) - 1:
                     raise UnsupportedMaterialDataJsonFormatException(self.parsers)
-                continue
 
     def __apply_material_data(self, material_mapping, node_inputs, material_data_parser, body_part):
         for material_json_name, material_node_name in material_mapping.items():
