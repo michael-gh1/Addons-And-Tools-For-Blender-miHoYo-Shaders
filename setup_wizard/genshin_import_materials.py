@@ -87,7 +87,7 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
             file_path_to_cache=project_root_directory_file_path,
             high_level_step_name=self.high_level_step_name
         )
-        super().reset()
+        super().clear_state()
         return {'FINISHED'}
 
 

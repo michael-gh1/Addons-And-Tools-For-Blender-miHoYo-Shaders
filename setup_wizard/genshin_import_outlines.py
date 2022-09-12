@@ -69,7 +69,7 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
             self.invoker_type,
             high_level_step_name=self.high_level_step_name
         )
-        super().reset()
+        super().clear_state()
         return {'FINISHED'}
 
 

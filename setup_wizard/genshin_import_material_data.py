@@ -115,7 +115,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             self.invoker_type, 
             high_level_step_name=self.high_level_step_name
         )
-        super().reset()
+        super().clear_state()
         return {'FINISHED'}
 
     def set_up_mesh_material_data(self, material_data_parser, body_part):

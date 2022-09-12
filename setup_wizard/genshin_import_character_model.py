@@ -79,7 +79,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             file_path_to_cache=character_model_folder_file_path,
             high_level_step_name=self.high_level_step_name
         )
-        super().reset()
+        super().clear_state()
         return {'FINISHED'}
 
     def import_character_model(self, character_model_file_path_directory):

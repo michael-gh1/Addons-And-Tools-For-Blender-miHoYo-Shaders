@@ -17,7 +17,7 @@ class CustomOperatorProperties:
     Scenario: After running Setup Wizard, Import Material Data would run the next steps in the Setup Wizard.
     This would occur despite running the individual component in Advanced Setup.
     '''
-    def reset(self):
+    def clear_state(self):
         self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         self.next_step_idx = -1
         self.file_directory = ''
