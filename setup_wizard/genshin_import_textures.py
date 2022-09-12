@@ -135,7 +135,7 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
             file_path_to_cache=directory,
             high_level_step_name=self.high_level_step_name
         )
-        super().clear_state()
+        super().clear_custom_properties()
         return {'FINISHED'}
 
     def plug_normal_map(self, shader_material_name, label_name):

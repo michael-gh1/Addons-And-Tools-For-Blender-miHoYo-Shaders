@@ -79,7 +79,7 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
             file_path_to_cache=character_model_folder_file_path,
             high_level_step_name=self.high_level_step_name
         )
-        super().clear_state()
+        super().clear_custom_properties()
         return {'FINISHED'}
 
 
