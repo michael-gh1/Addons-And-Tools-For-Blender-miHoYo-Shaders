@@ -64,12 +64,12 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
             if cache_enabled and filepath:
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_OUTLINES_FILE_PATH, filepath)
 
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type,
             high_level_step_name=self.high_level_step_name
         )
+        super().reset()
         return {'FINISHED'}
 
 

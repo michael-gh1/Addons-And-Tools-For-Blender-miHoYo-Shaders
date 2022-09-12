@@ -129,13 +129,13 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
         if cache_enabled and directory:
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
 
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx,
             self.invoker_type,
             file_path_to_cache=directory,
             high_level_step_name=self.high_level_step_name
         )
+        super().reset()
         return {'FINISHED'}
 
     def plug_normal_map(self, shader_material_name, label_name):

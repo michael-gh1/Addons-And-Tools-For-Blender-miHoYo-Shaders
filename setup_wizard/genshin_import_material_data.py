@@ -110,12 +110,12 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                 continue
 
         self.report({'INFO'}, 'Imported material data')
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
             high_level_step_name=self.high_level_step_name
         )
+        super().reset()
         return {'FINISHED'}
 
     def set_up_mesh_material_data(self, material_data_parser, body_part):

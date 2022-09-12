@@ -81,13 +81,13 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
         if cache_enabled and project_root_directory_file_path:
             cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
 
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
             file_path_to_cache=project_root_directory_file_path,
             high_level_step_name=self.high_level_step_name
         )
+        super().reset()
         return {'FINISHED'}
 
 
