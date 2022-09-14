@@ -73,13 +73,13 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         if context.window_manager.cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
 
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
             file_path_to_cache=character_model_folder_file_path,
             high_level_step_name=self.high_level_step_name
         )
+        super().clear_custom_properties()
         return {'FINISHED'}
 
     def import_character_model(self, character_model_file_path_directory):

@@ -100,21 +100,28 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             json_material_data = json.load(fp)
             material_data_parser = self.__get_material_data_json_parser(json_material_data)
 
-            self.set_up_mesh_material_data(material_data_parser, body_part)
-            self.set_up_outline_colors(material_data_parser, body_part)
+            try:
+                self.set_up_mesh_material_data(material_data_parser, body_part)
+                self.set_up_outline_colors(material_data_parser, body_part)
+            except KeyError:
+                self.report({'WARNING'}, \
+                    f'Continuing to apply other material data, but: \n'
+                    f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
+                continue
 
         self.report({'INFO'}, 'Imported material data')
-        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
             high_level_step_name=self.high_level_step_name
         )
+        super().clear_custom_properties()
         return {'FINISHED'}
 
     def set_up_mesh_material_data(self, material_data_parser, body_part):
         if body_part != 'Face':
-            node_tree_group001_inputs = bpy.data.materials[f'miHoYo - Genshin {body_part}'].node_tree.nodes["Group.001"].inputs
+            body_part_material = bpy.data.materials[f'miHoYo - Genshin {body_part}']
+            node_tree_group001_inputs = body_part_material.node_tree.nodes["Group.001"].inputs
 
             self.__apply_material_data(
                 self.local_material_mapping,
@@ -136,7 +143,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             )
 
     def set_up_outline_colors(self, material_data_parser, body_part):
-        outlines_material = bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
+        outlines_material = bpy.data.materials[f'miHoYo - Genshin {body_part} Outlines']
         outlines_shader_node_inputs = outlines_material.node_tree.nodes.get('Group.002').inputs
 
         self.__apply_material_data(

@@ -101,6 +101,7 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
                 modifier_name=modifier.name)
 
         modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_attribute_name'] = 'Col'
+        modifier[OUTLINE_THICKNESS_INPUT] = 0.25
 
         if mesh.name == 'Face_Eye':
             self.disable_face_eye_outlines(modifier)

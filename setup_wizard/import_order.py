@@ -25,7 +25,7 @@ class NextStepInvoker:
         elif type == 'invoke_next_step_ui':
             invoke_next_step_ui(high_level_step_name, current_step_index)
         else:
-            print(f'Warn: Unknown type found when invoking: {type}')
+            print(f'Warning: Unknown type found when invoking: {type}')
 
 
 def invoke_next_step(current_step_idx: int, file_path_to_cache=None):

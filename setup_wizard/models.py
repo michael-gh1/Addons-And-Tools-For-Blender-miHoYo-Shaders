@@ -10,6 +10,20 @@ class CustomOperatorProperties:
     invoker_type: StringProperty()
     high_level_step_name: StringProperty()
 
+    '''
+    Modules will be registered and store previous choices within the same Blender file instance/session.
+    This method will reset all values in the module in order for previous state to persist.
+    
+    Scenario: After running Setup Wizard, Import Material Data would run the next steps in the Setup Wizard.
+    This would occur despite running the individual component in Advanced Setup.
+    '''
+    def clear_custom_properties(self):
+        self.filepath = ''  # Important! UI saves previous choices to the Operator instance
+        self.next_step_idx = -1
+        self.file_directory = ''
+        self.invoker_type = ''
+        self.high_level_step_name = ''
+
 
 class BasicSetupUIOperator:
     def execute(self, context):
