@@ -34,11 +34,6 @@ meshes_to_create_geometry_nodes_on = [
     'Face',
 ]
 
-face_meshes = [
-    'Brow',
-    'Face',
-    'Face_Eye'
-]
 
 class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
     '''Sets Up Geometry Nodes for Outlines'''
