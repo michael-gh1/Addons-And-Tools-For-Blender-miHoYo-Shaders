@@ -31,9 +31,7 @@ outline_mask_to_material_mapping = {
 
 meshes_to_create_geometry_nodes_on = [
     'Body',
-    'Brow',
     'Face',
-    'Face_Eye'
 ]
 
 face_meshes = [
