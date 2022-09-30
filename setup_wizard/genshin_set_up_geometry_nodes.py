@@ -32,6 +32,7 @@ outline_mask_to_material_mapping = {
 meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
+    'Face_Eye',
 ]
 
 
@@ -96,8 +97,8 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
         modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_attribute_name'] = 'Col'
         modifier[OUTLINE_THICKNESS_INPUT] = 0.25
 
-        if mesh.name == 'Face_Eye':
-            self.disable_face_eye_outlines(modifier)
+        # if mesh.name == 'Face_Eye':
+        #     self.disable_face_eye_outlines(modifier)
 
         for (mask_input, material_input), material in zip(outline_mask_to_material_mapping.items(), mesh.material_slots):
             modifier[mask_input] = bpy.data.materials[material.name]
