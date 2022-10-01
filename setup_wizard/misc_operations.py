@@ -33,11 +33,12 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
         scene = bpy.context.scene
         objects_to_delete = [
             'EffectMesh'
-        ]
+        ]  # be extremely careful, we will be deleting anything that contains these object names
 
         for object in scene.objects:
-            if object.name in objects_to_delete:
-                bpy.data.objects.remove(object)
+            for object_to_delete in objects_to_delete:
+                if object_to_delete in object.name and object.type == 'MESH':
+                    bpy.data.objects.remove(object)
 
         if self.next_step_idx:
             NextStepInvoker().invoke(
