@@ -65,8 +65,9 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         # Hide EffectMesh (gets deleted later on) and EyeStar
         # Now shoving in adding UV1 map too...
         for object in bpy.data.objects:
-            if object.name == 'EffectMesh' or object.name == 'EyeStar':
+            if 'EffectMesh' in object.name or 'EyeStar' in object.name:
                 bpy.data.objects[object.name].hide_set(True)
+                bpy.data.objects[object.name].hide_render = True
             if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
                 object.data.uv_layers.new(name='UV1')
 

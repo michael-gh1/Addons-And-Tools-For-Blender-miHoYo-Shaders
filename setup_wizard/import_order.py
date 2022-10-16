@@ -133,11 +133,17 @@ def clear_cache():
 def get_actual_material_name_for_dress(material_name):
     for material in bpy.data.materials:
         if material_name in material.name:
-            # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
-            base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
-            actual_material_name = base_color_texture_image_name.split('_')[-2]
-            actual_material_name = actual_material_name if actual_material_name else 'Hair' \
-                if 'Hair' in base_color_texture_image_name else 'Body'  # fallback method to get mat name
+            try:
+                # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
+                base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
+                actual_material_name = base_color_texture_image_name.split('_')[-2]
+                actual_material_name = actual_material_name if actual_material_name else 'Hair' \
+                    if 'Hair' in base_color_texture_image_name else 'Body'  # fallback method to get mat name
+            except IndexError:
+                # ex. 'Diffuse Texture.001'
+                actual_material_name = material_name.split('_')[-1]
+                actual_material_name = actual_material_name if actual_material_name != 'Dress' else 'Body'  # if mat name is 'body' or 'hair' use that, else fallback to 'body'
+                print(f'WARNING: Fallback to applying "{actual_material_name}" onto "{material_name}". Image name is not parseable for: {material_name}')
             return actual_material_name
 
 

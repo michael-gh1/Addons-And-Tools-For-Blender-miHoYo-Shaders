@@ -58,65 +58,57 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
-                
-                # declare body and face mesh variables
-                body_mesh = bpy.context.scene.objects.get("Body")
-                face_mesh = bpy.context.scene.objects.get("Face")
+
+                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
+                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
+                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
                 
                 # Implement the texture in the correct node
                 self.report({'INFO'}, f'Importing texture {file}')
                 if "Hair_Diffuse" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
+                    hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
+                    hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
                     self.setup_dress_textures('Hair_Diffuse', img)
                 elif "Hair_Lightmap" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
                     img.colorspace_settings.name='Non-Color'
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
+                    hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
+                    hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
                     self.setup_dress_textures('Hair_Lightmap', img)
                 elif "Hair_Normalmap" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
                     img.colorspace_settings.name='Non-Color'
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Hair').material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
+                    hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
+                    hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
                     self.setup_dress_textures('Hair_Normalmap', img)
                     self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
                 elif "Hair_Shadow_Ramp" in file :
                     bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
                 elif "Body_Diffuse" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Diffuse_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Diffuse_UV1'].image = img
+                    body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
+                    body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
                     self.setup_dress_textures('Body_Diffuse', img)
                 elif "Body_Lightmap" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
                     img.colorspace_settings.name='Non-Color'
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Lightmap_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Lightmap_UV1'].image = img
+                    body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
+                    body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
                     self.setup_dress_textures('Body_Lightmap', img)
                 elif "Body_Normalmap" in file :
-                    bpy.context.view_layer.objects.active = body_mesh
                     img.colorspace_settings.name='Non-Color'
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Normalmap_UV0'].image = img
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Body').material.node_tree.nodes['Body_Normalmap_UV1'].image = img
+                    body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
+                    body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
                     self.setup_dress_textures('Body_Normalmap', img)
                     self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
+                    self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
                 elif "Body_Shadow_Ramp" in file :
                     bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file :
                     img.colorspace_settings.name='Non-Color'
                     bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img
                 elif "Face_Diffuse" in file :
-                    bpy.context.view_layer.objects.active = face_mesh if face_mesh else body_mesh
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Face').material.node_tree.nodes['Face_Diffuse'].image = img
+                    face_material.node_tree.nodes['Face_Diffuse'].image = img
                 elif "Face_Shadow" in file :
-                    bpy.context.view_layer.objects.active = face_mesh if face_mesh else body_mesh
                     img.colorspace_settings.name='Non-Color'
-                    bpy.context.object.material_slots.get('miHoYo - Genshin Face').material.node_tree.nodes['Face_Shadow'].image = img
+                    face_material.node_tree.nodes['Face_Shadow'].image = img
                 elif "FaceLightmap" in file :
-                    bpy.context.view_layer.objects.active = face_mesh if face_mesh else body_mesh
                     img.colorspace_settings.name='Non-Color'
                     bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
                 elif "MetalMap" in file :
@@ -142,14 +134,15 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
         shader_group_material_name = 'Group.001'
         shader_material = bpy.data.materials.get(shader_material_name)
 
-        normal_map_node_color_output = [node.outputs.get('Color') for node in shader_material.node_tree.nodes \
-            if node.label == label_name and not node.outputs.get('Color').is_linked][0]
-        normal_map_input = shader_material.node_tree.nodes.get(shader_group_material_name).inputs.get('Normal Map')
+        if shader_material:
+            normal_map_node_color_output = [node.outputs.get('Color') for node in shader_material.node_tree.nodes \
+                if node.label == label_name and not node.outputs.get('Color').is_linked][0]
+            normal_map_input = shader_material.node_tree.nodes.get(shader_group_material_name).inputs.get('Normal Map')
 
-        bpy.data.materials.get(shader_material_name).node_tree.links.new(
-            normal_map_node_color_output,
-            normal_map_input
-        )
+            bpy.data.materials.get(shader_material_name).node_tree.links.new(
+                normal_map_node_color_output,
+                normal_map_input
+            )
     
     def setup_dress_textures(self, texture_name, texture_img):
         shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]

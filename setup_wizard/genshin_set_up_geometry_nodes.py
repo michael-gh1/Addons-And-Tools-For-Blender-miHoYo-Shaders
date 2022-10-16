@@ -49,8 +49,10 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
     def setup_geometry_nodes(self, next_step_idx):
         self.clone_outlines()
         for mesh_name in meshes_to_create_geometry_nodes_on:
-            self.create_geometry_nodes_modifier(f'{mesh_name}{BODY_PART_SUFFIX}')
-            self.fix_meshes_by_setting_genshin_materials(mesh_name)
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if mesh_name in object_name and object_data.type == 'MESH':
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
 
         if next_step_idx:
             NextStepInvoker().invoke(
