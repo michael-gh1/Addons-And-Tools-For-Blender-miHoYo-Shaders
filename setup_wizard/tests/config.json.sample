@@ -1,0 +1,6 @@
+{
+    "blender_execution_file_path": "FILE_PATH_TO_blender.exe",
+    "festivity_root_folder_file_path": "FILE_PATH_TO_festivity_shaders_folder",
+    "characters_folder_file_path": "FILE_PATH_TO_gi-assets-characters-folder",
+    "material_json_folder_file_path": "FILE_PATH_TO_material_data_folder"
+}
