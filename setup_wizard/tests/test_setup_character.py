@@ -6,7 +6,7 @@ from pathlib import PurePath
 from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, ComponentFunctionFactory
 from setup_wizard.tests.gi_assets_material_data_mapper import get_character_material_dictionary
 
-MATERIAL_JSON_FOLDER_FILE_PATH = 'material_json_folder_file_path_with_placeholder_at_end'
+MATERIAL_JSON_FOLDER_FILE_PATH = 'material_json_folder_file_path'
 
 argv = sys.argv
 argv = argv[argv.index('--') + 1:]
@@ -21,7 +21,11 @@ arg_character_folder_file_path = argv[2]
 
 def setup_character(config, character_name, character_folder_file_path):
     try:
-        material_json_folder_file_path = config.get(MATERIAL_JSON_FOLDER_FILE_PATH)
+        material_json_folder_file_path = str(
+            PurePath(config.get(MATERIAL_JSON_FOLDER_FILE_PATH), 
+                'placeholder_string_for_import_material_data_operator'
+            )
+        )
         material_json_files = os.listdir(os.path.dirname(material_json_folder_file_path))
 
         character_name = get_character_material_dictionary().get(character_name)
