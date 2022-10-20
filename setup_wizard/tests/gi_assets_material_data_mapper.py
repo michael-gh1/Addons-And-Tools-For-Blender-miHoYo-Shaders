@@ -44,8 +44,9 @@ def parse_fbx_filename_to_material_data_name(filename):
 
 # Character name key is used by tests, format: {character_name}{skin_name}
 def parse_character_name_key(file_path):
-    character_name_key = file_path[file_path.index('Characters\\') + len('Characters\\'):]
-    character_name_key = character_name_key.replace('\\', '')
+    character_name_key = file_path[file_path.index('Characters') + len('Characters') + 1:]
+    character_name_key = character_name_key.replace('\\', '')  # Windows
+    character_name_key = character_name_key.replace('/', '')  # Linux/OSX filesytsem?
     return character_name_key
 
 
