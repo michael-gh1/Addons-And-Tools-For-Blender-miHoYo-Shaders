@@ -38,6 +38,9 @@ class TestDriver:
             )  # all items inside character folder
 
             for nested_character_folder_item in character_folder_items:  # is the item a directory?
+                if nested_character_folder_item == 'Material' or \
+                    nested_character_folder_item == 'Materials':  # is a material data folder
+                    continue
                 absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
 
                 if os.path.isdir(absolute_character_folder_file_path):
