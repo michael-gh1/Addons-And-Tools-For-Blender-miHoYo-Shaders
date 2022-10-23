@@ -4,7 +4,7 @@ import os
 import sys
 from pathlib import PurePath
 from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, ComponentFunctionFactory
-from setup_wizard.tests.gi_assets_material_data_mapper import get_character_material_dictionary
+from setup_wizard.tests.character_filename_to_material_data_mapper import get_character_material_dictionary
 
 MATERIAL_JSON_FOLDER_FILE_PATH = 'material_json_folder_file_path'
 
