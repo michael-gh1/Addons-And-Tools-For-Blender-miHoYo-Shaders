@@ -35,10 +35,10 @@ def setup_character(config, character_name, character_folder_file_path):
         )
         material_json_files = os.listdir(os.path.dirname(material_json_folder_file_path))
 
-        character_name = get_character_material_dictionary().get(character_name)
+        character_name_in_material_data = get_character_material_dictionary().get(character_name)
         material_json_files = [
             { 'name': material_json_file } for material_json_file in material_json_files
-            if f'_{character_name}_' in material_json_file and 
+            if f'_{character_name_in_material_data}_' in material_json_file and 
             (
                 material_json_file[material_json_file.rindex('_'):material_json_file.rindex('.json')] == '_Body' or
                 material_json_file[material_json_file.rindex('_'):material_json_file.rindex('.json')] == '_Dress' or

@@ -11,10 +11,8 @@ CHARACTERS_FOLDER_FILE_PATH = 'characters_folder_file_path'
 IGNORE_LIST = [
     'Asmoday',
     'Barbara',
-    'Childe',  # Body_CloakEffecTMesh. Maybe make us check 'BodyPart.' and not just 'BodyPart'
     'Dainsleif',  # Cloak Outlines not found...we didn't replace material
     'Dvalin',
-    'Eula', # Body_CloakEffectMesh
     'La Signora',
     'Ningguang',  # Floral issue?
     'Xiao',  # Mat_Arm not found...didn't replace material,
