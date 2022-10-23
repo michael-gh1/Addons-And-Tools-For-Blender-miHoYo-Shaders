@@ -13,7 +13,6 @@ IGNORE_LIST = [
     'Barbara',  # Missing face textures
     'Dvalin',
     'La Signora',
-    'Ningguang',  # Floral issue?
     'Xiao',  # Mat_Arm not found...didn't replace material,
 ]  # Broken characters
 
