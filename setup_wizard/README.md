@@ -8,6 +8,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 **Compatibility**: This tool has been tested on Blender Version 3.3.0 and attempts to support older versions of Blender, but working functionality is not guaranteed.
 
+:star: If this Addon is useful, please be sure to **Star** the repository! :star:
 
 ## Table of Contents
 1. [Tutorials/Screenshots](#tutorialsscreenshots)
@@ -224,6 +225,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [X] Turn Setup Wizard into an Addon
 - [X] UI Setup Wizard Addon
 - [ ] Update Configuration from UI (checkboxes that enable/disable steps)
+- [ ] Batch Character Setup
 ### Refactoring
 - [X] Refactor Material Assignment Mapping (externalize/centralize it to one locaiton)
 - [ ] Refactor Import Outline Lightmaps component
@@ -232,6 +234,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [ ] Invoker Class
 - [ ] import_order.py is becoming too big
 - [ ] invoke_next_step may not need to cache anymore since we can cache directly in Operators
+- [X] Automated Tests
 ### Misc.
 - [X] Crude design diagram depicting how this tool and the components interact and work
 - [ ] A refreshed design diagram with the UI Addon flow

@@ -50,7 +50,7 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
         self.clone_outlines()
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
-                if mesh_name in object_name and object_data.type == 'MESH':
+                if object_data.type == 'MESH' and (mesh_name == object_name or f'{mesh_name}.' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
@@ -98,9 +98,6 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
 
         modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_attribute_name'] = 'Col'
         modifier[OUTLINE_THICKNESS_INPUT] = 0.25
-
-        # if mesh.name == 'Face_Eye':
-        #     self.disable_face_eye_outlines(modifier)
 
         for (mask_input, material_input), material in zip(outline_mask_to_material_mapping.items(), mesh.material_slots):
             modifier[mask_input] = bpy.data.materials[material.name]

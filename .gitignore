@@ -1,4 +1,6 @@
 *.tmp
+*.log
+setup_wizard/tests/config.json
 
 
 # Byte-compiled / optimized / DLL files

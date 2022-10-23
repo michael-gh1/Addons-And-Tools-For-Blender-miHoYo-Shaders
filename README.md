@@ -4,6 +4,8 @@ This repo contains addons and tools for working with Blender-miHoYo-Shaders (Fes
 
 Please head to the [Releases Page](https://github.com/michael-gh1/Addons-And-Tools-For-Blender-miHoYo-Shaders/releases) to download the zipped Addons and Tools.
 
+:star: If these Addons are useful, please be sure to **Star** the repository! :star:
+
 # Installation Instructions
 
 If you are downloading an Addon, simply download the zipped file and install the file directly in Blender.
