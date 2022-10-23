@@ -10,13 +10,12 @@ BLENDER_EXECUTION_FILE_PATH = 'blender_execution_file_path'
 CHARACTERS_FOLDER_FILE_PATH = 'characters_folder_file_path'
 IGNORE_LIST = [
     'Asmoday',
-    'Barbara',
-    'Dainsleif',  # Cloak Outlines not found...we didn't replace material
+    'Barbara',  # Missing face textures
     'Dvalin',
     'La Signora',
     'Ningguang',  # Floral issue?
     'Xiao',  # Mat_Arm not found...didn't replace material,
-]  # TODO: Fix these characters, latest changes in v1.1.0 likely broke them
+]  # Broken characters
 
 class TestDriver:
     def __init__(self):
