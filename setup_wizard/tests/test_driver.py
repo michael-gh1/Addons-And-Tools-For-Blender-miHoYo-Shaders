@@ -58,17 +58,6 @@ class TestDriver:
                         f'{character_folder_file_path}{nested_character_folder_item}',
                         f'{absolute_character_folder_file_path}'
                     ])
-                    # setup_character(
-                    #     self.config_service.get_config(),
-                    #     f'{nested_character_folder_item}', 
-                    #     str(
-                    #         PurePath(
-                    #             characters_folder_file_path, 
-                    #             character_folder_file_path, 
-                    #             nested_character_folder_item
-                    #         )
-                    #     )
-                    # )
                     is_not_nested = False
             if is_not_nested:
                 absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path))
@@ -84,16 +73,6 @@ class TestDriver:
                     f'{character_folder_file_path}',
                     f'{absolute_character_folder_file_path}'
                 ])
-                # setup_character(
-                #     self.config_service.get_config(),
-                #     character_folder_file_path,
-                #     str(
-                #         PurePath(
-                #             characters_folder_file_path,
-                #             character_folder_file_path
-                #         )
-                #     )
-                # )
 
 
 TestDriver().execute()
