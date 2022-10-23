@@ -146,8 +146,11 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
     
     def setup_dress_textures(self, texture_name, texture_img):
         shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
-        shader_cloak_materials = [material for material in bpy.data.materials if 'Genshin Cloak' in material.name]
+        shader_cloak_materials = [material for material in bpy.data.materials
+                                  if 'Genshin Arm' in material.name or 'Genshin Cloak' in material.name]
 
+        # TODO: Refactor this for sure!
+        # Specific case for Xiao (the only character with an Arm material)
         # Specific case for Dainsleif (the only character with a Cloak material)
         # Technically Paimon has one, but we ignore it
         if shader_cloak_materials:

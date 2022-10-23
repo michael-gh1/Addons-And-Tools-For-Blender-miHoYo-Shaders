@@ -52,7 +52,8 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
 
                 if genshin_material:            
                     material_slot.material = genshin_material
-                elif 'Dress' in mesh_body_part_name or 'Cloak' in mesh_body_part_name:
+                elif 'Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name:
+                    # Xiao is the only character with an Arm material
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.report({'INFO'}, 'Dress detected on character model!')
 
