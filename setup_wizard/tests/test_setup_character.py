@@ -1,9 +1,11 @@
 import bpy
 import json
+import logging
 import os
 import sys
 from pathlib import PurePath
 from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, ComponentFunctionFactory
+from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.character_filename_to_material_data_mapper import get_character_material_dictionary
 
 MATERIAL_JSON_FOLDER_FILE_PATH = 'material_json_folder_file_path'
@@ -14,12 +16,17 @@ argv = argv[argv.index('--') + 1:]
 print('argv')
 print(argv)
 
-arg_config = json.loads(argv[0])
-arg_character_name = argv[1]
-arg_character_folder_file_path = argv[2]
+arg_logs_directory_path = argv[0]
+arg_config = json.loads(argv[1])
+arg_character_name = argv[2]
+arg_character_folder_file_path = argv[3]
+
+Logger(f'{arg_logs_directory_path}/tests.log')
+logger = logging.getLogger(__name__)
 
 
 def setup_character(config, character_name, character_folder_file_path):
+    logger.info(f'Starting test for {character_name}')
     try:
         material_json_folder_file_path = str(
             PurePath(config.get(MATERIAL_JSON_FOLDER_FILE_PATH), 
@@ -101,8 +108,10 @@ def setup_character(config, character_name, character_folder_file_path):
         execute_ops(
             'delete_specific_objects'
         )
+        logger.info(f'Completed test for {character_name}')
     except Exception as ex:
-        print(ex)
+        logger.error(ex)
+        logger.error(f'Failed test for {arg_character_name}')
         pass  # Unexpected exception! Catch any exception and quit
     bpy.ops.wm.quit_blender()
 
