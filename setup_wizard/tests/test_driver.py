@@ -5,9 +5,8 @@ import subprocess
 import os
 from pathlib import Path, PurePath
 from setup_wizard.services.config_service import ConfigService
+from setup_wizard.tests.constants import BLENDER_EXECUTION_FILE_PATH, CHARACTERS_FOLDER_FILE_PATH
 
-BLENDER_EXECUTION_FILE_PATH = 'blender_execution_file_path'
-CHARACTERS_FOLDER_FILE_PATH = 'characters_folder_file_path'
 IGNORE_LIST = [
     'Asmoday',
     'Barbara',  # Missing face textures
