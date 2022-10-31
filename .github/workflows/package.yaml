@@ -17,9 +17,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set Up Addon Folder Structure
         run: |
+          rm -r setup_wizard/tests
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
-          rm -r dist/setup_wizard/setup_wizard/tests
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
         with:
