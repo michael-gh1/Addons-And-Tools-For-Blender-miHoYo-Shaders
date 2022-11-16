@@ -67,7 +67,16 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                     img.alpha_mode = 'CHANNEL_PACKED'
 
                     self.report({'INFO'}, f'Importing lightmap texture "{file}" onto material "{outline_material.name}"')
-                    bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get('Image Texture').image = img
+
+                    # TODO: Refactor. Also, we need to assign Diffuse
+                    old_lightmap_node_name = 'Image Texture'
+                    rewrite_lightmap_node_name = 'Outline_Lightmap'
+
+                    lightmap_node = bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(old_lightmap_node_name) \
+                        if bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(old_lightmap_node_name) \
+                            else bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(rewrite_lightmap_node_name)
+
+                    lightmap_node.image = img
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         if cache_enabled and character_model_folder_file_path:
