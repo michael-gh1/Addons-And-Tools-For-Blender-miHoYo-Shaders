@@ -18,7 +18,7 @@ Example:
 {
     "job": {
         "source_folder": "",
-        "output_folder": "",
+        "destination_folder": "",
         "file_extension_search": "fbx",
         "operators": [
             {
