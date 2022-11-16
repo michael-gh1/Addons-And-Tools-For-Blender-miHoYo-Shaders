@@ -63,7 +63,7 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             'Set Up Materials',
             icon='MATERIAL'
         )
-        if version_number_above_or_equal((3, 3, 0)):
+        if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.set_up_outlines',
@@ -159,7 +159,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
         layout = self.layout
         sub_layout = layout.column()
 
-        if version_number_above_or_equal((3, 3, 0)):
+        if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_outlines',
@@ -223,17 +223,6 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'Delete EffectMesh',
             'TRASH'
         )
-
-
-def version_number_above_or_equal(required_version_number_tuple):
-    current_version = bpy.app.version
-
-    for index in range(0, len(required_version_number_tuple)):
-        if current_version[index] < required_version_number_tuple[index]:
-            return False
-        elif current_version[index] > required_version_number_tuple[index]:
-            return True
-    return True
 
 
 '''

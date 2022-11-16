@@ -6,7 +6,6 @@ from bpy.types import Operator
 from setup_wizard.import_order import NextStepInvoker
 
 from setup_wizard.models import BasicSetupUIOperator
-from setup_wizard.ui_setup_wizard_menu import version_number_above_or_equal
 
 
 class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
@@ -20,7 +19,7 @@ class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
         NextStepInvoker().invoke(
             next_step_index,
             'invoke_next_step_ui', 
-            high_level_step_name=self.bl_idname if version_number_above_or_equal((3, 3, 0)) \
+            high_level_step_name=self.bl_idname if bpy.app.version >= (3,3,0) >= (3,3,0) \
                 else self.bl_idname + '_no_outlines'
         )
         return {'FINISHED'}
