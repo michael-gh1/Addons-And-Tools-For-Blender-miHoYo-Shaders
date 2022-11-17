@@ -59,6 +59,7 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
                 original_material_name = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]  # from original model
                 material_part_name = get_actual_material_name_for_dress(original_material_name.name)
+
                 if 'Face' not in material_part_name and 'Face' not in body_part_material_name:
                     file = [file for file in lightmap_files if material_part_name in file][0]
 
@@ -75,8 +76,20 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                     lightmap_node = bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(old_lightmap_node_name) \
                         if bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(old_lightmap_node_name) \
                             else bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(rewrite_lightmap_node_name)
-
                     lightmap_node.image = img
+
+                    rewrite_difuse_node_name = 'Outline_Diffuse'
+                    diffuse_node = bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(rewrite_difuse_node_name) \
+                        if bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines').node_tree.nodes.get(rewrite_difuse_node_name) \
+                            else None
+                    if diffuse_node:
+                        print(body_part_material_name)
+                        # TODO: Refactor this logic as it's common with the Lightmap img
+                        diffuse_file = [file for file in files if 'Diffuse' in file and f'{material_part_name}' in file][0]
+                        diffuse_img_path = character_model_folder_file_path + "/" + diffuse_file
+                        diffuse_img = bpy.data.images.load(filepath = diffuse_img_path, check_existing=True)
+                        diffuse_img.alpha_mode = 'CHANNEL_PACKED'
+                        diffuse_node.image = diffuse_img
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         if cache_enabled and character_model_folder_file_path:
