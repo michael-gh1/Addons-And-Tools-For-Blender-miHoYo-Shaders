@@ -41,6 +41,51 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     files: CollectionProperty(type=PropertyGroup)
 
     local_material_mapping = {
+        '_FaceBlushColor': 'Face Blush Color',
+        '_FaceBlushStrength': 'Face Blush Strength',
+        # '_FaceMapSoftness': 'Face Shadow Softness',  # material data values are either 0.001 or 1E-06
+        "_UseMaterial2": 'Use Material 2',
+        "_UseMaterial3": 'Use Material 3',
+        "_UseMaterial4": 'Use Material 4',
+        "_UseMaterial5": 'Use Material 5',
+        '_UseBumpMap': 'Use Normal Map',
+        '_ShadowRampWidth': 'Shadow Ramp Width',
+        "_ShadowTransitionRange": 'Shadow Transition Range',
+        "_ShadowTransitionRange2": 'Shadow Transition Range 2',
+        "_ShadowTransitionRange3": 'Shadow Transition Range 3',
+        "_ShadowTransitionRange4": 'Shadow Transition Range 4',
+        "_ShadowTransitionRange5": 'Shadow Transition Range 5',
+        "_ShadowTransitionSoftness": 'Shadow Transition Softness',
+        "_ShadowTransitionSoftness2": 'Shadow Transition Softness 2',
+        "_ShadowTransitionSoftness3": 'Shadow Transition Softness 3',
+        "_ShadowTransitionSoftness4": 'Shadow Transition Softness 4',
+        "_ShadowTransitionSoftness5": 'Shadow Transition Softness 5',
+        '_MTMapBrightness': 'Metallic Matcap Brightness',
+        '_MTMapTileScale': 'Metallic Matcap Tile Scale',
+        '_MTMapLightColor': 'Metallic Matcap Light Color',
+        '_MTMapDarkColor': 'Metallic Matcap Dark Color',
+        '_MTShadowMultiColor': 'Metallic Matcap Shadow Multiply Color',
+        '_Shininess': 'Shininess',
+        '_Shininess2': 'Shininess 2',
+        '_Shininess3': 'Shininess 3',
+        '_Shininess4': 'Shininess 4',
+        '_Shininess5': 'Shininess 5',
+        '_SpecMulti': 'Specular Multiplier',
+        '_SpecMulti2': 'Specular Multiplier 2',
+        '_SpecMulti3': 'Specular Multiplier 3',
+        '_SpecMulti4': 'Specular Multiplier 4',
+        '_SpecMulti5': 'Specular Multiplier 5',
+        '_SpecularColor': 'Specular Color',
+        '_MTShininess': 'Metallic Specular Shininess',
+        '_MTSpecularScale': 'Metallic Specular Scale',
+        '_MTSpecularAttenInShadow': 'Metallic Specular Attenuation',
+        '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
+        '_MTSpecularColor': 'MT Specular Color',
+        '_MTSharpLayerColor': 'MT Sharp Layer Color',
+        '_MTUseSpecularRamp': 'Use Specular Ramp',
+    }
+
+    old_local_material_mapping = {
         '_SpecMulti': 'Non-Metallic Specular Multiplier 1',
         '_SpecMulti2': 'Non-Metallic Specular Multiplier 2',
         '_SpecMulti3': 'Non-Metallic Specular Multiplier 3',
@@ -70,15 +115,29 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         '_OutlineColor5': 'Outline Color 5'
     }
 
-    global_material_mapping = {
+    old_global_material_mapping = {
         '_MTUseSpecularRamp': 'Use Specular Ramp?',
         '_FaceBlushColor': 'Blush Color',
     }
+
+    global_material_mapping = {
+        '_MTUseSpecularRamp': 'Use Specular Ramp',
+        '_FaceBlushColor': 'Face Blush Color',
+    }
+
+    shader_node_tree_node_name = 'Group.006'
+    global_node_tree_node_name = 'Group.006'
+    outlines_node_tree_node_name = 'Group.006'
+    old_shader_node_tree_node_name = 'Group.001'
+    old_global_node_tree_node_name = 'Group Output'
+    old_outlines_node_tree_node_name = 'Group.002'
 
     parsers = [
         HoyoStudioMaterialDataJsonParser,
         UABEMaterialDataJsonParser,
     ]
+
+    material_data_appliers = []
 
     def execute(self, context):
         directory_file_path = os.path.dirname(self.filepath)
@@ -121,7 +180,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     def set_up_mesh_material_data(self, material_data_parser, body_part):
         if body_part != 'Face':
             body_part_material = bpy.data.materials[f'miHoYo - Genshin {body_part}']
-            node_tree_group001_inputs = body_part_material.node_tree.nodes["Group.001"].inputs
+            node_tree_group001_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
             self.__apply_material_data(
                 self.local_material_mapping,
@@ -132,6 +191,8 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             
         # Not sure, should we only apply Global Material Properties from Body .dat file?
         if body_part == 'Body':
+            # TODO: Add backwards compatibility
+            return  # SpecularRamp/FaceBlush already covered
             global_material_properties_node_inputs = \
                 bpy.data.node_groups["GLOBAL MATERIAL PROPERTIES"].nodes["Group Output"].inputs
 
@@ -144,7 +205,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
 
     def set_up_outline_colors(self, material_data_parser, body_part):
         outlines_material = bpy.data.materials[f'miHoYo - Genshin {body_part} Outlines']
-        outlines_shader_node_inputs = outlines_material.node_tree.nodes.get('Group.002').inputs
+        outlines_shader_node_inputs = outlines_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
 
         self.__apply_material_data(
             self.outline_mapping, 
@@ -172,6 +233,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                 continue
 
             node_input = node_inputs.get(material_node_name)
+            # print(f'Debug: Material Node Name: {material_node_name}')
             node_input.default_value = material_json_value
 
     def __get_value_in_json_parser(self, parser, key):
