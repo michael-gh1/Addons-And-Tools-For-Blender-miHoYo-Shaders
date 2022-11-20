@@ -12,7 +12,7 @@ import os
 from setup_wizard.import_order import FESTIVITY_ROOT_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
-BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
+DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
 
 NAMES_OF_GENSHIN_MATERIALS = [
@@ -66,9 +66,10 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
             )
             return {'FINISHED'}
 
+        blend_file_with_genshin_materials = self.filepath or DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS
         directory_with_blend_file_path = os.path.join(
             project_root_directory_file_path,
-            BLEND_FILE_WITH_GENSHIN_MATERIALS,
+            blend_file_with_genshin_materials,
             MATERIAL_PATH_INSIDE_BLEND_FILE
         )
 
