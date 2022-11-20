@@ -14,9 +14,10 @@ class MaterialDataApplier(ABC):
         '_OutlineColor5': 'Outline Color 5'
     }
 
-    def __init__(self, material_data_parser, body_part):
+    def __init__(self, material_data_parser, body_part, outlines_node_tree_node_name):
         self.material_data_parser = material_data_parser
         self.body_part = body_part
+        self.outlines_node_tree_node_name = outlines_node_tree_node_name
     
     @abstractmethod
     def set_up_mesh_material_data(self):
@@ -87,7 +88,7 @@ class V1_MaterialDataApplier(MaterialDataApplier):
     outlines_node_tree_node_name = 'Group.002'
 
     def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part)
+        super().__init__(material_data_parser, body_part, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
         if self.body_part != 'Face':
@@ -160,7 +161,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
     outlines_node_tree_node_name = 'Group.006'
 
     def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part)
+        super().__init__(material_data_parser, body_part, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
         body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
