@@ -23,52 +23,55 @@ class TestDriver:
         Path(self.logs_directory_path).mkdir(parents=True, exist_ok=True)
 
     def execute(self):
-        characters_folder_file_path = self.config_service.get(CHARACTERS_FOLDER_FILE_PATH)  # root level
-        character_folders = os.listdir(characters_folder_file_path)  # all folders inside
-        config = json.dumps(self.config_service.get_config())
+        environment_configs = self.config_service.get('environments')
 
-        for character_folder_file_path in character_folders:  # for each character folder
-            if character_folder_file_path in IGNORE_LIST:
-                continue
+        for environment_config in environment_configs:
+            characters_folder_file_path = environment_config.get(CHARACTERS_FOLDER_FILE_PATH)  # root level
+            character_folders = os.listdir(characters_folder_file_path)  # all folders inside
+            environment_config_str = json.dumps(environment_config)
 
-            is_not_nested = True
-            character_folder_items = os.listdir(
-                str(PurePath(characters_folder_file_path, character_folder_file_path))
-            )  # all items inside character folder
-
-            for nested_character_folder_item in character_folder_items:  # is the item a directory?
-                if nested_character_folder_item == 'Material' or \
-                    nested_character_folder_item == 'Materials':  # is a material data folder
+            for character_folder_file_path in character_folders:  # for each character folder
+                if character_folder_file_path in IGNORE_LIST:
                     continue
-                absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
 
-                if os.path.isdir(absolute_character_folder_file_path):
+                is_not_nested = True
+                character_folder_items = os.listdir(
+                    str(PurePath(characters_folder_file_path, character_folder_file_path))
+                )  # all items inside character folder
+
+                for nested_character_folder_item in character_folder_items:  # is the item a directory?
+                    if nested_character_folder_item == 'Material' or \
+                        nested_character_folder_item == 'Materials':  # is a material data folder
+                        continue
+                    absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
+
+                    if os.path.isdir(absolute_character_folder_file_path):
+                        subprocess.run([
+                            environment_config.get(BLENDER_EXECUTION_FILE_PATH),
+                            '-b',
+                            '--python',
+                            'setup_wizard/tests/test_setup_character.py',
+                            '--',
+                            f'{self.logs_directory_path}',
+                            f'{environment_config_str}',
+                            f'{character_folder_file_path}{nested_character_folder_item}',
+                            f'{absolute_character_folder_file_path}'
+                        ])
+                        is_not_nested = False
+                if is_not_nested:
+                    absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path))
+
                     subprocess.run([
-                        self.config_service.get(BLENDER_EXECUTION_FILE_PATH),
+                        environment_config.get(BLENDER_EXECUTION_FILE_PATH),
                         '-b',
                         '--python',
                         'setup_wizard/tests/test_setup_character.py',
                         '--',
                         f'{self.logs_directory_path}',
-                        f'{config}',
-                        f'{character_folder_file_path}{nested_character_folder_item}',
+                        f'{environment_config_str}',
+                        f'{character_folder_file_path}',
                         f'{absolute_character_folder_file_path}'
                     ])
-                    is_not_nested = False
-            if is_not_nested:
-                absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path))
-
-                subprocess.run([
-                    self.config_service.get(BLENDER_EXECUTION_FILE_PATH),
-                    '-b',
-                    '--python',
-                    'setup_wizard/tests/test_setup_character.py',
-                    '--',
-                    f'{self.logs_directory_path}',
-                    f'{config}',
-                    f'{character_folder_file_path}',
-                    f'{absolute_character_folder_file_path}'
-                ])
 
 
 TestDriver().execute()

@@ -182,5 +182,7 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
             return bpy.ops.genshin.setup_head_driver
+        elif component_name == 'clear_cache_operator':
+            return bpy.ops.genshin.clear_cache_operator
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')
