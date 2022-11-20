@@ -93,11 +93,11 @@ class V1_MaterialDataApplier(MaterialDataApplier):
     def set_up_mesh_material_data(self):
         if self.body_part != 'Face':
             body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
-            node_tree_group001_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+            shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
             super().apply_material_data(
                 self.local_material_mapping,
-                node_tree_group001_inputs,
+                shader_node_tree_inputs,
             )
             
         # Not sure, should we only apply Global Material Properties from Body .dat file?
@@ -165,9 +165,9 @@ class V2_MaterialDataApplier(MaterialDataApplier):
 
     def set_up_mesh_material_data(self):
         body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
-        node_tree_group001_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,
-            node_tree_group001_inputs,
+            shader_node_tree_inputs,
         )
