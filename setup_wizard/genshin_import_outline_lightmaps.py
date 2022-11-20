@@ -64,7 +64,6 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)
                     self.assign_diffuse_texture(character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name)
-                    self.report({'INFO'}, f'Imported outline textures (diffuse and lightmap) onto material "{outline_material.name}"')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         if cache_enabled and character_model_folder_file_path:
@@ -86,20 +85,20 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
 
         lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
         lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
-            if outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
-                else outline_material.node_tree.nodes.get(v1_lightmap_node_name)
+            or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
         self.assign_texture_to_node(lightmap_node, character_model_folder_file_path, lightmap_filename)
+        self.report({'INFO'}, f'Imported "{actual_material_part_name}" lightmap onto material "{outline_material.name}"')
 
     def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
         difuse_node_name = 'Outline_Diffuse'
         outline_material = bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines')
         diffuse_node = outline_material.node_tree.nodes.get(difuse_node_name) \
-            if outline_material.node_tree.nodes.get(difuse_node_name) \
-                else None  # None for backwards compatibility in v1 where it did not exist
+            or None  # None for backwards compatibility in v1 where it did not exist
 
         if diffuse_node:
             diffuse_filename = [file for file in diffuse_files if actual_material_part_name in file][0]
             self.assign_texture_to_node(diffuse_node, character_model_folder_file_path, diffuse_filename)
+            self.report({'INFO'}, f'Imported "{actual_material_part_name}" diffuse onto material "{outline_material.name}"')
 
     def assign_texture_to_node(self, node, character_model_folder_file_path, texture_file_name):
         texture_img_path = character_model_folder_file_path + "/" + texture_file_name

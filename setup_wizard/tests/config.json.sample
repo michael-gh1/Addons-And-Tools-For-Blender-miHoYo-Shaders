@@ -1,6 +1,26 @@
 {
-    "blender_execution_file_path": "FILE_PATH_TO_blender.exe",
-    "festivity_root_folder_file_path": "FILE_PATH_TO_festivity_shaders_folder",
-    "characters_folder_file_path": "FILE_PATH_TO_characters-folder",
-    "material_json_folder_file_path": "FILE_PATH_TO_material_data_folder"
+    "environments": [
+        {
+            "metadata": {
+                "name": "name of environment - vanilla blender",
+                "description": "description of environment"
+            },
+            "blender_execution_file_path": "FILE_PATH_TO_blender.exe",
+            "festivity_shader_file_path": "FILE_PATH_TO_festivity_shaders_blend_file",
+            "festivity_outlines_file_path": FILE_PATH_TO_festivity_outlines_blend_file",
+            "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
+            "material_json_folder_file_path": "FILE_PATH_TO_material_data_folder"
+        },
+        {
+            "metadata": {
+                "name": "name of environment - goo blender",
+                "description": "description of enviornment"
+            },
+            "blender_execution_file_path": "FILE_PATH_TO_goo_blender.exe",
+            "festivity_root_folder_file_path": "FILE_PATH_TO_festivity_shaders_folder",
+            "festivity_outlines_file_path": "FILE_PATH_TO_festivity_outlines_blend_file",
+            "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
+            "material_json_folder_file_path": "FILE_PATH_TO_material_data_folder"
+        },
+    }
 }

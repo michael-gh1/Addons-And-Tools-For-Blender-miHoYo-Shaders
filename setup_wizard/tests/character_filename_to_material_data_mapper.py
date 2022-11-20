@@ -3,19 +3,17 @@ import os
 from pathlib import PurePath
 
 
-config = json.load(open('setup_wizard/tests/config.json'))
-characters_folder_file_path = config.get('characters_folder_file_path')
-
-material_json_folder_file_path = config.get('material_json_folder_file_path')
-material_json_files = os.listdir(material_json_folder_file_path)
-
 def main():
-    character_material_dictionary = get_character_material_dictionary()
+    config = json.load(open('setup_wizard/tests/config.json')).get('environments')[0]
+    character_material_dictionary = get_character_material_dictionary(config)
     return character_material_dictionary
 
 
-def get_character_material_dictionary():
+def get_character_material_dictionary(config):
     character_material_dictionary = {}
+    characters_folder_file_path = config.get('characters_folder_file_path')
+    material_json_folder_file_path = config.get('material_json_folder_file_path')
+    material_json_files = os.listdir(material_json_folder_file_path)
 
     for character_folder in os.listdir(characters_folder_file_path):
         for root, dirs, files in os.walk(PurePath(characters_folder_file_path, character_folder)):
