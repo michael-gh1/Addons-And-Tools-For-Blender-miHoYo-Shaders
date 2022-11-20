@@ -64,7 +64,7 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)
                     self.assign_diffuse_texture(character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name)
-                    self.report({'INFO'}, f'Imported outline textures (diffuse and lightmap) onto material "{outline_material.name}"')
+                    self.report({'INFO'}, f'Imported outline texture(s) onto material "{outline_material.name}"')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         if cache_enabled and character_model_folder_file_path:
