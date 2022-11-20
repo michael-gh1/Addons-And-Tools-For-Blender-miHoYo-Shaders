@@ -130,19 +130,26 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
         super().clear_custom_properties()
         return {'FINISHED'}
 
+    '''
+    Deprecated: No longer needed after shader rewrite because normal map is plugged by default
+    Still maintains backward compatibility by only trying this if `label_name` is found in the node tree.
+    '''
     def plug_normal_map(self, shader_material_name, label_name):
         shader_group_material_name = 'Group.001'
         shader_material = bpy.data.materials.get(shader_material_name)
 
         if shader_material:
-            normal_map_node_color_output = [node.outputs.get('Color') for node in shader_material.node_tree.nodes \
-                if node.label == label_name and not node.outputs.get('Color').is_linked][0]
-            normal_map_input = shader_material.node_tree.nodes.get(shader_group_material_name).inputs.get('Normal Map')
+            normal_map_node_color_outputs = [node.outputs.get('Color') for node in shader_material.node_tree.nodes \
+                if node.label == label_name and not node.outputs.get('Color').is_linked]
+            
+            if normal_map_node_color_outputs:
+                normal_map_node_color_output = normal_map_node_color_outputs[0]
+                normal_map_input = shader_material.node_tree.nodes.get(shader_group_material_name).inputs.get('Normal Map')
 
-            bpy.data.materials.get(shader_material_name).node_tree.links.new(
-                normal_map_node_color_output,
-                normal_map_input
-            )
+                bpy.data.materials.get(shader_material_name).node_tree.links.new(
+                    normal_map_node_color_output,
+                    normal_map_input
+                )
     
     def setup_dress_textures(self, texture_name, texture_img):
         shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
