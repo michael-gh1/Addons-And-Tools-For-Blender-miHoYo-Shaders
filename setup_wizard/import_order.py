@@ -14,6 +14,7 @@ UI_ORDER_CONFIG_KEY = 'ui_order'
 
 # Cache Constants
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
+FESTIVITY_SHADER_FILE_PATH = "festivity_shader_file_path"
 FESTIVITY_OUTLINES_FILE_PATH = 'festivity_outlines_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
