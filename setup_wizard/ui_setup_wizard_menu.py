@@ -11,6 +11,13 @@ class UI_Properties:
             default = True
         )
 
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        if betterfbx_installed:
+            bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
+                name = "BetterFBX Enabled",
+                default = True
+            )
+
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_label = "Genshin Impact Setup Wizard"
@@ -38,6 +45,11 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             'Clear Cache',
             'TRASH'
         )
+
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        if betterfbx_installed:
+            row2 = layout.row()
+            row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
 
 class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
