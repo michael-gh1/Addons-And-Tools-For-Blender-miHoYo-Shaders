@@ -26,6 +26,9 @@ class TestDriver:
         environment_configs = self.config_service.get('environments')
 
         for environment_config in environment_configs:
+            if not environment_config.get('metadata').get('enabled'):
+                continue
+
             characters_folder_file_path = environment_config.get(CHARACTERS_FOLDER_FILE_PATH)  # root level
             character_folders = os.listdir(characters_folder_file_path)  # all folders inside
             environment_config_str = json.dumps(environment_config)
