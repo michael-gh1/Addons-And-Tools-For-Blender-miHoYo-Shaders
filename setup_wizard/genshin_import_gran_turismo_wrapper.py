@@ -8,7 +8,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 from setup_wizard.import_order import get_cache, FESTIVITY_GRAN_TURISMO_FILE_PATH
 
-from setup_wizard.models import BasicSetupUIOperator
+from setup_wizard.models import CustomOperatorProperties
 
 NAME_OF_GRAN_TURISMO_NODE_TREE = 'GranTurismoWrapper [APPEND]'
 
@@ -24,7 +24,7 @@ TODO
 '''
 
 
-class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, BasicSetupUIOperator):
+class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, CustomOperatorProperties):
     """Select Festivity's Gran Turismo ToneMapper .blend File to import NodeTree"""
     bl_idname = 'genshin.import_gran_turismo_wrapper'
     bl_label = 'Genshin: Import Gran Turismo Wrapper - Select Gran Turismo .blend File'
@@ -45,7 +45,7 @@ class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, BasicSetupUI
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    logs =  ''
+    logs = ''
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled
@@ -63,14 +63,22 @@ class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, BasicSetupUI
             )
             return {'FINISHED'}
 
+        # self.switch_to_compositor()  # while this technically works, we need to be out of the script to update ctx
         self.append_gran_turismo_wrapper(gran_turismo_blend_file_path)
         self.create_compositor_node(NAME_OF_GRAN_TURISMO_NODE_TREE)
         self.connect_starting_nodes()
         self.set_node_locations()
+        # self.switch_to_3D_viewport()
 
         self.report({'INFO'}, f'{self.logs}')
         return {'FINISHED'}
 
+    def switch_to_compositor(self):
+        bpy.context.area.type = 'NODE_EDITOR'
+        bpy.context.scene.use_nodes = True
+
+    def switch_to_3D_viewport(self):
+        bpy.context.area.type = 'VIEW_3D'
 
     def append_gran_turismo_wrapper(self, gran_turismo_blend_file_path):
         inner_path = 'NodeTree'
