@@ -237,6 +237,25 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
+class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
+    bl_label = "Gran Turismo Tonemapper"
+    bl_idname = "GI_PT_Gran_Turismo_Tonemapper_UI_Layout"
+    bl_space_type = "NODE_EDITOR"
+    bl_region_type = "UI"
+    bl_category = "Genshin - Setup Wizard"
+
+    def draw(self, context):
+        layout = self.layout
+        sub_layout = layout.box()
+
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.setup_gran_turismo_wrapper',
+            'Set Up GT Tonemapper',
+            'PLAY'
+        )
+
+
 '''
     This factory is intended to help create a UI element's operator (or the action it takes) when pressed.
     While it currently doesn't do anything too grand, it may provide future flexibility.
