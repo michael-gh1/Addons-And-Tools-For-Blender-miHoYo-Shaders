@@ -185,5 +185,7 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.setup_head_driver
         elif component_name == 'clear_cache_operator':
             return bpy.ops.genshin.clear_cache_operator
+        elif component_name == 'gran_turismo_tonemapper_setup':
+            return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')
