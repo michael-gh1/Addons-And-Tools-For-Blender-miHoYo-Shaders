@@ -62,16 +62,6 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         self.import_character_model(character_model_folder_file_path, betterfbx_enabled)
         self.reset_pose_location_and_rotation()
 
-        # Quick-fix, just want to shove this in here for now...
-        # Hide EffectMesh (gets deleted later on) and EyeStar
-        # Now shoving in adding UV1 map too...
-        for object in bpy.data.objects:
-            if 'EffectMesh' in object.name or 'EyeStar' in object.name:
-                bpy.data.objects[object.name].hide_set(True)
-                bpy.data.objects[object.name].hide_render = True
-            if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
-                object.data.uv_layers.new(name='UV1')
-
         if context.window_manager.cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
 
@@ -100,6 +90,16 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 force_connect_children=True,
                 automatic_bone_orientation=True
             )
+
+            # Quick-fix, just want to shove this in here for now...
+            # Hide EffectMesh (gets deleted later on) and EyeStar
+            # Now shoving in adding UV1 map too...
+            for object in bpy.data.objects:
+                if 'EffectMesh' in object.name or 'EyeStar' in object.name:
+                    bpy.data.objects[object.name].hide_set(True)
+                    bpy.data.objects[object.name].hide_render = True
+                if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
+                    object.data.uv_layers.new(name='UV1')
             self.report({'INFO'}, 'Imported character model')
 
     def reset_pose_location_and_rotation(self):
