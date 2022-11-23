@@ -24,10 +24,10 @@ TODO
 '''
 
 
-class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, CustomOperatorProperties):
+class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties):
     """Select Festivity's Gran Turismo ToneMapper .blend File to import NodeTree"""
-    bl_idname = 'genshin.import_gran_turismo_wrapper'
-    bl_label = 'Genshin: Import Gran Turismo Wrapper - Select Gran Turismo .blend File'
+    bl_idname = 'genshin.gran_turismo_tonemapper_setup'
+    bl_label = 'Genshin: Gran Turismo Tonemapper Setup - Select Gran Turismo .blend File'
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"
@@ -54,7 +54,7 @@ class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, CustomOperat
         gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(FESTIVITY_GRAN_TURISMO_FILE_PATH)
 
         if not gran_turismo_blend_file_path:
-            bpy.ops.genshin.import_gran_turismo_wrapper(
+            bpy.ops.genshin.gran_turismo_tonemapper_setup(
                 'INVOKE_DEFAULT',
                 next_step_idx=self.next_step_idx, 
                 file_directory=self.file_directory,
@@ -64,7 +64,7 @@ class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, CustomOperat
             return {'FINISHED'}
 
         # self.switch_to_compositor()  # while this technically works, we need to be out of the script to update ctx
-        self.append_gran_turismo_wrapper(gran_turismo_blend_file_path)
+        self.append_gran_turismo_tonemapper(gran_turismo_blend_file_path)
         self.create_compositor_node(NAME_OF_GRAN_TURISMO_NODE_TREE)
         self.connect_starting_nodes()
         self.set_node_locations()
@@ -80,7 +80,7 @@ class GI_OT_GenshinImportGranTurismoWrapper(Operator, ImportHelper, CustomOperat
     def switch_to_3D_viewport(self):
         bpy.context.area.type = 'VIEW_3D'
 
-    def append_gran_turismo_wrapper(self, gran_turismo_blend_file_path):
+    def append_gran_turismo_tonemapper(self, gran_turismo_blend_file_path):
         inner_path = 'NodeTree'
 
         bpy.ops.wm.append(
