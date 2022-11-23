@@ -250,7 +250,7 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
 
         OperatorFactory.create(
             sub_layout,
-            'genshin.setup_gran_turismo_wrapper',
+            'genshin.gran_turismo_tonemapper_setup',
             'Set Up GT Tonemapper',
             'PLAY'
         )
