@@ -15,9 +15,6 @@ NAME_OF_GRAN_TURISMO_NODE_TREE = 'GranTurismoWrapper [APPEND]'
 
 '''
 TODO
-* Set context correctly
-* Enable Use Nodes in Compositing
-* Write UI portion for this component
 * Setup Wizard integration
 * Caching
 * Add this component into the tests
@@ -49,28 +46,33 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled
-        self.logs = ''
-
         gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(FESTIVITY_GRAN_TURISMO_FILE_PATH)
 
-        if not gran_turismo_blend_file_path:
-            bpy.ops.genshin.gran_turismo_tonemapper_setup(
-                'INVOKE_DEFAULT',
-                next_step_idx=self.next_step_idx, 
-                file_directory=self.file_directory,
-                invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
-            )
-            return {'FINISHED'}
+        # Technically works if only running this Operator, but this cannot be chained because we need to be 
+        # out of the script (or in another Operator) to update ctx before the import modal appears
+        # Solution would be to create a separate Operator that handles context switches
+        self.switch_to_compositor()
 
-        # self.switch_to_compositor()  # while this technically works, we need to be out of the script to update ctx
-        self.append_gran_turismo_tonemapper(gran_turismo_blend_file_path)
-        self.create_compositor_node(NAME_OF_GRAN_TURISMO_NODE_TREE)
+        if not bpy.data.node_groups.get(NAME_OF_GRAN_TURISMO_NODE_TREE):
+            if not gran_turismo_blend_file_path:
+                bpy.ops.genshin.gran_turismo_tonemapper_setup(
+                    'INVOKE_DEFAULT',
+                    next_step_idx=self.next_step_idx, 
+                    file_directory=self.file_directory,
+                    invoker_type=self.invoker_type,
+                    high_level_step_name=self.high_level_step_name
+                )
+                return {'FINISHED'}
+            self.append_gran_turismo_tonemapper(gran_turismo_blend_file_path)
+            self.create_compositor_node(NAME_OF_GRAN_TURISMO_NODE_TREE)
+        else:
+            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} already appended, skipping and not creating new node.\n'
+
         self.connect_starting_nodes()
         self.set_node_locations()
-        # self.switch_to_3D_viewport()
 
         self.report({'INFO'}, f'{self.logs}')
+        super().clear_custom_properties()
         return {'FINISHED'}
 
     def switch_to_compositor(self):
