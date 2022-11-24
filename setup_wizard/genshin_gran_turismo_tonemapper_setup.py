@@ -6,7 +6,7 @@ import os
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-from setup_wizard.import_order import get_cache, FESTIVITY_GRAN_TURISMO_FILE_PATH
+from setup_wizard.import_order import cache_using_cache_key, get_cache, FESTIVITY_GRAN_TURISMO_FILE_PATH
 
 from setup_wizard.models import CustomOperatorProperties
 
@@ -70,6 +70,13 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
 
         self.connect_starting_nodes()
         self.set_node_locations()
+
+        if cache_enabled and gran_turismo_blend_file_path:
+            cache_using_cache_key(
+                get_cache(cache_enabled), 
+                FESTIVITY_GRAN_TURISMO_FILE_PATH, 
+                gran_turismo_blend_file_path
+            )
 
         self.report({'INFO'}, f'{self.logs}')
         super().clear_custom_properties()
