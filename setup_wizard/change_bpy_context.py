@@ -49,5 +49,5 @@ class GI_OT_Change_BPY_Context(Operator, CustomOperatorProperties):
     def clear_custom_properties(self):
         self.bpy_context_attr = ''
         self.bpy_context_value_str = ''
-        self.bpy_context_value_bool = ''
+        self.bpy_context_value_bool = False
         super().clear_custom_properties()
