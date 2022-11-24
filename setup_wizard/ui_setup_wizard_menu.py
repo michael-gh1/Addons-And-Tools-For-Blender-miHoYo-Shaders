@@ -11,12 +11,10 @@ class UI_Properties:
             default = True
         )
 
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
-        if betterfbx_installed:
-            bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
-                name = "BetterFBX Enabled",
-                default = True
-            )
+        bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
+            name = "BetterFBX Enabled",
+            default = True
+        )
 
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
