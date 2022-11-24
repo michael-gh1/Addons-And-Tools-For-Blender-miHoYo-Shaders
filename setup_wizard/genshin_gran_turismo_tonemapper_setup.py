@@ -42,7 +42,7 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    logs = ''
+    logs = '\n'
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled
@@ -51,7 +51,8 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         # Technically works if only running this Operator, but this cannot be chained because we need to be 
         # out of the script (or in another Operator) to update ctx before the import modal appears
         # Solution would be to create a separate Operator that handles context switches
-        self.switch_to_compositor()
+        # TODO: This does not work unless INVOKE_DEFAULT with a modal or some window appears to update the Blender UI
+        # self.switch_to_compositor()
 
         if not bpy.data.node_groups.get(NAME_OF_GRAN_TURISMO_NODE_TREE):
             if not gran_turismo_blend_file_path:
@@ -64,9 +65,15 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
                 )
                 return {'FINISHED'}
             self.append_gran_turismo_tonemapper(gran_turismo_blend_file_path)
+        else:
+            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} already appended, skipping.\n'
+
+        gran_turismo_node = bpy.data.scenes.get('Scene').node_tree.nodes.get('Group')
+        if not gran_turismo_node or \
+            (gran_turismo_node and gran_turismo_node.node_tree.name != NAME_OF_GRAN_TURISMO_NODE_TREE):
             self.create_compositor_node(NAME_OF_GRAN_TURISMO_NODE_TREE)
         else:
-            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} already appended, skipping and not creating new node.\n'
+            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} node already created, skipping and not creating new node.\n'
 
         self.connect_starting_nodes()
         self.set_node_locations()
@@ -82,12 +89,19 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         super().clear_custom_properties()
         return {'FINISHED'}
 
+    '''
     def switch_to_compositor(self):
-        bpy.context.area.type = 'NODE_EDITOR'
-        bpy.context.scene.use_nodes = True
-
-    def switch_to_3D_viewport(self):
-        bpy.context.area.type = 'VIEW_3D'
+        bpy.ops.genshin.change_bpy_context(
+            'EXEC_DEFAULT',
+            bpy_context_attr='area.type',
+            bpy_context_value_str='NODE_EDITOR'
+        )
+        bpy.ops.genshin.change_bpy_context(
+            'EXEC_DEFAULT',
+            bpy_context_attr='scene.use_nodes',
+            bpy_context_value_bool=True
+        )
+    '''
 
     def append_gran_turismo_tonemapper(self, gran_turismo_blend_file_path):
         inner_path = 'NodeTree'
