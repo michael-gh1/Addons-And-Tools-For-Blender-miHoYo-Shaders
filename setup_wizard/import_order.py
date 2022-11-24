@@ -186,7 +186,7 @@ class ComponentFunctionFactory:
         elif component_name == 'clear_cache_operator':
             return bpy.ops.genshin.clear_cache_operator
         elif component_name == 'change_bpy_context':
-            return bpy.ops.change_bpy_context
+            return bpy.ops.genshin.change_bpy_context
         elif component_name == 'gran_turismo_tonemapper_setup':
             return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:
