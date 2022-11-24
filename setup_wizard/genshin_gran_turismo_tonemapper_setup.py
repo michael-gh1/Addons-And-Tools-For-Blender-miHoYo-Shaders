@@ -13,14 +13,6 @@ from setup_wizard.models import CustomOperatorProperties
 NAME_OF_GRAN_TURISMO_NODE_TREE = 'GranTurismoWrapper [APPEND]'
 
 
-'''
-TODO
-* Setup Wizard integration
-* Caching
-* Add this component into the tests
-'''
-
-
 class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties):
     """Select Festivity's Gran Turismo ToneMapper .blend File to import NodeTree"""
     bl_idname = 'genshin.gran_turismo_tonemapper_setup'
