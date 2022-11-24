@@ -91,18 +91,18 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 automatic_bone_orientation=True
             )
 
-            # Quick-fix, just want to shove this in here for now...
-            # Hide EffectMesh (gets deleted later on) and EyeStar
-            # Now shoving in adding UV1 map too...
             for object in bpy.data.objects:
-                if 'EffectMesh' in object.name or 'EyeStar' in object.name:
-                    bpy.data.objects[object.name].hide_set(True)
-                    bpy.data.objects[object.name].hide_render = True
                 if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
                     # Important: This is actually not correct, but it looks better than not having a UV Map
                     # The outer part will show up as the inner part (ex. inner skirt will be same as outer skirt )
                     # TODO: Get feedback on whether this is desired or not...
                     object.data.uv_layers.new(name='UV1')
+        # Quick-fix, just want to shove this in here for now...
+        # Hide EffectMesh (gets deleted later on) and EyeStar
+        for object in bpy.data.objects:
+            if 'EffectMesh' in object.name or 'EyeStar' in object.name:
+                bpy.data.objects[object.name].hide_set(True)
+                bpy.data.objects[object.name].hide_render = True
             self.report({'INFO'}, 'Imported character model')
 
     def reset_pose_location_and_rotation(self):
