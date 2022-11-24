@@ -250,6 +250,14 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
 
         OperatorFactory.create(
             sub_layout,
+            'genshin.change_bpy_context',
+            'Enable Add Nodes',
+            'CHECKMARK',
+            bpy_context_attr='scene.use_nodes',
+            bpy_context_value_bool=True
+        )
+        OperatorFactory.create(
+            sub_layout,
             'genshin.gran_turismo_tonemapper_setup',
             'Set Up GT Tonemapper',
             'PLAY'
@@ -267,7 +275,8 @@ class OperatorFactory:
         operator: str,
         text: str,
         icon: str,
-        operator_context='EXEC_DEFAULT'
+        operator_context='EXEC_DEFAULT',
+        **kwargs
     ):
         ui_object.operator_context = operator_context
         ui_object = ui_object.operator(
@@ -275,3 +284,6 @@ class OperatorFactory:
             text=text,
             icon=icon,
         )
+
+        for key, value in kwargs.items():
+            setattr(ui_object, key, value)

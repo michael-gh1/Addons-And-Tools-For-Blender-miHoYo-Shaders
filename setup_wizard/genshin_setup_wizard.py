@@ -78,6 +78,7 @@ def setup_dependencies():
     import setup_wizard.fix_mouth_outlines
     import setup_wizard.misc_operations
     import setup_wizard.genshin_gran_turismo_tonemapper_setup
+    import setup_wizard.change_bpy_context
 
     importlib.reload(setup_wizard.import_order)
     importlib.reload(setup_wizard.genshin_import_character_model)
@@ -93,6 +94,7 @@ def setup_dependencies():
     importlib.reload(setup_wizard.fix_mouth_outlines)
     importlib.reload(setup_wizard.misc_operations)
     importlib.reload(setup_wizard.genshin_gran_turismo_tonemapper_setup)
+    importlib.reload(setup_wizard.change_bpy_context)
 
     for class_to_register in [
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
@@ -109,7 +111,8 @@ def setup_dependencies():
         setup_wizard.set_up_head_driver.GI_OT_SetUpHeadDriver,
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
-        setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup
+        setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
+        setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context
     ]:
         try:
             bpy.utils.register_class(class_to_register)
@@ -133,6 +136,7 @@ def unregister():
     from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
     from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
     from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup
+    from setup_wizard.change_bpy_context import GI_OT_Change_BPY_Context
 
     for class_to_unregister in [
         GI_OT_GenshinImportModel,
@@ -148,7 +152,8 @@ def unregister():
         GI_OT_SetUpHeadDriver,
         GI_OT_SetColorManagementToStandard,
         GI_OT_DeleteSpecificObjects,
-        GI_OT_GenshinGranTurismoTonemapperSetup
+        GI_OT_GenshinGranTurismoTonemapperSetup,
+        GI_OT_Change_BPY_Context
     ]:
         try:
             bpy.utils.unregister_class(class_to_unregister)
