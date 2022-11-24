@@ -25,6 +25,16 @@ logger = logging.getLogger(__name__)
 def setup_character(config, character_name, character_folder_file_path):
     logger.info(f'Starting test for {character_name}')
     logger.info(f'{config.get("metadata")}')
+
+    if config.get('metadata').get('betterfbx_enabled'):
+        logger.info('Enabling BetterFBX')
+        bpy.ops.preferences.addon_enable(module='better_fbx')
+        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
+    else:
+        logger.info('Disabling BetterFBX')
+        bpy.ops.preferences.addon_disable(module='better_fbx')
+        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
+
     try:
         material_json_folder_file_path = str(
             PurePath(config.get(MATERIAL_JSON_FOLDER_FILE_PATH), 
