@@ -46,7 +46,6 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
     )
 
     def execute(self, context):
-        betterfbx_enabled = context.window_manager.setup_wizard_betterfbx_enabled
         character_model_folder_file_path = self.file_directory or os.path.dirname(self.filepath)
 
         if not character_model_folder_file_path:
@@ -59,7 +58,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 )
             return {'FINISHED'}
 
-        self.import_character_model(character_model_folder_file_path, betterfbx_enabled)
+        self.import_character_model(character_model_folder_file_path)
         self.reset_pose_location_and_rotation()
 
         if context.window_manager.cache_enabled and character_model_folder_file_path:
@@ -74,9 +73,10 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         super().clear_custom_properties()
         return {'FINISHED'}
 
-    def import_character_model(self, character_model_file_path_directory, betterfbx_enabled):
+    def import_character_model(self, character_model_file_path_directory):
         character_model_file_path = self.__find_fbx_file(character_model_file_path_directory)
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        betterfbx_enabled = bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
 
         if betterfbx_installed and betterfbx_enabled:
             bpy.ops.better_import.fbx(
@@ -90,6 +90,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 force_connect_children=True,
                 automatic_bone_orientation=True
             )
+            self.report({'INFO'}, 'Imported character model')
 
             for object in bpy.data.objects:
                 if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
@@ -103,7 +104,6 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             if 'EffectMesh' in object.name or 'EyeStar' in object.name:
                 bpy.data.objects[object.name].hide_set(True)
                 bpy.data.objects[object.name].hide_render = True
-            self.report({'INFO'}, 'Imported character model')
 
     def reset_pose_location_and_rotation(self):
         armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
