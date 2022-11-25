@@ -10,7 +10,19 @@ from setup_wizard.import_order import cache_using_cache_key, get_cache, FESTIVIT
 
 from setup_wizard.models import CustomOperatorProperties
 
+NAME_OF_DEFAULT_SCENE = 'Scene'
+
+NAME_OF_GRAN_TURISMO_NODE = 'Group'
 NAME_OF_GRAN_TURISMO_NODE_TREE = 'GranTurismoWrapper [APPEND]'
+
+NAME_OF_COMPOSITOR_INPUT_NODE = 'Render Layers'
+NAME_OF_COMPOSITOR_OUTPUT_NODE = 'Composite'
+
+NAME_OF_VIEWER_NODE = 'Viewer'
+NAME_OF_VIEWER_NODE_TYPE = 'CompositorNodeViewer'
+
+NAME_OF_IMAGE_IO = 'Image'
+NAME_OF_RESULT_IO = 'Result'
 
 
 class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties):
@@ -40,7 +52,7 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         cache_enabled = context.window_manager.cache_enabled
         gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(FESTIVITY_GRAN_TURISMO_FILE_PATH)
 
-        if not bpy.data.scenes.get('Scene').node_tree:
+        if not bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree:
             self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up GT Tonemapper\n'
             self.report({'ERROR'}, f'{self.logs}')
             return {'FINISHED'}
@@ -65,16 +77,16 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         else:
             self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} already appended, skipping.\n'
 
-        gran_turismo_node = bpy.data.scenes.get('Scene').node_tree.nodes.get('Group')
+        gran_turismo_node = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
         if not gran_turismo_node or \
             (gran_turismo_node and gran_turismo_node.node_tree.name != NAME_OF_GRAN_TURISMO_NODE_TREE):
             self.create_compositor_node_group(NAME_OF_GRAN_TURISMO_NODE_TREE)
         else:
             self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} node already created, skipping and not creating new node.\n'
 
-        viewer_node = bpy.data.scenes.get('Scene').node_tree.nodes.get('Viewer')
+        viewer_node = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree.nodes.get(NAME_OF_VIEWER_NODE)
         if not viewer_node:
-            self.create_compositor_node('CompositorNodeViewer')
+            self.create_compositor_node(NAME_OF_VIEWER_NODE_TYPE)
         else:
             self.logs += f'Viewer node already exists, skipping.\n'
 
@@ -135,20 +147,20 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         self.logs += f'Created {node_type} node tree\n'
 
     def connect_starting_nodes(self):
-        default_scene = bpy.data.scenes.get('Scene')
+        default_scene = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE)
 
-        render_layers_node = default_scene.node_tree.nodes.get('Render Layers')
-        render_layers_output = render_layers_node.outputs.get('Image')
+        render_layers_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_INPUT_NODE)
+        render_layers_output = render_layers_node.outputs.get(NAME_OF_IMAGE_IO)
 
-        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get('Group')
-        gran_turismo_wrapper_node_input = gran_turismo_wrapper_node.inputs.get('Image')
-        gran_turismo_wrapper_node_output = gran_turismo_wrapper_node.outputs.get('Result')
+        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
+        gran_turismo_wrapper_node_input = gran_turismo_wrapper_node.inputs.get(NAME_OF_IMAGE_IO)
+        gran_turismo_wrapper_node_output = gran_turismo_wrapper_node.outputs.get(NAME_OF_RESULT_IO)
 
-        composite_node = default_scene.node_tree.nodes.get('Composite')
-        composite_node_input = composite_node.inputs.get('Image')
+        composite_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_OUTPUT_NODE)
+        composite_node_input = composite_node.inputs.get(NAME_OF_IMAGE_IO)
 
-        viewer_node = default_scene.node_tree.nodes.get('Viewer')
-        viewer_node_input = viewer_node.inputs.get('Image')
+        viewer_node = default_scene.node_tree.nodes.get(NAME_OF_VIEWER_NODE)
+        viewer_node_input = viewer_node.inputs.get(NAME_OF_IMAGE_IO)
 
         self.connect_nodes_in_scene(default_scene, render_layers_output, gran_turismo_wrapper_node_input)
         self.connect_nodes_in_scene(default_scene, gran_turismo_wrapper_node_output, composite_node_input)
@@ -171,11 +183,11 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         self.logs += f"Connected '{input_node_name}' ({input.name}) to '{output_node_name}' ({output.name}) in scene: {scene.name}\n"
 
     def set_node_locations(self):
-        default_scene = bpy.data.scenes.get('Scene')
-        render_layers_node = default_scene.node_tree.nodes.get('Render Layers')
-        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get('Group')
-        composite_node = default_scene.node_tree.nodes.get('Composite')
-        viewer_node = default_scene.node_tree.nodes.get('Viewer')
+        default_scene = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE)
+        render_layers_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_INPUT_NODE)
+        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
+        composite_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_OUTPUT_NODE)
+        viewer_node = default_scene.node_tree.nodes.get(NAME_OF_VIEWER_NODE)
 
         render_layers_node.location = (-200, 400)
         gran_turismo_wrapper_node.location = (250, 400)
