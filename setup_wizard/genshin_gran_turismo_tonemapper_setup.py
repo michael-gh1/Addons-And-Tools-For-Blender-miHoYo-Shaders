@@ -40,6 +40,11 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         cache_enabled = context.window_manager.cache_enabled
         gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(FESTIVITY_GRAN_TURISMO_FILE_PATH)
 
+        if not bpy.data.scenes.get('Scene').node_tree:
+            self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up GT Tonemapper\n'
+            self.report({'ERROR'}, f'{self.logs}')
+            return {'FINISHED'}
+
         # Technically works if only running this Operator, but this cannot be chained because we need to be 
         # out of the script (or in another Operator) to update ctx before the import modal appears
         # Solution would be to create a separate Operator that handles context switches
