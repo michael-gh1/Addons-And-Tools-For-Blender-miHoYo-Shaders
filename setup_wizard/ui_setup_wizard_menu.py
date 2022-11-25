@@ -244,12 +244,21 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
 
     def draw(self, context):
         layout = self.layout
+        row = layout.row()
         sub_layout = layout.box()
+        window_manager = context.window_manager
 
+        row.prop(window_manager, 'cache_enabled')
+        OperatorFactory.create(
+            row,
+            'genshin.clear_cache_operator',
+            'Clear Cache',
+            'TRASH'
+        )
         OperatorFactory.create(
             sub_layout,
             'genshin.change_bpy_context',
-            'Enable Add Nodes',
+            'Enable Use Nodes',
             'CHECKMARK',
             bpy_context_attr='scene.use_nodes',
             bpy_context_value_bool=True
