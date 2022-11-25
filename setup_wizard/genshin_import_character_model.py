@@ -46,6 +46,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
     )
 
     def execute(self, context):
+        betterfbx_enabled = context.window_manager.setup_wizard_betterfbx_enabled
         character_model_folder_file_path = self.file_directory or os.path.dirname(self.filepath)
 
         if not character_model_folder_file_path:
@@ -58,7 +59,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 )
             return {'FINISHED'}
 
-        self.import_character_model(character_model_folder_file_path)
+        self.import_character_model(character_model_folder_file_path, betterfbx_enabled)
         self.reset_pose_location_and_rotation()
 
         # Quick-fix, just want to shove this in here for now...
@@ -83,15 +84,24 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         super().clear_custom_properties()
         return {'FINISHED'}
 
-    def import_character_model(self, character_model_file_path_directory):
+    def import_character_model(self, character_model_file_path_directory, betterfbx_enabled):
         character_model_file_path = self.__find_fbx_file(character_model_file_path_directory)
-        bpy.ops.import_scene.fbx(
-            filepath=character_model_file_path,
-            force_connect_children=True,
-            automatic_bone_orientation=True
-        )
-        self.report({'INFO'}, 'Imported character model...')
-    
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+
+        if betterfbx_installed and betterfbx_enabled:
+            bpy.ops.better_import.fbx(
+                'EXEC_DEFAULT',
+                filepath=character_model_file_path,
+            )
+            self.report({'INFO'}, 'Imported character model using BetterFBX')
+        else:
+            bpy.ops.import_scene.fbx(
+                filepath=character_model_file_path,
+                force_connect_children=True,
+                automatic_bone_orientation=True
+            )
+            self.report({'INFO'}, 'Imported character model')
+
     def reset_pose_location_and_rotation(self):
         armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
         bpy.context.view_layer.objects.active = armature
