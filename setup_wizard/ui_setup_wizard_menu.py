@@ -11,12 +11,10 @@ class UI_Properties:
             default = True
         )
 
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
-        if betterfbx_installed:
-            bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
-                name = "BetterFBX Enabled",
-                default = True
-            )
+        bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
+            name = "BetterFBX Enabled",
+            default = True
+        )
 
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
@@ -237,6 +235,42 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
+class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
+    bl_label = "Gran Turismo Tonemapper"
+    bl_idname = "GI_PT_Gran_Turismo_Tonemapper_UI_Layout"
+    bl_space_type = "NODE_EDITOR"
+    bl_region_type = "UI"
+    bl_category = "Genshin - Setup Wizard"
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        sub_layout = layout.box()
+        window_manager = context.window_manager
+
+        row.prop(window_manager, 'cache_enabled')
+        OperatorFactory.create(
+            row,
+            'genshin.clear_cache_operator',
+            'Clear Cache',
+            'TRASH'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.change_bpy_context',
+            'Enable Use Nodes',
+            'CHECKMARK',
+            bpy_context_attr='scene.use_nodes',
+            bpy_context_value_bool=True
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.gran_turismo_tonemapper_setup',
+            'Set Up GT Tonemapper',
+            'PLAY'
+        )
+
+
 '''
     This factory is intended to help create a UI element's operator (or the action it takes) when pressed.
     While it currently doesn't do anything too grand, it may provide future flexibility.
@@ -248,7 +282,8 @@ class OperatorFactory:
         operator: str,
         text: str,
         icon: str,
-        operator_context='EXEC_DEFAULT'
+        operator_context='EXEC_DEFAULT',
+        **kwargs
     ):
         ui_object.operator_context = operator_context
         ui_object = ui_object.operator(
@@ -256,3 +291,6 @@ class OperatorFactory:
             text=text,
             icon=icon,
         )
+
+        for key, value in kwargs.items():
+            setattr(ui_object, key, value)

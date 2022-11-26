@@ -16,6 +16,7 @@ UI_ORDER_CONFIG_KEY = 'ui_order'
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
 FESTIVITY_SHADER_FILE_PATH = "festivity_shader_file_path"
 FESTIVITY_OUTLINES_FILE_PATH = 'festivity_outlines_file_path'
+FESTIVITY_GRAN_TURISMO_FILE_PATH = 'festivity_gran_turismo_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
 
@@ -184,5 +185,9 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.setup_head_driver
         elif component_name == 'clear_cache_operator':
             return bpy.ops.genshin.clear_cache_operator
+        elif component_name == 'change_bpy_context':
+            return bpy.ops.genshin.change_bpy_context
+        elif component_name == 'gran_turismo_tonemapper_setup':
+            return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

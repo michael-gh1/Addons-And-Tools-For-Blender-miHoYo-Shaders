@@ -4,7 +4,8 @@
             "metadata": {
                 "name": "name of environment - vanilla blender",
                 "description": "description of environment",
-                "enabled": true
+                "enabled": true,
+                "betterfbx_enabled": true
             },
             "blender_execution_file_path": "FILE_PATH_TO_blender.exe",
             "festivity_shader_file_path": "FILE_PATH_TO_festivity_shaders_blend_file",
@@ -16,7 +17,8 @@
             "metadata": {
                 "name": "name of environment - goo blender",
                 "description": "description of enviornment",
-                "enabled": true
+                "enabled": true,
+                "betterfbx_enabled": false
             },
             "blender_execution_file_path": "FILE_PATH_TO_goo_blender.exe",
             "festivity_root_folder_file_path": "FILE_PATH_TO_festivity_shaders_folder",
