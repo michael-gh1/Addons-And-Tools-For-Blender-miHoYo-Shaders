@@ -41,7 +41,12 @@ class MaterialDataApplier(ABC):
                 continue
 
             node_input = node_inputs.get(material_node_name)
-            node_input.default_value = material_json_value
+            try:
+                node_input.default_value = material_json_value
+            except AttributeError as ex:
+                print(f'Did not find {material_node_name} in {self.body_part} material. \
+                    Falling back to next MaterialDataApplier version')
+                raise ex
 
     def __get_value_in_json_parser(self, parser, key):
         try:
