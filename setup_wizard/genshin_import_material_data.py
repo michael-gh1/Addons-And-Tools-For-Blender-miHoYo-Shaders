@@ -71,6 +71,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                     material_data_applier: MaterialDataApplier = material_data_applier_cls(material_data_parser, body_part)
                     material_data_applier.set_up_mesh_material_data()
                     material_data_applier.set_up_outline_colors()
+                    break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
                 except AttributeError:
                     continue # fallback and try next version
                 except KeyError:

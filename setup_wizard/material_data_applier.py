@@ -44,7 +44,7 @@ class MaterialDataApplier(ABC):
             try:
                 node_input.default_value = material_json_value
             except AttributeError as ex:
-                print(f'Did not find {material_node_name} in {self.body_part} material. \
+                print(f'Did not find {material_node_name} in {self.body_part} material using {self} \
                     Falling back to next MaterialDataApplier version')
                 raise ex
 
@@ -57,7 +57,7 @@ class MaterialDataApplier(ABC):
             return None
 
     def __handle_material_value_not_found(self, material_json_name):
-        print(f'Info: Unable to find material data: {material_json_name} on {self.body_part} JSON.')
+        print(f'Info: Unable to find material data: {material_json_name} in {self.body_part} JSON.')
 
 
 class V1_MaterialDataApplier(MaterialDataApplier):
