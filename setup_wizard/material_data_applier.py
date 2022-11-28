@@ -116,6 +116,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         '_FaceBlushColor': 'Face Blush Color',
         '_FaceBlushStrength': 'Face Blush Strength',
         # '_FaceMapSoftness': 'Face Shadow Softness',  # material data values are either 0.001 or 1E-06
+        "_EmissionColor_MHY": "Emission Tint",
         "_UseMaterial2": 'Use Material 2',
         "_UseMaterial3": 'Use Material 3',
         "_UseMaterial4": 'Use Material 4',
