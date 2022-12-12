@@ -13,9 +13,12 @@ import os
 
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.material_data_applier import MaterialDataApplier, V1_MaterialDataApplier, V2_MaterialDataApplier
+from setup_wizard.material_data_applier import V1_MaterialDataApplier, V1_WeaponMaterialDataApplier, V2_MaterialDataApplier
 from setup_wizard.models import CustomOperatorProperties
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
+
+
+WEAPON_NAME_IDENTIFIER = 'Mat'
 
 
 class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProperties):
@@ -66,9 +69,18 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             json_material_data = json.load(fp)
             material_data_parser = self.__get_material_data_json_parser(json_material_data)
 
-            for material_data_applier_cls in [V2_MaterialDataApplier, V1_MaterialDataApplier]:
+            # Was tempted to add another check, but holding off for now: file.name.startswith('Avatar')
+            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
+
+            material_data_appliers = [
+                V1_WeaponMaterialDataApplier(material_data_parser, 'Body'),
+            ] if is_weapon else [
+                V2_MaterialDataApplier(material_data_parser, body_part), 
+                V1_MaterialDataApplier(material_data_parser, body_part),
+            ]
+
+            for material_data_applier in material_data_appliers:
                 try:
-                    material_data_applier: MaterialDataApplier = material_data_applier_cls(material_data_parser, body_part)
                     material_data_applier.set_up_mesh_material_data()
                     material_data_applier.set_up_outline_colors()
                     break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version

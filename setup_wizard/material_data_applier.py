@@ -177,3 +177,17 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             self.local_material_mapping,
             shader_node_tree_inputs,
         )
+
+
+class V1_WeaponMaterialDataApplier(V2_MaterialDataApplier):
+    def __init__(self, material_data_parser, body_part):
+        super().__init__(material_data_parser, body_part)
+
+    def set_up_mesh_material_data(self):
+        weapon_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
+        shader_node_tree_inputs = weapon_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+
+        super().apply_material_data(
+            self.local_material_mapping,
+            shader_node_tree_inputs,
+        )
