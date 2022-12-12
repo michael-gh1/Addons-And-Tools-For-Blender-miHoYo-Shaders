@@ -13,7 +13,7 @@ import os
 
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.material_data_applier import V1_MaterialDataApplier, V1_WeaponMaterialDataApplier, V2_MaterialDataApplier
+from setup_wizard.material_data_applier import V1_MaterialDataApplier, V2_WeaponMaterialDataApplier, V2_MaterialDataApplier
 from setup_wizard.models import CustomOperatorProperties
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
 
@@ -73,7 +73,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             is_weapon = body_part == WEAPON_NAME_IDENTIFIER
 
             material_data_appliers = [
-                V1_WeaponMaterialDataApplier(material_data_parser, 'Body'),
+                V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),
             ] if is_weapon else [
                 V2_MaterialDataApplier(material_data_parser, body_part), 
                 V1_MaterialDataApplier(material_data_parser, body_part),

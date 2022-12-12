@@ -179,7 +179,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         )
 
 
-class V1_WeaponMaterialDataApplier(V2_MaterialDataApplier):
+class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
     def __init__(self, material_data_parser, body_part):
         super().__init__(material_data_parser, body_part)
 
