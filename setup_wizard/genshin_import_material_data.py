@@ -69,17 +69,19 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             json_material_data = json.load(fp)
             material_data_parser = self.__get_material_data_json_parser(json_material_data)
 
-            # Was tempted to add another check, but holding off for now: file.name.startswith('Avatar')
-            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
-
             # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
-            material_data_appliers = [
+            weapon_material_data_appliers = [
                 V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
                 V1_MaterialDataApplier(material_data_parser, 'Body'),
-            ] if is_weapon else [
+            ]
+            character_model_material_data_appliers = [
                 V2_MaterialDataApplier(material_data_parser, body_part), 
                 V1_MaterialDataApplier(material_data_parser, body_part),
             ]
+            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
+            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
+
+            material_data_appliers = weapon_material_data_appliers if is_weapon else character_model_material_data_appliers
 
             for material_data_applier in material_data_appliers:
                 try:
