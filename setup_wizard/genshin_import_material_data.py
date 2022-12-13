@@ -72,8 +72,10 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             # Was tempted to add another check, but holding off for now: file.name.startswith('Avatar')
             is_weapon = body_part == WEAPON_NAME_IDENTIFIER
 
+            # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
             material_data_appliers = [
-                V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),
+                V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
+                V1_MaterialDataApplier(material_data_parser, 'Body'),
             ] if is_weapon else [
                 V2_MaterialDataApplier(material_data_parser, body_part), 
                 V1_MaterialDataApplier(material_data_parser, body_part),
