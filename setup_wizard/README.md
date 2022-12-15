@@ -54,14 +54,11 @@ Download Tutorials:
 8. Select the blend file containing with Festivity's Shaders 
     * **This only needs to be done the first time you run this tool.** This is because the filepath gets cached for future usage (click the clear cache button if you want to reset this value).
     * Ex. `miHoYo - Genshin Impact.blend` or `miHoYo - Genshin Impact - Goo Engine.blend`
-9. Select the `miHoYo - Outlines.blend` file (located in Festivity's Shaders `experimental-blender-3.3` folder)
+9. Select the `miHoYo - Outlines.blend` file with Festivity's Outlines Shaders
     * **This only needs to be done the first time you run this tool.** This is because the filepath gets cached for future usage (click the clear cache button if you want to reset this value).
-    * Ex. `Blender-miHoYo-Shaders/experimental-blender-3.3/miHoYo - Outlines.blend`
+    * Ex. `Blender-miHoYo-Shaders/miHoYo - Outlines.blend`
 10. Select the material data JSON files for the outlines
     * Shift+Click or Ctrl+Click the JSON files that you want to use (normally all of them)
-
-> **Do you use BetterFBX? Don't want to use FBX's standard import?** <br>
-> No problem! You can run the individual steps for `Set Up Character Menu` under the `Advanced Setup` section.
 
 ## How to Disable Components on the UI
 This tool is broken up into many different components. The `config_ui.json` file can be used to enable or disable specific steps when running the `Run Entire Setup` or `Basic Setup`.
@@ -93,7 +90,6 @@ In the example above, these were removed from the original `config_ui.json`:
 ```
 
 You can disable any step (component) in the Setup Wizard UI by removing the step from the list in `config_ui.json`.
-* This may be handy in the scenario that you use BetterFBX or are not on a Blender version that works with Outlines/Geometry Nodes.
 
 <br>
 
@@ -222,8 +218,10 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [X] Character Ramp Type Mapping (automatically plug correct Body Ramp Type from Global Material Properties)
     - Requires knowing all characters who have a different the Body Ramp Type than the default
 - [X] BetterFBX Support/Fix UV map imports (only one UV map is imported)
-    - Created UV1 UV map which allows for underskirt textures (Zhongli, Lumine, etc.)
-    - No BetterFBX support still at this time though... 
+    - BetterFBX supported! The option is enabled by default if the addon is installed 
+    - Created UV1 UV map which allows for underskirt textures (Zhongli, Lumine, etc.) 
+      - This provides a texture, but not the correct texture on things like underskirts or the opposite side of some clothing
+    
 - [X] Color Management Filmic -> Standard
 - [X] Turn Setup Wizard into an Addon
 - [X] UI Setup Wizard Addon
