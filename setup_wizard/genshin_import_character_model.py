@@ -58,8 +58,14 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 )
             return {'FINISHED'}
 
-        self.import_character_model(character_model_folder_file_path)
-        self.reset_pose_location_and_rotation()
+        original_language = bpy.context.preferences.view.language
+        try:
+            # Blender's FBX import has some silent issue when importing in different languages. Unsure why.
+            bpy.context.preferences.view.language = 'en_US'
+            self.import_character_model(character_model_folder_file_path)
+            self.reset_pose_location_and_rotation()
+        finally:
+            bpy.context.preferences.view.language = original_language
 
         if context.window_manager.cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
