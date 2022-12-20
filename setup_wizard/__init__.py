@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Genshin Setup Wizard",
     "author": "Mken",
-    "version": (1, 1, 1),
+    "version": (1, 1, 5),
     "blender": (2, 80, 0),
     "location": "3D View > Sidebar > Genshin Impact Setup Wizard",
     "description": "An addon to streamline the character model setup process when using Festivity's Shaders",
@@ -22,9 +22,15 @@ from setup_wizard.genshin_import_outlines import GI_OT_SetUpOutlines
 from setup_wizard.misc_final_steps import GI_OT_FinishSetup
 
 import setup_wizard.ui_setup_wizard_menu
-from setup_wizard.ui_setup_wizard_menu import UI_Properties, GI_PT_Setup_Wizard_UI_Layout, GI_PT_Basic_Setup_Wizard_UI_Layout, \
-    GI_PT_Advanced_Setup_Wizard_UI_Layout, GI_PT_UI_Character_Model_Menu, GI_PT_UI_Materials_Menu, GI_PT_UI_Outlines_Menu, \
-    GI_PT_UI_Finish_Setup_Menu
+from setup_wizard.ui_setup_wizard_menu import UI_Properties, \
+    GI_PT_Setup_Wizard_UI_Layout, \
+    GI_PT_Basic_Setup_Wizard_UI_Layout, \
+    GI_PT_Advanced_Setup_Wizard_UI_Layout, \
+    GI_PT_UI_Character_Model_Menu, \
+    GI_PT_UI_Materials_Menu, \
+    GI_PT_UI_Outlines_Menu, \
+    GI_PT_UI_Finish_Setup_Menu, \
+    GI_PT_UI_Gran_Turismo_UI_Layout
 
 from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
@@ -48,6 +54,7 @@ classes = [
     GI_PT_UI_Materials_Menu, 
     GI_PT_UI_Outlines_Menu, 
     GI_PT_UI_Finish_Setup_Menu,
+    GI_PT_UI_Gran_Turismo_UI_Layout,
     GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,
     GI_OT_SetUpMaterials,

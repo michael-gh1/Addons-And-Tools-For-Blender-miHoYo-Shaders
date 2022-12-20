@@ -58,18 +58,14 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 )
             return {'FINISHED'}
 
-        self.import_character_model(character_model_folder_file_path)
-        self.reset_pose_location_and_rotation()
-
-        # Quick-fix, just want to shove this in here for now...
-        # Hide EffectMesh (gets deleted later on) and EyeStar
-        # Now shoving in adding UV1 map too...
-        for object in bpy.data.objects:
-            if 'EffectMesh' in object.name or 'EyeStar' in object.name:
-                bpy.data.objects[object.name].hide_set(True)
-                bpy.data.objects[object.name].hide_render = True
-            if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
-                object.data.uv_layers.new(name='UV1')
+        original_language = bpy.context.preferences.view.language
+        try:
+            # Blender's FBX import has some silent issue when importing in different languages. Unsure why.
+            bpy.context.preferences.view.language = 'en_US'
+            self.import_character_model(character_model_folder_file_path)
+            self.reset_pose_location_and_rotation()
+        finally:
+            bpy.context.preferences.view.language = original_language
 
         if context.window_manager.cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
@@ -85,13 +81,36 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
 
     def import_character_model(self, character_model_file_path_directory):
         character_model_file_path = self.__find_fbx_file(character_model_file_path_directory)
-        bpy.ops.import_scene.fbx(
-            filepath=character_model_file_path,
-            force_connect_children=True,
-            automatic_bone_orientation=True
-        )
-        self.report({'INFO'}, 'Imported character model...')
-    
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        betterfbx_enabled = bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
+
+        if betterfbx_installed and betterfbx_enabled:
+            bpy.ops.better_import.fbx(
+                'EXEC_DEFAULT',
+                filepath=character_model_file_path,
+            )
+            self.report({'INFO'}, 'Imported character model using BetterFBX')
+        else:
+            bpy.ops.import_scene.fbx(
+                filepath=character_model_file_path,
+                force_connect_children=True,
+                automatic_bone_orientation=True
+            )
+            self.report({'INFO'}, 'Imported character model')
+
+            for object in bpy.data.objects:
+                if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
+                    # Important: This is actually not correct, but it looks better than not having a UV Map
+                    # The outer part will show up as the inner part (ex. inner skirt will be same as outer skirt )
+                    # TODO: Get feedback on whether this is desired or not...
+                    object.data.uv_layers.new(name='UV1')
+        # Quick-fix, just want to shove this in here for now...
+        # Hide EffectMesh (gets deleted later on) and EyeStar
+        for object in bpy.data.objects:
+            if 'EffectMesh' in object.name or 'EyeStar' in object.name:
+                bpy.data.objects[object.name].hide_set(True)
+                bpy.data.objects[object.name].hide_render = True
+
     def reset_pose_location_and_rotation(self):
         armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
         bpy.context.view_layer.objects.active = armature

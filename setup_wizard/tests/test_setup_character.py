@@ -4,7 +4,8 @@ import logging
 import os
 import sys
 from pathlib import PurePath
-from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, MATERIAL_JSON_FOLDER_FILE_PATH
+from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, MATERIAL_JSON_FOLDER_FILE_PATH, \
+    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.character_filename_to_material_data_mapper import get_character_material_dictionary
 from setup_wizard.tests.models.test_operator_executioner import TestOperatorExecutioner
@@ -23,6 +24,17 @@ logger = logging.getLogger(__name__)
 
 def setup_character(config, character_name, character_folder_file_path):
     logger.info(f'Starting test for {character_name}')
+    logger.info(f'{config.get("metadata")}')
+
+    if config.get('metadata').get('betterfbx_enabled'):
+        logger.info('Enabling BetterFBX')
+        bpy.ops.preferences.addon_enable(module='better_fbx')
+        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
+    else:
+        logger.info('Disabling BetterFBX')
+        bpy.ops.preferences.addon_disable(module='better_fbx')
+        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
+
     try:
         material_json_folder_file_path = str(
             PurePath(config.get(MATERIAL_JSON_FOLDER_FILE_PATH), 
@@ -31,7 +43,7 @@ def setup_character(config, character_name, character_folder_file_path):
         )
         material_json_files = os.listdir(os.path.dirname(material_json_folder_file_path))
 
-        character_name_in_material_data = get_character_material_dictionary().get(character_name)
+        character_name_in_material_data = get_character_material_dictionary(config).get(character_name)
         material_json_files = [
             { 'name': material_json_file } for material_json_file in material_json_files
             if f'_{character_name_in_material_data}_' in material_json_file and 
@@ -44,17 +56,16 @@ def setup_character(config, character_name, character_folder_file_path):
         ]
 
         operators = [
+            TestOperatorExecutioner('clear_cache_operator'),
             TestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             TestOperatorExecutioner('delete_empties'),
-            TestOperatorExecutioner('import_materials', file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH)),
+            TestOperatorExecutioner('import_materials', 
+                file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
+                filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
+            ),
             TestOperatorExecutioner('replace_default_materials'),
             TestOperatorExecutioner('import_character_textures'),
-            TestOperatorExecutioner('import_outlines', filepath=str(
-                PurePath(
-                    config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH), 
-                    'miHoYo - Outlines.blend'
-                )
-            )),
+            TestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
             TestOperatorExecutioner('setup_geometry_nodes'),
             TestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
             TestOperatorExecutioner('import_material_data', files=material_json_files, config=config),
@@ -74,7 +85,7 @@ def setup_character(config, character_name, character_folder_file_path):
     except Exception as ex:
         logger.error(ex)
         logger.error(f'Failed test for {arg_character_name}')
-        pass  # Unexpected exception! Catch any exception and quit
+        raise ex  # If it errors out it will still quit blender
     bpy.ops.wm.quit_blender()
 
 

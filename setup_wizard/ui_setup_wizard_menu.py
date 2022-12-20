@@ -11,6 +11,11 @@ class UI_Properties:
             default = True
         )
 
+        bpy.types.WindowManager.setup_wizard_betterfbx_enabled = bpy.props.BoolProperty(
+            name = "BetterFBX Enabled",
+            default = True
+        )
+
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_label = "Genshin Impact Setup Wizard"
@@ -39,6 +44,11 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             'TRASH'
         )
 
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        if betterfbx_installed:
+            row2 = layout.row()
+            row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
+
 
 class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'
@@ -63,7 +73,7 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             'Set Up Materials',
             icon='MATERIAL'
         )
-        if version_number_above_or_equal((3, 3, 0)):
+        if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.set_up_outlines',
@@ -159,7 +169,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
         layout = self.layout
         sub_layout = layout.column()
 
-        if version_number_above_or_equal((3, 3, 0)):
+        if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_outlines',
@@ -225,15 +235,40 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
-def version_number_above_or_equal(required_version_number_tuple):
-    current_version = bpy.app.version
+class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
+    bl_label = "Gran Turismo Tonemapper"
+    bl_idname = "GI_PT_Gran_Turismo_Tonemapper_UI_Layout"
+    bl_space_type = "NODE_EDITOR"
+    bl_region_type = "UI"
+    bl_category = "Genshin - Setup Wizard"
 
-    for index in range(0, len(required_version_number_tuple)):
-        if current_version[index] < required_version_number_tuple[index]:
-            return False
-        elif current_version[index] > required_version_number_tuple[index]:
-            return True
-    return True
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        sub_layout = layout.box()
+        window_manager = context.window_manager
+
+        row.prop(window_manager, 'cache_enabled')
+        OperatorFactory.create(
+            row,
+            'genshin.clear_cache_operator',
+            'Clear Cache',
+            'TRASH'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.change_bpy_context',
+            'Enable Use Nodes',
+            'CHECKMARK',
+            bpy_context_attr='scene.use_nodes',
+            bpy_context_value_bool=True
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.gran_turismo_tonemapper_setup',
+            'Set Up GT Tonemapper',
+            'PLAY'
+        )
 
 
 '''
@@ -247,7 +282,8 @@ class OperatorFactory:
         operator: str,
         text: str,
         icon: str,
-        operator_context='EXEC_DEFAULT'
+        operator_context='EXEC_DEFAULT',
+        **kwargs
     ):
         ui_object.operator_context = operator_context
         ui_object = ui_object.operator(
@@ -255,3 +291,6 @@ class OperatorFactory:
             text=text,
             icon=icon,
         )
+
+        for key, value in kwargs.items():
+            setattr(ui_object, key, value)
