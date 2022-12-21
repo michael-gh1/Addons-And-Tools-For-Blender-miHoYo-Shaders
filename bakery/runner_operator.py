@@ -40,4 +40,22 @@ class B_OT_BatchAppend(Operator, ImportHelper):
 
         filtered_character_blends = list(filter(lambda x: x.endswith('.blend'), character_blends))
 
+        for character_blend in filtered_character_blends:
+            character_blend_file_path = os.path.join(
+                character_blends_directory,
+                character_blend,
+                'Collection'
+            )
+            bpy.ops.wm.append(
+                directory=character_blend_file_path,
+                filename='Collection'
+            )
+            print(f'Appending: {character_blend}')
+
+        loc_x = 0
+        character_armatures = [object for object in bpy.data.objects if object.type == 'ARMATURE']
+        character_armatures.sort(key=lambda x: x.name)
+        for character_armature in character_armatures:
+            character_armature.location.x = loc_x
+            loc_x += 1
         return {'FINISHED'}
