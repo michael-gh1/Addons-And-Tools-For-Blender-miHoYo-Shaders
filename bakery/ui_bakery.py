@@ -12,8 +12,8 @@ class B_PT_Bakery_UI_Layout(Panel):
         column = layout.column()
 
         column.operator(
-            operator='',
-            text='Run Batch Job Runner',
+            operator='b.batch_append',
+            text='Run Batch Append Job',
             icon='PLAY'
         )
 
