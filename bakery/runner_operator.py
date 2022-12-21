@@ -54,7 +54,7 @@ class B_OT_BatchAppend(Operator, ImportHelper):
 
         loc_x = 0
         character_armatures = [object for object in bpy.data.objects if object.type == 'ARMATURE']
-        character_armatures.sort(key=lambda x: x.name)
+        character_armatures.sort(key=lambda x: x.name)  # TODO: Does not actually sort correctly
         for character_armature in character_armatures:
             character_armature.location.x = loc_x
             loc_x += 1
