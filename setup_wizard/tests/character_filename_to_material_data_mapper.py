@@ -34,8 +34,8 @@ def get_character_material_dictionary(config):
 def parse_fbx_filename_to_material_data_name(filename):
     index_of_character_name = 3
 
-    # lstrip 'NPC_' for characters with FBX files starting with that
-    npc_removed_filename = filename.lstrip('NPC_')
+    # Replace 'NPC_' for characters with FBX files starting with that
+    npc_removed_filename = filename.replace('NPC_', '')
     material_data_name = npc_removed_filename[npc_removed_filename.index('Avatar'):].split('_')[index_of_character_name]
     material_data_name = material_data_name.split(' ')[0]
     material_data_name = material_data_name.split('_')[0]
