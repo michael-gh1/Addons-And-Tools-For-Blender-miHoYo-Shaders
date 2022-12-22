@@ -56,6 +56,13 @@ character_armature = [object for object in bpy.data.objects if object.type == 'A
 character_armature.rotation_mode = 'XYZ'
 logger.info('Successfully set to "XYZ Euler"')
 
+logger.info('Packing files...')
+try:
+    bpy.ops.file.pack_all()
+except RuntimeError as e:
+    logger.warning(e)
+logger.info('Successfully packed files')
+
 filename = f'{character_name}.blend'
 logger.info(f'Saving file for {character_name} as: {filename}')
 bpy.ops.wm.save_as_mainfile(filepath=f'{recipe.get("destination_folder")}/{filename}')
