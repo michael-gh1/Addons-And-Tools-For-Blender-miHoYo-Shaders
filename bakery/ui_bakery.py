@@ -17,3 +17,9 @@ class B_PT_Bakery_UI_Layout(Panel):
             icon='PLAY'
         )
 
+        column.operator(
+            operator='b.batch_link',
+            text='Run Batch Link Job',
+            icon='PLAY'
+        )
+

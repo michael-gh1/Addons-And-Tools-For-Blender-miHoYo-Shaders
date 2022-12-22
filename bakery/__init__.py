@@ -1,7 +1,7 @@
 import bpy
 
 from bakery.ui_bakery import B_PT_Bakery_UI_Layout
-from bakery.runner_operator import B_OT_Bakery, B_OT_BatchAppend
+from bakery.runner_operator import B_OT_Bakery, B_OT_BatchAppend, B_OT_BatchLink
 
 bl_info = {
     "name": "Bakery (Batch Job Runner)",
@@ -22,6 +22,7 @@ classes = [
     B_PT_Bakery_UI_Layout,
     B_OT_Bakery,
     B_OT_BatchAppend,
+    B_OT_BatchLink,
 ]
 
 register, unregister = bpy.utils.register_classes_factory(classes)
