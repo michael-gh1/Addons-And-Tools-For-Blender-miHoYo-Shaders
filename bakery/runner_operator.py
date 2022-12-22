@@ -72,6 +72,20 @@ class B_OT_BatchLink(Operator, ImportHelper):
         return {'FINISHED'}
 
 
+class B_OT_LibraryOverrideSelectedCollections(Operator):
+    """Library override selected objects"""
+    bl_idname = "b.library_override_all_collections"
+    bl_label = "Bakery: Library Override All Collections"
+
+    def execute(self, context):
+        linked_collections = [obj for obj in bpy.data.objects if obj.type == 'EMPTY' and obj.instance_type == 'COLLECTION']
+        for linked_collection in linked_collections:
+            print(f'Overriding Library for: {linked_collection.name}')
+            bpy.context.view_layer.objects.active = linked_collection
+            bpy.ops.object.make_override_library()
+        return {'FINISHED'}
+
+
 def batch_action(filepath, action):
     character_blends_directory = os.path.dirname(filepath)
     character_blends = os.listdir(character_blends_directory)

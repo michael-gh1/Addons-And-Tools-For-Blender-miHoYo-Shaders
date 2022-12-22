@@ -23,3 +23,8 @@ class B_PT_Bakery_UI_Layout(Panel):
             icon='PLAY'
         )
 
+        column.operator(
+            operator='b.library_override_all_collections',
+            text='Library Override Selected Objects',
+            icon='PLAY'
+        )
