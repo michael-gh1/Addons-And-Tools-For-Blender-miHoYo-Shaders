@@ -44,14 +44,19 @@ class Runner:
             if skip:
                 print(f'Skipping: {root}')
                 continue
+
+            character_name = root[root.rindex('\\') + 1:]
             if root[root.rindex('\\') + 1:] in character_names:
-                character_name = root[root.rindex('\\') + 1:]
                 print(f'character_name: {character_name}')
+                self.recipe['base_character_name'] = character_name
                 self.recipe['character_name'] = character_name
 
             print(f'root: {root}')
             print(f'dirs: {dirs}')
             print(f'files: {files}')
+
+            if self.recipe.get('character_name') and character_name is not self.recipe.get('character_name'):
+                self.recipe['character_name'] = self.recipe.get('base_character_name') + character_name
 
             for file in files:
                 if file_extension_search in file:
