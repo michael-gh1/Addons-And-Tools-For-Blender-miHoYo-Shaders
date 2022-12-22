@@ -31,6 +31,12 @@ if cube:
     bpy.data.objects.remove(cube)
     logger.info('Deleted Cube')
 
+default_collection = bpy.data.collections.get('Collection')
+if default_collection:
+    logger.info(f'Renaming {default_collection.name} to {character_name}')
+    default_collection.name = character_name
+    logger.info(f'Successfully renamed Collection to: {bpy.data.collections.get(character_name).name}')
+
 logger.info(f'Starting recipe for {character_name}')
 
 for operator in operators:
@@ -44,6 +50,11 @@ for operator in operators:
         bpy.ops.wm.quit_blender()
 
 logger.info(f'Completed recipe for {character_name}')
+
+logger.info('Set Transform Mode to "XYZ Euler"')
+character_armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
+character_armature.rotation_mode = 'XYZ'
+logger.info('Successfully set to "XYZ Euler"')
 
 filename = f'{character_name}.blend'
 logger.info(f'Saving file for {character_name} as: {filename}')

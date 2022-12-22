@@ -84,18 +84,20 @@ def batch_action(filepath, action):
             character_blend,
             'Collection'
         )
+
+        character_name = character_blend.replace('.blend', '')
         if action == BatchActions.APPEND:
             bpy.ops.wm.append(
                 directory=character_blend_file_path,
-                filename='Collection'
+                filename=character_name
             )
-            print(f'Appending: {character_blend}')
+            print(f'Appending: {character_name} collection in {character_blend}')
         elif action == BatchActions.LINK:
             bpy.ops.wm.link(
                 directory=character_blend_file_path,
-                filename='Collection'
+                filename=character_name
             )
-            print(f'Linking: {character_blend}')
+            print(f'Linking: {character_name} collection in {character_blend}')
         else:
             print(f'Unknown action: {action} to perform on {filepath}')
 
