@@ -25,6 +25,12 @@ class B_PT_Bakery_UI_Layout(Panel):
 
         column.operator(
             operator='b.library_override_all_collections',
-            text='Library Override Selected Objects',
+            text='Library Override All Collections',
+            icon='PLAY'
+        )
+
+        column.operator(
+            operator='b.space_out_armatures',
+            text='Space Out Armatures',
             icon='PLAY'
         )

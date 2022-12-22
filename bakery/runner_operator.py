@@ -86,6 +86,23 @@ class B_OT_LibraryOverrideSelectedCollections(Operator):
         return {'FINISHED'}
 
 
+class B_OT_SpaceOutArmatures(Operator):
+    """Space out armatures from each other"""
+    bl_idname = "b.space_out_armatures"
+    bl_label = "Bakery: Space Out Armatures"
+
+    def execute(self, context):
+        loc_x = 0
+        character_armatures = [
+            object for object in bpy.data.objects if object.type == 'ARMATURE' and not object.library
+        ]  # `not object.library` is important because there seems to be a lingering "ghost" armature that exists
+        character_armatures.sort(key=lambda x: x.name)  # TODO: Does not actually sort correctly
+        for character_armature in character_armatures:
+            character_armature.location.x = loc_x
+            loc_x += 1
+        return {'FINISHED'}
+
+
 def batch_action(filepath, action):
     character_blends_directory = os.path.dirname(filepath)
     character_blends = os.listdir(character_blends_directory)
@@ -114,10 +131,3 @@ def batch_action(filepath, action):
             print(f'Linking: {character_name} collection in {character_blend}')
         else:
             print(f'Unknown action: {action} to perform on {filepath}')
-
-    loc_x = 0
-    character_armatures = [object for object in bpy.data.objects if object.type == 'ARMATURE']
-    character_armatures.sort(key=lambda x: x.name)  # TODO: Does not actually sort correctly
-    for character_armature in character_armatures:
-        character_armature.location.x = loc_x
-        loc_x += 1
