@@ -7,6 +7,9 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 
+OBJECT_TUPLE_INDEX = 1
+
+
 class BatchActions(Enum):
     APPEND = 'APPEND_ACTION'
     LINK = 'LINK_ACITON'
@@ -91,15 +94,22 @@ class B_OT_SpaceOutArmatures(Operator):
     bl_idname = "b.space_out_armatures"
     bl_label = "Bakery: Space Out Armatures"
 
+    spacing_factor = 1.0
+
     def execute(self, context):
+        collections = [collection[1] for collection in bpy.data.collections.items()]
+        collections.sort(key=lambda x: x.name)  # sort alphabetically by collection name (which is the character's name)
         loc_x = 0
-        character_armatures = [
-            object for object in bpy.data.objects if object.type == 'ARMATURE' and not object.library
-        ]  # `not object.library` is important because there seems to be a lingering "ghost" armature that exists
-        character_armatures.sort(key=lambda x: x.name)  # TODO: Does not actually sort correctly
-        for character_armature in character_armatures:
-            character_armature.location.x = loc_x
-            loc_x += 1
+
+        for collection in collections:
+            character_armatures = [
+                object for object in collection.objects.items() if \
+                    object[OBJECT_TUPLE_INDEX].type == 'ARMATURE' and not object[OBJECT_TUPLE_INDEX].library
+            ]  # `not object.library` is important because there seems to be a lingering "ghost" armature that exists
+            if character_armatures:
+                character_armature = character_armatures[0][OBJECT_TUPLE_INDEX]  # first element in list, then the armature in tuple
+                character_armature.location.x = loc_x
+                loc_x += self.spacing_factor
         return {'FINISHED'}
 
 
