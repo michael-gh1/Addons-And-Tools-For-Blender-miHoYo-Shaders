@@ -25,19 +25,23 @@ logger = logging.getLogger(__name__)
 operators = SetupWizardRecipe(recipe, **recipe).generate_recipe()
 character_name = recipe.get('character_name')
 
-cube = bpy.context.scene.objects.get('Cube')
-if cube:
-    logger.info('Deleting Cube')
-    bpy.data.objects.remove(cube)
-    logger.info('Deleted Cube')
+default_objects_to_delete = ['Cube', 'Light', 'Camera']
+
+for object_to_delete in default_objects_to_delete:
+    object = bpy.context.scene.objects.get(object_to_delete)
+    if object:
+        object_name = object.name  # necessary to create because we lose the reference after deletion
+        logger.info(f'Deleting {object_name}')
+        bpy.data.objects.remove(object)
+        logger.info(f'Deleted {object_name}')
 
 default_collection = bpy.data.collections.get('Collection')
 if default_collection:
-    logger.info(f'Renaming {default_collection.name} to {character_name}')
+    logger.info(f'Renaming {default_collection.name} to {character_name}...')
     default_collection.name = character_name
     logger.info(f'Successfully renamed Collection to: {bpy.data.collections.get(character_name).name}')
 
-logger.info(f'Starting recipe for {character_name}')
+logger.info(f'Starting recipe for {character_name}...')
 
 for operator in operators:
     try:
@@ -51,7 +55,7 @@ for operator in operators:
 
 logger.info(f'Completed recipe for {character_name}')
 
-logger.info('Set Transform Mode to "XYZ Euler"')
+logger.info('Setting Transform Mode to "XYZ Euler"...')
 character_armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
 character_armature.rotation_mode = 'XYZ'
 logger.info('Successfully set to "XYZ Euler"')
@@ -64,7 +68,7 @@ except RuntimeError as e:
 logger.info('Successfully packed files')
 
 filename = f'{character_name}.blend'
-logger.info(f'Saving file for {character_name} as: {filename}')
+logger.info(f'Saving file for {character_name} as: {filename}...')
 bpy.ops.wm.save_as_mainfile(filepath=f'{recipe.get("destination_folder")}/{filename}')
 logger.info(f'Saved file for {character_name} as: {filename}')
 
