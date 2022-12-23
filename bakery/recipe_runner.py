@@ -58,6 +58,7 @@ logger.info(f'Completed recipe for {character_name}')
 logger.info('Setting Transform Mode to "XYZ Euler"...')
 character_armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
 character_armature.rotation_mode = 'XYZ'
+character_armature.animation_data_clear()  # some characters have animation data, clear it
 logger.info('Successfully set to "XYZ Euler"')
 
 logger.info('Packing files...')
