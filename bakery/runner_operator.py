@@ -113,6 +113,19 @@ class B_OT_SpaceOutArmatures(Operator):
         return {'FINISHED'}
 
 
+class B_OT_HideEyeStar(Operator):
+    """Hide EyeStar"""
+    bl_idname = "b.hide_eyestar"
+    bl_label = "Bakery: Hide EyeStar"
+
+    def execute(self, context):
+        for mesh in [obj for obj in bpy.data.objects if obj.type == 'MESH']:
+            if 'EyeStar' in mesh.name:
+                bpy.data.objects.get(mesh.name).hide_set(True)
+                bpy.data.objects.get(mesh.name).hide_render = True
+        return {'FINISHED'}
+
+
 def batch_action(filepath, action):
     character_blends_directory = os.path.dirname(filepath)
     character_blends = os.listdir(character_blends_directory)

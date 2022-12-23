@@ -34,3 +34,9 @@ class B_PT_Bakery_UI_Layout(Panel):
             text='Space Out Armatures',
             icon='PLAY'
         )
+
+        column.operator(
+            operator='b.hide_eyestar',
+            text='Bulk: Hide EyeStar',
+            icon='PLAY'
+        )
