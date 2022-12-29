@@ -233,6 +233,13 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'Delete EffectMesh',
             'TRASH'
         )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.import_animation',
+            'Secret Sauce',
+            'PLAY',
+            operator_context='INVOKE_DEFAULT'
+        )
 
 
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
