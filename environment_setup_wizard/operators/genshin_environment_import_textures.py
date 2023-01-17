@@ -60,7 +60,7 @@ class B_OT_GenshinEnvironmentImportTextures(Operator, ImportHelper):
                 if DIFFUSE_TEXTURE_KEY in file:
                     self.import_diffuse_texture(environment_shader_material, texture_image)
                 elif SMBE_TEXTURE_KEY in file:
-                    self.import_SMBE_texture(environment_shader_material, texture_image)
+                    self.import_smbe_texture(environment_shader_material, texture_image)
                 elif NORMAL_MAP_TEXTURE_KEY in file:
                     self.import_normal_map_texture(environment_shader_material, texture_image)
                 else :
@@ -73,8 +73,8 @@ class B_OT_GenshinEnvironmentImportTextures(Operator, ImportHelper):
     def import_diffuse_texture(self, material, diffuse_texture):
         self.import_texture(material, '', diffuse_texture)
 
-    def import_SMBE_texture(self, material, SMBE_texture):
-        self.import_texture(material, '', SMBE_texture)
+    def import_smbe_texture(self, material, smbe_texture):
+        self.import_texture(material, '', smbe_texture)
 
     def import_normal_map_texture(self, material, normal_map_texture):
         self.import_texture(material, '', normal_map_texture)
