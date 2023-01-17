@@ -1,7 +1,7 @@
 import bpy
 
 from bakery.ui_bakery import B_PT_Bakery_UI_Layout
-from bakery.runner_operator import B_OT_Bakery, B_OT_BatchAppend, B_OT_BatchLink, B_OT_HideEyeStar, B_OT_LibraryOverrideSelectedCollections, B_OT_SpaceOutArmatures
+from bakery.runner_operator import B_OT_Bakery, B_OT_BatchAppend, B_OT_BatchLink, B_OT_HideEyeStar, B_OT_LibraryOverrideSelectedCollections, B_OT_SetRimlight, B_OT_SpaceOutArmatures, B_OT_ToggleRimlight
 
 bl_info = {
     "name": "Bakery (Batch Job Runner)",
@@ -26,6 +26,8 @@ classes = [
     B_OT_LibraryOverrideSelectedCollections,
     B_OT_SpaceOutArmatures,
     B_OT_HideEyeStar,
+    B_OT_SetRimlight,
+    B_OT_ToggleRimlight,
 ]
 
 register, unregister = bpy.utils.register_classes_factory(classes)

@@ -154,3 +154,78 @@ def batch_action(filepath, action):
             print(f'Linking: {character_name} collection in {character_blend}')
         else:
             print(f'Unknown action: {action} to perform on {filepath}')
+
+
+class B_OT_SetRimlight(Operator):
+    """Set Rimlight"""
+    bl_idname = "b.set_rimlight"
+    bl_label = "Bakery: Set Rimlight"
+
+    def execute(self, context):
+        genshin_material_names = [
+            'miHoYo - Genshin Hair',
+            'miHoYo - Genshin Body',
+            'miHoYo - Genshin Dress',
+            'miHoYo - Genshin Face',
+        ]
+        all_genshin_materials = []  # get `genshin_materials` materials
+
+        for genshin_material_name in genshin_material_names:
+            genshin_materials = [material for material in bpy.data.materials if genshin_material_name in material.name and 'Outlines' not in material.name]
+            all_genshin_materials += genshin_materials
+
+        for genshin_material in all_genshin_materials:
+            depth_based_node = genshin_material.node_tree.nodes.get('Group.010')
+            if depth_based_node:
+                rim_intensity_input = depth_based_node.inputs.get('Rim Intensity')
+                thickness_x = depth_based_node.inputs.get('Thickness X')
+                thickness_y = depth_based_node.inputs.get('Thickness Y')
+
+                if rim_intensity_input:
+                    rim_intensity_input.default_value = 0.1
+                else:
+                    print(f'No rim_intensity_input on {genshin_material}')
+                if thickness_x:
+                    thickness_x.default_value = 0.1
+                else:
+                    print(f'No thickness_x on {genshin_material}')
+                if thickness_y:
+                    thickness_y.default_value = 0.1
+                else:
+                    print(f'No thickness_y on {genshin_material}')
+            else:
+                print(f'No depth_based_node on {genshin_material}')
+
+        return {'FINISHED'}
+
+
+class B_OT_ToggleRimlight(Operator):
+    """Toggle Rimlight"""
+    bl_idname = "b.toggle_rimlight"
+    bl_label = "Bakery: Toggle Rimlight"
+
+    def execute(self, context):
+        genshin_material_names = [
+            'miHoYo - Genshin Hair',
+            'miHoYo - Genshin Body',
+            'miHoYo - Genshin Dress',
+            'miHoYo - Genshin Face',
+        ]
+        all_genshin_materials = []  # get `genshin_materials` materials
+
+        for genshin_material_name in genshin_material_names:
+            genshin_materials = [material for material in bpy.data.materials if genshin_material_name in material.name and 'Outlines' not in material.name]
+            all_genshin_materials += genshin_materials
+
+        for genshin_material in all_genshin_materials:
+            depth_based_node = genshin_material.node_tree.nodes.get('Group.010')
+            if depth_based_node:
+                depth_based_node.mute = not depth_based_node.mute
+            else:
+                print(f'No depth_based_node on {genshin_material}')
+        
+        armatures = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE']
+        for armature in armatures:
+            armature.hide_viewport = False
+
+        return {'FINISHED'}

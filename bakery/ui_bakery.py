@@ -40,3 +40,15 @@ class B_PT_Bakery_UI_Layout(Panel):
             text='Bulk: Hide EyeStar',
             icon='PLAY'
         )
+
+        column.operator(
+            operator='b.set_rimlight',
+            text='Bulk: Set Rimlight',
+            icon='PLAY'
+        )
+
+        column.operator(
+            operator='b.toggle_rimlight',
+            text='Bulk: Toggle Rimlight',
+            icon='PLAY'
+        )
