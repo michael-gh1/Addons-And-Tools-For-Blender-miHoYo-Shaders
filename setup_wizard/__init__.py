@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Genshin Setup Wizard",
     "author": "Mken",
-    "version": (1, 1, 5),
+    "version": (1, 1, 6),
     "blender": (2, 80, 0),
     "location": "3D View > Sidebar > Genshin Impact Setup Wizard",
     "description": "An addon to streamline the character model setup process when using Festivity's Shaders",
