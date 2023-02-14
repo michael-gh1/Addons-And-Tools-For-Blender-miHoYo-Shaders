@@ -112,7 +112,7 @@ def setup_dependencies():
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
         setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
-        setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context
+        setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context,
     ]:
         try:
             bpy.utils.register_class(class_to_register)
@@ -153,7 +153,7 @@ def unregister():
         GI_OT_SetColorManagementToStandard,
         GI_OT_DeleteSpecificObjects,
         GI_OT_GenshinGranTurismoTonemapperSetup,
-        GI_OT_Change_BPY_Context
+        GI_OT_Change_BPY_Context,
     ]:
         try:
             bpy.utils.unregister_class(class_to_unregister)

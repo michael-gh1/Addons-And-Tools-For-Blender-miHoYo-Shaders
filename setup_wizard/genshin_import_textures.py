@@ -53,7 +53,7 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
             return {'FINISHED'}
         
         for name, folder, files in os.walk(directory):
-            for file in files :
+            for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
@@ -65,55 +65,55 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
                 
                 # Implement the texture in the correct node
                 self.report({'INFO'}, f'Importing texture {file}')
-                if "Hair_Diffuse" in file :
+                if "Hair_Diffuse" in file and "Eff" not in file:
                     hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
                     hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
                     self.setup_dress_textures('Hair_Diffuse', img)
-                elif "Hair_Lightmap" in file :
+                elif "Hair_Lightmap" in file:
                     img.colorspace_settings.name='Non-Color'
                     hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
                     hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
                     self.setup_dress_textures('Hair_Lightmap', img)
-                elif "Hair_Normalmap" in file :
+                elif "Hair_Normalmap" in file:
                     img.colorspace_settings.name='Non-Color'
                     hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
                     hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
                     self.setup_dress_textures('Hair_Normalmap', img)
                     self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                elif "Hair_Shadow_Ramp" in file :
+                elif "Hair_Shadow_Ramp" in file:
                     bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
-                elif "Body_Diffuse" in file :
+                elif "Body_Diffuse" in file:
                     body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
                     body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
                     self.setup_dress_textures('Body_Diffuse', img)
-                elif "Body_Lightmap" in file :
+                elif "Body_Lightmap" in file:
                     img.colorspace_settings.name='Non-Color'
                     body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
                     body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
                     self.setup_dress_textures('Body_Lightmap', img)
-                elif "Body_Normalmap" in file :
+                elif "Body_Normalmap" in file:
                     img.colorspace_settings.name='Non-Color'
                     body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
                     body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
                     self.setup_dress_textures('Body_Normalmap', img)
                     self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
                     self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                elif "Body_Shadow_Ramp" in file :
+                elif "Body_Shadow_Ramp" in file:
                     bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file :
                     img.colorspace_settings.name='Non-Color'
                     bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img
-                elif "Face_Diffuse" in file :
+                elif "Face_Diffuse" in file:
                     face_material.node_tree.nodes['Face_Diffuse'].image = img
-                elif "Face_Shadow" in file :
+                elif "Face_Shadow" in file:
                     img.colorspace_settings.name='Non-Color'
                     face_material.node_tree.nodes['Face_Shadow'].image = img
-                elif "FaceLightmap" in file :
+                elif "FaceLightmap" in file:
                     img.colorspace_settings.name='Non-Color'
                     bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
-                elif "MetalMap" in file :
+                elif "MetalMap" in file:
                     bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
-                else :
+                else:
                     pass
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
