@@ -65,7 +65,7 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
                 
                 # Implement the texture in the correct node
                 self.report({'INFO'}, f'Importing texture {file}')
-                if "Hair_Diffuse" in file :
+                if "Hair_Diffuse" in file and "Eff" not in file:
                     hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
                     hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
                     self.setup_dress_textures('Hair_Diffuse', img)
