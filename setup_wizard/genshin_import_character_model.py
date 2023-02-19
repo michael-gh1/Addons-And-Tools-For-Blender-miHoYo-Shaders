@@ -18,6 +18,9 @@ from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PAT
 from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
 
+SHADER_COLOR_ATTRIBUTE_NAME = 'Col'
+
+
 class GI_OT_SetUpCharacter(Operator, BasicSetupUIOperator):
     '''Sets Up Character'''
     bl_idname = 'genshin.set_up_character'
@@ -64,7 +67,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             bpy.context.preferences.view.language = 'en_US'
             self.import_character_model(character_model_folder_file_path)
             self.reset_pose_location_and_rotation()
-            self.rename_mesh_color_attribute_name('Col')  # Blender 3.4 changed default name to 'Attribute', revert it
+            self.rename_mesh_color_attribute_name(SHADER_COLOR_ATTRIBUTE_NAME)  # Blender 3.4 changed default name to 'Attribute', revert it
         finally:
             bpy.context.preferences.view.language = original_language
 
@@ -121,6 +124,10 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         bpy.ops.pose.rot_clear()
         bpy.ops.object.mode_set(mode='OBJECT')
 
+    '''
+        NOTE: This will rename the Color Attributes for ALL meshes
+        Currently expecting character setup to be performed in a fresh (new) file
+    '''
     def rename_mesh_color_attribute_name(self, name):
         meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items()]
 
