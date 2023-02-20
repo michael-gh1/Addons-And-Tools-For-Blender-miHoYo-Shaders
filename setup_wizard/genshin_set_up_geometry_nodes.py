@@ -53,6 +53,7 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
+        self.fix_face_outlines_by_reordering_material_slots()
 
         if next_step_idx:
             NextStepInvoker().invoke(
@@ -110,10 +111,26 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
         # face_eye_outlines = bpy.context.object.modifiers.get('GeometryNodes Face_Eye')  # Bad!
         modifier[OUTLINE_THICKNESS_INPUT] = 0.0
 
-
+    '''
+        Necessary otherwise meshes/textures on character are visually messed up
+        Steps to Reproduce: Run `Basic Setup` (not entire setup) without this function
+    '''
     def fix_meshes_by_setting_genshin_materials(self, mesh_name):
         for material_slot_name, material_slot in bpy.context.scene.objects[mesh_name].material_slots.items():
             bpy.context.scene.objects[mesh_name].material_slots.get(material_slot_name).material = material_slot.material
+
+    '''
+        A very specific fix for Face outlines not showing up correctly after setup when importing using BetterFBX
+    '''
+    def fix_face_outlines_by_reordering_material_slots(self):
+        face_mesh = bpy.data.meshes.get('Face')
+        face_mesh_object = bpy.data.objects.get('Face')
+        bpy.context.view_layer.objects.active = face_mesh_object  # Select 'Face' mesh before swapping material slots
+
+        face_mesh.materials.append(None)  # Add a "dummy" empty material slot
+        bpy.ops.object.material_slot_move(direction='DOWN')  # Move the selected material down
+        bpy.ops.object.material_slot_move(direction='UP')  # Return selected material to original position
+        face_mesh.materials.pop()  # Remove "dummy" empty material slot
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_SetUpGeometryNodes)
