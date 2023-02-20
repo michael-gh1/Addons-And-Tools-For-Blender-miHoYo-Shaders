@@ -87,6 +87,7 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
 
                 new_outline_material = outline_material.copy()
                 new_outline_material.name = new_outline_name
+                new_outline_material.use_fake_user = True
 
 
     def set_up_modifier_default_values(self, modifier, mesh):
