@@ -12,6 +12,7 @@ import os
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH
 from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.utils import material_utils
 
 DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
 MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
@@ -103,6 +104,10 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_SHADER_FILE_PATH, user_selected_shader_blend_file_path)
             else:
                 cache_using_cache_key(get_cache(cache_enabled), FESTIVITY_ROOT_FOLDER_FILE_PATH, project_root_directory_file_path)
+
+        # Add fake user to prevent unused materials from being cleaned up
+        genshin_materials = [bpy.data.materials.get(genshin_material_name.get('name')) for genshin_material_name in NAMES_OF_GENSHIN_MATERIALS]
+        material_utils.add_fake_user_to_materials(genshin_materials)
 
         NextStepInvoker().invoke(
             self.next_step_idx, 
