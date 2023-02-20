@@ -16,6 +16,10 @@ import os
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key
 from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
 from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.utils import material_utils
+
+
+SHADER_COLOR_ATTRIBUTE_NAME = 'Col'
 
 
 class GI_OT_SetUpCharacter(Operator, BasicSetupUIOperator):
@@ -58,17 +62,23 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 )
             return {'FINISHED'}
 
+        existing_materials = bpy.data.materials.values()  # used to track materials before and after importing character model
         original_language = bpy.context.preferences.view.language
         try:
             # Blender's FBX import has some silent issue when importing in different languages. Unsure why.
             bpy.context.preferences.view.language = 'en_US'
             self.import_character_model(character_model_folder_file_path)
             self.reset_pose_location_and_rotation()
+            self.rename_mesh_color_attribute_name(SHADER_COLOR_ATTRIBUTE_NAME)  # Blender 3.4 changed default name to 'Attribute', revert it
         finally:
             bpy.context.preferences.view.language = original_language
 
         if context.window_manager.cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+
+        # Add fake user to all materials that were added when importing character model (to prevent unused materials from being cleaned up)
+        materials_imported_from_character_model = [material for material in bpy.data.materials.values() if material not in existing_materials]
+        material_utils.add_fake_user_to_materials(materials_imported_from_character_model)
 
         NextStepInvoker().invoke(
             self.next_step_idx, 
@@ -119,6 +129,17 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         bpy.ops.pose.loc_clear()
         bpy.ops.pose.rot_clear()
         bpy.ops.object.mode_set(mode='OBJECT')
+
+    '''
+        NOTE: This will rename the Color Attributes for ALL meshes
+        Currently expecting character setup to be performed in a fresh (new) file
+    '''
+    def rename_mesh_color_attribute_name(self, name):
+        meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items()]
+
+        for mesh in meshes:
+            if mesh.color_attributes.active_color:
+                mesh.color_attributes.active_color.name = name
 
     def __find_fbx_file(self, directory):
         for root, folder, files in os.walk(directory):
