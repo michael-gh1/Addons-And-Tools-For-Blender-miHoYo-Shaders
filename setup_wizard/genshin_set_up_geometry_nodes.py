@@ -57,9 +57,8 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
-        face_mesh = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Eye' not in mesh_name]
-        face_mesh_name = face_mesh[0].name if face_mesh else 'Face'
-        self.fix_face_outlines_by_reordering_material_slots(face_mesh_name)
+        face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Eye' not in mesh_name]
+        self.fix_face_outlines_by_reordering_material_slots(face_meshes)
 
         if next_step_idx:
             NextStepInvoker().invoke(
@@ -129,20 +128,21 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
     '''
         A very specific fix for Face outlines not showing up correctly after setup when importing using BetterFBX
     '''
-    def fix_face_outlines_by_reordering_material_slots(self, mesh_name='Face'):
-        face_mesh = bpy.data.meshes.get(mesh_name)
-        face_mesh_object = bpy.data.objects.get(mesh_name)
+    def fix_face_outlines_by_reordering_material_slots(self, face_meshes):
+        for face_mesh in face_meshes:
+            face_mesh = bpy.data.meshes.get(face_mesh.name)
+            face_mesh_object = bpy.data.objects.get(face_mesh.name)
 
-        if not face_mesh or not face_mesh_object:
-            self.report_message_level = {'ERROR'}
-            self.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
-            return
-        bpy.context.view_layer.objects.active = face_mesh_object  # Select 'Face' mesh before swapping material slots
+            if not face_mesh or not face_mesh_object:
+                self.report_message_level = {'ERROR'}
+                self.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
+                return
+            bpy.context.view_layer.objects.active = face_mesh_object  # Select 'Face' mesh before swapping material slots
 
-        face_mesh.materials.append(None)  # Add a "dummy" empty material slot
-        bpy.ops.object.material_slot_move(direction='DOWN')  # Move the selected material down
-        bpy.ops.object.material_slot_move(direction='UP')  # Return selected material to original position
-        face_mesh.materials.pop()  # Remove "dummy" empty material slot
+            face_mesh.materials.append(None)  # Add a "dummy" empty material slot
+            bpy.ops.object.material_slot_move(direction='DOWN')  # Move the selected material down
+            bpy.ops.object.material_slot_move(direction='UP')  # Return selected material to original position
+            face_mesh.materials.pop()  # Remove "dummy" empty material slot
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_SetUpGeometryNodes)
