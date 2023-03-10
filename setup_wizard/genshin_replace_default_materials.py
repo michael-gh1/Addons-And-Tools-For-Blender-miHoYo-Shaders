@@ -84,6 +84,7 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
         new_material.name = f'miHoYo - Genshin {mesh_body_part_name}'
+        new_material.use_fake_user = True
 
         material_slot.material = new_material
         return new_material
