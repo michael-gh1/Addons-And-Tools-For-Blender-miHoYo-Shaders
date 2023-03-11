@@ -89,7 +89,7 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
             return 'Face'
         elif 'Body' in material_name:
             return 'Body'
-        elif 'Dress' in material_name:
+        elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
             return 'Dress'
         else:
             return None
