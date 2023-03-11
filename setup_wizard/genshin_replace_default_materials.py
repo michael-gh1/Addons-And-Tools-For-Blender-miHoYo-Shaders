@@ -51,9 +51,9 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
                     material_name.startswith('NPC') else material_name.split('_')[-1]
                 genshin_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
 
-                if genshin_material:            
+                if genshin_material:
                     material_slot.material = genshin_material
-                elif 'Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name:
+                elif mesh_body_part_name and ('Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name):
                     # Xiao is the only character with an Arm material
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.report({'INFO'}, 'Dress detected on character model!')
@@ -73,7 +73,7 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
                     material_slot.material = bpy.data.materials.get(f'miHoYo - Genshin Body')
                     continue
                 else:
-                    self.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name}')
+                    self.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
 
                 # Don't need to duplicate multiple Face shader nodes
