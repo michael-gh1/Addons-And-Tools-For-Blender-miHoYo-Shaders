@@ -47,7 +47,7 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
         self.setup_dress_textures(f'{type.value}_Lightmap', img)
 
-    def set_normalmap_texture(self, type:TextureType, material, img):
+    def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
         material.node_tree.nodes[f'{type.value}_Normalmap_UV0'].image = img
         material.node_tree.nodes[f'{type.value}_Normalmap_UV1'].image = img
@@ -59,15 +59,12 @@ class GenshinTextureImporter:
         self.plug_normal_map('miHoYo - Genshin Dress1', 'MUTE IF ONLY 1 UV MAP EXISTS')
         self.plug_normal_map('miHoYo - Genshin Dress2', 'MUTE IF ONLY 1 UV MAP EXISTS')
 
-    def set_hair_shadow_ramp_texture(self, img):
-        bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
+    def set_shadow_ramp_texture(self, type: TextureType, img):
+        bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'{type.value}_Shadow_Ramp'].image = img
 
-    def set_body_shadow_ramp_texture(self, img):
-        bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
-
-    def set_body_specular_ramp_texture(self, img):
+    def set_specular_ramp_texture(self, type: TextureType, img):
         img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img        
+        bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
 
     def set_face_diffuse_texture(self, face_material, img):
         face_material.node_tree.nodes['Face_Diffuse'].image = img        
@@ -159,7 +156,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "Hair_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
-                    bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
+                    self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif "Body_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
                 elif "Body_Lightmap" in file:
@@ -167,20 +164,17 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "Body_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Shadow_Ramp" in file:
-                    bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
-                elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file :
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img
+                    self.set_shadow_ramp_texture(TextureType.BODY, img)
+                elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
+                    self.set_specular_ramp_texture(TextureType.BODY, img)
                 elif "Face_Diffuse" in file:
-                    face_material.node_tree.nodes['Face_Diffuse'].image = img
+                    self.set_face_diffuse_texture(face_material, img)
                 elif "Face_Shadow" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    face_material.node_tree.nodes['Face_Shadow'].image = img
+                    self.set_face_shadow_texture(face_material, img)
                 elif "FaceLightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
+                    self.set_face_lightmap_texture(img)
                 elif "MetalMap" in file:
-                    bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
+                    self.set_metalmap_texture(img)
                 else:
                     pass
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
@@ -212,7 +206,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Shadow_Ramp'], file):
-                    bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
+                    self.set_shadow_ramp_texture(TextureType.HAIR, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Diffuse'], file):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
@@ -224,26 +218,23 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Shadow_Ramp'], file):
-                    bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
+                    self.set_shadow_ramp_texture(TextureType.BODY, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Specular_Ramp'], file) or \
                     self.is_texture_identifiers_in_texture_name(['Tex', 'Specular_Ramp'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img
+                    self.set_specular_ramp_texture(TextureType.BODY, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Diffuse'], file):
-                    face_material.node_tree.nodes['Face_Diffuse'].image = img
+                    self.set_face_diffuse_texture(face_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['NPC', 'Face', 'Lightmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    face_material.node_tree.nodes['Face_Shadow'].image = img
+                    self.set_face_shadow_texture(face_material, img)  # Not a typo (set face shadow as NPC lightmap)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Lightmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
+                    self.set_face_lightmap_texture(img)
 
-                elif "MetalMap" in file:
-                    bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
+                elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
+                    self.set_metalmap_texture(img)
 
                 else:
                     pass
