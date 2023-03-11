@@ -11,6 +11,11 @@ class TextureImporterType(Enum):
     NPC = auto()
 
 
+class TextureType(Enum):
+    HAIR = 'Hair'
+    BODY = 'Body'
+
+
 class TextureImporterFactory:
     def create(texture_importer_type):
         if texture_importer_type == TextureImporterType.AVATAR:
@@ -31,45 +36,31 @@ class GenshinTextureImporter:
                 return False
         return True
 
-    def set_hair_diffuse_texture(self, hair_material, img):
-        hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
-        hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
-        self.setup_dress_textures('Hair_Diffuse', img)
+    def set_diffuse_texture(self, type: TextureType, material, img):
+        material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
+        material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
+        self.setup_dress_textures(f'{type.value}_Diffuse', img)
 
-    def set_hair_lightmap_texture(self, hair_material, img):
+    def set_lightmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
-        hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
-        hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
-        self.setup_dress_textures('Hair_Lightmap', img)
+        material.node_tree.nodes[f'{type.value}_Lightmap_UV0'].image = img
+        material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
+        self.setup_dress_textures(f'{type.value}_Lightmap', img)
 
-    def set_hair_normal_map_texture(self, hair_material, img):
+    def set_normalmap_texture(self, type:TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
-        hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
-        hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
-        self.setup_dress_textures('Hair_Normalmap', img)
-        self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV0'].image = img
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV1'].image = img
+        self.setup_dress_textures(f'{type.value}_Normalmap', img)
+
+        # Deprecated. Tries only if it exists. Only for V1 Shader
+        self.plug_normal_map(f'miHoYo - Genshin {type.value}', 'MUTE IF ONLY 1 UV MAP EXISTS')
+        self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
+        self.plug_normal_map('miHoYo - Genshin Dress1', 'MUTE IF ONLY 1 UV MAP EXISTS')
+        self.plug_normal_map('miHoYo - Genshin Dress2', 'MUTE IF ONLY 1 UV MAP EXISTS')
 
     def set_hair_shadow_ramp_texture(self, img):
         bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
-
-    def set_body_diffuse_texture(self, body_material, img):
-        body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
-        body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
-        self.setup_dress_textures('Body_Diffuse', img)
-
-    def set_body_lightmap_texture(self, body_material, img):
-        img.colorspace_settings.name='Non-Color'
-        body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
-        body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
-        self.setup_dress_textures('Body_Lightmap', img)
-
-    def set_body_normalmap_texture(self, body_material, img):
-        img.colorspace_settings.name='Non-Color'
-        body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
-        body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
-        self.setup_dress_textures('Body_Normalmap', img)
-        self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
-        self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
 
     def set_body_shadow_ramp_texture(self, img):
         bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
@@ -158,42 +149,23 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
                 face_material = bpy.data.materials.get('miHoYo - Genshin Face')
                 body_material = bpy.data.materials.get('miHoYo - Genshin Body')
-                
+
                 # Implement the texture in the correct node
                 print(f'Importing texture {file}')
                 if "Hair_Diffuse" in file and "Eff" not in file:
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Hair_Diffuse', img)
+                    self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Lightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Lightmap', img)
+                    self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Normalmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
+                    self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
                     bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
                 elif "Body_Diffuse" in file:
-                    body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Body_Diffuse', img)
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
                 elif "Body_Lightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Lightmap', img)
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Normalmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                    self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
+                    self.set_normalmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Shadow_Ramp" in file:
                     bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file :
@@ -226,49 +198,30 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
                 face_material = bpy.data.materials.get('miHoYo - Genshin Face')
                 body_material = bpy.data.materials.get('miHoYo - Genshin Body')
-                
+
                 # Implement the texture in the correct node
                 print(f'Importing texture {file}')
                 if self.is_texture_identifiers_in_texture_name(['Hair', 'Diffuse'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Eff'], file):
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Hair_Diffuse', img)
+                    self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Lightmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Lightmap', img)
+                    self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Normalmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
+                    self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Shadow_Ramp'], file):
                     bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Diffuse'], file):
-                    body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Body_Diffuse', img)
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Lightmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Lightmap', img)
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Normalmap'], file):
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                    self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
+                    self.set_normalmap_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Shadow_Ramp'], file):
                     bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
