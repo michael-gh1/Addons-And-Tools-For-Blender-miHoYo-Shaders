@@ -9,6 +9,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 import os
+from setup_wizard.domain.shader_configurator import ShaderConfigurator
 from setup_wizard.domain.texture_importers import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
@@ -58,6 +59,23 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
                 TextureImporterType.NPC
         texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
         texture_importer.import_textures(directory)
+
+        '''
+            NPCs don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
+            If an asset does exist, leave it as the default value (1.0).
+        '''
+        if texture_importer_type is TextureImporterType.NPC and \
+            not [file for file in [file for name, folder, file in os.walk(directory)][0] if 'Shadow_Ramp' in file]:
+            ShaderConfigurator().update_shader_value(
+                materials = [
+                    bpy.data.materials.get('miHoYo - Genshin Hair'),
+                    bpy.data.materials.get('miHoYo - Genshin Face'),
+                    bpy.data.materials.get('miHoYo - Genshin Body'),
+                ],
+                node_name = 'miHoYo - Genshin Impact',
+                input_name = 'Use Shadow Ramp',
+                value = 0
+        )
 
         self.report({'INFO'}, 'Imported textures')
         if cache_enabled and directory:
