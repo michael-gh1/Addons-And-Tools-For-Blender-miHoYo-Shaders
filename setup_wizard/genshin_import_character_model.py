@@ -66,6 +66,8 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         original_language = bpy.context.preferences.view.language
         try:
             # Blender's FBX import has some silent issue when importing in different languages. Unsure why.
+            # TODO: Confirm if this issue is due to the Color Attribute name being named differently in each language
+            # TODO: rename_mesh_color_attribute_name() should address this issue and not require us to set language
             bpy.context.preferences.view.language = 'en_US'
             self.import_character_model(character_model_folder_file_path)
             self.reset_pose_location_and_rotation()

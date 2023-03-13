@@ -9,6 +9,8 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 import os
+from setup_wizard.domain.shader_configurator import ShaderConfigurator
+from setup_wizard.domain.texture_importers import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.import_order import get_actual_material_name_for_dress
@@ -51,71 +53,29 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
                 high_level_step_name=self.high_level_step_name
             )
             return {'FINISHED'}
-        
-        for name, folder, files in os.walk(directory):
-            for file in files:
-                # load the file with the correct alpha mode
-                img_path = directory + "/" + file
-                img = bpy.data.images.load(filepath = img_path, check_existing=True)
-                img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
-                
-                # Implement the texture in the correct node
-                self.report({'INFO'}, f'Importing texture {file}')
-                if "Hair_Diffuse" in file and "Eff" not in file:
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Hair_Diffuse', img)
-                elif "Hair_Lightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Lightmap', img)
-                elif "Hair_Normalmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV0'].image = img
-                    hair_material.node_tree.nodes['Hair_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Hair_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Hair', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                elif "Hair_Shadow_Ramp" in file:
-                    bpy.data.node_groups['Hair Shadow Ramp'].nodes['Hair_Shadow_Ramp'].image = img
-                elif "Body_Diffuse" in file:
-                    body_material.node_tree.nodes['Body_Diffuse_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Diffuse_UV1'].image = img
-                    self.setup_dress_textures('Body_Diffuse', img)
-                elif "Body_Lightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Lightmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Lightmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Lightmap', img)
-                elif "Body_Normalmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    body_material.node_tree.nodes['Body_Normalmap_UV0'].image = img
-                    body_material.node_tree.nodes['Body_Normalmap_UV1'].image = img
-                    self.setup_dress_textures('Body_Normalmap', img)
-                    self.plug_normal_map('miHoYo - Genshin Body', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                    self.plug_normal_map('miHoYo - Genshin Dress', 'MUTE IF ONLY 1 UV MAP EXISTS')
-                elif "Body_Shadow_Ramp" in file:
-                    bpy.data.node_groups['Body Shadow Ramp'].nodes['Body_Shadow_Ramp'].image = img
-                elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file :
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Body Specular Ramp'].nodes['Body_Specular_Ramp'].image = img
-                elif "Face_Diffuse" in file:
-                    face_material.node_tree.nodes['Face_Diffuse'].image = img
-                elif "Face_Shadow" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    face_material.node_tree.nodes['Face_Shadow'].image = img
-                elif "FaceLightmap" in file:
-                    img.colorspace_settings.name='Non-Color'
-                    bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
-                elif "MetalMap" in file:
-                    bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
-                else:
-                    pass
-            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+        texture_importer_type = TextureImporterType.AVATAR if \
+            [material_name for material_name, material in bpy.data.materials.items() if 'Avatar' in material_name] else \
+                TextureImporterType.NPC
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer.import_textures(directory)
+
+        '''
+            NPCs don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
+            If an asset does exist, leave it as the default value (1.0).
+        '''
+        if texture_importer_type is TextureImporterType.NPC and \
+            not [file for file in [file for name, folder, file in os.walk(directory)][0] if 'Shadow_Ramp' in file]:
+            ShaderConfigurator().update_shader_value(
+                materials = [
+                    bpy.data.materials.get('miHoYo - Genshin Hair'),
+                    bpy.data.materials.get('miHoYo - Genshin Face'),
+                    bpy.data.materials.get('miHoYo - Genshin Body'),
+                ],
+                node_name = 'miHoYo - Genshin Impact',
+                input_name = 'Use Shadow Ramp',
+                value = 0
+        )
 
         self.report({'INFO'}, 'Imported textures')
         if cache_enabled and directory:

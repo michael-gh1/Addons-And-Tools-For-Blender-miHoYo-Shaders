@@ -47,12 +47,13 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
         for mesh in meshes:
             for material_slot in mesh.material_slots:
                 material_name = material_slot.name
-                mesh_body_part_name = material_name.split('_')[-1]
+                mesh_body_part_name = self.__get_npc_mesh_body_part_name(material_name) if \
+                    material_name.startswith('NPC') else material_name.split('_')[-1]
                 genshin_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
 
-                if genshin_material:            
+                if genshin_material:
                     material_slot.material = genshin_material
-                elif 'Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name:
+                elif mesh_body_part_name and ('Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name):
                     # Xiao is the only character with an Arm material
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.report({'INFO'}, 'Dress detected on character model!')
@@ -72,7 +73,7 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
                     material_slot.material = bpy.data.materials.get(f'miHoYo - Genshin Body')
                     continue
                 else:
-                    self.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name}')
+                    self.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
 
                 # Don't need to duplicate multiple Face shader nodes
@@ -80,6 +81,18 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
                     genshin_main_shader_node = genshin_material.node_tree.nodes.get('Group.001')
                     genshin_main_shader_node.node_tree = self.__clone_shader_node_and_rename(genshin_material, mesh_body_part_name)
         self.report({'INFO'}, 'Replaced default materials with Genshin shader materials...')
+
+    def __get_npc_mesh_body_part_name(self, material_name):
+        if 'Hair' in material_name:
+            return 'Hair'
+        elif 'Face' in material_name:
+            return 'Face'
+        elif 'Body' in material_name:
+            return 'Body'
+        elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
+            return 'Dress'
+        else:
+            return None
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()

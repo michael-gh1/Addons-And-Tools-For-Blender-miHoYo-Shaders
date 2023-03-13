@@ -88,7 +88,8 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
             shader_blend_file_path = blend_file_with_genshin_materials or default_blend_file_path
             bpy.ops.wm.append(
                 directory=shader_blend_file_path,
-                files=NAMES_OF_GENSHIN_MATERIALS
+                files=NAMES_OF_GENSHIN_MATERIALS,
+                set_fake=True
             )
         except RuntimeError as ex:
             super().clear_custom_properties()
