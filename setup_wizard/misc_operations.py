@@ -54,49 +54,35 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
     bl_idname = 'genshin.set_up_armtwist_bone_constraints'
     bl_label = 'Genshin: Set Up ArmTwist Bone Constraints'
 
+    LEFT_ARMTWIST_A01 = '+UpperArmTwist L A01'
+    LEFT_ARMTWIST_A02 = '+UpperArmTwist L A02'
+    RIGHT_ARMTWIST_A01 = '+UpperArmTwist R A01'
+    RIGHT_ARMTWIST_A02 = '+UpperArmTwist R A02'
+
+    ARMTWIST_A01_INFLUENCE = 0.35
+    ARMTWIST_A02_INFLUENCE = 0.65
+
+    LEFT_FOREARM = 'Bip001 L Forearm'
+    RIGHT_FOREARM = 'Bip001 R Forearm'
+
     def execute(self, context):
         armature =  [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
-        armature_bones = armature.pose.bones
+        left_armtwist_bone_names = [
+            self.LEFT_ARMTWIST_A01,
+            self.LEFT_ARMTWIST_A02,
+        ]
+        right_armtwist_bone_names = [
+            self.RIGHT_ARMTWIST_A01,
+            self.RIGHT_ARMTWIST_A02,
+        ]
 
-        bpy.context.view_layer.objects.active = armature
-        bpy.ops.object.mode_set(mode='EDIT')
+        self.reorient_armtwist_bones(armature, left_armtwist_bone_names, self.LEFT_FOREARM)
+        self.reorient_armtwist_bones(armature, right_armtwist_bone_names, self.RIGHT_FOREARM)
 
-        upper_arm_bone = armature.data.edit_bones.get('Bip001 R Forearm')
-        twist_bone = armature.data.edit_bones.get('+UpperArmTwist R A01')
-        twist_bone.tail = upper_arm_bone.head
-
-        twist_bone = armature.data.edit_bones.get('+UpperArmTwist R A02')
-        twist_bone.tail = upper_arm_bone.head
-
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        twist_bone = armature_bones.get('+UpperArmTwist R A01')
-        copy_rotation_constraint = twist_bone.constraints.new('COPY_ROTATION')
-        copy_rotation_constraint.target = armature
-        copy_rotation_constraint.subtarget = 'Bip001 R Forearm'
-
-        copy_rotation_constraint.use_x = False
-        copy_rotation_constraint.use_z = False
-
-        copy_rotation_constraint.target_space = 'LOCAL'
-        copy_rotation_constraint.owner_space = 'LOCAL'
-
-        copy_rotation_constraint.influence = 0.35
-
-        twist_bone = armature_bones.get('+UpperArmTwist R A02')
-        copy_rotation_constraint = twist_bone.constraints.new('COPY_ROTATION')
-        copy_rotation_constraint.target = armature
-        copy_rotation_constraint.subtarget = 'Bip001 R Forearm'
-
-        copy_rotation_constraint.use_x = False
-        copy_rotation_constraint.use_z = False
-
-        copy_rotation_constraint.target_space = 'LOCAL'
-        copy_rotation_constraint.owner_space = 'LOCAL'
-
-        copy_rotation_constraint.influence = 0.65
-
-        print(twist_bone)
+        self.set_up_armtwist_bone_constraint(armature, self.LEFT_ARMTWIST_A01, self.LEFT_FOREARM, self.ARMTWIST_A01_INFLUENCE)
+        self.set_up_armtwist_bone_constraint(armature, self.LEFT_ARMTWIST_A02, self.LEFT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
+        self.set_up_armtwist_bone_constraint(armature, self.RIGHT_ARMTWIST_A01, self.RIGHT_FOREARM, self.ARMTWIST_A01_INFLUENCE)
+        self.set_up_armtwist_bone_constraint(armature, self.RIGHT_ARMTWIST_A02, self.RIGHT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
 
         if self.next_step_idx:
             NextStepInvoker().invoke(
@@ -106,12 +92,30 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
             )
         return {'FINISHED'}
 
+    def reorient_armtwist_bones(self, armature, bone_names, target_bone_name):
+        bpy.context.view_layer.objects.active = armature
+        bpy.ops.object.mode_set(mode='EDIT')
 
-    def reorient_armtwist_bones(self):
-        pass
+        for bone_name in bone_names:
+            bone = armature.data.edit_bones.get(bone_name)
+            target_bone = armature.data.edit_bones.get(target_bone_name)
+            bone.tail = target_bone.head
+        bpy.ops.object.mode_set(mode='OBJECT')
 
-    def set_up_bone_constarint(self):
-        pass
+    def set_up_armtwist_bone_constraint(self, armature, bone_name, subtarget_bone_name, influence):
+        armature_bones = armature.pose.bones
+        twist_bone = armature_bones.get(bone_name)
+
+        copy_rotation_constraint = twist_bone.constraints.new('COPY_ROTATION')
+        copy_rotation_constraint.target = armature
+        copy_rotation_constraint.subtarget = subtarget_bone_name
+        copy_rotation_constraint.use_x = False
+        copy_rotation_constraint.use_z = False
+        copy_rotation_constraint.target_space = 'LOCAL'
+        copy_rotation_constraint.owner_space = 'LOCAL'
+        copy_rotation_constraint.influence = influence
+
+        return copy_rotation_constraint
 
 
 register, unregister = bpy.utils.register_classes_factory([
