@@ -183,6 +183,8 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.set_color_management_to_standard
         elif component_name == 'setup_head_driver':
             return bpy.ops.genshin.setup_head_driver
+        elif component_name == 'set_up_armtwist_bone_constraints':
+            return bpy.ops.genshin.set_up_armtwist_bone_constraints
         elif component_name == 'clear_cache_operator':
             return bpy.ops.genshin.clear_cache_operator
         elif component_name == 'change_bpy_context':

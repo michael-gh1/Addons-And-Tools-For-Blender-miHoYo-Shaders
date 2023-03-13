@@ -111,6 +111,7 @@ def setup_dependencies():
         setup_wizard.set_up_head_driver.GI_OT_SetUpHeadDriver,
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
+        setup_wizard.misc_operations.GI_OT_SetUpArmTwistBoneConstraints,
         setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
         setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context,
     ]:
@@ -134,7 +135,8 @@ def unregister():
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
     from setup_wizard.misc_final_steps import GI_OT_FixTransformations
     from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
-    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects
+    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects, \
+        GI_OT_SetUpArmTwistBoneConstraints
     from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup
     from setup_wizard.change_bpy_context import GI_OT_Change_BPY_Context
 
@@ -152,6 +154,7 @@ def unregister():
         GI_OT_SetUpHeadDriver,
         GI_OT_SetColorManagementToStandard,
         GI_OT_DeleteSpecificObjects,
+        GI_OT_SetUpArmTwistBoneConstraints,
         GI_OT_GenshinGranTurismoTonemapperSetup,
         GI_OT_Change_BPY_Context,
     ]:
