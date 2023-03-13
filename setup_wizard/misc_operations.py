@@ -99,7 +99,11 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
         for bone_name in bone_names:
             bone = armature.data.edit_bones.get(bone_name)
             target_bone = armature.data.edit_bones.get(target_bone_name)
+
+            original_bone_length = bone.length
             bone.tail = target_bone.head
+            bone.length = original_bone_length
+
         bpy.ops.object.mode_set(mode='OBJECT')
 
     def set_up_armtwist_bone_constraint(self, armature, bone_name, subtarget_bone_name, influence):
