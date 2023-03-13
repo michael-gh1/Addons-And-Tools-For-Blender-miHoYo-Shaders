@@ -73,6 +73,7 @@ def setup_character(config, character_name, character_folder_file_path):
             TestOperatorExecutioner('setup_head_driver'),
             TestOperatorExecutioner('set_color_management_to_standard'),
             TestOperatorExecutioner('delete_specific_objects'),
+            TestOperatorExecutioner('set_up_armtwist_bone_constraints'),
         ]
 
         for operator in operators:
