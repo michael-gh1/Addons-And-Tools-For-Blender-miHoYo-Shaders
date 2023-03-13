@@ -100,9 +100,10 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
             bone = armature.data.edit_bones.get(bone_name)
             target_bone = armature.data.edit_bones.get(target_bone_name)
 
-            original_bone_length = bone.length
-            bone.tail = target_bone.head
-            bone.length = original_bone_length
+            if bone and target_bone:
+                original_bone_length = bone.length
+                bone.tail = target_bone.head
+                bone.length = original_bone_length
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -110,16 +111,16 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
         armature_bones = armature.pose.bones
         twist_bone = armature_bones.get(bone_name)
 
-        copy_rotation_constraint = twist_bone.constraints.new('COPY_ROTATION')
-        copy_rotation_constraint.target = armature
-        copy_rotation_constraint.subtarget = subtarget_bone_name
-        copy_rotation_constraint.use_x = False
-        copy_rotation_constraint.use_z = False
-        copy_rotation_constraint.target_space = 'LOCAL'
-        copy_rotation_constraint.owner_space = 'LOCAL'
-        copy_rotation_constraint.influence = influence
-
-        return copy_rotation_constraint
+        if twist_bone and subtarget_bone_name:
+            copy_rotation_constraint = twist_bone.constraints.new('COPY_ROTATION')
+            copy_rotation_constraint.target = armature
+            copy_rotation_constraint.subtarget = subtarget_bone_name
+            copy_rotation_constraint.use_x = False
+            copy_rotation_constraint.use_z = False
+            copy_rotation_constraint.target_space = 'LOCAL'
+            copy_rotation_constraint.owner_space = 'LOCAL'
+            copy_rotation_constraint.influence = influence
+            return copy_rotation_constraint
 
 
 register, unregister = bpy.utils.register_classes_factory([
