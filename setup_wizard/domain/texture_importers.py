@@ -36,6 +36,12 @@ class GenshinTextureImporter:
                 return False
         return True
 
+    def is_texture_identifiers_in_files(self, texture_identifiers, files):
+        for file in files:
+            if self.is_texture_identifiers_in_texture_name(texture_identifiers, file):
+                return True
+        return False
+
     def set_diffuse_texture(self, type: TextureType, material, img):
         material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
         material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
@@ -148,7 +154,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 body_material = bpy.data.materials.get('miHoYo - Genshin Body')
 
                 # Implement the texture in the correct node
-                print(f'Importing texture {file}')
+                print(f'Importing texture {file} using {self.__class__.__name__}')
                 if "Hair_Diffuse" in file and "Eff" not in file:
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Lightmap" in file:
@@ -194,7 +200,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 body_material = bpy.data.materials.get('miHoYo - Genshin Body')
 
                 # Implement the texture in the correct node
-                print(f'Importing texture {file}')
+                print(f'Importing texture {file} using {self.__class__.__name__}')
                 if self.is_texture_identifiers_in_texture_name(['Hair', 'Diffuse'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Eff'], file):
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
@@ -227,8 +233,12 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Diffuse'], file):
                     self.set_face_diffuse_texture(face_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['NPC', 'Face', 'Lightmap'], file):
-                    self.set_face_shadow_texture(face_material, img)  # Not a typo (set face shadow as NPC lightmap)
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Shadow'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['NPC', 'Face', 'Lightmap'], file) and
+                        not self.is_texture_identifiers_in_files(['Face', 'Shadow'], files)):
+                    # If Face Shadow exists, use that texture
+                    # If Face Shadow does not exist in this folder, use "Face Lightmap" (actually an NPC Face Shadow texture)
+                    self.set_face_shadow_texture(face_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Lightmap'], file):
                     self.set_face_lightmap_texture(img)
