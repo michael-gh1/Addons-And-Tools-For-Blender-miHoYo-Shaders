@@ -263,6 +263,6 @@ This Setup Wizard should work on all playable characters, but if you do find any
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender.
 <br>
-Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0, @Modder4869 and @Bonny!
+:star: Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0, @Modder4869 and @Bonny!
 
 Cheers and Happy Blending
