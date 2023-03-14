@@ -28,6 +28,6 @@ If you are downloading an Addon, simply download the zipped file and install the
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-Special thanks to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0 and @Modder4869!
+:star: Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0, @Modder4869 and @Bonny! :star: 
 
 Cheers and Happy Blending!
