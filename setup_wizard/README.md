@@ -6,7 +6,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 **Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
 
-**Compatibility**: This tool has been tested on Blender Version 3.3.0 and attempts to support older versions of Blender, but working functionality is not guaranteed.
+**Compatibility**: This tool has been tested on Blender (and Goo Blender) Version >= 3.3.0 and attempts to support older versions of Blender, but working functionality is not guaranteed.
 
 :star: If this Addon is useful, please be sure to **Star** the repository! :star:
 
@@ -133,6 +133,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 12. Setup Head Driver
 13. Set Color Management to 'Standard'
 14. Delete EffectMesh
+15. Set Up ArmTwist Bone Constraints
 
 
 ## Steps (Detailed Guide)
@@ -193,18 +194,24 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
     * Select the JSON files with the material data (Ctrl + Click or Shift + Click).
 10. ~~Fix Mouth Outlines~~ (Legacy, may be return in future releases) - **[Disabled by Default]**
     * This step "fixes" outlines on the mouth (Face) by assigning a Camera to the geometry node and setting Depth Offset. You will likely need to manually change the Depth Offset depending on your scene.
-    * This step may not be needed if you use BetterFBX to import your model (not confirmed).
-11. Delete Specific Objects
-    * This step deletes specific object(s) which is only EffectMesh at this time.
-    * No selection needed.
+    * This step may not be needed if you use BetterFBX to import your model (not confirmed)
 12. Make Character Upright
     * This step will reset the rotation and scale of the character armature and set the character armature to 90 degrees on the x-axis (standing upright).
     * No selection needed.
-13. Set Color Management to 'Standard'
+13. Setup Head Driver
+    * This step will setup the Head Driver constraint so that face shadows work
+    * No selection needed.
+14. Set Color Management to 'Standard'
     * This step will set the Color Management to Standard (normally Filmic)
     * No selection needed.
-14. Setup Head Driver
-    * This step will setup the Head Driver constraint so that face shadows work
+15. Delete Specific Objects
+    * This step deletes specific object(s) which is only EffectMesh at this time.
+    * No selection needed.
+16. Set Up ArmTwist Bone Constraints
+    * This step will create Copy Rotation Bone Constraints on the ArmTwist bones to the Forearm bone (if the ArmTwist bones exist). 
+    * It does this by reorienting the ArmTwist bones so the ArmTwist bone's Tail points towards the Forearm bone's Head.
+    * Afterwards, it creates Copy Rotation Bone Constraints on the ArmTwist bones.
+    * If you do not want these Bone Constraints, you can easily select the bones and turn off the bone constraint.
     * No selection needed.
 </details>
 
@@ -227,6 +234,8 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [X] UI Setup Wizard Addon
 - [ ] Update Configuration from UI (checkboxes that enable/disable steps)
 - [ ] Batch Character Setup
+- [X] Basic NPC Support
+- [ ] Basic Monster Support
 ### Refactoring
 - [X] Refactor Material Assignment Mapping (externalize/centralize it to one locaiton)
 - [ ] Refactor Import Outline Lightmaps component
@@ -244,27 +253,16 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 ![alt text](https://user-images.githubusercontent.com/8632035/183316362-8a47f471-0fa4-4a3d-8e17-ea2c2a9a852e.png)
 
 ## "Tested" Character Models
-The models below should not throw errors when running the Setup Wizard.
-- Amber
-- Alhaitham
-- Collei
-- Dori
-- Hu Tao
-- Kamisato Ayato
-- Keqing
-- Lumine
-- Nahida
-- Nilou
-- Rosaria
-- Tighnari
-- Yelan
+Automated tests are run each release on all playable characters and a small subset of NPC characters.
+<br>
+This Setup Wizard should work on all playable characters, but if you do find any issues or need help, don't hesitate to reach out in the #help channel on Discord or open up an issue in this repository.
 
 #
 
 ## Credits
 
-Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender.
+Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0 and @Modder4869!
+:star: Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0, @Modder4869 and @Bonny! :star:
 
 Cheers and Happy Blending

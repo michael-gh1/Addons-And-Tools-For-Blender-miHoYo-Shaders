@@ -58,8 +58,11 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
-                original_material_name = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]  # from original model
-                actual_material_part_name = get_actual_material_name_for_dress(original_material_name.name)
+                original_mesh_material = \
+                    [material for material in bpy.data.materials if material.name.startswith('NPC') and body_part_material_name in material.name][0] if \
+                    [material for material in bpy.data.materials if material.name.startswith('NPC')] else \
+                    [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
+                actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name)
 
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)

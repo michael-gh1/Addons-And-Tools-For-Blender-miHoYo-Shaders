@@ -233,6 +233,12 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'Delete EffectMesh',
             'TRASH'
         )
+        OperatorFactory.create(
+            sub_layout,
+            'genshin.set_up_armtwist_bone_constraints',
+            'Set Up ArmTwist Bone Constraints',
+            'CONSTRAINT_BONE'
+        )
 
 
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):

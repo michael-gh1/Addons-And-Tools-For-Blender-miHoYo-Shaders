@@ -24,6 +24,25 @@ logger = logging.getLogger(__name__)
 
 def setup_character(config, character_name, character_folder_file_path):
     logger.info(f'Starting test for {character_name}')
+    logger.info(f'Emptying scene...')
+
+    default_objects_to_delete = ['Cube', 'Light', 'Camera']
+
+    for object_to_delete in default_objects_to_delete:
+        object = bpy.context.scene.objects.get(object_to_delete)
+        if object:
+            object_name = object.name  # necessary to create because we lose the reference after deletion
+            logger.info(f'Deleting {object_name}')
+            bpy.data.objects.remove(object)
+            logger.info(f'Deleted {object_name}')
+
+    logger.info(f'Preparing scene...')
+    default_collection = bpy.data.collections.get('Collection')
+    if default_collection:
+        logger.info(f'Renaming {default_collection.name} to {character_name}...')
+        default_collection.name = character_name
+        logger.info(f'Successfully renamed Collection to: {bpy.data.collections.get(character_name).name}')
+
     logger.info(f'{config.get("metadata")}')
 
     if config.get('metadata').get('betterfbx_enabled'):
@@ -73,6 +92,7 @@ def setup_character(config, character_name, character_folder_file_path):
             TestOperatorExecutioner('setup_head_driver'),
             TestOperatorExecutioner('set_color_management_to_standard'),
             TestOperatorExecutioner('delete_specific_objects'),
+            TestOperatorExecutioner('set_up_armtwist_bone_constraints'),
         ]
 
         for operator in operators:
@@ -86,6 +106,26 @@ def setup_character(config, character_name, character_folder_file_path):
         logger.error(ex)
         logger.error(f'Failed test for {arg_character_name}')
         raise ex  # If it errors out it will still quit blender
+    finally:
+        if config.get('metadata').get('save_file'):
+            logger.info(f'Preparing file for {character_name}')
+            logger.info('Setting Transform Mode to "XYZ Euler"...')
+            character_armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
+            character_armature.rotation_mode = 'XYZ'
+            character_armature.animation_data_clear()  # some characters have animation data, clear it
+            logger.info('Successfully set to "XYZ Euler"')
+
+            logger.info('Packing files...')
+            try:
+                bpy.ops.file.pack_all()
+            except RuntimeError as e:
+                logger.warning(e)
+            logger.info('Successfully packed files')
+
+            filename = f'{character_name}.blend'
+            logger.info(f'Saving file for {character_name} as: {filename}...')
+            bpy.ops.wm.save_as_mainfile(filepath=f'{os.path.abspath(arg_logs_directory_path)}/{filename}')
+            logger.info(f'Saved file for {character_name} as: {filename}')
     bpy.ops.wm.quit_blender()
 
 
