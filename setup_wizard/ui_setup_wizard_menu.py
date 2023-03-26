@@ -3,6 +3,8 @@
 import bpy
 from bpy.types import Panel, UILayout
 
+from setup_wizard import bl_info
+
 class UI_Properties:
     @staticmethod
     def create_custom_ui_properties():
@@ -27,6 +29,9 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
     def draw(self, context):
         layout = self.layout
         window_manager = context.window_manager
+
+        version_text = layout.row()
+        version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
         row = layout.row()
