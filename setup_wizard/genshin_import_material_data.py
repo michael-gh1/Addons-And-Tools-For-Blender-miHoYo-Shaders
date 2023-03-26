@@ -88,7 +88,8 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                     material_data_applier.set_up_mesh_material_data()
                     material_data_applier.set_up_outline_colors()
                     break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
-                except AttributeError:
+                except AttributeError as err:
+                    print(err)
                     continue # fallback and try next version
                 except KeyError:
                     self.report({'WARNING'}, \
