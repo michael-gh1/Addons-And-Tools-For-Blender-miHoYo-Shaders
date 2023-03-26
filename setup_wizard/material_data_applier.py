@@ -34,7 +34,7 @@ class MaterialDataApplier(ABC):
 
     def apply_material_data(self, material_mapping, node_inputs):
         for material_json_name, material_node_name in material_mapping.items():
-            material_json_value = self.__get_value_in_json_parser(self.material_data_parser, material_json_name)
+            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_json_name)
 
             if material_json_value is None:  # explicitly check for None
                 self.__handle_material_value_not_found(material_json_name)
@@ -48,7 +48,7 @@ class MaterialDataApplier(ABC):
                     Falling back to next MaterialDataApplier version')
                 raise ex
 
-    def __get_value_in_json_parser(self, parser, key):
+    def get_value_in_json_parser(self, parser, key):
         try:
             return getattr(parser.m_floats, key)
         except AttributeError:
@@ -177,6 +177,42 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             self.local_material_mapping,
             shader_node_tree_inputs,
         )
+        self.set_up_alpha_options_material_data(shader_node_tree_inputs)
+
+    # We should consider abstracting this logic if we need to add additional logic for other material data values
+    def set_up_alpha_options_material_data(self, node_inputs):
+        _MainTexAlphaUse_name = '_MainTexAlphaUse'
+        _MainTexAlphaUse_mapping = {
+            0: {
+                "Use Alpha": 0,
+                "0 = Emission, 1 = Transparency": 0
+            },
+            1: {
+                "Use Alpha": 1,
+                "0 = Emission, 1 = Transparency": 1
+            },
+            2: {
+                "Use Alpha": 1,
+                "0 = Emission, 1 = Transparency": 0
+            },
+            3: {},
+        }
+
+        _MainTexAlphaUse_value = int(self.get_value_in_json_parser(self.material_data_parser, _MainTexAlphaUse_name))
+        _MainTexAlphaUse_material_node_dict = _MainTexAlphaUse_mapping.get(_MainTexAlphaUse_value)
+
+        if _MainTexAlphaUse_value is None:  # explicitly check for None
+            self.__handle_material_value_not_found(_MainTexAlphaUse_name)
+            return
+
+        for material_node_name, material_json_value in _MainTexAlphaUse_material_node_dict.items():
+            node_input = node_inputs.get(material_node_name)
+            try:
+                node_input.default_value = material_json_value
+            except AttributeError as ex:
+                print(f'Did not find {material_node_name} in {self.body_part} material using {self} \
+                    Falling back to next MaterialDataApplier version')
+                raise ex
 
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
