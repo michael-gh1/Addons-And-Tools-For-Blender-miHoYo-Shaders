@@ -86,10 +86,6 @@ class GameMaterialImporter:
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
-        # Add fake user to prevent unused materials from being cleaned up
-        genshin_materials = [bpy.data.materials.get(genshin_material_name.get('name')) for genshin_material_name in self.names_of_game_materials]
-        material_utils.add_fake_user_to_materials(genshin_materials)
-
         NextStepInvoker().invoke(
             self.blender_operator.next_step_idx, 
             self.blender_operator.invoker_type, 
