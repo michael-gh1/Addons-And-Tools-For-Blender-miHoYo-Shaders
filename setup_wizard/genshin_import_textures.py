@@ -8,7 +8,6 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.models import CustomOperatorProperties
 from setup_wizard.texture_setup.game_texture_importers import GameTextureImporterFactory, GenshinImpactTextureImporter
