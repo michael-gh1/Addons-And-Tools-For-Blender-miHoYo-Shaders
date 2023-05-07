@@ -59,7 +59,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
                 file_directory=self.blender_operator.file_directory,
                 invoker_type=self.blender_operator.invoker_type,
                 high_level_step_name=self.blender_operator.high_level_step_name,
-                game_type=GameType.GENSHIN_IMPACT,
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             return {'FINISHED'}
 
@@ -94,7 +94,8 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             self.blender_operator.next_step_idx,
             self.blender_operator.invoker_type,
             file_path_to_cache=directory,
-            high_level_step_name=self.blender_operator.high_level_step_name
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=GameType.GENSHIN_IMPACT,
         )
         return {'FINISHED'}
 
