@@ -148,7 +148,8 @@ class GI_PT_UI_Materials_Menu(Panel):
             sub_layout,
             'genshin.import_materials',
             'Import Genshin Materials',
-            'MATERIAL'
+            'MATERIAL',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,

@@ -134,8 +134,9 @@ class HSR_PT_UI_Materials_Menu(Panel):
         OperatorFactory.create(
             sub_layout,
             'genshin.import_materials',
-            'Import Honkai Star Rail Materials',
-            'MATERIAL'
+            'Import HSR Materials',
+            'MATERIAL',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,

@@ -95,7 +95,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             self.blender_operator.invoker_type,
             file_path_to_cache=directory,
             high_level_step_name=self.blender_operator.high_level_step_name,
-            game_type=GameType.GENSHIN_IMPACT,
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         return {'FINISHED'}
 
