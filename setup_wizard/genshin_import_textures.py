@@ -40,10 +40,10 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
             GameTextureImporterFactory.create(self.game_type, self, context)
 
         texture_importer_service = TextureImporterService(game_texture_importer)
-        texture_importer_service.import_textures()
+        status = texture_importer_service.import_textures()
 
         super().clear_custom_properties()
-        return {'FINISHED'}
+        return status or {'FINISHED'}
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportTextures)

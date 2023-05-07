@@ -19,14 +19,14 @@ class GameTextureImporter(ABC):
 
 
 class GameTextureImporterFactory:
-    def create(game_texture_importer_type: GameType, blender_operator: Operator, context):
+    def create(game_type: GameType, blender_operator: Operator, context: Context):
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
-        if game_texture_importer_type == GameType.GENSHIN_IMPACT.name:
+        if game_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactTextureImporterFacade(blender_operator, context)
-        elif game_texture_importer_type == GameType.HONKAI_STAR_RAIL.name:
+        elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailTextureImporterFacade(blender_operator, context)
         else:
-            raise Exception(f'Unknown {GameType}: {game_texture_importer_type}')
+            raise Exception(f'Unknown {GameType}: {game_type}')
 
 
 '''
@@ -96,6 +96,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             file_path_to_cache=directory,
             high_level_step_name=self.blender_operator.high_level_step_name
         )
+        return {'FINISHED'}
 
 
 '''

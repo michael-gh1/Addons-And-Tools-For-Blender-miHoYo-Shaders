@@ -7,4 +7,4 @@ class TextureImporterService:
         self.game_texture_importer = game_texture_importer
 
     def import_textures(self):
-        self.game_texture_importer.import_textures()
+        return self.game_texture_importer.import_textures()
