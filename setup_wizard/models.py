@@ -9,6 +9,7 @@ class CustomOperatorProperties:
     file_directory: StringProperty()
     invoker_type: StringProperty()
     high_level_step_name: StringProperty()
+    game_type: StringProperty()
 
     '''
     Modules will be registered and store previous choices within the same Blender file instance/session.
@@ -23,6 +24,7 @@ class CustomOperatorProperties:
         self.file_directory = ''
         self.invoker_type = ''
         self.high_level_step_name = ''
+        self.game_type = ''
 
 
 class BasicSetupUIOperator:

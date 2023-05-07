@@ -5,16 +5,11 @@ import os
 
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
-from enum import Enum, auto
+from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.domain.shader_configurator import ShaderConfigurator
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.texture_setup.texture_importer_types import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
-
-
-class GameTextureImporterType(Enum):
-    GENSHIN_IMPACT = auto()
-    HONKAI_STAR_RAIL = auto()
 
 
 class GameTextureImporter(ABC):
@@ -24,13 +19,13 @@ class GameTextureImporter(ABC):
 
 
 class GameTextureImporterFactory:
-    def create(game_texture_importer_type: GameTextureImporterType, blender_operator: Operator, context):
-        if game_texture_importer_type is GameTextureImporterType.GENSHIN_IMPACT:
+    def create(game_texture_importer_type: GameType, blender_operator: Operator, context):
+        if game_texture_importer_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactTextureImporter(blender_operator, context)
-        elif game_texture_importer_type is GameTextureImporterType.HONKAI_STAR_RAIL:
+        elif game_texture_importer_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailTextureImporter(blender_operator, context)
         else:
-            raise Exception(f'Unknown {GameTextureImporterType}: {game_texture_importer_type}')
+            raise Exception(f'Unknown {GameType}: {game_texture_importer_type}')
 
 
 class GenshinImpactTextureImporter(GameTextureImporter):
@@ -54,7 +49,8 @@ class GenshinImpactTextureImporter(GameTextureImporter):
                 next_step_idx=self.blender_operator.next_step_idx, 
                 file_directory=self.blender_operator.file_directory,
                 invoker_type=self.blender_operator.invoker_type,
-                high_level_step_name=self.blender_operator.high_level_step_name
+                high_level_step_name=self.blender_operator.high_level_step_name,
+                game_type=GameType.GENSHIN_IMPACT,
             )
             return {'FINISHED'}
 

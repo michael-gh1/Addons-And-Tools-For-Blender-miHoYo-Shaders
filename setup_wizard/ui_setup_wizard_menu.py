@@ -4,6 +4,7 @@ import bpy
 from bpy.types import Panel, UILayout
 
 from setup_wizard import bl_info
+from setup_wizard.domain.game_types import GameType
 
 class UI_Properties:
     @staticmethod
@@ -159,7 +160,8 @@ class GI_PT_UI_Materials_Menu(Panel):
             sub_layout,
             'genshin.import_textures',
             'Import Character Textures',
-            'TEXTURE'
+            'TEXTURE',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
 

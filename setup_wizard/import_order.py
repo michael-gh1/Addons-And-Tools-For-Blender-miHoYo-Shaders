@@ -6,6 +6,8 @@ import bpy
 import json
 import os
 
+from setup_wizard.domain.game_types import GameType
+
 # Config Constants
 COMPONENT_NAME = 'component_name'
 ENABLED = 'enabled'
@@ -21,16 +23,21 @@ CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 
 
 class NextStepInvoker:
-    def invoke(self, current_step_index, type, file_path_to_cache=None, high_level_step_name=None):
+    def invoke(self, 
+               current_step_index, 
+               type, 
+               file_path_to_cache=None, 
+               high_level_step_name=None, 
+               game_type: GameType=GameType.GENSHIN_IMPACT):
         if type == 'invoke_next_step':
-            invoke_next_step(current_step_index, file_path_to_cache)
+            invoke_next_step(game_type, current_step_index, file_path_to_cache)
         elif type == 'invoke_next_step_ui':
-            invoke_next_step_ui(high_level_step_name, current_step_index)
+            invoke_next_step_ui(high_level_step_name, current_step_index, game_type)
         else:
             print(f'Warning: Unknown type found when invoking: {type}')
 
 
-def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
+def invoke_next_step(current_step_idx: int, file_path_to_cache=None, game_type: GameType=GameType.GENSHIN_IMPACT):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
@@ -56,7 +63,8 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         if type(function_to_use) is bpy.ops._BPyOpsSubModOp:
             print(f'Calling {function_to_use} with {execute_or_invoke}_DEFAULT w/ cache: {cached_file_directory}')
             function_to_use(
-                    f'{execute_or_invoke}_DEFAULT', 
+                    f'{execute_or_invoke}_DEFAULT',
+                    game_type=game_type.name,
                     next_step_idx=current_step_idx + 1, 
                     file_directory=cached_file_directory,
                     invoker_type='invoke_next_step'
@@ -67,7 +75,7 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         invoke_next_step(current_step_idx + 1)
 
 
-def invoke_next_step_ui(high_level_step_name, current_step_index):
+def invoke_next_step_ui(high_level_step_name, current_step_index, game_type: GameType=GameType.GENSHIN_IMPACT):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
     file = open(f'{path_to_setup_wizard_folder}/config_ui.json')
@@ -81,6 +89,7 @@ def invoke_next_step_ui(high_level_step_name, current_step_index):
 
     operator_to_execute(
         'EXEC_DEFAULT',
+        game_type=game_type.name,
         next_step_idx=current_step_index + 1,
         invoker_type='invoke_next_step_ui',
         high_level_step_name=high_level_step_name
