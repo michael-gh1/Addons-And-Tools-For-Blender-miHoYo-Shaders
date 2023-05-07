@@ -10,8 +10,8 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 from setup_wizard.models import CustomOperatorProperties
-from setup_wizard.texture_setup.game_texture_importers import GameTextureImporter, GameTextureImporterFactory
-from setup_wizard.texture_setup.texture_importer_service import TextureImporterService
+from setup_wizard.texture_import_setup.game_texture_importers import GameTextureImporter, GameTextureImporterFactory
+from setup_wizard.texture_import_setup.texture_importer_service import TextureImporterService
 
 
 class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperties):

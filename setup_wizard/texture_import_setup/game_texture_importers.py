@@ -9,7 +9,7 @@ from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.domain.shader_configurator import ShaderConfigurator
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
-from setup_wizard.texture_setup.texture_importer_types import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
+from setup_wizard.texture_import_setup.texture_importer_types import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
 
 
 class GameTextureImporter(ABC):
@@ -96,6 +96,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             file_path_to_cache=directory,
             high_level_step_name=self.blender_operator.high_level_step_name
         )
+
 
 '''
 HSR Texture Importer Abstraction Layer

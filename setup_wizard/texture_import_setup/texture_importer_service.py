@@ -1,5 +1,5 @@
 
-from setup_wizard.texture_setup.game_texture_importers import GameTextureImporter
+from setup_wizard.texture_import_setup.game_texture_importers import GameTextureImporter
 
 
 class TextureImporterService:
