@@ -25,7 +25,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_idname = "GI_PT_Setup_Wizard_UI_Layout"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
 
     def draw(self, context):
         layout = self.layout
@@ -61,7 +61,7 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
 
     def draw(self, context):
         layout = self.layout
@@ -101,7 +101,7 @@ class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
