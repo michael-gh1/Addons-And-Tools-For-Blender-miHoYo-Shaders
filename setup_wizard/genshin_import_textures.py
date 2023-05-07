@@ -10,7 +10,8 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 from setup_wizard.models import CustomOperatorProperties
-from setup_wizard.texture_setup.game_texture_importers import GameTextureImporterFactory, GenshinImpactTextureImporterFacade
+from setup_wizard.texture_setup.game_texture_importers import GameTextureImporter, GameTextureImporterFactory
+from setup_wizard.texture_setup.texture_importer_service import TextureImporterService
 
 
 class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperties):
@@ -35,9 +36,11 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
     )
 
     def execute(self, context):
-        genshin_impact_texture_importer: GenshinImpactTextureImporterFacade = \
+        game_texture_importer: GameTextureImporter = \
             GameTextureImporterFactory.create(self.game_type, self, context)
-        genshin_impact_texture_importer.import_textures()
+
+        texture_importer_service = TextureImporterService(game_texture_importer)
+        texture_importer_service.import_textures()
 
         super().clear_custom_properties()
         return {'FINISHED'}

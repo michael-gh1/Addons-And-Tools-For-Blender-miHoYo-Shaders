@@ -29,12 +29,20 @@ class GameTextureImporterFactory:
             raise Exception(f'Unknown {GameType}: {game_texture_importer_type}')
 
 
+'''
+GI Texture Importer Abstraction Layer
+Facade class intended to help abstract the Blender Operator layer from the Texture Importing layer.
+Also named as a Facade in order to differentiate from the actual Texture Importers.
+'''
 class GenshinImpactTextureImporterFacade(GameTextureImporter):
     def __init__(self, blender_operator, context):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
 
-    # Acts as a "facade". May help when troubleshooting issues with others (method name appears in stack trace).
+    '''
+    This does look odd, but is intended to help with troubleshooting errors that users may encounter.
+    The stacktrace will contain the method name (game name).
+    '''
     def import_textures(self):
         self.__import_genshin_impact_textures()
 
@@ -89,14 +97,52 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             high_level_step_name=self.blender_operator.high_level_step_name
         )
 
+'''
+HSR Texture Importer Abstraction Layer
+Facade class intended to help abstract the Blender Operator layer from the Texture Importing layer.
+Also named as a Facade in order to differentiate from the actual Texture Importers.
+'''
+class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
+    def __init__(self, blender_operator, context):
+        self.blender_operator: Operator = blender_operator
+        self.context: Context = context
 
-class HonkaiStarRailTextureImporterFacade:
-    def __init__(self):
-        pass
+    '''
+    This does look odd, but is intended to help with troubleshooting errors that users may encounter.
+    The stacktrace will contain the method name (game name).
+    '''
+    def import_textures(self):
+        self.__import_honkai_star_rail_textures()
 
-    # Acts as a "facade". May help when troubleshooting issues with others (method name appears in stack trace).
-    def import_textures(self, context):
-        self.__import_honkai_star_rail_textures(context)
+    def __import_honkai_star_rail_textures(self):
+        cache_enabled = self.context.window_manager.cache_enabled
+        directory = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.blender_operator.filepath)
 
-    def __import_honkai_star_rail_textures(self, context):
-        pass
+        if not directory:
+            bpy.ops.genshin.import_textures(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.blender_operator.next_step_idx, 
+                file_directory=self.blender_operator.file_directory,
+                invoker_type=self.blender_operator.invoker_type,
+                high_level_step_name=self.blender_operator.high_level_step_name,
+                game_type=GameType.HONKAI_STAR_RAIL,
+            )
+            return {'FINISHED'}
+
+        texture_importer_type = TextureImporterType.HSR_AVATAR
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer.import_textures(directory)
+
+        self.blender_operator.report({'INFO'}, 'Imported textures')
+        if cache_enabled and directory:
+            cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx,
+            self.blender_operator.invoker_type,
+            file_path_to_cache=directory,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=GameType.HONKAI_STAR_RAIL
+        )

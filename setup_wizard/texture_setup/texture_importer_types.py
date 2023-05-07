@@ -9,6 +9,7 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 class TextureImporterType(Enum):
     AVATAR = auto()
     NPC = auto()
+    HSR_AVATAR = auto()
 
 
 class TextureType(Enum):
@@ -22,6 +23,8 @@ class TextureImporterFactory:
             return GenshinAvatarTextureImporter()
         elif texture_importer_type == TextureImporterType.NPC:
             return GenshinNPCTextureImporter()
+        elif texture_importer_type == TextureImporterType.HSR_AVATAR:
+            return HonkaiStarRailAvatarTextureImporter()
         else:
             print(f'Unknown TextureImporterType: {texture_importer_type}')
 
@@ -249,3 +252,12 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 else:
                     pass
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+
+
+class HonkaiStarRailTextureImporter:
+    def import_textures(self, directory):
+        raise NotImplementedError()
+
+class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
+    def import_textures(self, directory):
+        pass
