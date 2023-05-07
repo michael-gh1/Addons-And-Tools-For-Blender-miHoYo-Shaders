@@ -37,7 +37,10 @@ class NextStepInvoker:
             print(f'Warning: Unknown type found when invoking: {type}')
 
 
-def invoke_next_step(current_step_idx: int, file_path_to_cache=None, game_type: GameType=GameType.GENSHIN_IMPACT):
+def invoke_next_step(
+        current_step_idx: int, 
+        file_path_to_cache=None, 
+        game_type: GameType=GameType.GENSHIN_IMPACT):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
@@ -75,7 +78,10 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None, game_type: 
         invoke_next_step(current_step_idx + 1)
 
 
-def invoke_next_step_ui(high_level_step_name, current_step_index, game_type: GameType=GameType.GENSHIN_IMPACT):
+def invoke_next_step_ui(
+        high_level_step_name, 
+        current_step_index, 
+        game_type: GameType=GameType.GENSHIN_IMPACT):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
     file = open(f'{path_to_setup_wizard_folder}/config_ui.json')

@@ -20,6 +20,7 @@ class GameTextureImporter(ABC):
 
 class GameTextureImporterFactory:
     def create(game_texture_importer_type: GameType, blender_operator: Operator, context):
+        # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_texture_importer_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactTextureImporter(blender_operator, context)
         elif game_texture_importer_type == GameType.HONKAI_STAR_RAIL.name:
