@@ -130,7 +130,7 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
                 file_directory=self.blender_operator.file_directory,
                 invoker_type=self.blender_operator.invoker_type,
                 high_level_step_name=self.blender_operator.high_level_step_name,
-                game_type=GameType.HONKAI_STAR_RAIL,
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
             return {'FINISHED'}
 
@@ -147,5 +147,5 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
             self.blender_operator.invoker_type,
             file_path_to_cache=directory,
             high_level_step_name=self.blender_operator.high_level_step_name,
-            game_type=GameType.HONKAI_STAR_RAIL
+            game_type=GameType.HONKAI_STAR_RAIL.name
         )
