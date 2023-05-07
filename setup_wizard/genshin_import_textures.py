@@ -10,7 +10,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 from setup_wizard.domain.shader_configurator import ShaderConfigurator
-from setup_wizard.domain.texture_importers import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
+from setup_wizard.texture_setup.texture_importer_types import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.import_order import get_actual_material_name_for_dress
