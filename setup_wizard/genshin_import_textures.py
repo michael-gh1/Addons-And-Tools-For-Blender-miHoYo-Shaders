@@ -8,11 +8,9 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-import os
-from setup_wizard.domain.shader_configurator import ShaderConfigurator
-from setup_wizard.texture_setup.texture_importer_types import GenshinTextureImporter, TextureImporterFactory, TextureImporterType
 
-from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
+from setup_wizard.texture_setup.game_texture_importers import GameTextureImporterFactory, GameTextureImporterType, GenshinImpactTextureImporter
+
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.models import CustomOperatorProperties
 
@@ -39,54 +37,10 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
     )
 
     def execute(self, context):
-        cache_enabled = context.window_manager.cache_enabled
-        directory = self.file_directory \
-            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
-            or os.path.dirname(self.filepath)
+        genshin_impact_texture_importer: GenshinImpactTextureImporter = \
+            GameTextureImporterFactory.create(GameTextureImporterType.GENSHIN_IMPACT, self, context)
+        genshin_impact_texture_importer.import_textures()
 
-        if not directory:
-            bpy.ops.genshin.import_textures(
-                'INVOKE_DEFAULT',
-                next_step_idx=self.next_step_idx, 
-                file_directory=self.file_directory,
-                invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
-            )
-            return {'FINISHED'}
-
-        texture_importer_type = TextureImporterType.AVATAR if \
-            [material_name for material_name, material in bpy.data.materials.items() if 'Avatar' in material_name] else \
-                TextureImporterType.NPC
-        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
-        texture_importer.import_textures(directory)
-
-        '''
-            NPCs don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
-            If an asset does exist, leave it as the default value (1.0).
-        '''
-        if texture_importer_type is TextureImporterType.NPC and \
-            not [file for file in [file for name, folder, file in os.walk(directory)][0] if 'Shadow_Ramp' in file]:
-            ShaderConfigurator().update_shader_value(
-                materials = [
-                    bpy.data.materials.get('miHoYo - Genshin Hair'),
-                    bpy.data.materials.get('miHoYo - Genshin Face'),
-                    bpy.data.materials.get('miHoYo - Genshin Body'),
-                ],
-                node_name = 'miHoYo - Genshin Impact',
-                input_name = 'Use Shadow Ramp',
-                value = 0
-        )
-
-        self.report({'INFO'}, 'Imported textures')
-        if cache_enabled and directory:
-            cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
-
-        NextStepInvoker().invoke(
-            self.next_step_idx,
-            self.invoker_type,
-            file_path_to_cache=directory,
-            high_level_step_name=self.high_level_step_name
-        )
         super().clear_custom_properties()
         return {'FINISHED'}
 
