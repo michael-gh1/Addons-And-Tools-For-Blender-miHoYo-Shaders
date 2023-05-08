@@ -8,6 +8,8 @@ from bpy.types import Operator
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.replace_default_materials_setup.default_material_replacer_service import DefaultMaterialReplacerService
+from setup_wizard.replace_default_materials_setup.game_default_material_replacers import GameDefaultMaterialReplacerFactory
 
 
 class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
@@ -32,12 +34,16 @@ class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
     )
 
     def execute(self, context):
-        self.replace_default_materials_with_genshin_materials()
+        game_default_material_replacer = GameDefaultMaterialReplacerFactory.create(self.game_type, self, context)
+
+        default_material_replacer_service = DefaultMaterialReplacerService(game_default_material_replacer)
+        default_material_replacer_service.replace_default_materials()
 
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type
         )
         return {'FINISHED'}
     

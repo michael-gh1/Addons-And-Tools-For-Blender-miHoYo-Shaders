@@ -142,7 +142,8 @@ class HSR_PT_UI_Materials_Menu(Panel):
             sub_layout,
             'genshin.replace_default_materials',
             'Replace Default Materials',
-            'ARROW_LEFTRIGHT'
+            'ARROW_LEFTRIGHT',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,
