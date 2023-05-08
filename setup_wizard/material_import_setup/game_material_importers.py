@@ -80,7 +80,7 @@ class GameMaterialImporter:
                 set_fake=True
             )
         except RuntimeError as ex:
-            self.report({'ERROR'}, \
+            self.blender_operator.report({'ERROR'}, \
                 f"ERROR: Error when trying to append materials. \n\
                 Did not find `{self.game_default_blend_file_with_materials}` in the directory you selected. \n\
                 Try selecting the exact blend file you want to use.")
