@@ -33,6 +33,7 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'Hair',  # HSR Support
 ]
 
 
