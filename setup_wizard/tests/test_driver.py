@@ -29,6 +29,7 @@ class TestDriver:
             if not environment_config.get('metadata').get('enabled'):
                 continue
 
+            test_file = environment_config.get('test_file')
             characters_folder_file_path = environment_config.get(CHARACTERS_FOLDER_FILE_PATH)  # root level
             character_folders = os.listdir(characters_folder_file_path)  # all folders inside
             environment_config_str = json.dumps(environment_config)
@@ -43,8 +44,8 @@ class TestDriver:
                 )  # all items inside character folder
 
                 for nested_character_folder_item in character_folder_items:  # is the item a directory?
-                    if nested_character_folder_item == 'Material' or \
-                        nested_character_folder_item == 'Materials':  # is a material data folder
+                    if nested_character_folder_item.lower() == 'material' or \
+                        nested_character_folder_item.lower() == 'materials':  # is a material data folder
                         continue
                     absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
 
@@ -53,7 +54,7 @@ class TestDriver:
                             environment_config.get(BLENDER_EXECUTION_FILE_PATH),
                             '-b',
                             '--python',
-                            'setup_wizard/tests/test_setup_character.py',
+                            test_file,
                             '--',
                             f'{self.logs_directory_path}',
                             f'{environment_config_str}',
@@ -68,7 +69,7 @@ class TestDriver:
                         environment_config.get(BLENDER_EXECUTION_FILE_PATH),
                         '-b',
                         '--python',
-                        'setup_wizard/tests/test_setup_character.py',
+                        test_file,
                         '--',
                         f'{self.logs_directory_path}',
                         f'{environment_config_str}',

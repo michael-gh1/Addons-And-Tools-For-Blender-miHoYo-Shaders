@@ -44,3 +44,8 @@ class TestOperatorExecutioner:
 class GenshinImpactTestOperatorExecutioner(TestOperatorExecutioner):
     def __init__(self, operator_name, file_directory='', filepath='', files=[], config={}):
         super().__init__(operator_name, file_directory, filepath, files, config, GameType.GENSHIN_IMPACT.name)
+
+
+class HonkaiStarRailTestOperatorExecutioner(TestOperatorExecutioner):
+    def __init__(self, operator_name, file_directory='', filepath='', files=[], config={}):
+        super().__init__(operator_name, file_directory, filepath, files, config, GameType.HONKAI_STAR_RAIL.name)
