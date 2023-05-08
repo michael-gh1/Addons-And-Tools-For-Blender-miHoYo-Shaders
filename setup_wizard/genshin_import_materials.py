@@ -47,21 +47,9 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
 
             material_importer_service = MaterialImporterService(game_material_importer)
             material_importer_service.import_materials()
-        except RuntimeError as ex:
-            # Catch error when running bpy.ops.wm.append()
-            super().clear_custom_properties()
-            self.report({'ERROR'}, \
-                f"ERROR: Error when trying to append materials. \n\
-                Did not find `{game_material_importer.game_default_blend_file_with_materials}` in the directory you selected. \n\
-                Try selecting the exact blend file you want to use.")
+        except Exception as ex:
             raise ex
         finally:
-            NextStepInvoker().invoke(
-                self.next_step_idx, 
-                self.invoker_type, 
-                high_level_step_name=self.high_level_step_name,
-                game_type=self.game_type,
-            )
             super().clear_custom_properties()
         return {'FINISHED'}
 

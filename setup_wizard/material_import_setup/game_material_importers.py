@@ -71,13 +71,20 @@ class GameMaterialImporter:
             self.MATERIAL_PATH_INSIDE_BLEND_FILE
         )
 
-        # Use the exact file the user selected, otherwise fallback to the non-Goo blender file in the directory
-        shader_blend_file_path = blend_file_with_genshin_materials or default_blend_file_path
-        bpy.ops.wm.append(
-            directory=shader_blend_file_path,
-            files=self.names_of_game_materials,
-            set_fake=True
-        )
+        try:
+            # Use the exact file the user selected, otherwise fallback to the non-Goo blender file in the directory
+            shader_blend_file_path = blend_file_with_genshin_materials or default_blend_file_path
+            bpy.ops.wm.append(
+                directory=shader_blend_file_path,
+                files=self.names_of_game_materials,
+                set_fake=True
+            )
+        except RuntimeError as ex:
+            self.report({'ERROR'}, \
+                f"ERROR: Error when trying to append materials. \n\
+                Did not find `{self.game_default_blend_file_with_materials}` in the directory you selected. \n\
+                Try selecting the exact blend file you want to use.")
+            raise ex
 
         self.blender_operator.report({'INFO'}, 'Imported Shader/Genshin Materials...')
         if cache_enabled and (user_selected_shader_blend_file_path or project_root_directory_file_path):
@@ -85,6 +92,14 @@ class GameMaterialImporter:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_file_path, user_selected_shader_blend_file_path)
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
 
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
@@ -107,7 +122,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        return super().import_materials()
+        return super().import_materials()  # Genshin Impact Material Importer
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
@@ -132,6 +147,5 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
             self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS
         )
 
-
     def import_materials(self):
-        return super().import_materials()
+        return super().import_materials()  # Honkai Star Rail Material Importer
