@@ -185,13 +185,15 @@ class HSR_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.import_outline_lightmaps',
                 'Import Outline Lightmaps',
-                'FILE_FOLDER'
+                'FILE_FOLDER',
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_material_data',
                 'Import Material Data',
-                'FILE'
+                'FILE',
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
