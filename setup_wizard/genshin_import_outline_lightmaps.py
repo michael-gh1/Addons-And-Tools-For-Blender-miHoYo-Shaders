@@ -7,7 +7,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.models import CustomOperatorProperties
 from setup_wizard.texture_import_setup.outline_texture_importers import OutlineTextureImporter, OutlineTextureImporterFactory
 
