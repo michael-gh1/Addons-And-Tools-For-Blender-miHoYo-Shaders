@@ -40,7 +40,8 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.setup_wizard_ui',
             'Run Entire Setup',
-            'PLAY'
+            'PLAY',
+            game_type=GameType.GENSHIN_IMPACT.name
         )
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(

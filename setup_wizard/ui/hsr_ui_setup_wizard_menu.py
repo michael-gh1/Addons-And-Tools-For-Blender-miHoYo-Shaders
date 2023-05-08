@@ -27,7 +27,8 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.setup_wizard_ui',
             'Run Entire Setup',
-            'PLAY'
+            'PLAY',
+            game_type=GameType.HONKAI_STAR_RAIL.name
         )
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
