@@ -9,7 +9,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 from setup_wizard.material_import_setup.game_material_importers import GameMaterialImporterFactory
-from setup_wizard.material_import_setup.game_material_service import MaterialImporterService
+from setup_wizard.material_import_setup.material_importer_service import MaterialImporterService
 from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
 
 
