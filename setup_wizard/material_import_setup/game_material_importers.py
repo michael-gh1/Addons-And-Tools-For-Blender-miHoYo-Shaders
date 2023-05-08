@@ -86,14 +86,6 @@ class GameMaterialImporter:
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
-        NextStepInvoker().invoke(
-            self.blender_operator.next_step_idx, 
-            self.blender_operator.invoker_type, 
-            file_path_to_cache=project_root_directory_file_path,
-            high_level_step_name=self.blender_operator.high_level_step_name,
-            game_type=self.blender_operator.game_type,
-        )
-
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'

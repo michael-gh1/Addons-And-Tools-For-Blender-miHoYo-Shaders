@@ -7,6 +7,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
+from setup_wizard.import_order import NextStepInvoker
 
 from setup_wizard.material_import_setup.game_material_importers import GameMaterialImporterFactory
 from setup_wizard.material_import_setup.material_importer_service import MaterialImporterService
@@ -55,6 +56,12 @@ class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorPropert
                 Try selecting the exact blend file you want to use.")
             raise ex
         finally:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
             super().clear_custom_properties()
         return {'FINISHED'}
 
