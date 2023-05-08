@@ -104,4 +104,4 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         self.context: Context = context
 
     def import_textures(self):
-        self.blender_operator.report({'WARNING'}, 'Importing Outline Textures is currently unsupported!')
+        self.blender_operator.report({'WARNING'}, 'Importing HSR Outline Textures is currently unsupported!')
