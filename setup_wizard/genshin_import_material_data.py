@@ -58,7 +58,8 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
                 next_step_idx=self.next_step_idx, 
                 file_directory=self.file_directory,
                 invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
             return {'FINISHED'}
 
@@ -101,7 +102,8 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}

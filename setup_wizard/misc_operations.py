@@ -19,7 +19,8 @@ class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
@@ -44,7 +45,8 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
@@ -88,7 +90,8 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 

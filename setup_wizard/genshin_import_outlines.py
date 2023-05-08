@@ -53,7 +53,8 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
                     next_step_idx=self.next_step_idx, 
                     file_directory=self.file_directory,
                     invoker_type=self.invoker_type,
-                    high_level_step_name=self.high_level_step_name
+                    high_level_step_name=self.high_level_step_name,
+                    game_type=self.game_type,
                 )
                 return {'FINISHED'}
             bpy.ops.wm.append(
@@ -67,7 +68,8 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type,
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}

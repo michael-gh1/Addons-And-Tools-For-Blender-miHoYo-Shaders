@@ -47,7 +47,8 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
                 next_step_idx=self.next_step_idx, 
                 file_directory=self.file_directory,
                 invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
             return {'FINISHED'}
         
@@ -76,7 +77,8 @@ class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperator
             self.next_step_idx, 
             self.invoker_type, 
             file_path_to_cache=character_model_folder_file_path,
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}

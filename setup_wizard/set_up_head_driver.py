@@ -29,7 +29,8 @@ class GI_OT_SetUpHeadDriver(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
