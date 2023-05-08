@@ -58,20 +58,23 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.set_up_character',
             'Set Up Character',
-            icon='OUTLINER_OB_ARMATURE'
+            icon='OUTLINER_OB_ARMATURE',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,
             'genshin.set_up_materials',
             'Set Up Materials',
-            icon='MATERIAL'
+            icon='MATERIAL',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.set_up_outlines',
                 'Set Up Outlines',
-                icon='GEOMETRY_NODES'
+                icon='GEOMETRY_NODES',
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
