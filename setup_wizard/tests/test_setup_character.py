@@ -8,7 +8,7 @@ from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, MATERI
     FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.character_filename_to_material_data_mapper import get_character_material_dictionary
-from setup_wizard.tests.models.test_operator_executioner import TestOperatorExecutioner
+from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner, TestOperatorExecutioner
 
 argv = sys.argv
 argv = argv[argv.index('--') + 1:]
@@ -76,23 +76,23 @@ def setup_character(config, character_name, character_folder_file_path):
 
         operators = [
             TestOperatorExecutioner('clear_cache_operator'),
-            TestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
-            TestOperatorExecutioner('delete_empties'),
-            TestOperatorExecutioner('import_materials', 
+            GenshinImpactTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
+            GenshinImpactTestOperatorExecutioner('delete_empties'),
+            GenshinImpactTestOperatorExecutioner('import_materials', 
                 file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
                 filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
             ),
-            TestOperatorExecutioner('replace_default_materials'),
-            TestOperatorExecutioner('import_character_textures'),
-            TestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
-            TestOperatorExecutioner('setup_geometry_nodes'),
-            TestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
-            TestOperatorExecutioner('import_material_data', files=material_json_files, config=config),
-            TestOperatorExecutioner('fix_transformations'),
-            TestOperatorExecutioner('setup_head_driver'),
-            TestOperatorExecutioner('set_color_management_to_standard'),
-            TestOperatorExecutioner('delete_specific_objects'),
-            TestOperatorExecutioner('set_up_armtwist_bone_constraints'),
+            GenshinImpactTestOperatorExecutioner('replace_default_materials'),
+            GenshinImpactTestOperatorExecutioner('import_character_textures'),
+            GenshinImpactTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
+            GenshinImpactTestOperatorExecutioner('setup_geometry_nodes'),
+            GenshinImpactTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
+            GenshinImpactTestOperatorExecutioner('import_material_data', files=material_json_files, config=config),
+            GenshinImpactTestOperatorExecutioner('fix_transformations'),
+            GenshinImpactTestOperatorExecutioner('setup_head_driver'),
+            GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
+            GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
+            GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
         ]
 
         for operator in operators:
@@ -100,6 +100,7 @@ def setup_character(config, character_name, character_folder_file_path):
             if operator.operator_name == 'import_material_data' and not material_json_files:
                 continue
 
+            logger.info(f'Executing Operator: {operator.operator_name}')
             operator.execute()
         logger.info(f'Completed test for {character_name}')
     except Exception as ex:
