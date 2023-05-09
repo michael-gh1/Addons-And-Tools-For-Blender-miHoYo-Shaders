@@ -19,7 +19,7 @@ class TestOperatorExecutioner:
             operator_to_execute(
                 'EXEC_DEFAULT',
                 files=self.files,
-                filepath=self.config.get(MATERIAL_JSON_FOLDER_FILE_PATH),
+                filepath=self.filepath or self.config.get(MATERIAL_JSON_FOLDER_FILE_PATH),
                 game_type=self.game_type,
             )
         elif self.file_directory or self.filepath:

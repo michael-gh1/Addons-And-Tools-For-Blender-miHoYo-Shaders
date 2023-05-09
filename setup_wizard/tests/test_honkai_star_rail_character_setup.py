@@ -49,12 +49,12 @@ def setup_character(config, character_name, character_folder_file_path):
     logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
 
     try:
-        material_json_files = os.listdir(os.path.dirname(PurePath(character_folder_file_path, 'materials')))
-
+        material_json_files = os.listdir(PurePath(character_folder_file_path, 'materials'))
         material_json_files = [
             { 'name': material_json_file } for material_json_file in material_json_files
             if material_json_file.endswith('Mat_Face.json') or \
                 material_json_file.endswith('Mat_Hair.json') or \
+                material_json_file.endswith('Mat_Body.json') or \
                 material_json_file.endswith('Mat_Body1.json') or \
                 material_json_file.endswith('Mat_Body2.json')
         ]
@@ -72,7 +72,10 @@ def setup_character(config, character_name, character_folder_file_path):
             HonkaiStarRailTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
             HonkaiStarRailTestOperatorExecutioner('setup_geometry_nodes'),
             HonkaiStarRailTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
-            HonkaiStarRailTestOperatorExecutioner('import_material_data', files=material_json_files, config=config),
+            HonkaiStarRailTestOperatorExecutioner('import_material_data', 
+                                                  files=material_json_files, 
+                                                  filepath=str(PurePath(character_folder_file_path, "materials", "placeholder_value")), 
+                                                  config=config),
             HonkaiStarRailTestOperatorExecutioner('fix_transformations'),
             HonkaiStarRailTestOperatorExecutioner('setup_head_driver'),
             HonkaiStarRailTestOperatorExecutioner('set_color_management_to_standard'),
