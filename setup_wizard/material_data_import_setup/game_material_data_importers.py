@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import json
 import os
 from pathlib import PurePosixPath
+from typing import List
 import bpy
 from bpy.types import Operator, Context
 
@@ -15,6 +16,32 @@ class GameMaterialDataImporter(ABC):
     @abstractmethod
     def import_material_data(self):
         raise NotImplementedError
+
+    def apply_material_data(self, body_part: str, material_data_appliers: List[MaterialDataApplier]):
+        for material_data_applier in material_data_appliers:
+            try:
+                material_data_applier.set_up_mesh_material_data()
+                material_data_applier.set_up_outline_colors()
+                break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
+            except AttributeError as err:
+                print(err)
+                continue # fallback and try next version
+            except KeyError:
+                self.blender_operator.report({'WARNING'}, \
+                    f'Continuing to apply other material data, but: \n'
+                    f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
+                break
+
+    # Originally a "private" method, but moved to public due to inheriting classes
+    def get_material_data_json_parser(self, json_material_data):
+        for index, parser_class in enumerate(self.parsers):
+            try:
+                parser: MaterialDataJsonParser  = parser_class(json_material_data)
+                parser.parse()
+                return parser
+            except AttributeError:
+                if index == len(self.parsers) - 1:
+                    raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
 
 class GameMaterialDataImporterFactory:
@@ -58,7 +85,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
-            material_data_parser = self.__get_material_data_json_parser(json_material_data)
+            material_data_parser = self.get_material_data_json_parser(json_material_data)
 
             # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
             weapon_material_data_appliers = [
@@ -74,30 +101,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             material_data_appliers  = weapon_material_data_appliers if is_weapon else character_model_material_data_appliers
 
-            material_data_applier: MaterialDataApplier  # annotate type
-            for material_data_applier in material_data_appliers:
-                try:
-                    material_data_applier.set_up_mesh_material_data()
-                    material_data_applier.set_up_outline_colors()
-                    break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
-                except AttributeError as err:
-                    print(err)
-                    continue # fallback and try next version
-                except KeyError:
-                    self.blender_operator.report({'WARNING'}, \
-                        f'Continuing to apply other material data, but: \n'
-                        f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
-                    break
+            self.apply_material_data(body_part, material_data_appliers)
 
-    def __get_material_data_json_parser(self, json_material_data):
-        for index, parser_class in enumerate(self.parsers):
-            try:
-                parser: MaterialDataJsonParser  = parser_class(json_material_data)
-                parser.parse()
-                return parser
-            except AttributeError:
-                if index == len(self.parsers) - 1:
-                    raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
     def __init__(self, blender_operator, context):
@@ -127,35 +132,11 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
-            material_data_parser = self.__get_material_data_json_parser(json_material_data)
+            material_data_parser = self.get_material_data_json_parser(json_material_data)
 
             character_model_material_data_appliers = [
                 V2_HSR_MaterialDataApplier(material_data_parser, body_part), 
             ]
 
             material_data_appliers = character_model_material_data_appliers
-
-            material_data_applier: MaterialDataApplier  # annotate type
-            for material_data_applier in material_data_appliers:
-                try:
-                    material_data_applier.set_up_mesh_material_data()
-                    material_data_applier.set_up_outline_colors()
-                    break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
-                except AttributeError as err:
-                    print(err)
-                    continue # fallback and try next version
-                except KeyError:
-                    self.blender_operator.report({'WARNING'}, \
-                        f'Continuing to apply other material data, but: \n'
-                        f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
-                    break
-
-    def __get_material_data_json_parser(self, json_material_data):
-        for index, parser_class in enumerate(self.parsers):
-            try:
-                parser: MaterialDataJsonParser  = parser_class(json_material_data)
-                parser.parse()
-                return parser
-            except AttributeError:
-                if index == len(self.parsers) - 1:
-                    raise UnsupportedMaterialDataJsonFormatException(self.parsers)
+            self.apply_material_data(body_part, material_data_appliers)
