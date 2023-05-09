@@ -324,6 +324,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
                 face_material = bpy.data.materials.get('miHoYo - Genshin Face')
+                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
                 body1_material = bpy.data.materials.get('miHoYo - Genshin Body1')
                 body2_material = bpy.data.materials.get('miHoYo - Genshin Body2')
 
@@ -346,12 +347,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Color'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
-                    self.set_diffuse_texture(TextureType.BODY, body1_material, img)
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'LightMap'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
-                    self.set_lightmap_texture(TextureType.BODY, body1_material, img)
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body1', 'Color'], file):
                     self.set_diffuse_texture(TextureType.BODY, body1_material, img)
