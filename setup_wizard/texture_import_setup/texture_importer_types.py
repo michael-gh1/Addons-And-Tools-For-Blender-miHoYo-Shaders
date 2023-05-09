@@ -37,17 +37,36 @@ class GenshinTextureImporter:
     def import_textures(self, directory):
         raise NotImplementedError()
 
+    '''
+    Checks if all texture identifiers are in the texture name
+    Use Case: I want to check if a texture has [X, Y, Z] in it.
+    '''
     def is_texture_identifiers_in_texture_name(self, texture_identifiers, texture_name):
         for texture_identifier in texture_identifiers:
             if texture_identifier not in texture_name:
                 return False
         return True
 
+    '''
+    Checks a groups of files to see if there is a file that has all texture identifiers in the filename
+    Use Case: I want to check if there is a file with [X, Y, Z] in a group of files
+    '''
     def is_texture_identifiers_in_files(self, texture_identifiers, files):
         for file in files:
             if self.is_texture_identifiers_in_texture_name(texture_identifiers, file):
                 return True
         return False
+
+    '''
+    Checks if no texture identifiers exist in each file
+    Use Case: I want to check if a group of files does not have [X, Y, Z] in each filename
+    '''
+    def is_no_texture_identifiers_in_files(self, texture_identifiers, files):
+        for file in files:
+            for texture_identifier in texture_identifiers:
+                if texture_identifier in file:
+                    return False
+        return True
 
     def set_diffuse_texture(self, type: TextureType, material, img):
         material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
@@ -308,7 +327,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     not self.is_texture_identifiers_in_texture_name(['Eff'], file):  # TODO: Review this line
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Hair', 'LightMap'], file):
+                elif self.is_texture_identifiers_in_texture_name(['hair', 'lightmap'], file.lower()):
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Warm_Ramp'], file):
@@ -316,6 +335,16 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Cool_Ramp'], file):
                     self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
+                
+                # Character has Body and no Body1 or Body2?
+                elif self.is_texture_identifiers_in_texture_name(['body', 'color'], file.lower()) and \
+                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                    self.set_diffuse_texture(TextureType.BODY, body1_material, img)
+
+                # Character has Body and no Body1 or Body2?
+                elif self.is_texture_identifiers_in_texture_name(['body', 'lightmap'], file.lower()) and \
+                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                    self.set_lightmap_texture(TextureType.BODY, body1_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body1', 'Color'], file):
                     self.set_diffuse_texture(TextureType.BODY, body1_material, img)

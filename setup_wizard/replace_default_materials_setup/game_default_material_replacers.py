@@ -121,6 +121,16 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name == 'EyeShadow':
                     mesh_body_part_name = 'Eye Shadow'
 
+                # Another hacky-solution, some characters only have a "Body" material, but the shader materials
+                # only have Body1, Body2 and Body_A. Should request Shader to have a "Body" material
+                # Some characters have a mismatch between Texture and Material Data too... (Body_Color_A and Body)
+                # Checklist:
+                # 1. Materials
+                # 2. Textures
+                # 3. Material Data
+                if mesh_body_part_name == 'Body':
+                    mesh_body_part_name = 'Body1'
+
                 honkai_star_rail_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
 
                 if honkai_star_rail_material:
