@@ -8,12 +8,12 @@ from setup_wizard.domain.game_types import GameType
 
 
 class MaterialDataAppliersFactory:
-    WEAPON_NAME_IDENTIFIER = 'Mat'
+    def create(game_type, material_data_parser, body_part):
+        WEAPON_NAME_IDENTIFIER = 'Mat'
 
-    def create(self, game_type, material_data_parser, body_part):
-        if game_type == GameType.GenshinImpact.name:
+        if game_type == GameType.GENSHIN_IMPACT.name:
             # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
-            is_weapon = body_part == self.WEAPON_NAME_IDENTIFIER
+            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
 
             if is_weapon:
                 # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
