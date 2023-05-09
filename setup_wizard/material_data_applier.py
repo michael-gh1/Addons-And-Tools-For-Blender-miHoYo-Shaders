@@ -4,6 +4,35 @@ import bpy
 
 from abc import ABC, abstractmethod
 
+from setup_wizard.domain.game_types import GameType
+
+
+class MaterialDataAppliersFactory:
+    WEAPON_NAME_IDENTIFIER = 'Mat'
+
+    def create(self, game_type, material_data_parser, body_part):
+        if game_type == GameType.GenshinImpact.name:
+            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
+            is_weapon = body_part == self.WEAPON_NAME_IDENTIFIER
+
+            if is_weapon:
+                # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
+                return [
+                    V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
+                    V1_MaterialDataApplier(material_data_parser, 'Body'),
+                ]
+            else:
+                return [
+                    V2_MaterialDataApplier(material_data_parser, body_part), 
+                    V1_MaterialDataApplier(material_data_parser, body_part),
+                ]
+        elif game_type == GameType.HONKAI_STAR_RAIL.name:
+            return [
+                V2_HSR_MaterialDataApplier(material_data_parser, body_part), 
+            ]
+        else:
+            raise Exception(f'Unknown {GameType}: {game_type}')
+
 
 class MaterialDataApplier(ABC):
     outline_mapping = {

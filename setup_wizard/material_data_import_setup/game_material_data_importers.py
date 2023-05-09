@@ -9,7 +9,7 @@ from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
-from setup_wizard.material_data_applier import MaterialDataApplier, V1_MaterialDataApplier, V2_HSR_MaterialDataApplier, V2_WeaponMaterialDataApplier, V2_MaterialDataApplier
+from setup_wizard.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
 
 class GameMaterialDataImporter(ABC):
@@ -85,22 +85,13 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
+
             material_data_parser = self.get_material_data_json_parser(json_material_data)
-
-            # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
-            weapon_material_data_appliers = [
-                V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
-                V1_MaterialDataApplier(material_data_parser, 'Body'),
-            ]
-            character_model_material_data_appliers = [
-                V2_MaterialDataApplier(material_data_parser, body_part), 
-                V1_MaterialDataApplier(material_data_parser, body_part),
-            ]
-            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
-            is_weapon = body_part == self.WEAPON_NAME_IDENTIFIER
-
-            material_data_appliers  = weapon_material_data_appliers if is_weapon else character_model_material_data_appliers
-
+            material_data_appliers = MaterialDataAppliersFactory.create(
+                self.blender_operator.game_type,
+                material_data_parser,
+                body_part
+            )
             self.apply_material_data(body_part, material_data_appliers)
 
 
@@ -132,11 +123,11 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
+
             material_data_parser = self.get_material_data_json_parser(json_material_data)
-
-            character_model_material_data_appliers = [
-                V2_HSR_MaterialDataApplier(material_data_parser, body_part), 
-            ]
-
-            material_data_appliers = character_model_material_data_appliers
+            material_data_appliers = MaterialDataAppliersFactory.create(
+                self.blender_operator.game_type,
+                material_data_parser,
+                body_part
+            )
             self.apply_material_data(body_part, material_data_appliers)
