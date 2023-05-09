@@ -131,7 +131,7 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
                 original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')]
 
-                if original_mesh_material:
+                if original_mesh_material and 'Face' not in original_mesh_material and 'Face' not in body_part_material_name:
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, body_part_material_name)
                     self.assign_diffuse_texture(character_model_folder_file_path, color_files, body_part_material_name, body_part_material_name)
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
