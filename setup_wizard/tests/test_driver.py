@@ -59,7 +59,8 @@ class TestDriver:
                             f'{self.logs_directory_path}',
                             f'{environment_config_str}',
                             f'{character_folder_file_path}{nested_character_folder_item}',
-                            f'{absolute_character_folder_file_path}'
+                            f'{absolute_character_folder_file_path}',
+                            str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
                         ])
                         is_not_nested = False
                 if is_not_nested:
@@ -74,7 +75,8 @@ class TestDriver:
                         f'{self.logs_directory_path}',
                         f'{environment_config_str}',
                         f'{character_folder_file_path}',
-                        f'{absolute_character_folder_file_path}'
+                        f'{absolute_character_folder_file_path}',
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
                     ])
 
 

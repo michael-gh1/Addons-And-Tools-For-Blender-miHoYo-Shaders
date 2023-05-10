@@ -1,6 +1,5 @@
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import ComponentFunctionFactory
-from setup_wizard.tests.constants import MATERIAL_JSON_FOLDER_FILE_PATH
 
 
 class TestOperatorExecutioner:
@@ -19,7 +18,7 @@ class TestOperatorExecutioner:
             operator_to_execute(
                 'EXEC_DEFAULT',
                 files=self.files,
-                filepath=self.filepath or self.config.get(MATERIAL_JSON_FOLDER_FILE_PATH),
+                filepath=self.filepath,
                 game_type=self.game_type,
             )
         elif self.file_directory or self.filepath:
