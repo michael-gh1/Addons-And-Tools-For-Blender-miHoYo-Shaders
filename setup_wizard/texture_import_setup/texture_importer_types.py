@@ -372,6 +372,11 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):  # Not Hair, so ramp must be Body
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
+                # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
+                elif self.is_texture_identifiers_in_texture_name(['Ramp'], file):
+                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
                     self.set_face_diffuse_texture(face_material, img)
 
