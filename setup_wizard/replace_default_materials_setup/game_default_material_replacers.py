@@ -114,7 +114,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         for mesh in meshes:
             for material_slot in mesh.material_slots:
                 material_name = material_slot.name
-                mesh_body_part_name = material_name.split('_')[-1]
+                mesh_body_part_name = self.find_body_part_name(material_name)
 
                 # Hacky-solution, suggest that the shader change name to "EyeShadow"
                 # Otherwise "EyeShadow" doesn't get replaced since we have "Eye Shadow" and not "EyeShadow"
@@ -146,3 +146,42 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
         self.blender_operator.report({'INFO'}, 'Replaced default materials with Genshin shader materials...')
+
+    def find_body_part_name(self, material_name):
+        expected_format_body_part_name = self.__expected_format_body_part_name_search(material_name)
+        naive_search_body_part_name = self.__naive_body_part_name_search(material_name)
+        body_part_name = ''
+
+        # If the two are equal, then we're confident that the body part name is correct (pick either)
+        # Elif the naive search found none of the expected body part names, return expected format search body part name
+        # Else expected format and naive searches do not equal, use the naive search (pulls from list of expected body part names)
+        if expected_format_body_part_name == naive_search_body_part_name:
+            body_part_name = expected_format_body_part_name
+        elif expected_format_body_part_name and not naive_search_body_part_name:
+            body_part_name = expected_format_body_part_name
+        else:
+            return naive_search_body_part_name
+        return body_part_name
+
+    '''
+    Expected Format Search: Search for body part name at expected location, at the end of the material name (ex. 'Body')
+    '''
+    def __expected_format_body_part_name_search(self, material_name):
+        return material_name.split('_')[-1]
+
+    '''
+    Naive Search: Search for body part name in material name
+    '''
+    def __naive_body_part_name_search(self, material_name):
+        EXPECTED_BODY_PART_NAMES = [
+            'Hair',
+            'Body1',
+            'Body2',
+            'Face',
+            'EyeShadow',
+            'Body',  # Important this is last in the list because it could interfere with Body1 and Body2
+        ]
+
+        for expected_body_part_name in EXPECTED_BODY_PART_NAMES:
+            if expected_body_part_name in material_name:
+                return expected_body_part_name
