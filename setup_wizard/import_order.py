@@ -22,6 +22,7 @@ FESTIVITY_GRAN_TURISMO_FILE_PATH = 'festivity_gran_turismo_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'nya222_honkai_star_rail_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'nya222_honkai_star_rail_shader_file_path'
+NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'nya222_honkai_star_rail_outlines_file_path'
 
 
 class NextStepInvoker:
@@ -151,24 +152,30 @@ def clear_cache():
 
 def clear_cache(game_type: str):
     cache = get_cache()
-    if game_type == GameType.GENSHIN_IMPACT.name:
+    if game_type == GameType.HONKAI_STAR_RAIL.name:
         cached_gi_root_folder_file_path = cache.get(FESTIVITY_ROOT_FOLDER_FILE_PATH)
         cached_gi_shader_file_path = cache.get(FESTIVITY_SHADER_FILE_PATH)
+        cached_gi_outlines_file_path = cache.get(FESTIVITY_OUTLINES_FILE_PATH)
         cache = {}
 
         if cached_gi_root_folder_file_path:
             cache[FESTIVITY_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
         if cached_gi_shader_file_path:
             cache[FESTIVITY_SHADER_FILE_PATH] = cached_gi_shader_file_path
-    elif game_type == GameType.HONKAI_STAR_RAIL.name:
+        if cached_gi_shader_file_path:
+            cache[FESTIVITY_OUTLINES_FILE_PATH] = cached_gi_outlines_file_path
+    elif game_type == GameType.GENSHIN_IMPACT.name:
         cached_hsr_root_folder_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
         cached_hsr_shader_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH)
+        cached_hsr_outlines_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)
         cache = {}
 
         if cached_hsr_root_folder_file_path:
             cache[NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
         if cached_hsr_shader_file_path:
             cache[NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
+        if cached_hsr_outlines_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
     else:
         cache = {}
 
