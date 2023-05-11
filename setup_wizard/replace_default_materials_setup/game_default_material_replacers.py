@@ -104,12 +104,16 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
 
 class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
+    MESH_IGNORE_LIST = [
+        'Face_Mask'
+    ]
+
     def __init__(self, blender_operator, context):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
 
     def replace_default_materials(self):
-        meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH']
+        meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH' and mesh.name not in self.MESH_IGNORE_LIST]
 
         for mesh in meshes:
             for material_slot in mesh.material_slots:
@@ -134,6 +138,15 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     if not body_material:
                         body_material = bpy.data.materials.get('miHoYo - Genshin Body1').copy()
                         body_material.name = 'miHoYo - Genshin Body'
+                        body_material.use_fake_user = True
+                    mesh.material_slots.get(material_name).material = body_material
+                    material_name = body_material.name
+
+                if mesh_body_part_name == 'Weapon':
+                    body_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
+                    if not body_material:
+                        body_material = bpy.data.materials.get('miHoYo - Genshin Body1').copy()
+                        body_material.name = 'miHoYo - Genshin Weapon'
                         body_material.use_fake_user = True
                     mesh.material_slots.get(material_name).material = body_material
                     material_name = body_material.name
