@@ -149,6 +149,37 @@ def clear_cache():
         json.dump({}, f)
 
 
+def clear_cache(game_type: str):
+    cache = get_cache()
+    if game_type == GameType.GENSHIN_IMPACT.name:
+        cached_gi_root_folder_file_path = cache.get(FESTIVITY_ROOT_FOLDER_FILE_PATH)
+        cached_gi_shader_file_path = cache.get(FESTIVITY_SHADER_FILE_PATH)
+        cache = {}
+
+        if cached_gi_root_folder_file_path:
+            cache[FESTIVITY_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
+        if cached_gi_shader_file_path:
+            cache[FESTIVITY_SHADER_FILE_PATH] = cached_gi_shader_file_path
+    elif game_type == GameType.HONKAI_STAR_RAIL.name:
+        cached_hsr_root_folder_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
+        cached_hsr_shader_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH)
+        cache = {}
+
+        if cached_hsr_root_folder_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
+        if cached_hsr_shader_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
+    else:
+        cache = {}
+
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
+    with open(cache_file_path, 'w') as f:
+        json_string = json.dumps(cache, indent=4)
+        f.write(json_string)
+
+
+
 def get_actual_material_name_for_dress(material_name):
     for material in bpy.data.materials:
         if material_name in material.name:

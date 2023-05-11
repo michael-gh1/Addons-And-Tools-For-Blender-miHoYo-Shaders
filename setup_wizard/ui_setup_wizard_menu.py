@@ -48,7 +48,8 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
@@ -269,7 +270,8 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,

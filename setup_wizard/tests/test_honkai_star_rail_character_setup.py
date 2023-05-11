@@ -60,7 +60,7 @@ def setup_character(config, character_name, character_folder_file_path):
         ]
 
         operators = [
-            TestOperatorExecutioner('clear_cache_operator'),
+            HonkaiStarRailTestOperatorExecutioner('clear_cache_operator'),
             HonkaiStarRailTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             HonkaiStarRailTestOperatorExecutioner('delete_empties'),
             HonkaiStarRailTestOperatorExecutioner('import_materials', 

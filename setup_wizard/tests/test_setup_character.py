@@ -73,7 +73,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
         logger.info(material_json_files)
 
         operators = [
-            TestOperatorExecutioner('clear_cache_operator'),
+            GenshinImpactTestOperatorExecutioner('clear_cache_operator'),
             GenshinImpactTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             GenshinImpactTestOperatorExecutioner('delete_empties'),
             GenshinImpactTestOperatorExecutioner('import_materials', 

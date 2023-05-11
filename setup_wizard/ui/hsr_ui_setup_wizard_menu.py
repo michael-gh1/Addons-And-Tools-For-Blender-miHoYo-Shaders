@@ -35,7 +35,8 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
 
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
@@ -261,7 +262,8 @@ class HSR_PT_UI_Gran_Turismo_UI_Layout(Panel):
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,
