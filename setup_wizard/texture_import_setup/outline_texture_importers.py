@@ -66,7 +66,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
         cache_enabled = self.context.window_manager.cache_enabled
         character_model_folder_file_path = self.blender_operator.file_directory \
             or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
-            or os.path.dirname(self.filepath)
+            or os.path.dirname(self.blender_operator.filepath)
 
         if not character_model_folder_file_path:
             bpy.ops.genshin.import_outline_lightmaps(
@@ -109,7 +109,7 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         cache_enabled = self.context.window_manager.cache_enabled
         character_model_folder_file_path = self.blender_operator.file_directory \
             or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
-            or os.path.dirname(self.filepath)
+            or os.path.dirname(self.blender_operator.filepath)
 
         if not character_model_folder_file_path:
             bpy.ops.genshin.import_outline_lightmaps(
