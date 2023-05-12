@@ -7,7 +7,7 @@ from pathlib import PurePath
 from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
     FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
 from setup_wizard.tests.logger import Logger
-from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner, TestOperatorExecutioner
+from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
 
 argv = sys.argv
 argv = argv[argv.index('--') + 1:]
