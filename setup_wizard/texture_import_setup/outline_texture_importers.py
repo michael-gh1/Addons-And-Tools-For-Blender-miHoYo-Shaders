@@ -80,8 +80,8 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
             return {'FINISHED'}
         
         for name, folder, files in os.walk(character_model_folder_file_path):
-            diffuse_files = [file for file in files if 'Diffuse' in file]
-            lightmap_files = [file for file in files if 'Lightmap' in file]
+            diffuse_files = [file for file in files if 'Diffuse'.lower() in file.lower()]
+            lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower()]
             outline_materials = [material for material in bpy.data.materials.values() if 'Outlines' in material.name and material.name != 'miHoYo - Genshin Outlines']
 
             for outline_material in outline_materials:
@@ -123,8 +123,8 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
             return {'FINISHED'}
 
         for name, folder, files in os.walk(character_model_folder_file_path):
-            color_files = [file for file in files if 'color' in file.lower()]
-            lightmap_files = [file for file in files if 'lightmap' in file.lower() or 'facemap' in file.lower()]
+            color_files = [file for file in files if 'Color'.lower() in file.lower()]
+            lightmap_files = [file for file in files if 'LightMap'.lower() in file.lower() or 'FaceMap' in file.lower() or 'LigthMap'.lower() in file.lower()]  # that Lightmap typo is on purpose
             outline_materials = [material for material in bpy.data.materials.values() if 'outlines' in material.name.lower() and material.name.lower() != 'mihoyo - genshin outlines']
 
             for outline_material in outline_materials:
