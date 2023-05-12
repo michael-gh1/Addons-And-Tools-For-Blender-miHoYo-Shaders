@@ -309,6 +309,12 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
         img.colorspace_settings.name='Non-Color'
         face_material.node_tree.nodes['Face_Shadow.001'].image = img  # Yes, the node name is Face_Shadow.001
 
+    def set_stocking_texture(self, type: TextureType, material, img):
+        # Yes, the Stocking node is duplicated and ends in .001
+        img.colorspace_settings.name='Non-Color'
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV0.001'].image = img
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV1.001'].image = img
+
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
     def __init__(self):
@@ -376,6 +382,9 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Ramp'], file):
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Stocking'], file):
+                    self.set_stocking_texture(TextureType.BODY, body1_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
                     self.set_face_diffuse_texture(face_material, img)
