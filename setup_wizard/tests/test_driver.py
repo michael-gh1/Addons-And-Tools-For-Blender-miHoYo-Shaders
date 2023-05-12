@@ -48,6 +48,18 @@ class TestDriver:
                         nested_character_folder_item.lower() == 'materials':  # is a material data folder
                         continue
                     absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
+                    material_data_folder_file_path = ''
+
+                    try:
+                        material_data_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
+                        os.listdir(material_data_folder_file_path)
+                    except FileNotFoundError as ex:
+                        print(f'WARNING: Character material data folder not found. {ex}')
+                        try:
+                            material_data_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials'))
+                            os.listdir(material_data_folder_file_path)
+                        except FileNotFoundError as ex:
+                            print(f'WARNING: Character material data folder not found. {ex}')
 
                     if os.path.isdir(absolute_character_folder_file_path):
                         subprocess.run([
@@ -60,7 +72,7 @@ class TestDriver:
                             f'{environment_config_str}',
                             f'{character_folder_file_path}{nested_character_folder_item}',
                             f'{absolute_character_folder_file_path}',
-                            str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
+                            material_data_folder_file_path
                         ])
                         is_not_nested = False
                 if is_not_nested:
@@ -76,7 +88,7 @@ class TestDriver:
                         f'{environment_config_str}',
                         f'{character_folder_file_path}',
                         f'{absolute_character_folder_file_path}',
-                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
+                        material_data_folder_file_path
                     ])
 
 
