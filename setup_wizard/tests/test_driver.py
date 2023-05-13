@@ -50,16 +50,16 @@ class TestDriver:
                     absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
                     material_data_folder_file_path = ''
 
-                    try:
-                        material_data_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials'))
-                        os.listdir(material_data_folder_file_path)
-                    except FileNotFoundError as ex:
-                        print(f'WARNING: Character material data folder not found. {ex}')
-                        try:
-                            material_data_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials'))
-                            os.listdir(material_data_folder_file_path)
-                        except FileNotFoundError as ex:
-                            print(f'WARNING: Character material data folder not found. {ex}')
+                    possible_material_data_folder_file_paths = [
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials')),
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'Material')),
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials'))
+                    ]
+
+                    for possible_material_data_folder_file_path in possible_material_data_folder_file_paths:
+                        if os.path.isdir(possible_material_data_folder_file_path):
+                            material_data_folder_file_path = possible_material_data_folder_file_path
+                            break
 
                     if os.path.isdir(absolute_character_folder_file_path):
                         subprocess.run([
