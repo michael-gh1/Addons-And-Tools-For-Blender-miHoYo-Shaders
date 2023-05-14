@@ -333,6 +333,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 body_material = bpy.data.materials.get('miHoYo - Genshin Body')
                 body1_material = bpy.data.materials.get('miHoYo - Genshin Body1')
                 body2_material = bpy.data.materials.get('miHoYo - Genshin Body2')
+                weapon_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -379,7 +380,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
                 # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
-                elif self.is_texture_identifiers_in_texture_name(['Ramp'], file):
+                elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
+                    not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
@@ -400,6 +402,20 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['Face_ExpressionMap'], file):
                     self.set_face_expression_texture(face_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, weapon_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'LightMap'], file) or \
+                    self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo
+                    self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
+                    # There is no Weapon Shadow Ramp node, so do nothing. Also, some weapons don't have a ramp?
+                    # Replacing the Body Shadow Ramp would affect the character
+                    print(f'Ignoring texture {file} using {self.__class__.__name__}')
+                    pass
+                    # self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
 
                 else:
                     pass
