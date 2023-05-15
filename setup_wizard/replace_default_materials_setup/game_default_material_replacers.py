@@ -142,7 +142,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh.material_slots.get(material_name).material = body_material
                     material_name = body_material.name
 
-                if mesh_body_part_name == 'Weapon':
+                if 'Weapon' in mesh_body_part_name:
                     body_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
                     if not body_material:
                         body_material = bpy.data.materials.get('miHoYo - Genshin Body1').copy()
