@@ -35,6 +35,8 @@ meshes_to_create_geometry_nodes_on = [
     'Face_Eye',
     'Hair',  # HSR Support
     'Weapon',  # HSR Support
+    'Weapon01',  # HSR Support
+    'Weapon02',  # HSR Support
 ]
 
 

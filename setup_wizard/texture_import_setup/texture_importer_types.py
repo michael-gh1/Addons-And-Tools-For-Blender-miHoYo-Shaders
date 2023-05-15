@@ -334,6 +334,10 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 body1_material = bpy.data.materials.get('miHoYo - Genshin Body1')
                 body2_material = bpy.data.materials.get('miHoYo - Genshin Body2')
                 weapon_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
+                weapon_material01 = bpy.data.materials.get('miHoYo - Genshin Weapon01')
+                weapon_material02 = bpy.data.materials.get('miHoYo - Genshin Weapon02')
+
+                weapon_materials = [weapon_material, weapon_material01, weapon_material02]
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -404,11 +408,16 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_face_expression_texture(face_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file):
-                    self.set_diffuse_texture(TextureType.BODY, weapon_material, img)
+                    for weapon_material in weapon_materials:
+                        if weapon_material:
+                            self.set_diffuse_texture(TextureType.BODY, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'LightMap'], file) or \
                     self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo
-                    self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+
+                    for weapon_material in weapon_materials:
+                        if weapon_material:
+                            self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
                     # There is no Weapon Shadow Ramp node, so do nothing. Also, some weapons don't have a ramp?
