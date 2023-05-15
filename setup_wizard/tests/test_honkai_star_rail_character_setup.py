@@ -51,12 +51,7 @@ def setup_character(config, character_name, character_folder_file_path):
     try:
         material_json_files = os.listdir(PurePath(character_folder_file_path, 'materials'))
         material_json_files = [
-            { 'name': material_json_file } for material_json_file in material_json_files
-            if material_json_file.endswith('Mat_Face.json') or \
-                material_json_file.endswith('Mat_Hair.json') or \
-                material_json_file.endswith('Mat_Body.json') or \
-                material_json_file.endswith('Mat_Body1.json') or \
-                material_json_file.endswith('Mat_Body2.json')
+            { 'name': material_json_file } for material_json_file in material_json_files if material_json_file.endswith('.json')
         ]
 
         operators = [

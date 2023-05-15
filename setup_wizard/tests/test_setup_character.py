@@ -61,13 +61,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             pass  # eat the error, NPCs do not have material data
 
         material_json_files = [
-            { 'name': material_json_file } for material_json_file in material_json_files
-            if material_json_file.endswith('Mat_Body.json') or \
-                material_json_file.endswith('Mat_Dress.json') or \
-                material_json_file.endswith('Mat_Dress1.json') or \
-                material_json_file.endswith('Mat_Dress2.json') or \
-                material_json_file.endswith('Mat_Face.json') or \
-                material_json_file.endswith('Mat_Hair.json')
+            { 'name': material_json_file } for material_json_file in material_json_files if material_json_file.endswith('.json')
         ]
 
         logger.info(material_json_files)
