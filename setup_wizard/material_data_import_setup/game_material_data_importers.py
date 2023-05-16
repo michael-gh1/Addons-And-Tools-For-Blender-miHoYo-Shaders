@@ -9,7 +9,7 @@ from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
-from setup_wizard.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
+from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
 
 class GameMaterialDataImporter(ABC):
