@@ -15,7 +15,7 @@ import os
 
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key
 from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
-from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 from setup_wizard.utils import material_utils
 
 

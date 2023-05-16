@@ -6,7 +6,7 @@ import bpy
 from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 '''
 While this Operator technically works in changing bpy.context, the Blender UI

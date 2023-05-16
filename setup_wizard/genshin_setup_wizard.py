@@ -6,7 +6,7 @@ from bpy.types import Operator
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import NextStepInvoker
 
-from setup_wizard.models import BasicSetupUIOperator
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator
 
 
 class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):

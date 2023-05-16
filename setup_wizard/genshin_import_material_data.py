@@ -10,7 +10,7 @@ from bpy.types import Operator, PropertyGroup
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporterFactory
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, UABEMaterialDataJsonParser
 
 WEAPON_NAME_IDENTIFIER = 'Mat'

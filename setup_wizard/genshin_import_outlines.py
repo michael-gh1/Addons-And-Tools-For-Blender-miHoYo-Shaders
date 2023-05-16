@@ -11,7 +11,7 @@ import os
 from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache
-from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 
 
 class GI_OT_SetUpOutlines(Operator, BasicSetupUIOperator):

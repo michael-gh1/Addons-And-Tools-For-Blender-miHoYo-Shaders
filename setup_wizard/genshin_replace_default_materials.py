@@ -7,7 +7,7 @@ from bpy.types import Operator
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.import_order import get_actual_material_name_for_dress
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 from setup_wizard.replace_default_materials_setup.default_material_replacer_service import DefaultMaterialReplacerService
 from setup_wizard.replace_default_materials_setup.game_default_material_replacers import GameDefaultMaterialReplacerFactory
 

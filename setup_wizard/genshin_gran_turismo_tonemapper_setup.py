@@ -8,7 +8,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 from setup_wizard.import_order import cache_using_cache_key, get_cache, FESTIVITY_GRAN_TURISMO_FILE_PATH
 
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 NAME_OF_DEFAULT_SCENE = 'Scene'
 

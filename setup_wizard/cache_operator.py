@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.import_order import clear_cache
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 class ClearCacheOperator(Operator, CustomOperatorProperties):
     """Clears the cache"""

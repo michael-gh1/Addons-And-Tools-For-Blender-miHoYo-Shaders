@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 
 
 class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
