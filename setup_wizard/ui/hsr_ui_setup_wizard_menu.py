@@ -84,7 +84,8 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.finish_setup',
             'Finish Setup',
-            icon='CHECKMARK'
+            icon='CHECKMARK',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
 
 

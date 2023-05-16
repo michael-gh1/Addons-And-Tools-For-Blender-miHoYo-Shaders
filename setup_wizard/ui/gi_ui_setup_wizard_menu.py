@@ -73,20 +73,23 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.set_up_character',
             'Set Up Character',
-            icon='OUTLINER_OB_ARMATURE'
+            icon='OUTLINER_OB_ARMATURE',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,
             'genshin.set_up_materials',
             'Set Up Materials',
-            icon='MATERIAL'
+            icon='MATERIAL',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.set_up_outlines',
                 'Set Up Outlines',
-                icon='GEOMETRY_NODES'
+                icon='GEOMETRY_NODES',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
@@ -94,7 +97,8 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.finish_setup',
             'Finish Setup',
-            icon='CHECKMARK'
+            icon='CHECKMARK',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
 
@@ -191,19 +195,21 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.setup_geometry_nodes',
                 'Set Up Geometry Nodes',
-                'GEOMETRY_NODES'
+                'GEOMETRY_NODES',
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_outline_lightmaps',
                 'Import Outline Lightmaps',
-                'FILE_FOLDER'
+                'FILE_FOLDER',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_material_data',
                 'Import Material Data',
-                'FILE'
+                'FILE',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
