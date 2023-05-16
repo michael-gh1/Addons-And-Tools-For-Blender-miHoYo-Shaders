@@ -21,8 +21,8 @@ from setup_wizard.genshin_import_materials import GI_OT_SetUpMaterials
 from setup_wizard.genshin_import_outlines import GI_OT_SetUpOutlines
 from setup_wizard.misc_final_steps import GI_OT_FinishSetup
 
-import setup_wizard.ui_setup_wizard_menu
-from setup_wizard.ui_setup_wizard_menu import \
+import setup_wizard.ui.ui_setup_wizard_menu
+from setup_wizard.ui.ui_setup_wizard_menu import \
     UI_Properties, \
     GI_PT_Setup_Wizard_UI_Layout, \
     GI_PT_Basic_Setup_Wizard_UI_Layout, \
@@ -51,7 +51,7 @@ register_genshin_setup_wizard()
 setup_dependencies()
 
 modules = [
-    setup_wizard.ui_setup_wizard_menu,
+    setup_wizard.ui.ui_setup_wizard_menu,
     setup_wizard.genshin_setup_wizard,
     setup_wizard.cache_operator
 ]
