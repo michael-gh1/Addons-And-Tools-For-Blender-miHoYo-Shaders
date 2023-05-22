@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import List
 import bpy
 
 import os
@@ -65,10 +66,7 @@ class GenshinTextureImporter:
     Checks if no texture identifiers exist in each file
     Use Case: I want to check if a group of files does not have [X, Y, Z] in each filename
     '''
-    def is_no_texture_identifiers_in_files(self, texture_identifiers, files):
-        file: str
-        texture_identifier: str
-
+    def is_no_texture_identifiers_in_files(self, texture_identifiers: List[str], files: List[str]):
         for file in files:
             for texture_identifier in texture_identifiers:
                 if texture_identifier.lower() in file.lower():
