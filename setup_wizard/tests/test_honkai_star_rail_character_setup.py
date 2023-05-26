@@ -7,7 +7,7 @@ from pathlib import PurePath
 from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
     FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
 from setup_wizard.tests.logger import Logger
-from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
+from setup_wizard.tests.models.test_operator_executioner import HonkaiStarRailTestOperatorExecutioner
 
 argv = sys.argv
 argv = argv[argv.index('--') + 1:]
@@ -16,12 +16,12 @@ arg_logs_directory_path = argv[0]
 arg_config = json.loads(argv[1])
 arg_character_name = argv[2]
 arg_character_folder_file_path = argv[3]
-arg_material_data_folder = argv[4]
 
 Logger(f'{arg_logs_directory_path}/tests.log')
 logger = logging.getLogger(__name__)
 
-def setup_character(config, character_name, character_folder_file_path, arg_material_data_folder):
+
+def setup_character(config, character_name, character_folder_file_path):
     logger.info(f'Starting test for {character_name}')
     logger.info(f'Emptying scene...')
 
@@ -44,57 +44,44 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
 
     logger.info(f'{config.get("metadata")}')
 
-    if config.get('metadata').get('betterfbx_enabled'):
-        logger.info('Enabling BetterFBX')
-        bpy.ops.preferences.addon_enable(module='better_fbx')
-        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
-    else:
-        logger.info('Disabling BetterFBX')
-        bpy.ops.preferences.addon_disable(module='better_fbx')
-        logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
+    logger.info('Enabling BetterFBX')
+    bpy.ops.preferences.addon_enable(module='better_fbx')
+    logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
 
     try:
-        material_json_files = []
-        try:
-            material_json_files = os.listdir(PurePath(arg_material_data_folder))
-        except FileNotFoundError as ex:
-            pass  # eat the error, NPCs do not have material data
-
+        material_json_files = os.listdir(PurePath(character_folder_file_path, 'materials'))
         material_json_files = [
             { 'name': material_json_file } for material_json_file in material_json_files if material_json_file.endswith('.json')
         ]
 
-        logger.info(material_json_files)
-
         operators = [
-            GenshinImpactTestOperatorExecutioner('clear_cache_operator'),
-            GenshinImpactTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
-            GenshinImpactTestOperatorExecutioner('delete_empties'),
-            GenshinImpactTestOperatorExecutioner('import_materials', 
+            HonkaiStarRailTestOperatorExecutioner('clear_cache_operator'),
+            HonkaiStarRailTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
+            HonkaiStarRailTestOperatorExecutioner('delete_empties'),
+            HonkaiStarRailTestOperatorExecutioner('import_materials', 
                 file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
                 filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
             ),
-            GenshinImpactTestOperatorExecutioner('replace_default_materials'),
-            GenshinImpactTestOperatorExecutioner('import_character_textures'),
-            GenshinImpactTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
-            GenshinImpactTestOperatorExecutioner('setup_geometry_nodes'),
-            GenshinImpactTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
-            GenshinImpactTestOperatorExecutioner('import_material_data', 
-                                                 files=material_json_files, 
-                                                 filepath=str(PurePath(arg_material_data_folder, "placeholder_value")),
-                                                 config=config),
-            GenshinImpactTestOperatorExecutioner('fix_transformations'),
-            GenshinImpactTestOperatorExecutioner('setup_head_driver'),
-            GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
-            GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
-            GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
+            HonkaiStarRailTestOperatorExecutioner('replace_default_materials'),
+            HonkaiStarRailTestOperatorExecutioner('import_character_textures'),
+            HonkaiStarRailTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
+            HonkaiStarRailTestOperatorExecutioner('setup_geometry_nodes'),
+            HonkaiStarRailTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
+            HonkaiStarRailTestOperatorExecutioner('import_material_data', 
+                                                  files=material_json_files, 
+                                                  filepath=str(PurePath(character_folder_file_path, "materials", "placeholder_value")), 
+                                                  config=config),
+            HonkaiStarRailTestOperatorExecutioner('fix_transformations'),
+            HonkaiStarRailTestOperatorExecutioner('setup_head_driver'),
+            HonkaiStarRailTestOperatorExecutioner('set_color_management_to_standard'),
+            HonkaiStarRailTestOperatorExecutioner('delete_specific_objects'),
+            HonkaiStarRailTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
         ]
 
         for operator in operators:
             # Important! Running tests in background will hit a RecursionError if no material files
             if operator.operator_name == 'import_material_data' and not material_json_files:
                 continue
-
             logger.info(f'Executing Operator: {operator.operator_name}')
             operator.execute()
         logger.info(f'Completed test for {character_name}')
@@ -125,4 +112,4 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
     bpy.ops.wm.quit_blender()
 
 
-setup_character(arg_config, arg_character_name, arg_character_folder_file_path, arg_material_data_folder)
+setup_character(arg_config, arg_character_name, arg_character_folder_file_path)

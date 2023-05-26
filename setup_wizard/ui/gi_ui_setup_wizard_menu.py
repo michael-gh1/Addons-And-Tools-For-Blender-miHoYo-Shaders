@@ -4,6 +4,7 @@ import bpy
 from bpy.types import Panel, UILayout
 
 from setup_wizard import bl_info
+from setup_wizard.domain.game_types import GameType
 
 class UI_Properties:
     @staticmethod
@@ -24,7 +25,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_idname = "GI_PT_Setup_Wizard_UI_Layout"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
 
     def draw(self, context):
         layout = self.layout
@@ -39,14 +40,16 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.setup_wizard_ui',
             'Run Entire Setup',
-            'PLAY'
+            'PLAY',
+            game_type=GameType.GENSHIN_IMPACT.name
         )
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
@@ -60,7 +63,7 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
 
     def draw(self, context):
         layout = self.layout
@@ -70,20 +73,23 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.set_up_character',
             'Set Up Character',
-            icon='OUTLINER_OB_ARMATURE'
+            icon='OUTLINER_OB_ARMATURE',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,
             'genshin.set_up_materials',
             'Set Up Materials',
-            icon='MATERIAL'
+            icon='MATERIAL',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
                 'genshin.set_up_outlines',
                 'Set Up Outlines',
-                icon='GEOMETRY_NODES'
+                icon='GEOMETRY_NODES',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
@@ -91,7 +97,8 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             sub_layout,
             'genshin.finish_setup',
             'Finish Setup',
-            icon='CHECKMARK'
+            icon='CHECKMARK',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
 
@@ -100,7 +107,7 @@ class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
     bl_idname = 'GI_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin"
+    bl_category = "Genshin Impact"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -147,19 +154,22 @@ class GI_PT_UI_Materials_Menu(Panel):
             sub_layout,
             'genshin.import_materials',
             'Import Genshin Materials',
-            'MATERIAL'
+            'MATERIAL',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,
             'genshin.replace_default_materials',
             'Replace Default Materials',
-            'ARROW_LEFTRIGHT'
+            'ARROW_LEFTRIGHT',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,
             'genshin.import_textures',
             'Import Character Textures',
-            'TEXTURE'
+            'TEXTURE',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
 
 
@@ -185,19 +195,21 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.setup_geometry_nodes',
                 'Set Up Geometry Nodes',
-                'GEOMETRY_NODES'
+                'GEOMETRY_NODES',
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_outline_lightmaps',
                 'Import Outline Lightmaps',
-                'FILE_FOLDER'
+                'FILE_FOLDER',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_material_data',
                 'Import Material Data',
-                'FILE'
+                'FILE',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
@@ -264,7 +276,8 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
             row,
             'genshin.clear_cache_operator',
             'Clear Cache',
-            'TRASH'
+            'TRASH',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,

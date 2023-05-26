@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 # Constants
 NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
@@ -33,6 +33,10 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'Hair',  # HSR Support
+    'Weapon',  # HSR Support
+    'Weapon01',  # HSR Support
+    'Weapon02',  # HSR Support
 ]
 
 
@@ -64,7 +68,8 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
 
 
@@ -107,8 +112,9 @@ class GI_OT_SetUpGeometryNodes(Operator, CustomOperatorProperties):
         modifier[OUTLINE_THICKNESS_INPUT] = 0.25
 
         for (mask_input, material_input), material in zip(outline_mask_to_material_mapping.items(), mesh.material_slots):
-            modifier[mask_input] = bpy.data.materials[material.name]
-            modifier[material_input] = bpy.data.materials[f'{material.name} Outlines']
+            if bpy.data.materials.get(material.name) and bpy.data.materials.get(f'{material.name} Outlines'):
+                modifier[mask_input] = bpy.data.materials.get(material.name)
+                modifier[material_input] = bpy.data.materials.get(f'{material.name} Outlines')
 
 
     def disable_face_eye_outlines(self, modifier):

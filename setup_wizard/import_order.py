@@ -6,6 +6,8 @@ import bpy
 import json
 import os
 
+from setup_wizard.domain.game_types import GameType
+
 # Config Constants
 COMPONENT_NAME = 'component_name'
 ENABLED = 'enabled'
@@ -18,19 +20,30 @@ FESTIVITY_SHADER_FILE_PATH = "festivity_shader_file_path"
 FESTIVITY_OUTLINES_FILE_PATH = 'festivity_outlines_file_path'
 FESTIVITY_GRAN_TURISMO_FILE_PATH = 'festivity_gran_turismo_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
+NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'nya222_honkai_star_rail_folder_file_path'
+NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'nya222_honkai_star_rail_shader_file_path'
+NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'nya222_honkai_star_rail_outlines_file_path'
 
 
 class NextStepInvoker:
-    def invoke(self, current_step_index, type, file_path_to_cache=None, high_level_step_name=None):
+    def invoke(self, 
+               current_step_index, 
+               type, 
+               file_path_to_cache=None, 
+               high_level_step_name=None, 
+               game_type: str=GameType.GENSHIN_IMPACT.name):
         if type == 'invoke_next_step':
-            invoke_next_step(current_step_index, file_path_to_cache)
+            invoke_next_step(current_step_index, file_path_to_cache, game_type)
         elif type == 'invoke_next_step_ui':
-            invoke_next_step_ui(high_level_step_name, current_step_index)
+            invoke_next_step_ui(high_level_step_name, current_step_index, game_type)
         else:
             print(f'Warning: Unknown type found when invoking: {type}')
 
 
-def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
+def invoke_next_step(
+        current_step_idx: int, 
+        file_path_to_cache=None, 
+        game_type: str=GameType.GENSHIN_IMPACT.name):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
     file = open(f'{path_to_setup_wizard_folder}/config.json')
     config = json.load(file)
@@ -56,10 +69,11 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         if type(function_to_use) is bpy.ops._BPyOpsSubModOp:
             print(f'Calling {function_to_use} with {execute_or_invoke}_DEFAULT w/ cache: {cached_file_directory}')
             function_to_use(
-                    f'{execute_or_invoke}_DEFAULT', 
+                    f'{execute_or_invoke}_DEFAULT',
                     next_step_idx=current_step_idx + 1, 
                     file_directory=cached_file_directory,
-                    invoker_type='invoke_next_step'
+                    invoker_type='invoke_next_step',
+                    game_type=game_type,
             )
         else:
             function_to_use(current_step_idx + 1)
@@ -67,7 +81,10 @@ def invoke_next_step(current_step_idx: int, file_path_to_cache=None):
         invoke_next_step(current_step_idx + 1)
 
 
-def invoke_next_step_ui(high_level_step_name, current_step_index):
+def invoke_next_step_ui(
+        high_level_step_name, 
+        current_step_index, 
+        game_type: str=GameType.GENSHIN_IMPACT.name):
     path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
 
     file = open(f'{path_to_setup_wizard_folder}/config_ui.json')
@@ -83,7 +100,8 @@ def invoke_next_step_ui(high_level_step_name, current_step_index):
         'EXEC_DEFAULT',
         next_step_idx=current_step_index + 1,
         invoker_type='invoke_next_step_ui',
-        high_level_step_name=high_level_step_name
+        high_level_step_name=high_level_step_name,
+        game_type=game_type,
     )
 
 
@@ -130,6 +148,43 @@ def clear_cache():
     cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
     with open(cache_file_path, 'w') as f:
         json.dump({}, f)
+
+
+def clear_cache(game_type: str):
+    cache = get_cache()
+    if game_type == GameType.HONKAI_STAR_RAIL.name:
+        cached_gi_root_folder_file_path = cache.get(FESTIVITY_ROOT_FOLDER_FILE_PATH)
+        cached_gi_shader_file_path = cache.get(FESTIVITY_SHADER_FILE_PATH)
+        cached_gi_outlines_file_path = cache.get(FESTIVITY_OUTLINES_FILE_PATH)
+        cache = {}
+
+        if cached_gi_root_folder_file_path:
+            cache[FESTIVITY_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
+        if cached_gi_shader_file_path:
+            cache[FESTIVITY_SHADER_FILE_PATH] = cached_gi_shader_file_path
+        if cached_gi_shader_file_path:
+            cache[FESTIVITY_OUTLINES_FILE_PATH] = cached_gi_outlines_file_path
+    elif game_type == GameType.GENSHIN_IMPACT.name:
+        cached_hsr_root_folder_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
+        cached_hsr_shader_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH)
+        cached_hsr_outlines_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)
+        cache = {}
+
+        if cached_hsr_root_folder_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
+        if cached_hsr_shader_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
+        if cached_hsr_outlines_file_path:
+            cache[NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
+    else:
+        cache = {}
+
+    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
+    with open(cache_file_path, 'w') as f:
+        json_string = json.dumps(cache, indent=4)
+        f.write(json_string)
+
 
 
 def get_actual_material_name_for_dress(material_name):

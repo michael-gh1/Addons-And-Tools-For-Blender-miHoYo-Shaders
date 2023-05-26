@@ -1,7 +1,9 @@
 from enum import Enum, auto
+from typing import List
 import bpy
 
 import os
+from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 
@@ -9,6 +11,7 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 class TextureImporterType(Enum):
     AVATAR = auto()
     NPC = auto()
+    HSR_AVATAR = auto()
 
 
 class TextureType(Enum):
@@ -22,42 +25,76 @@ class TextureImporterFactory:
             return GenshinAvatarTextureImporter()
         elif texture_importer_type == TextureImporterType.NPC:
             return GenshinNPCTextureImporter()
+        elif texture_importer_type == TextureImporterType.HSR_AVATAR:
+            return HonkaiStarRailAvatarTextureImporter()
         else:
             print(f'Unknown TextureImporterType: {texture_importer_type}')
 
 
 class GenshinTextureImporter:
+    def __init__(self, game_type: GameType):
+        self.game_type = game_type
+
     def import_textures(self, directory):
         raise NotImplementedError()
 
-    def is_texture_identifiers_in_texture_name(self, texture_identifiers, texture_name):
+    '''
+    Checks if all texture identifiers are in the texture name
+    Use Case: I want to check if a texture has [X, Y, Z] in it.
+    '''
+    def is_texture_identifiers_in_texture_name(self, texture_identifiers, texture_name: str):
+        texture_identifier: str
+
         for texture_identifier in texture_identifiers:
-            if texture_identifier not in texture_name:
+            if texture_identifier.lower() not in texture_name.lower():
                 return False
         return True
 
+    '''
+    Checks a groups of files to see if there is a file that has all texture identifiers in the filename
+    Use Case: I want to check if there is a file with [X, Y, Z] in a group of files
+    '''
     def is_texture_identifiers_in_files(self, texture_identifiers, files):
+        file: str
+
         for file in files:
-            if self.is_texture_identifiers_in_texture_name(texture_identifiers, file):
+            if self.is_texture_identifiers_in_texture_name(texture_identifiers, file.lower()):
                 return True
         return False
+
+    '''
+    Checks if no texture identifiers exist in each file
+    Use Case: I want to check if a group of files does not have [X, Y, Z] in each filename
+    '''
+    def is_no_texture_identifiers_in_files(self, texture_identifiers: List[str], files: List[str]):
+        for file in files:
+            for texture_identifier in texture_identifiers:
+                if texture_identifier.lower() in file.lower():
+                    return False
+        return True
 
     def set_diffuse_texture(self, type: TextureType, material, img):
         material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
         material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
-        self.setup_dress_textures(f'{type.value}_Diffuse', img)
+
+        if self.game_type == GameType.GENSHIN_IMPACT:
+            self.setup_dress_textures(f'{type.value}_Diffuse', img)
 
     def set_lightmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
         material.node_tree.nodes[f'{type.value}_Lightmap_UV0'].image = img
         material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
-        self.setup_dress_textures(f'{type.value}_Lightmap', img)
+        
+        if self.game_type == GameType.GENSHIN_IMPACT:
+            self.setup_dress_textures(f'{type.value}_Lightmap', img)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
         material.node_tree.nodes[f'{type.value}_Normalmap_UV0'].image = img
         material.node_tree.nodes[f'{type.value}_Normalmap_UV1'].image = img
-        self.setup_dress_textures(f'{type.value}_Normalmap', img)
+        
+        if self.game_type == GameType.GENSHIN_IMPACT:
+            self.setup_dress_textures(f'{type.value}_Normalmap', img)
 
         # Deprecated. Tries only if it exists. Only for V1 Shader
         self.plug_normal_map(f'miHoYo - Genshin {type.value}', 'MUTE IF ONLY 1 UV MAP EXISTS')
@@ -141,6 +178,9 @@ class GenshinTextureImporter:
 
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
+    def __init__(self):
+        super().__init__(GameType.GENSHIN_IMPACT)
+
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
             for file in files:
@@ -187,6 +227,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
 
 class GenshinNPCTextureImporter(GenshinTextureImporter):
+    def __init__(self):
+        super().__init__(GameType.GENSHIN_IMPACT)
+
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
             for file in files:
@@ -249,3 +292,139 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 else:
                     pass
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+
+
+class HonkaiStarRailTextureImporter(GenshinTextureImporter):
+    def set_warm_shadow_ramp_texture(self, type: TextureType, img):
+        # Yes, the Hair_Shadow_Ramp's Warm Ramp is also named Body_Shadow_Ramp
+        bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp'].image = img
+
+    def set_cool_shadow_ramp_texture(self, type: TextureType, img):
+        # Yes, the Hair_Shadow_Ramp Cool Ramp is also named Body_Shadow_Ramp.001
+        bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp.001'].image = img
+
+    def set_face_expression_texture(self, face_material, img):
+        img.colorspace_settings.name='Non-Color'
+        face_material.node_tree.nodes['Face_Shadow.001'].image = img  # Yes, the node name is Face_Shadow.001
+
+    def set_stocking_texture(self, type: TextureType, material, img):
+        # Yes, the Stocking node is duplicated and ends in .001
+        img.colorspace_settings.name='Non-Color'
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV0.001'].image = img
+        material.node_tree.nodes[f'{type.value}_Normalmap_UV1.001'].image = img
+
+
+class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
+    def __init__(self):
+        super().__init__(GameType.HONKAI_STAR_RAIL)
+
+    def import_textures(self, directory):
+        for name, folder, files in os.walk(directory):
+            for file in files:
+                # load the file with the correct alpha mode
+                img_path = directory + "/" + file
+                img = bpy.data.images.load(filepath = img_path, check_existing=True)
+                img.alpha_mode = 'CHANNEL_PACKED'
+
+                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
+                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
+                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                body1_material = bpy.data.materials.get('miHoYo - Genshin Body1')
+                body2_material = bpy.data.materials.get('miHoYo - Genshin Body2')
+                weapon_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
+                weapon_material01 = bpy.data.materials.get('miHoYo - Genshin Weapon01')
+                weapon_material02 = bpy.data.materials.get('miHoYo - Genshin Weapon02')
+
+                weapon_materials = [weapon_material, weapon_material01, weapon_material02]
+
+                # Implement the texture in the correct node
+                print(f'Importing texture {file} using {self.__class__.__name__}')
+
+                if self.is_texture_identifiers_in_texture_name(['Hair', 'Color'], file) and \
+                    not self.is_texture_identifiers_in_texture_name(['Eff'], file):  # TODO: Review this line
+                    self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Warm_Ramp'], file):
+                    self.set_warm_shadow_ramp_texture(TextureType.HAIR, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Cool_Ramp'], file):
+                    self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
+                
+                # Character has Body and no Body1 or Body2?
+                elif self.is_texture_identifiers_in_texture_name(['Body', 'Color'], file) and \
+                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
+
+                # Character has Body and no Body1 or Body2?
+                elif self.is_texture_identifiers_in_texture_name(['Body', 'LightMap'], file) and \
+                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body1', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, body1_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body1', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, body1_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body2', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, body2_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body2', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, body2_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file):  # Not Hair, so ramp must be Body
+                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):  # Not Hair, so ramp must be Body
+                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+
+                # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
+                elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
+                    not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
+                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Stocking'], file):
+                    self.set_stocking_texture(TextureType.BODY, body1_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
+                    self.set_face_diffuse_texture(face_material, img)
+
+                # TODO: Review this whole block, NPC support is borrowed code from GI
+                elif self.is_texture_identifiers_in_texture_name(['FaceMap'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['NPC', 'Face', 'LightMap'], file) and
+                        not self.is_texture_identifiers_in_files(['FaceMap'], files)):
+                    # If Face Shadow exists, use that texture
+                    # If Face Shadow does not exist in this folder, use "Face Lightmap" (actually an NPC Face Shadow texture)
+                    self.set_face_shadow_texture(face_material, img)
+                    self.set_face_lightmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Face_ExpressionMap'], file):
+                    self.set_face_expression_texture(face_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file):
+                    for weapon_material in weapon_materials:
+                        if weapon_material:
+                            self.set_diffuse_texture(TextureType.BODY, weapon_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'LightMap'], file) or \
+                    self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo
+
+                    for weapon_material in weapon_materials:
+                        if weapon_material:
+                            self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
+                    # There is no Weapon Shadow Ramp node, so do nothing. Also, some weapons don't have a ramp?
+                    # Replacing the Body Shadow Ramp would affect the character
+                    print(f'Ignoring texture {file} using {self.__class__.__name__}')
+                    pass
+                    # self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+
+                else:
+                    pass
+            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+

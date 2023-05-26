@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.models import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 
 class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
@@ -19,7 +19,8 @@ class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
@@ -44,7 +45,8 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
@@ -88,7 +90,8 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 

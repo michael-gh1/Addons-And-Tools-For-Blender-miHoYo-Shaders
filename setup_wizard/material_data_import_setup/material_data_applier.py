@@ -4,6 +4,35 @@ import bpy
 
 from abc import ABC, abstractmethod
 
+from setup_wizard.domain.game_types import GameType
+
+
+class MaterialDataAppliersFactory:
+    def create(game_type, material_data_parser, body_part):
+        WEAPON_NAME_IDENTIFIER = 'Mat'
+
+        if game_type == GameType.GENSHIN_IMPACT.name:
+            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
+            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
+
+            if is_weapon:
+                # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
+                return [
+                    V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
+                    V1_MaterialDataApplier(material_data_parser, 'Body'),
+                ]
+            else:
+                return [
+                    V2_MaterialDataApplier(material_data_parser, body_part), 
+                    V1_MaterialDataApplier(material_data_parser, body_part),
+                ]
+        elif game_type == GameType.HONKAI_STAR_RAIL.name:
+            return [
+                V2_HSR_MaterialDataApplier(material_data_parser, body_part), 
+            ]
+        else:
+            raise Exception(f'Unknown {GameType}: {game_type}')
+
 
 class MaterialDataApplier(ABC):
     outline_mapping = {
@@ -222,6 +251,43 @@ class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         weapon_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
         shader_node_tree_inputs = weapon_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+
+        super().apply_material_data(
+            self.local_material_mapping,
+            shader_node_tree_inputs,
+        )
+
+
+class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
+    outline_mapping = {
+        '_OutlineColor0': 'Outline Color 1',
+        '_OutlineColor1': 'Outline Color 2',
+        '_OutlineColor2': 'Outline Color 3',
+        '_OutlineColor3': 'Outline Color 4',
+        '_OutlineColor4': 'Outline Color 5',
+        '_OutlineColor5': 'Outline Color 6',
+        '_OutlineColor6': 'Outline Color 7',
+        '_OutlineColor7': 'Outline Color 8',
+    }
+
+    face_outline_mapping = {
+        '_OutlineColor': 'Outline Color 1',
+    }
+
+    local_material_mapping = {
+        '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
+        # '_SpecularColor': 'Specular Color',  # GI - RGBA | HSR - Float
+    }
+
+    def __init__(self, material_data_parser, body_part):
+        super().__init__(material_data_parser, body_part)
+
+        if self.body_part == 'Face':
+            self.outline_mapping = self.face_outline_mapping
+
+    def set_up_mesh_material_data(self):
+        body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
+        shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,

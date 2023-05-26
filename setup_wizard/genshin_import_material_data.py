@@ -1,22 +1,17 @@
 # Author: michael-gh1
 
 import bpy
-import json
-from pathlib import PurePosixPath
 
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, CollectionProperty
 from bpy.types import Operator, PropertyGroup
-import os
 
-from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.material_data_applier import V1_MaterialDataApplier, V2_WeaponMaterialDataApplier, V2_MaterialDataApplier
-from setup_wizard.models import CustomOperatorProperties
-from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
-
+from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporterFactory
+from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
+from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, UABEMaterialDataJsonParser
 
 WEAPON_NAME_IDENTIFIER = 'Mat'
 
@@ -50,71 +45,18 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     ]
 
     def execute(self, context):
-        directory_file_path = os.path.dirname(self.filepath)
-
-        if not self.filepath or not self.files:
-            bpy.ops.genshin.import_material_data(
-                'INVOKE_DEFAULT',
-                next_step_idx=self.next_step_idx, 
-                file_directory=self.file_directory,
-                invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
-            )
-            return {'FINISHED'}
-
-        for file in self.files:
-            body_part = PurePosixPath(file.name).stem.split('_')[-1]
-
-            fp = open(f'{directory_file_path}/{file.name}')
-            json_material_data = json.load(fp)
-            material_data_parser = self.__get_material_data_json_parser(json_material_data)
-
-            # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
-            weapon_material_data_appliers = [
-                V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
-                V1_MaterialDataApplier(material_data_parser, 'Body'),
-            ]
-            character_model_material_data_appliers = [
-                V2_MaterialDataApplier(material_data_parser, body_part), 
-                V1_MaterialDataApplier(material_data_parser, body_part),
-            ]
-            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
-            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
-
-            material_data_appliers = weapon_material_data_appliers if is_weapon else character_model_material_data_appliers
-
-            for material_data_applier in material_data_appliers:
-                try:
-                    material_data_applier.set_up_mesh_material_data()
-                    material_data_applier.set_up_outline_colors()
-                    break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
-                except AttributeError as err:
-                    print(err)
-                    continue # fallback and try next version
-                except KeyError:
-                    self.report({'WARNING'}, \
-                        f'Continuing to apply other material data, but: \n'
-                        f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
-                    break
+        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context)
+        game_material_data_importer.import_material_data()
 
         self.report({'INFO'}, 'Imported material data')
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}
-
-    def __get_material_data_json_parser(self, json_material_data):
-        for index, parser_class in enumerate(self.parsers):
-            try:
-                parser: MaterialDataJsonParser  = parser_class(json_material_data)
-                parser.parse()
-                return parser
-            except AttributeError:
-                if index == len(self.parsers) - 1:
-                    raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportMaterialData)

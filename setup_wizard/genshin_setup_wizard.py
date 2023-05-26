@@ -3,9 +3,10 @@
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
+from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import NextStepInvoker
 
-from setup_wizard.models import BasicSetupUIOperator
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator
 
 
 class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
@@ -20,7 +21,8 @@ class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
             next_step_index,
             'invoke_next_step_ui', 
             high_level_step_name=self.bl_idname if bpy.app.version >= (3,3,0) >= (3,3,0) \
-                else self.bl_idname + '_no_outlines'
+                else self.bl_idname + '_no_outlines',
+            game_type=self.game_type,
         )
         return {'FINISHED'}
 

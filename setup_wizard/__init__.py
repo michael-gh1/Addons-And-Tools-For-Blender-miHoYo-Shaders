@@ -1,14 +1,14 @@
 bl_info = {
-    "name": "Genshin Setup Wizard",
+    "name": "HoYoverse Setup Wizard",
     "author": "Mken",
-    "version": (1, 1, 9),
+    "version": (1, 2, 0),
     "blender": (2, 80, 0),
-    "location": "3D View > Sidebar > Genshin Impact Setup Wizard",
-    "description": "An addon to streamline the character model setup process when using Festivity's Shaders",
+    "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail",
+    "description": "An addon to streamline the character model setup process when using Festivity or Nya222's Shaders",
     "warning": "",
     "doc_url": "",
     "support": 'COMMUNITY',
-    "category": "miHoYo",
+    "category": "HoYoverse",
     "tracker_url": "",
     "doc_url": ""
 }
@@ -21,8 +21,9 @@ from setup_wizard.genshin_import_materials import GI_OT_SetUpMaterials
 from setup_wizard.genshin_import_outlines import GI_OT_SetUpOutlines
 from setup_wizard.misc_final_steps import GI_OT_FinishSetup
 
-import setup_wizard.ui_setup_wizard_menu
-from setup_wizard.ui_setup_wizard_menu import UI_Properties, \
+import setup_wizard.ui.gi_ui_setup_wizard_menu
+from setup_wizard.ui.gi_ui_setup_wizard_menu import \
+    UI_Properties, \
     GI_PT_Setup_Wizard_UI_Layout, \
     GI_PT_Basic_Setup_Wizard_UI_Layout, \
     GI_PT_Advanced_Setup_Wizard_UI_Layout, \
@@ -31,6 +32,15 @@ from setup_wizard.ui_setup_wizard_menu import UI_Properties, \
     GI_PT_UI_Outlines_Menu, \
     GI_PT_UI_Finish_Setup_Menu, \
     GI_PT_UI_Gran_Turismo_UI_Layout
+from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
+    HSR_PT_Setup_Wizard_UI_Layout, \
+    HSR_PT_Basic_Setup_Wizard_UI_Layout, \
+    HSR_PT_Advanced_Setup_Wizard_UI_Layout, \
+    HSR_PT_UI_Character_Model_Menu, \
+    HSR_PT_UI_Materials_Menu, \
+    HSR_PT_UI_Outlines_Menu, \
+    HSR_PT_UI_Finish_Setup_Menu, \
+    HSR_PT_UI_Gran_Turismo_UI_Layout
 
 from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
@@ -41,7 +51,7 @@ register_genshin_setup_wizard()
 setup_dependencies()
 
 modules = [
-    setup_wizard.ui_setup_wizard_menu,
+    setup_wizard.ui.gi_ui_setup_wizard_menu,
     setup_wizard.genshin_setup_wizard,
     setup_wizard.cache_operator
 ]
@@ -60,7 +70,15 @@ classes = [
     GI_OT_SetUpMaterials,
     GI_OT_SetUpOutlines,
     GI_OT_FinishSetup,
-    ClearCacheOperator
+    HSR_PT_Setup_Wizard_UI_Layout,
+    HSR_PT_Basic_Setup_Wizard_UI_Layout,
+    HSR_PT_Advanced_Setup_Wizard_UI_Layout,
+    HSR_PT_UI_Character_Model_Menu,
+    HSR_PT_UI_Materials_Menu,
+    HSR_PT_UI_Outlines_Menu,
+    HSR_PT_UI_Finish_Setup_Menu,
+    HSR_PT_UI_Gran_Turismo_UI_Layout,
+    ClearCacheOperator,
 ]
 
 for module in modules:

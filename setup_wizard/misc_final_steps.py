@@ -4,7 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 
 
 class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
@@ -48,7 +48,8 @@ class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 

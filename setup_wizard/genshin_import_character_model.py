@@ -15,7 +15,7 @@ import os
 
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key
 from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
-from setup_wizard.models import BasicSetupUIOperator, CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 from setup_wizard.utils import material_utils
 
 
@@ -58,7 +58,8 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 next_step_idx=self.next_step_idx, 
                 file_directory=self.file_directory,
                 invoker_type=self.invoker_type,
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
                 )
             return {'FINISHED'}
 
@@ -86,7 +87,8 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             self.next_step_idx, 
             self.invoker_type, 
             file_path_to_cache=character_model_folder_file_path,
-            high_level_step_name=self.high_level_step_name
+            high_level_step_name=self.high_level_step_name,
+            game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}
@@ -175,7 +177,8 @@ class GI_OT_DeleteEmpties(Operator, CustomOperatorProperties):
             NextStepInvoker().invoke(
                 self.next_step_idx, 
                 self.invoker_type, 
-                high_level_step_name=self.high_level_step_name
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
             )
         return {'FINISHED'}
 
