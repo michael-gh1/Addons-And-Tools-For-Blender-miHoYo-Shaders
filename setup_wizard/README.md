@@ -236,6 +236,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [ ] Batch Character Setup
 - [X] Basic NPC Support
 - [ ] Basic Monster Support
+- [X] HSR Support
 ### Refactoring
 - [X] Refactor Material Assignment Mapping (externalize/centralize it to one locaiton)
 - [ ] Refactor Import Outline Lightmaps component
@@ -245,6 +246,7 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 - [ ] import_order.py is becoming too big
 - [ ] invoke_next_step may not need to cache anymore since we can cache directly in Operators
 - [X] Automated Tests
+- [X] Support for Multiple Shader Versions/Games
 ### Misc.
 - [X] Crude design diagram depicting how this tool and the components interact and work
 - [ ] A refreshed design diagram with the UI Addon flow
@@ -257,7 +259,7 @@ Automated tests are run each release on all playable characters and a small subs
 <br>
 This Setup Wizard should work on all playable characters, but if you do find any issues or need help, don't hesitate to reach out in the #help channel on Discord or open up an issue in this repository.
 
-#
+----
 
 ## Credits
 
