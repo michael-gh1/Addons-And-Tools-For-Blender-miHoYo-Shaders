@@ -6,6 +6,8 @@ Please head to the [Releases Page](https://github.com/michael-gh1/Addons-And-Too
 
 :star: If these Addons are useful, please be sure to **Star** the repository! :star:
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M4ET8D2)
+
 # Installation Instructions
 
 If you are downloading an Addon, simply download the zipped file and install the file directly in Blender.
