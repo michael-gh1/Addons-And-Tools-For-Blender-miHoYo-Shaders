@@ -190,6 +190,16 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         '_MTSpecularColor': 'MT Specular Color',
         '_MTSharpLayerColor': 'MT Sharp Layer Color',
         '_MTUseSpecularRamp': 'Use Specular Ramp',
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',
+        '_CoolShadowMultColor2': 'Nighttime Shadow Color 2',
+        '_CoolShadowMultColor3': 'Nighttime Shadow Color 3',
+        '_CoolShadowMultColor4': 'Nighttime Shadow Color 4',
+        '_CoolShadowMultColor5': 'Nighttime Shadow Color 5',
+        '_FirstShadowMultColor': 'Daytime Shadow Color',
+        '_FirstShadowMultColor2': 'Daytime Shadow Color 2',
+        '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
+        '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
+        '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
     }
 
     shader_node_tree_node_name = 'Group.006'
