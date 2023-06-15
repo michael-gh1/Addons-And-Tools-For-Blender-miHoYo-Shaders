@@ -63,9 +63,15 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             )
             return {'FINISHED'}
 
-        texture_importer_type = TextureImporterType.AVATAR if \
-            [material_name for material_name, material in bpy.data.materials.items() if 'Avatar' in material_name] else \
-                TextureImporterType.NPC
+        texture_importer_type = ''
+        
+        if [material_name for material_name, material in bpy.data.materials.items() if 'Avatar' in material_name]:
+            texture_importer_type = TextureImporterType.AVATAR
+        elif [material_name for material_name, material in bpy.data.materials.items() if 'Monster' in material_name]:
+            texture_importer_type = TextureImporterType.MONSTER
+        else:
+            texture_importer_type = TextureImporterType.NPC
+
         texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
         texture_importer.import_textures(directory)
 
@@ -73,7 +79,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
             NPCs don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
             If an asset does exist, leave it as the default value (1.0).
         '''
-        if texture_importer_type is TextureImporterType.NPC and \
+        if (texture_importer_type is TextureImporterType.NPC or texture_importer_type is TextureImporterType.MONSTER) and \
             not [file for file in [file for name, folder, file in os.walk(directory)][0] if 'Shadow_Ramp' in file]:
             ShaderConfigurator().update_shader_value(
                 materials = [

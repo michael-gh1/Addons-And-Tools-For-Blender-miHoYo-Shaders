@@ -10,6 +10,7 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 
 class TextureImporterType(Enum):
     AVATAR = auto()
+    MONSTER = auto()
     NPC = auto()
     HSR_AVATAR = auto()
 
@@ -25,6 +26,8 @@ class TextureImporterFactory:
             return GenshinAvatarTextureImporter()
         elif texture_importer_type == TextureImporterType.NPC:
             return GenshinNPCTextureImporter()
+        elif texture_importer_type == TextureImporterType.MONSTER:
+            return GenshinMonsterTextureImporter()
         elif texture_importer_type == TextureImporterType.HSR_AVATAR:
             return HonkaiStarRailAvatarTextureImporter()
         else:
@@ -271,6 +274,55 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Specular_Ramp'], file) or \
                     self.is_texture_identifiers_in_texture_name(['Tex', 'Specular_Ramp'], file):
+                    self.set_specular_ramp_texture(TextureType.BODY, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Diffuse'], file):
+                    self.set_face_diffuse_texture(face_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Shadow'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['NPC', 'Face', 'Lightmap'], file) and
+                        not self.is_texture_identifiers_in_files(['Face', 'Shadow'], files)):
+                    # If Face Shadow exists, use that texture
+                    # If Face Shadow does not exist in this folder, use "Face Lightmap" (actually an NPC Face Shadow texture)
+                    self.set_face_shadow_texture(face_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Lightmap'], file):
+                    self.set_face_lightmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
+                    self.set_metalmap_texture(img)
+
+                else:
+                    pass
+            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+
+
+class GenshinMonsterTextureImporter(GenshinTextureImporter):
+    def __init__(self):
+        super().__init__(GameType.GENSHIN_IMPACT)
+
+    def import_textures(self, directory):
+        for name, folder, files in os.walk(directory):
+            for file in files:
+                # load the file with the correct alpha mode
+                img_path = directory + "/" + file
+                img = bpy.data.images.load(filepath = img_path, check_existing=True)
+                img.alpha_mode = 'CHANNEL_PACKED'
+
+                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
+                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
+                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+
+                # Implement the texture in the correct node
+                print(f'Importing texture {file} using {self.__class__.__name__}')
+
+                if self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file):
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Tex', 'Specular_Ramp'], file):
                     self.set_specular_ramp_texture(TextureType.BODY, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Diffuse'], file):

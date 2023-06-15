@@ -81,7 +81,11 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             return {'FINISHED'}
 
         for file in self.blender_operator.files:
-            body_part = PurePosixPath(file.name).stem.split('_')[-1]
+            body_part = None
+            if 'Monster' in file.name:
+                body_part = PurePosixPath(file.name).stem.split('_')[-2]
+            else:
+                body_part = PurePosixPath(file.name).stem.split('_')[-1]
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)

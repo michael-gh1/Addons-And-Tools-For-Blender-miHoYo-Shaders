@@ -7,6 +7,7 @@ from bpy.types import Context, Operator
 from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
+from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
 class OutlineTextureImporter(ABC):
@@ -86,13 +87,23 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
-                original_mesh_material = \
-                    [material for material in bpy.data.materials if material.name.startswith('NPC') and body_part_material_name in material.name][0] if \
-                    [material for material in bpy.data.materials if material.name.startswith('NPC')] else \
-                    [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
-                actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name)
+                character_type = None
+
+                if [material for material in bpy.data.materials if material.name.startswith('NPC')]:
+                    original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('NPC') and body_part_material_name in material.name][0]
+                    character_type = TextureImporterType.NPC
+                elif [material for material in bpy.data.materials if material.name.startswith('Monster')]:
+                    if body_part_material_name == 'Body':
+                        original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and body_part_material_name in material.name][0]
+                    character_type = TextureImporterType.MONSTER
+                else:
+                    original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
+                    character_type = TextureImporterType.AVATAR
+                actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type)
 
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
+                    if character_type is TextureImporterType.MONSTER:
+                        actual_material_part_name = 'Tex'
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)
                     self.assign_diffuse_texture(character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name)
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

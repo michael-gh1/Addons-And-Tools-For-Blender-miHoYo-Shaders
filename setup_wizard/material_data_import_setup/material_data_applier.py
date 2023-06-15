@@ -200,6 +200,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
         '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
         '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
+        "_UseShadowRamp": "Use Shadow Ramp",
     }
 
     shader_node_tree_node_name = 'Group.006'
