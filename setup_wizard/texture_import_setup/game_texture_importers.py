@@ -76,7 +76,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
         texture_importer.import_textures(directory)
 
         '''
-            NPCs don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
+            NPCs and Monsters don't typically have shadow ramps. Turn off using shadow ramp if there are no assets for it.
             If an asset does exist, leave it as the default value (1.0).
         '''
         if (texture_importer_type is TextureImporterType.NPC or texture_importer_type is TextureImporterType.MONSTER) and \
@@ -86,6 +86,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
                     bpy.data.materials.get('miHoYo - Genshin Hair'),
                     bpy.data.materials.get('miHoYo - Genshin Face'),
                     bpy.data.materials.get('miHoYo - Genshin Body'),
+                    bpy.data.materials.get('miHoYo - Genshin Dress'),
                 ],
                 node_name = 'miHoYo - Genshin Impact',
                 input_name = 'Use Shadow Ramp',
