@@ -200,7 +200,6 @@ def get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
             if material_name in material.name:
                 try:
                     # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
-                    print(material_name)
                     base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
                     actual_material_name = base_color_texture_image_name.split('_')[-2]
                     actual_material_name = \
