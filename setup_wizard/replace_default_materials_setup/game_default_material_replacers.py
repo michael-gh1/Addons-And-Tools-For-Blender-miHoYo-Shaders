@@ -106,7 +106,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif 'Dress' in material_name:
             return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
         else:
-            return None
+            return 'Body'  # Assumption that everything else should be a Body material
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
