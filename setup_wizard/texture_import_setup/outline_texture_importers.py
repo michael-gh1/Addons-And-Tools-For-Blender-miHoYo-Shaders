@@ -93,8 +93,8 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                     original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('NPC') and body_part_material_name in material.name][0]
                     character_type = TextureImporterType.NPC
                 elif [material for material in bpy.data.materials if material.name.startswith('Monster')]:
-                    if body_part_material_name == 'Body':
-                        original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and body_part_material_name in material.name][0]
+                    # Assuming all body parts are Body for now
+                    original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and 'Body' in material.name][0]
                     character_type = TextureImporterType.MONSTER
                 else:
                     original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
