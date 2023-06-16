@@ -6,6 +6,7 @@ from pathlib import PurePosixPath
 from typing import List
 import bpy
 from bpy.types import Operator, Context
+from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
@@ -26,7 +27,8 @@ class GameMaterialDataImporter(ABC):
             except AttributeError as err:
                 print(err)
                 continue # fallback and try next version
-            except KeyError:
+            except KeyError as err:
+                print(err)
                 self.blender_operator.report({'WARNING'}, \
                     f'Continuing to apply other material data, but: \n'
                     f'* Material Data JSON "{body_part}" was selected, but there is no material named "miHoYo - Genshin {body_part}"')
@@ -82,10 +84,13 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
         for file in self.blender_operator.files:
             body_part = None
+
             if 'Monster' in file.name:
                 body_part = PurePosixPath(file.name).stem.split('_')[-2]
+                character_type = CharacterType.MONSTER
             else:
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
+                character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
@@ -94,7 +99,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             material_data_appliers = MaterialDataAppliersFactory.create(
                 self.blender_operator.game_type,
                 material_data_parser,
-                body_part
+                body_part,
+                character_type
             )
             self.apply_material_data(body_part, material_data_appliers)
 

@@ -3,17 +3,24 @@
 import bpy
 
 from abc import ABC, abstractmethod
+from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name
 
 
 class MaterialDataAppliersFactory:
-    def create(game_type, material_data_parser, body_part):
+    def create(game_type, material_data_parser, body_part, character_type: CharacterType):
         WEAPON_NAME_IDENTIFIER = 'Mat'
 
         if game_type == GameType.GENSHIN_IMPACT.name:
             # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
             is_weapon = body_part == WEAPON_NAME_IDENTIFIER
+            is_monster = character_type is CharacterType.MONSTER
+
+            if is_monster:
+                # ex. 'XXX_None_Mat.json', try to determine the body part to apply this material data to
+                body_part = get_monster_body_part_name(body_part)
 
             if is_weapon:
                 # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
