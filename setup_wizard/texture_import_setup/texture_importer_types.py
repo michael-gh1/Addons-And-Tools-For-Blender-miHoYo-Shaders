@@ -35,8 +35,9 @@ class TextureImporterFactory:
 
 
 class GenshinTextureImporter:
-    def __init__(self, game_type: GameType):
+    def __init__(self, game_type: GameType, character_type: TextureImporterType):
         self.game_type = game_type
+        self.character_type = character_type
 
     def import_textures(self, directory):
         raise NotImplementedError()
@@ -81,7 +82,7 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
 
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Diffuse', img)
+            self.setup_dress_textures(f'{type.value}_Diffuse', img, self.character_type)
 
     def set_lightmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -89,7 +90,7 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
         
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Lightmap', img)
+            self.setup_dress_textures(f'{type.value}_Lightmap', img, self.character_type)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -97,7 +98,7 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Normalmap_UV1'].image = img
         
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Normalmap', img)
+            self.setup_dress_textures(f'{type.value}_Normalmap', img, self.character_type)
 
         # Deprecated. Tries only if it exists. Only for V1 Shader
         self.plug_normal_map(f'miHoYo - Genshin {type.value}', 'MUTE IF ONLY 1 UV MAP EXISTS')
@@ -126,7 +127,7 @@ class GenshinTextureImporter:
     def set_metalmap_texture(self, img):
         bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
-    def setup_dress_textures(self, texture_name, texture_img):
+    def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
         shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
         shader_cloak_materials = [material for material in bpy.data.materials
                                   if 'Genshin Arm' in material.name or 'Genshin Cloak' in material.name]
@@ -139,7 +140,7 @@ class GenshinTextureImporter:
             original_cloak_material = [material for material in bpy.data.materials if material.name.endswith(
                 shader_cloak_materials[0].name.split(' ')[-1]
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
-            actual_cloak_material = get_actual_material_name_for_dress(original_cloak_material.name)
+            actual_cloak_material = get_actual_material_name_for_dress(original_cloak_material.name, character_type.name)
             if actual_cloak_material in texture_name:
                 material_shader_nodes = bpy.data.materials.get(shader_cloak_materials[0].name).node_tree.nodes
                 material_shader_nodes.get(f'{texture_name}_UV0').image = texture_img
@@ -150,7 +151,7 @@ class GenshinTextureImporter:
                 shader_dress_material.name.split(' ')[-1]
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
 
-            actual_material = get_actual_material_name_for_dress(original_dress_material.name)
+            actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
             if actual_material in texture_name:
                 print(f'Importing texture "{texture_name}" onto material "{shader_dress_material.name}"')
                 material_shader_nodes = bpy.data.materials.get(shader_dress_material.name).node_tree.nodes
@@ -182,7 +183,7 @@ class GenshinTextureImporter:
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
     def __init__(self):
-        super().__init__(GameType.GENSHIN_IMPACT)
+        super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -231,7 +232,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
 class GenshinNPCTextureImporter(GenshinTextureImporter):
     def __init__(self):
-        super().__init__(GameType.GENSHIN_IMPACT)
+        super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -299,7 +300,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
 class GenshinMonsterTextureImporter(GenshinTextureImporter):
     def __init__(self):
-        super().__init__(GameType.GENSHIN_IMPACT)
+        super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -368,7 +369,7 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
     def __init__(self):
-        super().__init__(GameType.HONKAI_STAR_RAIL)
+        super().__init__(GameType.HONKAI_STAR_RAIL, TextureImporterType.HSR_AVATAR)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):

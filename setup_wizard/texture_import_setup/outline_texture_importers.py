@@ -99,7 +99,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                 else:
                     original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
                     character_type = TextureImporterType.AVATAR
-                actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type)
+                actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type.name)
 
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
                     if character_type is TextureImporterType.MONSTER:

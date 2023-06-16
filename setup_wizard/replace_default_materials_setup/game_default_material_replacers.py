@@ -59,7 +59,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.blender_operator.report({'INFO'}, 'Dress detected on character model!')
 
-                    actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type)
+                    actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type.name)
                     if actual_material_for_dress == 'Cloak':
                         # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
                         continue
