@@ -65,9 +65,9 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
 
         texture_importer_type = ''
         
-        if [material_name for material_name, material in bpy.data.materials.items() if 'Avatar' in material_name and 'Avatar_Default_Mat'.lower() not in material_name.lower()]:
+        if [material_name for material_name, material in bpy.data.materials.items() if 'Avatar'.lower() in material_name.lower() and 'Avatar_Default_Mat'.lower() not in material_name.lower()]:
             texture_importer_type = TextureImporterType.AVATAR
-        elif [material_name for material_name, material in bpy.data.materials.items() if 'Monster' in material_name]:
+        elif [material_name for material_name, material in bpy.data.materials.items() if 'Monster'.lower() in material_name.lower()]:
             texture_importer_type = TextureImporterType.MONSTER
         else:
             texture_importer_type = TextureImporterType.NPC
