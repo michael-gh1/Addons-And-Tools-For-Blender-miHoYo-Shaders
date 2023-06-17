@@ -57,7 +57,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     def execute(self, context):
         selected_material = context.scene.setup_wizard_selected_material_for_material_data_import
 
-        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, selected_material)
+        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context)
         game_material_data_importer.import_material_data()
 
         self.report({'INFO'}, 'Imported material data')
