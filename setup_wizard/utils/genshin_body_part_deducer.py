@@ -10,5 +10,7 @@ def get_monster_body_part_name(name):
             return 'Body'
         elif 'Dress' in name:
             return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
+        elif 'None' in name:
+            return 'Body'  # TODO: Current assumption/belief all None are Body-type
         else:
-            return 'Body'  # Assumption that everything else should be a Body material
+            return None
