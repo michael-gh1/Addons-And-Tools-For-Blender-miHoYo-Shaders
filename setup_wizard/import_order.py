@@ -212,6 +212,7 @@ def get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
                     actual_material_name = material_name.split('_')[-1]
                     actual_material_name = actual_material_name if actual_material_name != 'Dress' else 'Body'  # if mat name is 'body' or 'hair' use that, else fallback to 'body'
                     print(f'WARNING: Fallback to applying "{actual_material_name}" onto "{material_name}". Image name is not parseable for: {material_name}')
+                return actual_material_name
     else:
         # NPC/Monster?
         # ex. 'XXXX_Dress_Mat' or 'XXXX - Genshin Dress'
