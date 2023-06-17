@@ -3,39 +3,30 @@
 import bpy
 
 from abc import ABC, abstractmethod
-from setup_wizard.domain.character_types import CharacterType
+from bpy.types import Material
 
+from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name
+from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 
 
 class MaterialDataAppliersFactory:
-    def create(game_type, material_data_parser, body_part, character_type: CharacterType):
-        WEAPON_NAME_IDENTIFIER = 'Mat'
-
+    def create(game_type, material_data_parser, outline_material_group: OutlineMaterialGroup, character_type: CharacterType):
         if game_type == GameType.GENSHIN_IMPACT.name:
-            # Was tempted to add another check, but holding off for now: file.name.startswith('Equip')
-            is_weapon = body_part == WEAPON_NAME_IDENTIFIER
-            is_monster = character_type is CharacterType.MONSTER
-
-            if is_monster:
-                # ex. 'XXX_None_Mat.json', try to determine the body part to apply this material data to
-                body_part = get_monster_body_part_name(body_part)
-
-            if is_weapon:
+            if character_type is CharacterType.GI_EQUIPMENT:
                 # V2_WeaponMaterialDataApplier is technically unnecessary for now, does same logic as V2_MaterialDataApplier
                 return [
-                    V2_WeaponMaterialDataApplier(material_data_parser, 'Body'),  
-                    V1_MaterialDataApplier(material_data_parser, 'Body'),
+                    V2_WeaponMaterialDataApplier(material_data_parser, outline_material_group),  
+                    V1_MaterialDataApplier(material_data_parser, outline_material_group),
                 ]
             else:
                 return [
-                    V2_MaterialDataApplier(material_data_parser, body_part), 
-                    V1_MaterialDataApplier(material_data_parser, body_part),
+                    V2_MaterialDataApplier(material_data_parser, outline_material_group), 
+                    V1_MaterialDataApplier(material_data_parser, outline_material_group),
                 ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
-                V2_HSR_MaterialDataApplier(material_data_parser, body_part), 
+                V2_HSR_MaterialDataApplier(material_data_parser, outline_material_group), 
             ]
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
@@ -50,9 +41,10 @@ class MaterialDataApplier(ABC):
         '_OutlineColor5': 'Outline Color 5'
     }
 
-    def __init__(self, material_data_parser, body_part, outlines_node_tree_node_name):
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup, outlines_node_tree_node_name):
         self.material_data_parser = material_data_parser
-        self.body_part = body_part
+        self.material = outline_material_group.material
+        self.outline_material = outline_material_group.outlines_material
         self.outlines_node_tree_node_name = outlines_node_tree_node_name
     
     @abstractmethod
@@ -60,8 +52,7 @@ class MaterialDataApplier(ABC):
         raise NotImplementedError()
 
     def set_up_outline_colors(self):
-        outlines_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part} Outlines']
-        outlines_shader_node_inputs = outlines_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
+        outlines_shader_node_inputs = self.outline_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
 
         self.apply_material_data(
             self.outline_mapping, 
@@ -80,7 +71,7 @@ class MaterialDataApplier(ABC):
             try:
                 node_input.default_value = material_json_value
             except AttributeError as ex:
-                print(f'Did not find {material_node_name} in {self.body_part} material using {self} \
+                print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
                     Falling back to next MaterialDataApplier version')
                 raise ex
 
@@ -93,7 +84,7 @@ class MaterialDataApplier(ABC):
             return None
 
     def __handle_material_value_not_found(self, material_json_name):
-        print(f'Info: Unable to find material data: {material_json_name} in {self.body_part} JSON.')
+        print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
 
 
 class V1_MaterialDataApplier(MaterialDataApplier):
@@ -128,21 +119,19 @@ class V1_MaterialDataApplier(MaterialDataApplier):
     global_node_group_node_name = 'Group Output'
     outlines_node_tree_node_name = 'Group.002'
 
-    def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part, self.outlines_node_tree_node_name)
+    def __init__(self, material_data_parser, material: Material):
+        super().__init__(material_data_parser, material, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
-        if self.body_part != 'Face':
-            body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
-            shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        if 'Face' not in self.material.name:
+            shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
             super().apply_material_data(
                 self.local_material_mapping,
                 shader_node_tree_inputs,
             )
-            
-        # Not sure, should we only apply Global Material Properties from Body .dat file?
-        if self.body_part == 'Body':
+
+        if 'Body' in self.material.name:
             global_material_properties_node_inputs = \
                 bpy.data.node_groups["GLOBAL MATERIAL PROPERTIES"].nodes[self.global_node_group_node_name].inputs
 
@@ -213,12 +202,11 @@ class V2_MaterialDataApplier(MaterialDataApplier):
     shader_node_tree_node_name = 'Group.006'
     outlines_node_tree_node_name = 'Group.006'
 
-    def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part, self.outlines_node_tree_node_name)
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+        super().__init__(material_data_parser, outline_material_group, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
-        body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
-        shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,
@@ -257,17 +245,17 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             try:
                 node_input.default_value = material_json_value
             except AttributeError as ex:
-                print(f'Did not find {material_node_name} in {self.body_part} material using {self} \
+                print(f'Did not find {material_node_name} in {self.material.name} material using {self} \
                     Falling back to next MaterialDataApplier version')
                 raise ex
 
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
-    def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part)
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+        super().__init__(material_data_parser, outline_material_group)
 
     def set_up_mesh_material_data(self):
-        weapon_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
+        weapon_material = self.material
         shader_node_tree_inputs = weapon_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
@@ -297,15 +285,14 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
         # '_SpecularColor': 'Specular Color',  # GI - RGBA | HSR - Float
     }
 
-    def __init__(self, material_data_parser, body_part):
-        super().__init__(material_data_parser, body_part)
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+        super().__init__(material_data_parser, outline_material_group)
 
-        if self.body_part == 'Face':
+        if 'Face' in self.material.name:
             self.outline_mapping = self.face_outline_mapping
 
     def set_up_mesh_material_data(self):
-        body_part_material = bpy.data.materials[f'miHoYo - Genshin {self.body_part}']
-        shader_node_tree_inputs = body_part_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,

@@ -6,3 +6,8 @@ class UnsupportedMaterialDataJsonFormatException(Exception):
             'Unsupported Material Data Json format detected. ' \
                 f'Supported Material Data Json Formats: {parsers}'
         super().__init__(message)
+
+
+class UserInputException(Exception):
+    def __init__(self, message):
+        super().__init__(message)

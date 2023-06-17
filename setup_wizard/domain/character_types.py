@@ -12,3 +12,4 @@ class CharacterType(Enum):
     MONSTER = auto()
     NPC = auto()
     UNKNOWN = auto()
+    GI_EQUIPMENT = auto()

@@ -7,6 +7,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, CollectionProperty, PointerProperty
 from bpy.types import Operator, PropertyGroup
+from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporterFactory
@@ -55,9 +56,12 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     ]
 
     def execute(self, context):
-        selected_material = context.scene.setup_wizard_selected_material_for_material_data_import
+        selected_material = context.scene.setup_wizard_material_for_material_data_import
+        outlines_material = context.scene.setup_wizard_outlines_material_for_material_data_import
 
-        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context)
+        outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(selected_material, outlines_material)
+
+        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
         game_material_data_importer.import_material_data()
 
         self.report({'INFO'}, 'Imported material data')
