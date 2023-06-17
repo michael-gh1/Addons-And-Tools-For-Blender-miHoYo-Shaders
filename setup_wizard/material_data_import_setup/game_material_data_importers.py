@@ -10,7 +10,7 @@ from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException
+from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException, UserInputException
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
 from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name
@@ -73,6 +73,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         self.outlines_material = outline_material_group.outlines_material
 
     def import_material_data(self):
+        self.__validate_UI_inputs_for_targeted_material_data_import()
+
         directory_file_path = os.path.dirname(self.blender_operator.filepath)
 
         if not self.blender_operator.filepath or not self.blender_operator.files:
@@ -85,6 +87,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 game_type=self.blender_operator.game_type,
             )
             return {'FINISHED'}
+
+        self.__validate_num_of_file_inputs_for_targeted_material_data_import()
 
         for file in self.blender_operator.files:
             body_part = None
@@ -122,6 +126,17 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 character_type
             )
             self.apply_material_data(body_part, material_data_appliers)
+
+    def __validate_UI_inputs_for_targeted_material_data_import(self):
+        if self.material and not self.outlines_material:
+            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Outlines Material" input')
+        elif not self.material and self.outlines_material:
+            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Target Material" input')
+
+    def __validate_num_of_file_inputs_for_targeted_material_data_import(self):
+        num_of_files = len(self.blender_operator.files)
+        if self.material and self.outlines_material and num_of_files != 1:
+            raise UserInputException(f'\n\n>>> Select only 1 material data file to apply to the material. You selected {num_of_files} material data files to apply on 1 material.')
 
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
