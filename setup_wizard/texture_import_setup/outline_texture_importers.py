@@ -24,7 +24,7 @@ class OutlineTextureImporter(ABC):
         v2_lightmap_node_name = 'Outline_Lightmap'
         outline_material = bpy.data.materials.get(f'miHoYo - Genshin {body_part_material_name} Outlines')
 
-        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
+        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]  # TODO: Unable to determine between character/equipment textures for Monsters
         lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
             or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
         self.assign_texture_to_node(lightmap_node, character_model_folder_file_path, lightmap_filename)
