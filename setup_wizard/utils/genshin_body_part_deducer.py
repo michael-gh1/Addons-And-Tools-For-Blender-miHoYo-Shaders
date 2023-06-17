@@ -13,7 +13,8 @@ def get_monster_body_part_name(name):
         elif 'None' in name:
             return 'Body'  # TODO: Current assumption/belief all None are Body-type
         else:
-            return None
+            print(f'"Best Guess" attempt made for retrieving mosnter body part name {name}')
+            return 'Body'
 
 
 def get_npc_mesh_body_part_name(material_name):

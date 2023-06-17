@@ -94,7 +94,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             body_part = None
 
             if 'Monster' in file.name:
-                body_part = get_monster_body_part_name(PurePosixPath(file.name).stem.split('_')[-2])
+                expected_body_part_name = PurePosixPath(file.name).stem.split('_')[-2]
+                body_part = get_monster_body_part_name(PurePosixPath(file.name).stem.split('_')[-2]) if expected_body_part_name != 'Mat' else get_monster_body_part_name(PurePosixPath(file.name).stem.split('_')[-1])
                 character_type = CharacterType.MONSTER
             elif 'Equip' in file.name:
                 body_part = 'Body'
