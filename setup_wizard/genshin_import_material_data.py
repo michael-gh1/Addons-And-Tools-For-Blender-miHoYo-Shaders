@@ -5,7 +5,7 @@ import bpy
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty, CollectionProperty
+from bpy.props import StringProperty, CollectionProperty, PointerProperty
 from bpy.types import Operator, PropertyGroup
 
 from setup_wizard.import_order import NextStepInvoker
@@ -20,6 +20,16 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     """Select the Character Material Data Json Files for Outlines"""
     bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
     bl_label = "Genshin: Select Material Json Data Files"
+
+    bpy.types.Scene.setup_wizard_material_for_material_data_import = PointerProperty(
+        name='Target Material',
+        type=bpy.types.Material
+    )
+
+    bpy.types.Scene.setup_wizard_outlines_material_for_material_data_import = PointerProperty(
+        name='Outlines Material',
+        type=bpy.types.Material
+    )
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"
@@ -45,7 +55,9 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     ]
 
     def execute(self, context):
-        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context)
+        selected_material = context.scene.setup_wizard_selected_material_for_material_data_import
+
+        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, selected_material)
         game_material_data_importer.import_material_data()
 
         self.report({'INFO'}, 'Imported material data')
