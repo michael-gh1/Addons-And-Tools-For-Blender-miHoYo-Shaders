@@ -65,12 +65,13 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         game_material_data_importer.import_material_data()
 
         self.report({'INFO'}, 'Imported material data')
-        NextStepInvoker().invoke(
-            self.next_step_idx, 
-            self.invoker_type, 
-            high_level_step_name=self.high_level_step_name,
-            game_type=self.game_type,
-        )
+        if self.filepath or self.files:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
         super().clear_custom_properties()
         return {'FINISHED'}
 
