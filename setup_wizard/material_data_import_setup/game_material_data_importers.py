@@ -13,7 +13,7 @@ from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException, UserInputException
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
-from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name
+from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name
 
 class GameMaterialDataImporter(ABC):
     @abstractmethod
@@ -97,6 +97,9 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 expected_body_part_name = PurePosixPath(file.name).stem.split('_')[-2]
                 body_part = get_monster_body_part_name(PurePosixPath(file.name).stem.split('_')[-2]) if expected_body_part_name != 'Mat' else get_monster_body_part_name(PurePosixPath(file.name).stem.split('_')[-1])
                 character_type = CharacterType.MONSTER
+            elif 'NPC' in file.name:
+                body_part = get_npc_mesh_body_part_name(PurePosixPath(file.name).stem)
+                character_type = CharacterType.NPC
             elif 'Equip' in file.name:
                 body_part = 'Body'
                 character_type = CharacterType.GI_EQUIPMENT
