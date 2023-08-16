@@ -186,25 +186,43 @@ def clear_cache(game_type: str):
         f.write(json_string)
 
 
+'''
+This method is a real mess, be prepared to spend some time if you're working with a Dress material!
+There are a few issues that cause this:
+1. AVATARs and NPCs/MONSTERs have different logic
+2. Dress materials can be Body or Hair for AVATARs
+3. Dress materials are only Body (to be confirmed) for NPCs/MONSTERs
+'''
+def get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
+    # must check string instead of enum until this is moved out of import_order.py due to circular dependency
+    if character_type == 'AVATAR' or character_type == 'HSR_AVATAR':
+        for material in bpy.data.materials:
+            if material_name in material.name:
+                try:
+                    # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
+                    base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
+                    actual_material_name = base_color_texture_image_name.split('_')[-2]
+                    actual_material_name = \
+                        actual_material_name if actual_material_name == 'Hair' or actual_material_name == 'Body' \
+                            else 'Hair' if 'Hair' in base_color_texture_image_name \
+                                else 'Body' if 'Body' in base_color_texture_image_name \
+                                    else actual_material_name  # fallback method to get mat name
+                except IndexError:
+                    # ex. 'Diffuse Texture.001'
+                    actual_material_name = material_name.split('_')[-1]
+                    actual_material_name = actual_material_name if actual_material_name != 'Dress' else 'Body'  # if mat name is 'body' or 'hair' use that, else fallback to 'body'
+                    print(f'WARNING: Fallback to applying "{actual_material_name}" onto "{material_name}". Image name is not parseable for: {material_name}')
+                return actual_material_name
+    else:
+        # NPC/Monster?
+        # ex. 'XXXX_Dress_Mat' or 'XXXX - Genshin Dress'
+        is_shader_dress_material = 'Genshin Dress' in material_name  # 'XXXX - Genshin Dress'
 
-def get_actual_material_name_for_dress(material_name):
-    for material in bpy.data.materials:
-        if material_name in material.name:
-            try:
-                # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
-                base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
-                actual_material_name = base_color_texture_image_name.split('_')[-2]
-                actual_material_name = \
-                    actual_material_name if actual_material_name == 'Hair' or actual_material_name == 'Body' \
-                        else 'Hair' if 'Hair' in base_color_texture_image_name \
-                            else 'Body' if 'Body' in base_color_texture_image_name \
-                                else actual_material_name  # fallback method to get mat name
-            except IndexError:
-                # ex. 'Diffuse Texture.001'
-                actual_material_name = material_name.split('_')[-1]
-                actual_material_name = actual_material_name if actual_material_name != 'Dress' else 'Body'  # if mat name is 'body' or 'hair' use that, else fallback to 'body'
-                print(f'WARNING: Fallback to applying "{actual_material_name}" onto "{material_name}". Image name is not parseable for: {material_name}')
-            return actual_material_name
+        # is it the shader's Dress material? or are we checking the original material's name?
+        actual_material_name = material_name.split(' ')[-1] if is_shader_dress_material else material_name.split('_')[-2] if material_name.split('_')[-2] != 'Mat' else material_name.split('_')[-1]
+        actual_material_name = actual_material_name if actual_material_name != 'Dress' else 'Body'  # if mat name is 'body' or 'hair' use that, else fallback to 'body'
+        print(f'WARNING: Fallback to applying "{actual_material_name}" onto "{material_name}". Image name is not parseable for: {material_name}')
+        return actual_material_name
 
 
 class ComponentFunctionFactory:

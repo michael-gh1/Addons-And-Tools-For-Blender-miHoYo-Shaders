@@ -7,6 +7,8 @@ class ShaderConfigurator:
 
     def update_shader_value(self, materials, node_name, input_name, value):
         for material in materials:
+            if not material:
+                continue
             internal_node_name = self.v2_node_name_mapping.get(node_name) if \
                 self.v2_node_name_mapping.get(node_name) else self.v1_node_name_mapping.get(node_name)
 

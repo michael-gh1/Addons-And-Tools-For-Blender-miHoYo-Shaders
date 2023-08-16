@@ -183,6 +183,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
     def draw(self, context):
         layout = self.layout
         sub_layout = layout.column()
+        scene = context.scene
 
         if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
@@ -204,6 +205,10 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 'FILE_FOLDER',
                 game_type=GameType.GENSHIN_IMPACT.name,
             )
+
+            sub_layout = layout.box()
+            sub_layout.prop_search(scene, 'setup_wizard_material_for_material_data_import', bpy.data, 'materials')
+            sub_layout.prop_search(scene, 'setup_wizard_outlines_material_for_material_data_import', bpy.data, 'materials')
             OperatorFactory.create(
                 sub_layout,
                 'genshin.import_material_data',

@@ -6,6 +6,7 @@ from bpy.types import Context, Operator
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
 class GameDefaultMaterialReplacer(ABC):
@@ -36,8 +37,19 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         for mesh in meshes:
             for material_slot in mesh.material_slots:
                 material_name = material_slot.name
-                mesh_body_part_name = self.__get_npc_mesh_body_part_name(material_name) if \
-                    material_name.startswith('NPC') else material_name.split('_')[-1]
+                mesh_body_part_name = None
+                character_type = None
+
+                if material_name.startswith('NPC'):
+                    mesh_body_part_name = self.__get_npc_mesh_body_part_name(material_name)
+                    character_type = TextureImporterType.NPC
+                elif material_name.startswith('Monster'):
+                    mesh_body_part_name = self.__get_monster_mesh_body_part_name(material_name)
+                    character_type = TextureImporterType.MONSTER
+                else:
+                    mesh_body_part_name = material_name.split('_')[-1]
+                    character_type = TextureImporterType.AVATAR
+
                 genshin_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
 
                 if genshin_material:
@@ -47,7 +59,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.blender_operator.report({'INFO'}, 'Dress detected on character model!')
 
-                    actual_material_for_dress = get_actual_material_name_for_dress(material_name)
+                    actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type.name)
                     if actual_material_for_dress == 'Cloak':
                         # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
                         continue
@@ -83,6 +95,18 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             return 'Dress'
         else:
             return None
+
+    def __get_monster_mesh_body_part_name(self, material_name):
+        if 'Hair' in material_name:
+            return 'Hair'
+        elif 'Face' in material_name:
+            return 'Face'
+        elif 'Body' in material_name:
+            return 'Body'
+        elif 'Dress' in material_name:
+            return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
+        else:
+            return 'Body'  # Assumption that everything else should be a Body material
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
