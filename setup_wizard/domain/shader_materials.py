@@ -1,11 +1,10 @@
 # Author: michael-gh1
 
 
-from enum import Enum, auto
 
-
-class Nya222HonkaiStarRailShaderMaterialNames(Enum):
+class Nya222HonkaiStarRailShaderMaterialNames:
     MATERIAL_PREFIX = 'HSR - '
+    BODY = 'HSR - Body'
     BODY1 = 'HSR - Body1'
     BODY2 = 'HSR - Body2'
     BODY_TRANS = 'HSR - Body_Trans'

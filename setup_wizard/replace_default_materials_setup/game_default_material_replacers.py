@@ -145,8 +145,27 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             for material_slot in mesh.material_slots:
                 material_name = material_slot.name
                 mesh_body_part_name = self.find_body_part_name(material_name)
+
+                # Another hacky-solution, some characters only have a "Body" material, but the shader materials
+                # only have Body1, Body2 and Body_A. Should request Shader to have a "Body" material
+                # Some characters have a mismatch between Texture and Material Data too... (Body_Color_A and Body)
+                # Checklist:
+                # 1. Materials
+                # 2. Textures
+                # 3. Material Data
+                # The best fix would be to create a "Body" material via code in case the shader is updated to have the same
+                if mesh_body_part_name == 'Body':
+                    body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+                    if not body_material:
+                        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
+                        body_material.name = Nya222HonkaiStarRailShaderMaterialNames.BODY
+                        body_material.use_fake_user = True
+                    mesh.material_slots.get(material_name).material = body_material
+                    material_name = body_material.name
+
+
                 honkai_star_rail_material = bpy.data.materials.get(
-                    f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX.value}{mesh_body_part_name}'
+                    f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}'
                 )
 
                 if honkai_star_rail_material:
@@ -184,6 +203,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def __naive_body_part_name_search(self, material_name):
         EXPECTED_BODY_PART_NAMES = [
             'Hair',
+            'Body',
             'Body1',
             'Body2',
             'Face',

@@ -406,12 +406,13 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.HAIR.value)
-                face_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.FACE.value)
-                body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1.value)
-                body2_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2.value)
-                body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS.value)
-                weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON.value)
+                hair_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.HAIR)
+                face_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.FACE)
+                body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+                body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
+                body2_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2)
+                body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS)
+                weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON)
                 weapon_materials = [weapon_material]
 
                 # Implement the texture in the correct node
@@ -434,12 +435,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Color'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
-                    self.set_diffuse_texture(TextureType.BODY, body1_material, img)
+                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'LightMap'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
-                    self.set_lightmap_texture(TextureType.BODY, body1_material, img)
+                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body1', 'Color'], file):
                     self.set_diffuse_texture(TextureType.BODY, body1_material, img)
