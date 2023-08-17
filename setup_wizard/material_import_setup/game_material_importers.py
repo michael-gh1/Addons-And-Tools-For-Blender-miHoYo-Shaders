@@ -127,13 +127,14 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_HSR_MATERIALS = 'miHoYo_-_Star_Rail.blend'
     NAMES_OF_HONKAI_STAR_RAIL_MATERIALS = [
-        {'name': 'miHoYo - Genshin Body1'},
-        {'name': 'miHoYo - Genshin Body2'},
-        {'name': 'miHoYo - Genshin Body_A'},
-        {'name': 'miHoYo - Genshin Eye Shadow'},
-        {'name': 'miHoYo - Genshin Face'},
-        {'name': 'miHoYo - Genshin Hair'},
-        {'name': 'miHoYo - Genshin Outlines'},
+        {'name': 'HSR - Body1'},
+        {'name': 'HSR - Body2'},
+        {'name': 'HSR - Body_Trans'},
+        {'name': 'HSR - Hair'},
+        {'name': 'HSR - Face'},
+        {'name': 'HSR - EyeShadow'},
+        {'name': 'HSR - Outlines'},
+        {'name': 'HSR - Weapon'},
     ]
 
     def __init__(self, blender_operator, context):
