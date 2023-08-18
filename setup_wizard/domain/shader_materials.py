@@ -1,8 +1,28 @@
 # Author: michael-gh1
 
 
+class GameMaterialNames:
+    MATERIAL_PREFIX = ''
+    BODY = ''
+    BODY1 = ''
+    BODY2 = ''
+    BODY_TRANS = ''
+    HAIR = ''
+    FACE = ''
+    EYESHADOW = ''
+    OUTLINES = ''
+    WEAPON = ''
 
-class Nya222HonkaiStarRailShaderMaterialNames:
+
+class FestivityGenshinImpactMaterialNames(GameMaterialNames):
+    MATERIAL_PREFIX = 'miHoYo - Genshin '
+    BODY = f'{MATERIAL_PREFIX}Body'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+
+
+class Nya222HonkaiStarRailShaderMaterialNames(GameMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
     BODY = 'HSR - Body'
     BODY1 = 'HSR - Body1'

@@ -198,6 +198,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 'genshin.setup_geometry_nodes',
                 'Set Up Geometry Nodes',
                 'GEOMETRY_NODES',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             OperatorFactory.create(
                 sub_layout,

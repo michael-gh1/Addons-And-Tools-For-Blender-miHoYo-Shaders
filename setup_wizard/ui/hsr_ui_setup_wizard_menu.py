@@ -183,7 +183,8 @@ class HSR_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.setup_geometry_nodes',
                 'Set Up Geometry Nodes',
-                'GEOMETRY_NODES'
+                'GEOMETRY_NODES',
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
             OperatorFactory.create(
                 sub_layout,
