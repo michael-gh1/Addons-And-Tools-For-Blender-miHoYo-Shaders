@@ -61,16 +61,18 @@ class GameGeometryNodesSetup(ABC):
         raise NotImplementedError
 
     def clone_outlines(self, game_material_names: GameMaterialNames):
-        materials = bpy.data.materials.values()
+        materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
 
         for material in materials:
-            if game_material_names.MATERIAL_PREFIX in material.name and material.name != game_material_names.OUTLINES:
+            if game_material_names.MATERIAL_PREFIX in material.name and material.name != game_material_names.OUTLINES and \
+                not material.name.endswith('Outlines'):
                 outline_material = bpy.data.materials.get(game_material_names.OUTLINES)
                 new_outline_name = f'{material.name} Outlines'
 
-                new_outline_material = outline_material.copy()
-                new_outline_material.name = new_outline_name
-                new_outline_material.use_fake_user = True
+                if not bpy.data.materials.get(new_outline_name):
+                    new_outline_material = outline_material.copy()
+                    new_outline_material.name = new_outline_name
+                    new_outline_material.use_fake_user = True
 
     def set_up_modifier_default_values(self, modifier, mesh):
         if modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute'] == 0:
