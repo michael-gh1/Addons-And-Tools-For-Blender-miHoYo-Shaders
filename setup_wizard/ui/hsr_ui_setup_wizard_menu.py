@@ -176,7 +176,8 @@ class HSR_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.import_outlines',
                 'Import Outlines',
-                'FILE_FOLDER'
+                'FILE_FOLDER',
+                game_type=GameType.HONKAI_STAR_RAIL.name,
             )
             OperatorFactory.create(
                 sub_layout,
