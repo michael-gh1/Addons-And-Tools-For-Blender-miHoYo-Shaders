@@ -4,10 +4,12 @@ import os
 
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
+
+from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.game_types import GameType
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
-from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
+from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterFactory, TextureImporterType
 from setup_wizard.utils.genshin_body_part_deducer import get_npc_mesh_body_part_name
 
 
@@ -148,11 +150,42 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
                 original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')]
 
-                if original_mesh_material and 'Face' not in original_mesh_material and 'Face' not in body_part_material_name:
+                if original_mesh_material and 'EyeShadow' not in original_mesh_material and 'EyeShadow' not in body_part_material_name:
                     actual_material_part_name = 'Weapon' if 'Weapon' in body_part_material_name else body_part_material_name
-                    self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)
+
                     self.assign_diffuse_texture(character_model_folder_file_path, color_files, body_part_material_name, actual_material_part_name)
+
+                    # No Lightmap texture for Face (not sure if Face even needs Color diffuse either...)
+                    if 'Face' not in original_mesh_material and 'Face' not in body_part_material_name:
+                        self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
         if cache_enabled and character_model_folder_file_path:
             cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+
+    def assign_lightmap_texture(self, character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name):
+        outline_material = bpy.data.materials.get(
+            f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+
+        # Genshin Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
+        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
+
+        texture_img_path = character_model_folder_file_path + "/" + lightmap_filename
+        texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
+        texture_img.alpha_mode = 'CHANNEL_PACKED'
+
+        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR)
+        hsr_texture_importer.set_lightmap_texture(None, outline_material, texture_img)
+
+    def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
+        outline_material = bpy.data.materials.get(
+            f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+
+        diffuse_filename = [file for file in diffuse_files if actual_material_part_name in file][0]
+
+        texture_img_path = character_model_folder_file_path + "/" + diffuse_filename
+        texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
+        texture_img.alpha_mode = 'CHANNEL_PACKED'
+
+        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR)
+        hsr_texture_importer.set_diffuse_texture(None, outline_material, texture_img)
