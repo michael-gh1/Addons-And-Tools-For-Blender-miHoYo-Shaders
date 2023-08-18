@@ -266,24 +266,27 @@ class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
 
 class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
     outline_mapping = {
-        '_OutlineColor0': 'Outline Color 1',
-        '_OutlineColor1': 'Outline Color 2',
-        '_OutlineColor2': 'Outline Color 3',
-        '_OutlineColor3': 'Outline Color 4',
-        '_OutlineColor4': 'Outline Color 5',
-        '_OutlineColor5': 'Outline Color 6',
-        '_OutlineColor6': 'Outline Color 7',
-        '_OutlineColor7': 'Outline Color 8',
+        '_OutlineColor0': 'Outline Color 0',
+        '_OutlineColor1': 'Outline Color 1',
+        '_OutlineColor2': 'Outline Color 2',
+        '_OutlineColor3': 'Outline Color 3',
+        '_OutlineColor4': 'Outline Color 4',
+        '_OutlineColor5': 'Outline Color 5',
+        '_OutlineColor6': 'Outline Color 6',
+        '_OutlineColor7': 'Outline Color 7',
     }
 
     face_outline_mapping = {
-        '_OutlineColor': 'Outline Color 1',
+        '_OutlineColor': 'Outline Color 0',
     }
 
     local_material_mapping = {
-        '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
+        # '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
         # '_SpecularColor': 'Specular Color',  # GI - RGBA | HSR - Float
     }
+
+    shader_node_tree_node_name = 'Group'
+    outlines_node_tree_node_name = 'グループ.008'
 
     def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
         super().__init__(material_data_parser, outline_material_group)

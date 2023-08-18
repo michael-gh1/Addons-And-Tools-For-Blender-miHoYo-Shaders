@@ -6,6 +6,7 @@ from pathlib import PurePosixPath
 from typing import List
 import bpy
 from bpy.types import Operator, Context, Material
+from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
@@ -175,8 +176,8 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             fp = open(f'{directory_file_path}/{file.name}')
             json_material_data = json.load(fp)
 
-            material: Material = self.material or bpy.data.materials.get(f'miHoYo - Genshin {body_part}')
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
+            material: Material = self.material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}')
+            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines')
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
@@ -184,7 +185,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                     f'Continuing to apply other material data, but: \n'
                     f'* Type: {character_type}\n'
                     f'* Material Data JSON "{file.name}" was selected, but unable to determine material to apply this to.\n'
-                    f'* Expected Materials "miHoYo - Genshin {body_part}" and "miHoYo - Genshin {body_part} Outlines"')
+                    f'* Expected Materials "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}" and "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
             material_data_parser = self.get_material_data_json_parser(json_material_data)

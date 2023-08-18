@@ -59,20 +59,22 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         selected_material = context.scene.setup_wizard_material_for_material_data_import
         outlines_material = context.scene.setup_wizard_outlines_material_for_material_data_import
 
-        outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(selected_material, outlines_material)
+        try:
+            outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(selected_material, outlines_material)
 
-        game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
-        game_material_data_importer.import_material_data()
+            game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
+            game_material_data_importer.import_material_data()
 
-        self.report({'INFO'}, 'Imported material data')
-        if self.filepath or self.files:
-            NextStepInvoker().invoke(
-                self.next_step_idx, 
-                self.invoker_type, 
-                high_level_step_name=self.high_level_step_name,
-                game_type=self.game_type,
-            )
-        super().clear_custom_properties()
+            self.report({'INFO'}, 'Imported material data')
+            if self.filepath or self.files:
+                NextStepInvoker().invoke(
+                    self.next_step_idx, 
+                    self.invoker_type, 
+                    high_level_step_name=self.high_level_step_name,
+                    game_type=self.game_type,
+                )
+        finally:
+            super().clear_custom_properties()
         return {'FINISHED'}
 
 
