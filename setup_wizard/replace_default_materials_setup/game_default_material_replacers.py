@@ -155,14 +155,12 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 # 3. Material Data
                 # The best fix would be to create a "Body" material via code in case the shader is updated to have the same
                 if mesh_body_part_name == 'Body':
-                    body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
-                    if not body_material:
-                        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
-                        body_material.name = Nya222HonkaiStarRailShaderMaterialNames.BODY
-                        body_material.use_fake_user = True
-                    mesh.material_slots.get(material_name).material = body_material
+                    body_material = self.create_body_material(mesh, material_name)
                     material_name = body_material.name
 
+                if 'Weapon' in mesh_body_part_name:
+                    weapon_material = self.create_weapon_materials(mesh_body_part_name)
+                    material_name = weapon_material.name
 
                 honkai_star_rail_material = bpy.data.materials.get(
                     f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}'
@@ -213,3 +211,24 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         for expected_body_part_name in EXPECTED_BODY_PART_NAMES:
             if expected_body_part_name in material_name:
                 return expected_body_part_name
+
+    def create_body_material(self, mesh, material_name):
+        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+        if not body_material:
+            body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
+            body_material.name = Nya222HonkaiStarRailShaderMaterialNames.BODY
+            body_material.use_fake_user = True
+        return body_material
+
+    def create_weapon_materials(self, mesh_body_part_name):
+        weapon_material_name = \
+            f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}' if \
+            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' else \
+            f'{Nya222HonkaiStarRailShaderMaterialNames.WEAPON}'
+        weapon_material = bpy.data.materials.get(weapon_material_name)
+
+        if not weapon_material:
+            weapon_material = bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.WEAPON}').copy()
+            weapon_material.name = weapon_material_name
+            weapon_material.use_fake_user = True
+        return weapon_material

@@ -152,9 +152,14 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         super().import_materials()  # Honkai Star Rail Material Importer
 
         # Set 'Use Nodes' because shader does not have that by default
-        materials_to_turn_on_use_nodes = \
-            self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS + [{'name': Nya222HonkaiStarRailShaderMaterialNames.BODY}] if \
-            bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY) else self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS
+        materials_to_turn_on_use_nodes = self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS
+        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY):
+            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.BODY}]
+        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01):
+            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON01}]
+        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON02):
+            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON02}]
+
         for material_dictionary in materials_to_turn_on_use_nodes:
             material: bpy.types.Material = bpy.data.materials.get(material_dictionary.get('name'))
             material.use_nodes = True
