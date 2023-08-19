@@ -69,6 +69,10 @@ class MaterialDataApplier(ABC):
 
             node_input = node_inputs.get(material_node_name)
             try:
+                # Convert to sRGB to Hex to RGB for Nya222 Shader 
+                # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
+                if type(self) is V2_HSR_MaterialDataApplier:
+                    material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
                 node_input.default_value = material_json_value
             except AttributeError as ex:
                 print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
@@ -85,6 +89,41 @@ class MaterialDataApplier(ABC):
 
     def __handle_material_value_not_found(self, material_json_name):
         print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
+
+    def convert_color_srgb_to_hex_to_rgb(self, material_json_value):
+        r = material_json_value[0]
+        g = material_json_value[1]
+        b = material_json_value[2]
+        a = material_json_value[3]
+
+        hex_color = self.srgb_to_hex(r, g, b)
+        r, g, b = self.hex_to_linear_rgb(hex_color)
+
+        return (r, g, b, a)
+
+    @staticmethod
+    def hex_to_linear(val):
+        val = int(val, 16) / 255.0
+        if val <= 0.04045:
+            return val / 12.92
+        else:
+            return ((val + 0.055) / 1.055) ** 2.4
+
+    @staticmethod
+    def hex_to_linear_rgb(hex_color):
+        r = MaterialDataApplier.hex_to_linear(hex_color[1:3])
+        g = MaterialDataApplier.hex_to_linear(hex_color[3:5])
+        b = MaterialDataApplier.hex_to_linear(hex_color[5:7])
+        return r, g, b
+
+    @staticmethod
+    def srgb_to_hex(r, g, b):
+        def to_byte(val):
+            val = min(max(0, val), 1)
+            return int(val * 255)
+        
+        hex_color = "#{:02X}{:02X}{:02X}".format(to_byte(r), to_byte(g), to_byte(b))
+        return hex_color
 
 
 class V1_MaterialDataApplier(MaterialDataApplier):
