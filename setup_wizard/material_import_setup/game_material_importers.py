@@ -3,6 +3,7 @@ import bpy
 import os
 
 from bpy.types import Operator, Context
+from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
@@ -127,14 +128,14 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_HSR_MATERIALS = 'miHoYo_-_Star_Rail.blend'
     NAMES_OF_HONKAI_STAR_RAIL_MATERIALS = [
-        {'name': 'HSR - Body1'},
-        {'name': 'HSR - Body2'},
-        {'name': 'HSR - Body_Trans'},
-        {'name': 'HSR - Hair'},
-        {'name': 'HSR - Face'},
-        {'name': 'HSR - EyeShadow'},
-        {'name': 'HSR - Outlines'},
-        {'name': 'HSR - Weapon'},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY1},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY2},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.HAIR},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.FACE},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.EYESHADOW},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.OUTLINES},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON},
     ]
 
     def __init__(self, blender_operator, context):
@@ -151,6 +152,9 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         super().import_materials()  # Honkai Star Rail Material Importer
 
         # Set 'Use Nodes' because shader does not have that by default
-        for material_dictionary in self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS + [{'name': 'HSR - Body'}]:
+        materials_to_turn_on_use_nodes = \
+            self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS + [{'name': Nya222HonkaiStarRailShaderMaterialNames.BODY}] if \
+            bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY) else self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS
+        for material_dictionary in materials_to_turn_on_use_nodes:
             material: bpy.types.Material = bpy.data.materials.get(material_dictionary.get('name'))
             material.use_nodes = True
