@@ -144,15 +144,19 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         for name, folder, files in os.walk(character_model_folder_file_path):
             color_files = [file for file in files if 'Color'.lower() in file.lower()]
             lightmap_files = [file for file in files if 'LightMap'.lower() in file.lower() or 'FaceMap' in file.lower() or 'LigthMap'.lower() in file.lower()]  # that Lightmap typo is on purpose
-            outline_materials = [material for material in bpy.data.materials.values() if 'outlines' in material.name.lower() and material.name.lower() != 'mihoyo - genshin outlines']
+            outline_materials = [material for material in bpy.data.materials.values() if 'outlines' in material.name.lower() and (material.name.lower() != 'mihoyo - genshin outlines' and (material.name.lower() != 'hsr - outlines'))]
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
                 original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')]
 
                 if original_mesh_material and 'EyeShadow' not in original_mesh_material and 'EyeShadow' not in body_part_material_name:
-                    actual_material_part_name = 'Weapon' if 'Weapon' in body_part_material_name else body_part_material_name
-                    actual_material_part_name = 'Body' if 'Body_Trans' in body_part_material_name else body_part_material_name
+                    if 'Weapon' in body_part_material_name:
+                        actual_material_part_name = 'Weapon'
+                    elif 'Body_Trans' in body_part_material_name:
+                        actual_material_part_name = 'Body'
+                    else:
+                        actual_material_part_name = body_part_material_name
 
                     self.assign_diffuse_texture(character_model_folder_file_path, color_files, body_part_material_name, actual_material_part_name)
 
