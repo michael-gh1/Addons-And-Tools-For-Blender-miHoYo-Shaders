@@ -48,13 +48,6 @@ class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperti
 
             outline_importer_service = GameOutlineImporterService(game_outline_importer)
             outline_importer_service.import_outlines()
-
-            NextStepInvoker().invoke(
-                self.next_step_idx, 
-                self.invoker_type,
-                high_level_step_name=self.high_level_step_name,
-                game_type=self.game_type,
-            )
         except Exception as ex:
             raise ex
         finally:
