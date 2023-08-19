@@ -93,14 +93,6 @@ class GameMaterialImporter:
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
-        NextStepInvoker().invoke(
-            self.blender_operator.next_step_idx, 
-            self.blender_operator.invoker_type, 
-            file_path_to_cache=project_root_directory_file_path,
-            high_level_step_name=self.blender_operator.high_level_step_name,
-            game_type=self.blender_operator.game_type,
-        )
-
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
@@ -122,7 +114,24 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        return super().import_materials()  # Genshin Impact Material Importer
+        status = super().import_materials()  # Genshin Impact Material Importer
+
+        if status == {'FINISHED'}:
+            return status
+
+
+        cache_enabled = self.context.window_manager.cache_enabled
+        project_root_directory_file_path = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(self.game_shader_folder_path) \
+            or os.path.dirname(self.blender_operator.filepath)
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
@@ -149,17 +158,31 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        super().import_materials()  # Honkai Star Rail Material Importer
+        status = super().import_materials()  # Honkai Star Rail Material Importer
+
+        # EXEC_DEFAULT hits this if INVOKE_DEFAULT is executed above.
+        # Ensure it ends here otherwise it will error below due to the materia
+        if status == {'FINISHED'}:
+            return status
 
         # Set 'Use Nodes' because shader does not have that by default
-        materials_to_turn_on_use_nodes = self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS
-        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY):
-            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.BODY}]
-        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01):
-            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON01}]
-        if bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON02):
-            materials_to_turn_on_use_nodes += [{'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON02}]
-
-        for material_dictionary in materials_to_turn_on_use_nodes:
+        # It's important this runs BEFORE the next step is invoked because Replace Default Materials clones materials
+        for material_dictionary in self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS:
             material: bpy.types.Material = bpy.data.materials.get(material_dictionary.get('name'))
-            material.use_nodes = True
+            if material:
+                material.use_nodes = True
+
+
+        cache_enabled = self.context.window_manager.cache_enabled
+        project_root_directory_file_path = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(self.game_shader_folder_path) \
+            or os.path.dirname(self.blender_operator.filepath)
+
+        # Important that this is called here so that 'Use Nodes' is set on all original materials before Replace Default Materials
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
