@@ -14,6 +14,8 @@ class TextureNodeNames:
     FACE_MAP = ''
     FACE_EXPRESSION_NODE_GROUP = ''
     FACE_EXPRESSION_MAP = ''
+    WEAPON_RAMP_NODE_GROUP = ''
+    WEAPON_RAMP = ''
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     DIFFUSE = '画像テクスチャ'
@@ -28,6 +30,7 @@ class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     FACE_MAP = 'Face_Lightmap'
     FACE_EXPRESSION_NODE_GROUP = '_Expression'  # From bpy.data.node_groups, not the node name in material
     FACE_EXPRESSION_MAP = '画像テクスチャ.001'
-
+    WEAPON_RAMP_NODE_GROUP = 'Weapon_Ramp'  # From bpy.data.node_groups, not the node name in material
+    WEAPON_RAMP = 'Image Texture.002'
 
 

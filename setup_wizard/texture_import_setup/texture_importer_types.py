@@ -377,6 +377,14 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
         # Yes, the Hair_Shadow_Ramp Cool Ramp is also named Body_Shadow_Ramp.001
         bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp.001'].image = img
 
+    def set_weapon_ramp_texture(self, img, override=False):
+        weapon_ramp_node = bpy.data.node_groups[f'{Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP_NODE_GROUP}'].nodes[
+            Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP
+        ]
+        
+        if override or not weapon_ramp_node.image:
+            weapon_ramp_node.image = img
+
     def set_facemap_texture(self, img):
         img.colorspace_settings.name='Non-Color'
         bpy.data.node_groups[self.texture_node_names.FACE_MAP_NODE_GROUP].nodes[
@@ -456,6 +464,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file):  # Not Hair, so ramp must be Body
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                    self.set_weapon_ramp_texture(img)
 
                 # TODO: RAMPS? Only supporting Warm Ramps for now
                 elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):  # Not Hair, so ramp must be Body
@@ -501,11 +510,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                             self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
-                    # There is no Weapon Shadow Ramp node, so do nothing. Also, some weapons don't have a ramp?
-                    # Replacing the Body Shadow Ramp would affect the character
-                    print(f'Ignoring texture {file} using {self.__class__.__name__}')
-                    pass
-                    # self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+                    # Set Weapon Ramp, if none exists use Body Ramp
+                    self.set_weapon_ramp_texture(img, override=True)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')
