@@ -203,7 +203,6 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def __naive_body_part_name_search(self, material_name):
         EXPECTED_BODY_PART_NAMES = [
             'Hair',
-            'Body',
             'Body1',
             'Body2',
             'Face',
