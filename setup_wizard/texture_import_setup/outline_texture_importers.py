@@ -152,6 +152,7 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
 
                 if original_mesh_material and 'EyeShadow' not in original_mesh_material and 'EyeShadow' not in body_part_material_name:
                     actual_material_part_name = 'Weapon' if 'Weapon' in body_part_material_name else body_part_material_name
+                    actual_material_part_name = 'Body' if 'Body_Trans' in body_part_material_name else body_part_material_name
 
                     self.assign_diffuse_texture(character_model_folder_file_path, color_files, body_part_material_name, actual_material_part_name)
 
