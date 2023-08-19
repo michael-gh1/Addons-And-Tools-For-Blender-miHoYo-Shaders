@@ -148,4 +148,9 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        return super().import_materials()  # Honkai Star Rail Material Importer
+        super().import_materials()  # Honkai Star Rail Material Importer
+
+        # Set 'Use Nodes' because shader does not have that by default
+        for material_dictionary in self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS + [{'name': 'HSR - Body'}]:
+            material: bpy.types.Material = bpy.data.materials.get(material_dictionary.get('name'))
+            material.use_nodes = True
