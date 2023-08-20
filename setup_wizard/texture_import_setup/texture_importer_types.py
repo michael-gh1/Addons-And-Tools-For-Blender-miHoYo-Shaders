@@ -419,6 +419,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
                 body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
                 body2_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2)
+                body3_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY3)
                 body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS)
                 weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON)
                 weapon01_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01)
@@ -469,6 +470,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['Body2', 'LightMap'], file):
                     self.set_lightmap_texture(TextureType.BODY, body2_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body3', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, body3_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body3', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, body3_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file):  # Not Hair, so ramp must be Body
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
