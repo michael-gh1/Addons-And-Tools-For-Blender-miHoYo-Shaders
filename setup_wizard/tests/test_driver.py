@@ -45,7 +45,8 @@ class TestDriver:
 
                 for nested_character_folder_item in character_folder_items:  # is the item a directory?
                     if nested_character_folder_item.lower() == 'material' or \
-                        nested_character_folder_item.lower() == 'materials':  # is a material data folder
+                        nested_character_folder_item.lower() == 'materials' or \
+                            'phone' in nested_character_folder_item.lower():  # Phone folder? Material Data folder?
                         continue
                     absolute_character_folder_file_path = str(PurePath(characters_folder_file_path, character_folder_file_path,  nested_character_folder_item))
                     material_data_folder_file_path = ''
