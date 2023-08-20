@@ -27,7 +27,7 @@ class HoyoStudioMaterialDataJsonParser(MaterialDataJsonParser):
         self.m_floats = MaterialData(self.json_material_data.get('m_SavedProperties').get('m_Floats'))
         self.m_colors = MaterialData(m_colors_dict)
 
-    def __get_rgba_colors(self, material_json_value):
+    def get_rgba_colors(self, material_json_value):
         # check lowercase for backwards compatibility
         # explicitly check 'is not None' because rgba values could be Falsy
         r = material_json_value.get('R') if material_json_value.get('R') is not None else material_json_value.get('r')
@@ -35,6 +35,29 @@ class HoyoStudioMaterialDataJsonParser(MaterialDataJsonParser):
         b = material_json_value.get('B') if material_json_value.get('B') is not None else material_json_value.get('b')
         a = material_json_value.get('A') if material_json_value.get('A') is not None else material_json_value.get('a')
         return (r, g, b, a)
+
+
+class UnknownHoyoStudioMaterialDataJsonParser(HoyoStudioMaterialDataJsonParser):
+    def __init__(self, json_material_data):
+        super().__init__(json_material_data)
+
+    def parse(self):
+        m_colors = self.json_material_data.get('m_SavedProperties').get('m_Colors')
+        m_colors_dict = {}
+        for m_colors_value_dict in m_colors:
+            key = m_colors_value_dict['Key']
+            value = m_colors_value_dict['Value']
+            m_colors_dict[key] = self.get_rgba_colors(value)
+
+        m_floats = self.json_material_data.get('m_SavedProperties').get('m_Floats')
+        m_floats_dict = {}
+        for m_floats_value_dict in m_floats:
+            key = m_floats_value_dict['Key']
+            value = m_floats_value_dict['Value']
+            m_floats_dict[key] = value
+
+        self.m_floats = MaterialData(m_floats_dict)
+        self.m_colors = MaterialData(m_colors_dict)
 
 
 class UABEMaterialDataJsonParser(MaterialDataJsonParser):

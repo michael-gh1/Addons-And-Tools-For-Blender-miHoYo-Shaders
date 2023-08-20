@@ -13,7 +13,8 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException, UserInputException
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
-from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
+from setup_wizard.parsers.material_data_json_parsers import MaterialDataJsonParser, HoyoStudioMaterialDataJsonParser, \
+    UABEMaterialDataJsonParser, UnknownHoyoStudioMaterialDataJsonParser
 from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name
 
 class GameMaterialDataImporter(ABC):
@@ -150,6 +151,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         self.context: Context = context
         self.parsers = [
             HoyoStudioMaterialDataJsonParser,
+            UnknownHoyoStudioMaterialDataJsonParser,
             UABEMaterialDataJsonParser,
         ]
         self.material = outline_material_group.material

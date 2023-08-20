@@ -12,7 +12,6 @@ from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporterFactory
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
-from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, UABEMaterialDataJsonParser
 
 WEAPON_NAME_IDENTIFIER = 'Mat'
 
@@ -49,11 +48,6 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
     )
 
     files: CollectionProperty(type=PropertyGroup)
-
-    parsers = [
-        HoyoStudioMaterialDataJsonParser,
-        UABEMaterialDataJsonParser,
-    ]
 
     def execute(self, context):
         selected_material = context.scene.setup_wizard_material_for_material_data_import
