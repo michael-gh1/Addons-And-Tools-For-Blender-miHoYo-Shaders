@@ -22,7 +22,7 @@ class HoyoStudioMaterialDataJsonParser(MaterialDataJsonParser):
         m_colors = self.json_material_data.get('m_SavedProperties').get('m_Colors')
         m_colors_dict = {}
         for key, value in m_colors.items():
-            m_colors_dict[key] = self.__get_rgba_colors(value)
+            m_colors_dict[key] = self.get_rgba_colors(value)
 
         self.m_floats = MaterialData(self.json_material_data.get('m_SavedProperties').get('m_Floats'))
         self.m_colors = MaterialData(m_colors_dict)
