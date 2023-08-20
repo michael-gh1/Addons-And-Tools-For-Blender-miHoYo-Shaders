@@ -7,7 +7,7 @@ from bpy.types import Context, Operator
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
@@ -52,7 +52,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
-                genshin_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
+                genshin_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}')
 
                 if genshin_material:
                     material_slot.material = genshin_material
@@ -68,12 +68,12 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
-                        f'miHoYo - Genshin {actual_material_for_dress}', 
+                        f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(f'miHoYo - Genshin Body')
+                    material_slot.material = bpy.data.materials.get(FestivityGenshinImpactMaterialNames.BODY)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')

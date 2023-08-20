@@ -3,9 +3,9 @@ import bpy
 import os
 
 from bpy.types import Operator, Context
-from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
@@ -97,10 +97,10 @@ class GameMaterialImporter:
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
-        {'name': 'miHoYo - Genshin Body'},
-        {'name': 'miHoYo - Genshin Face'},
-        {'name': 'miHoYo - Genshin Hair'},
-        {'name': 'miHoYo - Genshin Outlines'}
+        {'name': FestivityGenshinImpactMaterialNames.BODY},
+        {'name': FestivityGenshinImpactMaterialNames.FACE},
+        {'name': FestivityGenshinImpactMaterialNames.HAIR},
+        {'name': FestivityGenshinImpactMaterialNames.OUTLINES}
     ]
 
     def __init__(self, blender_operator, context):
