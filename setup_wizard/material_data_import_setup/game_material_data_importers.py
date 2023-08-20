@@ -49,6 +49,14 @@ class GameMaterialDataImporter(ABC):
                 if index == len(self.parsers) - 1:
                     raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
+    def open_and_load_json_data(self, directory_file_path, file):
+        with open(f'{directory_file_path}/{file.name}') as fp:
+            try:
+                json_material_data = json.load(fp)
+                return json_material_data
+            except UnicodeDecodeError:
+                raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
+
 
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
@@ -109,8 +117,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
-            fp = open(f'{directory_file_path}/{file.name}')
-            json_material_data = json.load(fp)
+            json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
             material: Material = self.material or bpy.data.materials.get(f'miHoYo - Genshin {body_part}')
             outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
@@ -175,8 +182,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             body_part = PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
 
-            fp = open(f'{directory_file_path}/{file.name}')
-            json_material_data = json.load(fp)
+            json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
             material: Material = self.material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}')
             outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines')
