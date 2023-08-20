@@ -155,7 +155,10 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 # 3. Material Data
                 # The best fix would be to create a "Body" material via code in case the shader is updated to have the same
                 if mesh_body_part_name == 'Body':
-                    body_material = self.create_body_material(mesh, material_name)
+                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY)
+                    material_name = body_material.name
+                if mesh_body_part_name == 'Body3':
+                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY3)
                     material_name = body_material.name
 
                 if 'Weapon' in mesh_body_part_name:
@@ -203,6 +206,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             'Hair',
             'Body1',
             'Body2',
+            'Body3',
             'Body_Trans',
             'Face',
             'EyeShadow',
@@ -214,10 +218,10 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 return expected_body_part_name
 
     def create_body_material(self, mesh, material_name):
-        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+        body_material = bpy.data.materials.get(material_name)
         if not body_material:
             body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
-            body_material.name = Nya222HonkaiStarRailShaderMaterialNames.BODY
+            body_material.name = material_name
             body_material.use_fake_user = True
         return body_material
 
