@@ -71,7 +71,7 @@ class MaterialDataApplier(ABC):
             try:
                 # Convert to sRGB to Hex to RGB for Nya222 Shader 
                 # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
-                if type(self) is V2_HSR_MaterialDataApplier:
+                if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
                     material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
                 node_input.default_value = material_json_value
             except AttributeError as ex:
@@ -326,8 +326,48 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
     }
 
     local_material_mapping = {
-        # '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
-        # '_SpecularColor': 'Specular Color',  # GI - RGBA | HSR - Float
+        '_SpecularColor0': '_SpecularColor0',
+        '_SpecularColor1': '_SpecularColor1',
+        '_SpecularColor2': '_SpecularColor2',
+        '_SpecularColor3': '_SpecularColor3',
+        '_SpecularColor4': '_SpecularColor4',
+        '_SpecularColor5': '_SpecularColor5',
+        '_SpecularColor6': '_SpecularColor6',
+        '_SpecularColor7': '_SpecularColor7',
+        '_SpecularRoughness': '_SpecularRoughness',
+        '_SpecularRoughness0': '_SpecularRoughness0',
+        '_SpecularRoughness1': '_SpecularRoughness1',
+        '_SpecularRoughness2': '_SpecularRoughness2',
+        '_SpecularRoughness3': '_SpecularRoughness3',
+        '_SpecularRoughness4': '_SpecularRoughness4',
+        '_SpecularRoughness5': '_SpecularRoughness5',
+        '_SpecularRoughness6': '_SpecularRoughness6',
+        '_SpecularRoughness7': '_SpecularRoughness7',
+        '_SpecularIntensity': '_SpecularIntensity',
+        '_SpecularIntensity0': '_SpecularIntensity0',
+        '_SpecularIntensity1': '_SpecularIntensity1',
+        '_SpecularIntensity2': '_SpecularIntensity2',
+        '_SpecularIntensity3': '_SpecularIntensity3',
+        '_SpecularIntensity4': '_SpecularIntensity4',
+        '_SpecularIntensity5': '_SpecularIntensity5',
+        '_SpecularIntensity6': '_SpecularIntensity6',
+        '_SpecularIntensity7': '_SpecularIntensity7',
+        '_SpecularShininess': '_SpecularShininess',
+        '_SpecularShininess0': '_SpecularShininess0',
+        '_SpecularShininess1': '_SpecularShininess1',
+        '_SpecularShininess2': '_SpecularShininess2',
+        '_SpecularShininess3': '_SpecularShininess3',
+        '_SpecularShininess4': '_SpecularShininess4',
+        '_SpecularShininess5': '_SpecularShininess5',
+        '_SpecularShininess6': '_SpecularShininess6',
+        '_SpecularShininess7': '_SpecularShininess7',
+        '_StockDarkcolor': '_StockDarkcolor',
+        '_Stockcolor': '_StockColor',
+        '_StockRoughness': '_StockRoughness',
+        '_Stockpower': '_Stockpower',
+        '_Stockpower1': '_Stockpower1',
+        '_StockDarkWidth': '_StockDarkWidth',
+        '_StockSP': '_StockSP',
     }
 
     shader_node_tree_node_name = 'Group'
