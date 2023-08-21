@@ -245,13 +245,19 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         super().__init__(material_data_parser, outline_material_group, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
-        shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        base_material_shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        outline_material_shader_node_tree_inputs = self.outline_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,
-            shader_node_tree_inputs,
+            base_material_shader_node_tree_inputs,
         )
-        self.set_up_alpha_options_material_data(shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+
+        super().apply_material_data(
+            self.local_material_mapping,
+            outline_material_shader_node_tree_inputs
+        )
 
     # We should consider abstracting this logic if we need to add additional logic for other material data values
     def set_up_alpha_options_material_data(self, node_inputs):
