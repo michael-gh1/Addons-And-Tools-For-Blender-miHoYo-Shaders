@@ -17,7 +17,7 @@ from setup_wizard.texture_import_setup.texture_importer_service import TextureIm
 class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperties):
     """Select the folder with the model's textures to import"""
     bl_idname = "genshin.import_textures"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Import Textures - Select Character Model Folder"
+    bl_label = "Select Character Folder"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"

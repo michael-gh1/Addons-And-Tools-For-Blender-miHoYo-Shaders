@@ -31,7 +31,7 @@ class GI_OT_SetUpCharacter(Operator, BasicSetupUIOperator):
 class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties):
     """Select the folder with the desired model to import"""
     bl_idname = "genshin.import_model"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Import Character Model - Select Character Model Folder"
+    bl_label = "Select Character Folder"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"

@@ -19,7 +19,7 @@ WEAPON_NAME_IDENTIFIER = 'Mat'
 class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProperties):
     """Select the Character Material Data Json Files for Outlines"""
     bl_idname = "genshin.import_material_data"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Select Material Json Data Files"
+    bl_label = "Select Material JSONs"
 
     bpy.types.Scene.setup_wizard_material_for_material_data_import = PointerProperty(
         name='Target Material',

@@ -12,7 +12,7 @@ from setup_wizard.replace_default_materials_setup.game_default_material_replacer
 
 
 class GI_OT_GenshinReplaceDefaultMaterials(Operator, CustomOperatorProperties):
-    """Swaps out the default character materials with Festivity's Shaders materials"""
+    """Swaps out the default character materials with the Shader's materials"""
     bl_idname = "genshin.replace_default_materials"  # important since its how we chain file dialogs
     bl_label = "Genshin: Replace Default Materials - Select Character Model Folder"
 

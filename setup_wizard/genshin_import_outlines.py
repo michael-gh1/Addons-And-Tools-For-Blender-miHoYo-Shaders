@@ -22,9 +22,9 @@ class GI_OT_SetUpOutlines(Operator, BasicSetupUIOperator):
 
 
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperties):
-    """Select the `miHoYo - Outlines.blend` file to import Outlines"""
+    """Select the .blend file with the outlines node group to import"""
     bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Select `miHoYo - Outlines.blend`"
+    bl_label = "Select Outlines File"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"
