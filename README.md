@@ -27,18 +27,15 @@ If you are downloading an Addon, simply download the zipped file and install the
     * [Click here for the README/instructions for the Character Setup Wizard Addon](https://github.com/michael-gh1/Addons-And-Tools-For-Blender-miHoYo-Shaders/tree/main/setup_wizard/README.md)
 
 
-# Credits
+# :star: Credits :star:
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-:star:
 * [@Festivity](https://github.com/festivities)
 * @TheyCallMeSpy
 * @Sultana
 * @M4urlcl0
 * @Modder4869 
 * [@Bonny](https://www.youtube.com/@BonnyAnimations)
-
-:star:
 
 Cheers and Happy Blending!

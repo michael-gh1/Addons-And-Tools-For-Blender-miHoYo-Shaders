@@ -264,18 +264,15 @@ This Setup Wizard should work on all playable characters, but if you do find any
 
 ----
 
-## Credits
+## :star: Credits :star:
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-:star:
 * [@Festivity](https://github.com/festivities)
 * @TheyCallMeSpy
 * @Sultana
 * @M4urlcl0
 * @Modder4869 
 * [@Bonny](https://www.youtube.com/@BonnyAnimations)
-
-:star:
 
 Cheers and Happy Blending
