@@ -396,10 +396,18 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
             self.texture_node_names.FACE_EXPRESSION_MAP].image = img
 
     def set_stocking_texture(self, type: TextureType, material, img):
-        # Yes, the Stocking node is duplicated and ends in .001
+        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+        body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
         img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups[self.texture_node_names.STOCKINGS_NODE_GROUP].nodes[
-            self.texture_node_names.STOCKINGS].image = img
+
+        # If Body material or Body1 material apply to Body1 Stockings
+        # Else Body2 material or Body Stockings texture with Body1/Body2 materials apply to Body2 Stockings
+        if (body_material and material is body_material) or (body1_material and material is body1_material):
+            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP].nodes[
+                self.texture_node_names.STOCKINGS].image = img
+        else:
+            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP].nodes[
+                self.texture_node_names.STOCKINGS].image = img
 
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
@@ -496,8 +504,13 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     # TODO: RAMPS? Only supporting Warm Ramps for now
                     # self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Stocking'], file):
-                    self.set_stocking_texture(TextureType.BODY, body1_material, img)
+                elif self.is_texture_identifiers_in_texture_name(['Stockings'], file):
+                    if self.is_texture_identifiers_in_texture_name(['Body1'], file):
+                        self.set_stocking_texture(TextureType.BODY, body1_material, img)
+                    elif self.is_texture_identifiers_in_texture_name(['Body2'], file):
+                        self.set_stocking_texture(TextureType.BODY, body2_material, img)
+                    elif self.is_texture_identifiers_in_texture_name(['Body'], file):  # Must be AFTER Body1/Body2
+                        self.set_stocking_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
                     self.set_diffuse_texture(TextureType.FACE, face_material, img)

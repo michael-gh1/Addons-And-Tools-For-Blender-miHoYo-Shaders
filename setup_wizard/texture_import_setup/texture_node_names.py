@@ -4,7 +4,8 @@
 class TextureNodeNames:
     DIFFUSE = ''
     LIGHTMAP = ''
-    STOCKINGS_NODE_GROUP = ''
+    STOCKINGS_BODY1_NODE_GROUP = ''
+    STOCKINGS_BODY2_NODE_GROUP = ''
     STOCKINGS = ''
     BODY_RAMP_NODE_GROUP = ''
     BODY_RAMP = ''
@@ -20,7 +21,8 @@ class TextureNodeNames:
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     DIFFUSE = '画像テクスチャ'
     LIGHTMAP = '画像テクスチャ.001'
-    STOCKINGS_NODE_GROUP = '_Stockings'  # From bpy.data.node_groups, not the node name in material
+    STOCKINGS_BODY1_NODE_GROUP = '_Stockings Body1'  # From bpy.data.node_groups, not the node name in material
+    STOCKINGS_BODY2_NODE_GROUP = '_Stockings Body2'  # From bpy.data.node_groups, not the node name in material
     STOCKINGS = '画像テクスチャ.002'
     BODY_RAMP_NODE_GROUP = 'グループ.009'
     BODY_RAMP = 'Image Texture.002'
