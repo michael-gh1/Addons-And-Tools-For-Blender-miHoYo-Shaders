@@ -20,9 +20,9 @@ class GI_OT_SetUpMaterials(Operator, BasicSetupUIOperator):
 
 
 class GI_OT_GenshinImportMaterials(Operator, ImportHelper, CustomOperatorProperties):
-    """Select Festivity's Shader .blend File to import materials"""
+    """Select the .blend file with Shader materials to import"""
     bl_idname = "genshin.import_materials"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Import Materials - Select Festivity's .blend File"
+    bl_label = "Select Shader .blend File"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"

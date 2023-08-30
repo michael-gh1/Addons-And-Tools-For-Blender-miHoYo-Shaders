@@ -13,9 +13,9 @@ from setup_wizard.texture_import_setup.outline_texture_importers import OutlineT
 
 
 class GI_OT_GenshinImportOutlineLightmaps(Operator, ImportHelper, CustomOperatorProperties):
-    """Select the folder with the character's lightmaps to import"""
+    """Select the folder with the character's textures to import"""
     bl_idname = "genshin.import_outline_lightmaps"  # important since its how we chain file dialogs
-    bl_label = "Genshin: Import Lightmaps - Select Character Model Folder"
+    bl_label = "Select Character Folder"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"

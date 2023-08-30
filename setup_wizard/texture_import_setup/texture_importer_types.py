@@ -4,8 +4,11 @@ import bpy
 
 import os
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
+from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import Nya222HonkaiStarRailTextureNodeNames
 
 
 class TextureImporterType(Enum):
@@ -18,6 +21,7 @@ class TextureImporterType(Enum):
 class TextureType(Enum):
     HAIR = 'Hair'
     BODY = 'Body'
+    FACE = 'Face'
 
 
 class TextureImporterFactory:
@@ -29,7 +33,7 @@ class TextureImporterFactory:
         elif texture_importer_type == TextureImporterType.MONSTER:
             return GenshinMonsterTextureImporter()
         elif texture_importer_type == TextureImporterType.HSR_AVATAR:
-            return HonkaiStarRailAvatarTextureImporter()
+            return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
         else:
             print(f'Unknown TextureImporterType: {texture_importer_type}')
 
@@ -348,28 +352,67 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
 
 class HonkaiStarRailTextureImporter(GenshinTextureImporter):
-    def set_warm_shadow_ramp_texture(self, type: TextureType, img):
-        # Yes, the Hair_Shadow_Ramp's Warm Ramp is also named Body_Shadow_Ramp
-        bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp'].image = img
+    def __init__(self, game_type: GameType, character_type: TextureImporterType, texture_node_names: TextureNodeNames):
+        super().__init__(game_type, character_type)
+        self.texture_node_names: TextureNodeNames = texture_node_names
 
+    def set_diffuse_texture(self, type: TextureType, material, img):
+        material.node_tree.nodes[self.texture_node_names.DIFFUSE].image = img
+
+    def set_lightmap_texture(self, type: TextureType, material, img):
+        img.colorspace_settings.name='Non-Color'
+        material.node_tree.nodes[self.texture_node_names.LIGHTMAP].image = img
+
+    def set_warm_shadow_ramp_texture(self, type: TextureType, img):
+        ramp_node_name = \
+            self.texture_node_names.BODY_RAMP if type is TextureType.BODY else \
+            self.texture_node_names.HAIR_RAMP
+
+        ramp_texture_node = bpy.data.node_groups.get('Body_Ramp').nodes[ramp_node_name] if \
+            type is TextureType.BODY else bpy.data.node_groups.get('Hair_Ramp').nodes[ramp_node_name]
+        ramp_texture_node.image = img
+
+    # TODO: Not currently called, but should be supported in the future
     def set_cool_shadow_ramp_texture(self, type: TextureType, img):
         # Yes, the Hair_Shadow_Ramp Cool Ramp is also named Body_Shadow_Ramp.001
         bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp.001'].image = img
 
+    def set_weapon_ramp_texture(self, img, override=False):
+        weapon_ramp_node = bpy.data.node_groups[f'{Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP_NODE_GROUP}'].nodes[
+            Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP
+        ]
+        
+        if override or not weapon_ramp_node.image:
+            weapon_ramp_node.image = img
+
+    def set_facemap_texture(self, img):
+        img.colorspace_settings.name='Non-Color'
+        bpy.data.node_groups[self.texture_node_names.FACE_MAP_NODE_GROUP].nodes[
+            self.texture_node_names.FACE_MAP].image = img
+
     def set_face_expression_texture(self, face_material, img):
         img.colorspace_settings.name='Non-Color'
-        face_material.node_tree.nodes['Face_Shadow.001'].image = img  # Yes, the node name is Face_Shadow.001
+        bpy.data.node_groups[self.texture_node_names.FACE_EXPRESSION_NODE_GROUP].nodes[
+            self.texture_node_names.FACE_EXPRESSION_MAP].image = img
 
     def set_stocking_texture(self, type: TextureType, material, img):
-        # Yes, the Stocking node is duplicated and ends in .001
+        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+        body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
         img.colorspace_settings.name='Non-Color'
-        material.node_tree.nodes[f'{type.value}_Normalmap_UV0.001'].image = img
-        material.node_tree.nodes[f'{type.value}_Normalmap_UV1.001'].image = img
+
+        # If Body material or Body1 material apply to Body1 Stockings
+        # Else Body2 material or Body Stockings texture with Body1/Body2 materials apply to Body2 Stockings
+        if (body_material and material is body_material) or (body1_material and material is body1_material):
+            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP].nodes[
+                self.texture_node_names.STOCKINGS].image = img
+        else:
+            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP].nodes[
+                self.texture_node_names.STOCKINGS].image = img
 
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
-    def __init__(self):
-        super().__init__(GameType.HONKAI_STAR_RAIL, TextureImporterType.HSR_AVATAR)
+    def __init__(self, texture_node_names: TextureNodeNames):
+        super().__init__(GameType.HONKAI_STAR_RAIL, TextureImporterType.HSR_AVATAR, texture_node_names)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -379,19 +422,20 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
-                body1_material = bpy.data.materials.get('miHoYo - Genshin Body1')
-                body2_material = bpy.data.materials.get('miHoYo - Genshin Body2')
-                weapon_material = bpy.data.materials.get('miHoYo - Genshin Weapon')
-                weapon_material01 = bpy.data.materials.get('miHoYo - Genshin Weapon01')
-                weapon_material02 = bpy.data.materials.get('miHoYo - Genshin Weapon02')
-
-                weapon_materials = [weapon_material, weapon_material01, weapon_material02]
+                hair_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.HAIR)
+                face_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.FACE)
+                body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
+                body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
+                body2_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2)
+                body3_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY3)
+                body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS)
+                weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON)
+                weapon01_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01)
+                weapon02_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON02)
+                weapon_materials = [weapon_material, weapon01_material, weapon02_material]
 
                 # Implement the texture in the correct node
-                print(f'Importing texture {file} using {self.__class__.__name__}')
+                print(f'INFO: Importing texture {file} using {self.__class__.__name__}')
 
                 if self.is_texture_identifiers_in_texture_name(['Hair', 'Color'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Eff'], file):  # TODO: Review this line
@@ -404,17 +448,24 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_warm_shadow_ramp_texture(TextureType.HAIR, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Cool_Ramp'], file):
-                    self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
+                    pass
+                #     self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
                 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Color'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
+                    if body_trans_material:
+                        self.set_diffuse_texture(TextureType.BODY, body_trans_material, img)
+
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'LightMap'], file) and \
                     self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
+
+                    if body_trans_material:
+                        self.set_lightmap_texture(TextureType.BODY, body_trans_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body1', 'Color'], file):
                     self.set_diffuse_texture(TextureType.BODY, body1_material, img)
@@ -428,23 +479,41 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Body2', 'LightMap'], file):
                     self.set_lightmap_texture(TextureType.BODY, body2_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file):  # Not Hair, so ramp must be Body
-                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                elif self.is_texture_identifiers_in_texture_name(['Body3', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, body3_material, img)
 
+                elif self.is_texture_identifiers_in_texture_name(['Body3', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, body3_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file) or \
+                    self.is_texture_identifiers_in_texture_name(['Body_Ramp'], file):  # Not Hair, so ramp must be Body
+                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                    self.set_weapon_ramp_texture(img)
+
+                # TODO: RAMPS? Only supporting Warm Ramps for now
                 elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):  # Not Hair, so ramp must be Body
-                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+                    pass
+                #     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
                 # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
                 elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
-                    self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
-                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Stocking'], file):
-                    self.set_stocking_texture(TextureType.BODY, body1_material, img)
+                    if self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file):
+                        self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
+                    # TODO: RAMPS? Only supporting Warm Ramps for now
+                    # self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Stockings'], file):
+                    if self.is_texture_identifiers_in_texture_name(['Body1'], file):
+                        self.set_stocking_texture(TextureType.BODY, body1_material, img)
+                    elif self.is_texture_identifiers_in_texture_name(['Body2'], file):
+                        self.set_stocking_texture(TextureType.BODY, body2_material, img)
+                    elif self.is_texture_identifiers_in_texture_name(['Body'], file):  # Must be AFTER Body1/Body2
+                        self.set_stocking_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
-                    self.set_face_diffuse_texture(face_material, img)
+                    self.set_diffuse_texture(TextureType.FACE, face_material, img)
 
                 # TODO: Review this whole block, NPC support is borrowed code from GI
                 elif self.is_texture_identifiers_in_texture_name(['FaceMap'], file) or \
@@ -452,8 +521,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                         not self.is_texture_identifiers_in_files(['FaceMap'], files)):
                     # If Face Shadow exists, use that texture
                     # If Face Shadow does not exist in this folder, use "Face Lightmap" (actually an NPC Face Shadow texture)
-                    self.set_face_shadow_texture(face_material, img)
-                    self.set_face_lightmap_texture(img)
+                    self.set_facemap_texture(img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face_ExpressionMap'], file):
                     self.set_face_expression_texture(face_material, img)
@@ -471,13 +539,10 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                             self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
-                    # There is no Weapon Shadow Ramp node, so do nothing. Also, some weapons don't have a ramp?
-                    # Replacing the Body Shadow Ramp would affect the character
-                    print(f'Ignoring texture {file} using {self.__class__.__name__}')
-                    pass
-                    # self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+                    # Set Weapon Ramp, if none exists use Body Ramp
+                    self.set_weapon_ramp_texture(img, override=True)
 
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 

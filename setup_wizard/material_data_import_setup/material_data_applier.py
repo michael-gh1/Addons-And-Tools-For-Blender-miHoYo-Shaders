@@ -69,6 +69,10 @@ class MaterialDataApplier(ABC):
 
             node_input = node_inputs.get(material_node_name)
             try:
+                # Convert to sRGB to Hex to RGB for Nya222 Shader 
+                # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
+                if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
+                    material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
                 node_input.default_value = material_json_value
             except AttributeError as ex:
                 print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
@@ -85,6 +89,41 @@ class MaterialDataApplier(ABC):
 
     def __handle_material_value_not_found(self, material_json_name):
         print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
+
+    def convert_color_srgb_to_hex_to_rgb(self, material_json_value):
+        r = material_json_value[0]
+        g = material_json_value[1]
+        b = material_json_value[2]
+        a = material_json_value[3]
+
+        hex_color = self.srgb_to_hex(r, g, b)
+        r, g, b = self.hex_to_linear_rgb(hex_color)
+
+        return (r, g, b, a)
+
+    @staticmethod
+    def hex_to_linear(val):
+        val = int(val, 16) / 255.0
+        if val <= 0.04045:
+            return val / 12.92
+        else:
+            return ((val + 0.055) / 1.055) ** 2.4
+
+    @staticmethod
+    def hex_to_linear_rgb(hex_color):
+        r = MaterialDataApplier.hex_to_linear(hex_color[1:3])
+        g = MaterialDataApplier.hex_to_linear(hex_color[3:5])
+        b = MaterialDataApplier.hex_to_linear(hex_color[5:7])
+        return r, g, b
+
+    @staticmethod
+    def srgb_to_hex(r, g, b):
+        def to_byte(val):
+            val = min(max(0, val), 1)
+            return int(val * 255)
+        
+        hex_color = "#{:02X}{:02X}{:02X}".format(to_byte(r), to_byte(g), to_byte(b))
+        return hex_color
 
 
 class V1_MaterialDataApplier(MaterialDataApplier):
@@ -206,13 +245,19 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         super().__init__(material_data_parser, outline_material_group, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
-        shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        base_material_shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        outline_material_shader_node_tree_inputs = self.outline_material.node_tree.nodes[self.shader_node_tree_node_name].inputs
 
         super().apply_material_data(
             self.local_material_mapping,
-            shader_node_tree_inputs,
+            base_material_shader_node_tree_inputs,
         )
-        self.set_up_alpha_options_material_data(shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+
+        super().apply_material_data(
+            self.local_material_mapping,
+            outline_material_shader_node_tree_inputs
+        )
 
     # We should consider abstracting this logic if we need to add additional logic for other material data values
     def set_up_alpha_options_material_data(self, node_inputs):
@@ -266,24 +311,67 @@ class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
 
 class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
     outline_mapping = {
-        '_OutlineColor0': 'Outline Color 1',
-        '_OutlineColor1': 'Outline Color 2',
-        '_OutlineColor2': 'Outline Color 3',
-        '_OutlineColor3': 'Outline Color 4',
-        '_OutlineColor4': 'Outline Color 5',
-        '_OutlineColor5': 'Outline Color 6',
-        '_OutlineColor6': 'Outline Color 7',
-        '_OutlineColor7': 'Outline Color 8',
+        '_OutlineColor0': 'Outline Color 0',
+        '_OutlineColor1': 'Outline Color 1',
+        '_OutlineColor2': 'Outline Color 2',
+        '_OutlineColor3': 'Outline Color 3',
+        '_OutlineColor4': 'Outline Color 4',
+        '_OutlineColor5': 'Outline Color 5',
+        '_OutlineColor6': 'Outline Color 6',
+        '_OutlineColor7': 'Outline Color 7',
     }
 
     face_outline_mapping = {
-        '_OutlineColor': 'Outline Color 1',
+        '_OutlineColor': 'Outline Color 0',
     }
 
     local_material_mapping = {
-        '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
-        # '_SpecularColor': 'Specular Color',  # GI - RGBA | HSR - Float
+        '_SpecularColor0': '_SpecularColor0',
+        '_SpecularColor1': '_SpecularColor1',
+        '_SpecularColor2': '_SpecularColor2',
+        '_SpecularColor3': '_SpecularColor3',
+        '_SpecularColor4': '_SpecularColor4',
+        '_SpecularColor5': '_SpecularColor5',
+        '_SpecularColor6': '_SpecularColor6',
+        '_SpecularColor7': '_SpecularColor7',
+        '_SpecularRoughness': '_SpecularRoughness',
+        '_SpecularRoughness0': '_SpecularRoughness0',
+        '_SpecularRoughness1': '_SpecularRoughness1',
+        '_SpecularRoughness2': '_SpecularRoughness2',
+        '_SpecularRoughness3': '_SpecularRoughness3',
+        '_SpecularRoughness4': '_SpecularRoughness4',
+        '_SpecularRoughness5': '_SpecularRoughness5',
+        '_SpecularRoughness6': '_SpecularRoughness6',
+        '_SpecularRoughness7': '_SpecularRoughness7',
+        '_SpecularIntensity': '_SpecularIntensity',
+        '_SpecularIntensity0': '_SpecularIntensity0',
+        '_SpecularIntensity1': '_SpecularIntensity1',
+        '_SpecularIntensity2': '_SpecularIntensity2',
+        '_SpecularIntensity3': '_SpecularIntensity3',
+        '_SpecularIntensity4': '_SpecularIntensity4',
+        '_SpecularIntensity5': '_SpecularIntensity5',
+        '_SpecularIntensity6': '_SpecularIntensity6',
+        '_SpecularIntensity7': '_SpecularIntensity7',
+        '_SpecularShininess': '_SpecularShininess',
+        '_SpecularShininess0': '_SpecularShininess0',
+        '_SpecularShininess1': '_SpecularShininess1',
+        '_SpecularShininess2': '_SpecularShininess2',
+        '_SpecularShininess3': '_SpecularShininess3',
+        '_SpecularShininess4': '_SpecularShininess4',
+        '_SpecularShininess5': '_SpecularShininess5',
+        '_SpecularShininess6': '_SpecularShininess6',
+        '_SpecularShininess7': '_SpecularShininess7',
+        '_StockDarkcolor': '_StockDarkcolor',
+        '_Stockcolor': '_StockColor',
+        '_StockRoughness': '_StockRoughness',
+        '_Stockpower': '_Stockpower',
+        '_Stockpower1': '_Stockpower1',
+        '_StockDarkWidth': '_StockDarkWidth',
+        '_StockSP': '_StockSP',
     }
+
+    shader_node_tree_node_name = 'Group'
+    outlines_node_tree_node_name = 'グループ.008'
 
     def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
         super().__init__(material_data_parser, outline_material_group)

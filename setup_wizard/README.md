@@ -1,12 +1,14 @@
-# Blender miHoYo Shaders - Setup Wizard Tool
+# [Blender] Character Setup Wizard Addon for  HoYoverse Shaders
 
 > You should view this on Github or some other Markdown reader if you aren't!
 
 The goal of this tool is to streamline the character setup process. Whether it's importing the materials, importing the character model, setting up the outlines (geometry nodes) or configuring the outline colors to be game accurate, this tool has got it all! Your one-stop-shop for setting up your characters in Blender!
 
-**Important**: This tool is intended to be used with Festivity's shaders, found here: https://github.com/festivize/Blender-miHoYo-Shaders
+**Important**: This tool is intended to be used with:
+* Festivity's Genshin Impact Shader, found here: https://github.com/festivize/Blender-miHoYo-Shaders
+* Nya222's Honkai Star Rail Shader, found here: https://discord.com/channels/894925535870865498/1127604826885328926
 
-**Compatibility**: This tool has been tested on Blender (and Goo Blender) Version >= 3.3.0 and attempts to support older versions of Blender, but working functionality is not guaranteed.
+**Compatibility**: This tool has been tested on **Blender (and Goo Blender) Version >= 3.3.0** and attempts to support older versions of Blender, but working functionality is not guaranteed.
 
 :star: If this Addon is useful, please be sure to **Star** the repository! :star:
 
@@ -47,16 +49,21 @@ Download Tutorials:
 3. Install the Setup Wizard
     * Edit > Preferences > Install > Select `Setup_Wizard_UI_Addon.zip`
 4. Open up the N-Panel (Hit the 'N' key)
-5. Select the `Genshin` tab
+5. Select the `Genshin Impact` tab or `Honkai Star Rail` tab`
 6. Click the `Run Entire Setup` button
     * Outlines are supported for Blender Version >= 3.3 (you can either disable the outline-related components or use the Basic Setup instead)
 7. Select the folder with the character model and textures (lightmaps, diffuses, etc.)
-8. Select the blend file containing with Festivity's Shaders 
+8. Select the blend file containing the Shaders
     * **This only needs to be done the first time you run this tool.** This is because the filepath gets cached for future usage (click the clear cache button if you want to reset this value).
-    * Ex. `miHoYo - Genshin Impact.blend` or `miHoYo - Genshin Impact - Goo Engine.blend`
+    * Examples
+        * `miHoYo - Genshin Impact.blend`
+        * `miHoYo - Genshin Impact - Goo Engine.blend`
+        * `HSR_Shader_1.055.blend`
 9. Select the `miHoYo - Outlines.blend` file with Festivity's Outlines Shaders
     * **This only needs to be done the first time you run this tool.** This is because the filepath gets cached for future usage (click the clear cache button if you want to reset this value).
-    * Ex. `Blender-miHoYo-Shaders/miHoYo - Outlines.blend`
+    * Examples
+        * `Blender-miHoYo-Shaders/miHoYo - Outlines.blend`
+        * `HSR_Shader_1.055.blend`
 10. Select the material data JSON files for the outlines
     * Shift+Click or Ctrl+Click the JSON files that you want to use (normally all of them)
 
@@ -99,15 +106,17 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
         * Saves the character model folder file path selected
         * You may want to disable the cache if you are importing textures that are different from the character model (not the usual workflow)
         * Used when importing textures and outline lightmaps
-    * Festivity Shader Blend File Path
-        * Saves the file path to Festivity's shader blend file
-        * Used when importing materials either: `miHoYo - Genshin Impact.blend` or `miHoYo - Genshin Impact - Goo Engine.blend`
-    * **(Deprecated)** Festivity Root/Base Folder File Path
-        * Saves the file path to Festivity's shaders folder
-        * Used when importing materials from `miHoYo - Genshin Impact.blend`
-    * Festivity Outlines File Path
-        * Saves the file path to Festivity's Outlines blend file
-        * Used when importing outlines from `miHoYo - Outlines.blend`
+    * Shader Blend File Path
+        * Saves the file path to the selected shader blend file
+        * Used when importing materials from:
+            * `miHoYo - Genshin Impact.blend`
+            * `miHoYo - Genshin Impact - Goo Engine.blend`
+            * `HSR_Shader_#.##.blend`
+    * Shader Outlines File Path
+        * Saves the file path to the Outlines blend file
+        * Used when importing outlines from:
+            * `miHoYo - Outlines.blend`
+            * `HSR_Shader_#.##.blend`
 
 
 ### Other Notes:
@@ -118,13 +127,12 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 
 > Note: Ideally these steps won't change too much between releases! If they do, I will make note of it in the release notes.
 
-0. ~~Setup Wizard~~ (Legacy)
 1. Import Character Model
 2. Delete Empties
-3. Import Materials (`miHoYo - Genshin Impact.blend`)
+3. Import Materials (Select Shader's `.blend` file)
 4. Replace/Re-Assign Default Character Model Materials (and rename)
 5. Import Character Textures
-6. Import Outlines (`miHoYo - Outlines.blend`)
+6. Import Outlines (Select Shader's Outlines `.blend` file)
 7. Setup Outlines (Geometry Nodes)
 8. Import Lightmaps for Outlines
 9. Import Material Data
@@ -143,11 +151,8 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
 
 > Note: Ideally these steps won't change too much between releases! If they do, I will make note of it in the release notes.
 
-0. ~~Setup Wizard~~ (Legacy)
-    * This step starts the Setup Wizard process. It also is **very important** for setting up the Python paths so that the scripts can import dependencies and other scripts.
-    * If you are running into an error about `invoke_next_step`, this is likely your issue. You only need to run this step for the Setup Wizard and then you can close out of the File Explorer window.
-    * Select the root folder that contains Festivity's Shaders
-        * Cache not enabled in this step in case you run it only to set up your `sys.path`/Python path)
+> Note: These instructions have been written for Festivity's Genshin Impact shader, but other shaders, such as Nya222's HSR Shader, have a similar setup!
+
 1. Import Character Model
     * This step will: 
         * Import the character model which should be a .fbx file
@@ -163,7 +168,6 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
     * This step imports `miHoYo - Genshin Hair`, `miHoYo - Genshin Face`, `miHoYo - Genshin Body` and `miHoYo - Genshin Outlines`.
     * **This step uses the cache (if enabled)** so you do not need to re-select the `miHoYo - Genshin Impact.blend` after selecting it on first use.
     * Select the blend file containing Festivity's Shaders `miHoYo - Genshin Impact.blend` or `miHoYo - Genshin Impact - Goo Engine.blend`.
-        * (**Deprecated**) Select the root folder that contains Festivity's Shaders.
 4. Replace Default Character Model Materials (and rename)
     * This step replaces/re-assigns the default character model materials to the shader's materials.
     * Naming Convention of Genshin Materials (and their Shader nodes): `miHoYo - Genshin {Body Part}` 
@@ -228,15 +232,14 @@ You can disable the cache for any step by unchecking the `Cache Enabled` checkbo
     - BetterFBX supported! The option is enabled by default if the addon is installed 
     - Created UV1 UV map which allows for underskirt textures (Zhongli, Lumine, etc.) 
       - This provides a texture, but not the correct texture on things like underskirts or the opposite side of some clothing
-    
 - [X] Color Management Filmic -> Standard
 - [X] Turn Setup Wizard into an Addon
 - [X] UI Setup Wizard Addon
 - [ ] Update Configuration from UI (checkboxes that enable/disable steps)
 - [ ] Batch Character Setup
 - [X] Basic NPC Support
-- [ ] Basic Monster Support
-- [X] HSR Support
+- [X] Basic Monster Support
+- [X] Honkai Star Rail Support
 ### Refactoring
 - [X] Refactor Material Assignment Mapping (externalize/centralize it to one locaiton)
 - [ ] Refactor Import Outline Lightmaps component
@@ -261,10 +264,15 @@ This Setup Wizard should work on all playable characters, but if you do find any
 
 ----
 
-## Credits
+## :star: Credits :star:
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-:star: Shoutout to @Festivity, @TheyCallMeSpy, @Sultana, @M4urlcl0, @Modder4869 and @Bonny! :star:
+* [@Festivity](https://github.com/festivities)
+* @TheyCallMeSpy
+* @Sultana
+* @M4urlcl0
+* @Modder4869 
+* [@Bonny](https://www.youtube.com/@BonnyAnimations)
 
 Cheers and Happy Blending

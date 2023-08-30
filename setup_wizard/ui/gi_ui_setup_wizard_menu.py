@@ -190,13 +190,15 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 sub_layout,
                 'genshin.import_outlines',
                 'Import Outlines',
-                'FILE_FOLDER'
+                'FILE_FOLDER',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             OperatorFactory.create(
                 sub_layout,
                 'genshin.setup_geometry_nodes',
                 'Set Up Geometry Nodes',
                 'GEOMETRY_NODES',
+                game_type=GameType.GENSHIN_IMPACT.name,
             )
             OperatorFactory.create(
                 sub_layout,

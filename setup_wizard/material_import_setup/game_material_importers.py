@@ -5,6 +5,7 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
@@ -92,22 +93,14 @@ class GameMaterialImporter:
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
-        NextStepInvoker().invoke(
-            self.blender_operator.next_step_idx, 
-            self.blender_operator.invoker_type, 
-            file_path_to_cache=project_root_directory_file_path,
-            high_level_step_name=self.blender_operator.high_level_step_name,
-            game_type=self.blender_operator.game_type,
-        )
-
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
-        {'name': 'miHoYo - Genshin Body'},
-        {'name': 'miHoYo - Genshin Face'},
-        {'name': 'miHoYo - Genshin Hair'},
-        {'name': 'miHoYo - Genshin Outlines'}
+        {'name': FestivityGenshinImpactMaterialNames.BODY},
+        {'name': FestivityGenshinImpactMaterialNames.FACE},
+        {'name': FestivityGenshinImpactMaterialNames.HAIR},
+        {'name': FestivityGenshinImpactMaterialNames.OUTLINES}
     ]
 
     def __init__(self, blender_operator, context):
@@ -121,19 +114,37 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        return super().import_materials()  # Genshin Impact Material Importer
+        status = super().import_materials()  # Genshin Impact Material Importer
+
+        if status == {'FINISHED'}:
+            return status
+
+
+        cache_enabled = self.context.window_manager.cache_enabled
+        project_root_directory_file_path = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(self.game_shader_folder_path) \
+            or os.path.dirname(self.blender_operator.filepath)
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_HSR_MATERIALS = 'miHoYo_-_Star_Rail.blend'
     NAMES_OF_HONKAI_STAR_RAIL_MATERIALS = [
-        {'name': 'miHoYo - Genshin Body1'},
-        {'name': 'miHoYo - Genshin Body2'},
-        {'name': 'miHoYo - Genshin Body_A'},
-        {'name': 'miHoYo - Genshin Eye Shadow'},
-        {'name': 'miHoYo - Genshin Face'},
-        {'name': 'miHoYo - Genshin Hair'},
-        {'name': 'miHoYo - Genshin Outlines'},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY1},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY2},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.HAIR},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.FACE},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.EYESHADOW},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.OUTLINES},
+        {'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON},
     ]
 
     def __init__(self, blender_operator, context):
@@ -147,4 +158,31 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
-        return super().import_materials()  # Honkai Star Rail Material Importer
+        status = super().import_materials()  # Honkai Star Rail Material Importer
+
+        # EXEC_DEFAULT hits this if INVOKE_DEFAULT is executed above.
+        # Ensure it ends here otherwise it will error below due to the materia
+        if status == {'FINISHED'}:
+            return status
+
+        # Set 'Use Nodes' because shader does not have that by default
+        # It's important this runs BEFORE the next step is invoked because Replace Default Materials clones materials
+        for material_dictionary in self.NAMES_OF_HONKAI_STAR_RAIL_MATERIALS:
+            material: bpy.types.Material = bpy.data.materials.get(material_dictionary.get('name'))
+            if material:
+                material.use_nodes = True
+
+
+        cache_enabled = self.context.window_manager.cache_enabled
+        project_root_directory_file_path = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(self.game_shader_folder_path) \
+            or os.path.dirname(self.blender_operator.filepath)
+
+        # Important that this is called here so that 'Use Nodes' is set on all original materials before Replace Default Materials
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )

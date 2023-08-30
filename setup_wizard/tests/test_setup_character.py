@@ -120,7 +120,8 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
 
             filename = f'{character_name}.blend'
             logger.info(f'Saving file for {character_name} as: {filename}...')
-            bpy.ops.wm.save_as_mainfile(filepath=f'{os.path.abspath(arg_logs_directory_path)}/{filename}')
+            os.makedirs(f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact', exist_ok=True)
+            bpy.ops.wm.save_as_mainfile(filepath=f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact/{filename}')
             logger.info(f'Saved file for {character_name} as: {filename}')
     bpy.ops.wm.quit_blender()
 

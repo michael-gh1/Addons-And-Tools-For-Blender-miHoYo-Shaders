@@ -12,8 +12,6 @@ def main():
 def get_character_material_dictionary(config):
     character_material_dictionary = {}
     characters_folder_file_path = config.get('characters_folder_file_path')
-    material_json_folder_file_path = config.get('material_json_folder_file_path')
-    material_json_files = os.listdir(material_json_folder_file_path)
 
     for character_folder in os.listdir(characters_folder_file_path):
         for root, dirs, files in os.walk(PurePath(characters_folder_file_path, character_folder)):

@@ -1,3 +1,4 @@
+# Author: michael-gh1
 
 import bpy
 
@@ -6,6 +7,7 @@ from bpy.types import Context, Operator
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
@@ -50,7 +52,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
-                genshin_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
+                genshin_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}')
 
                 if genshin_material:
                     material_slot.material = genshin_material
@@ -66,12 +68,12 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
-                        f'miHoYo - Genshin {actual_material_for_dress}', 
+                        f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(f'miHoYo - Genshin Body')
+                    material_slot.material = bpy.data.materials.get(FestivityGenshinImpactMaterialNames.BODY)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
@@ -144,11 +146,6 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 material_name = material_slot.name
                 mesh_body_part_name = self.find_body_part_name(material_name)
 
-                # Hacky-solution, suggest that the shader change name to "EyeShadow"
-                # Otherwise "EyeShadow" doesn't get replaced since we have "Eye Shadow" and not "EyeShadow"
-                if mesh_body_part_name == 'EyeShadow':
-                    mesh_body_part_name = 'Eye Shadow'
-
                 # Another hacky-solution, some characters only have a "Body" material, but the shader materials
                 # only have Body1, Body2 and Body_A. Should request Shader to have a "Body" material
                 # Some characters have a mismatch between Texture and Material Data too... (Body_Color_A and Body)
@@ -158,27 +155,19 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 # 3. Material Data
                 # The best fix would be to create a "Body" material via code in case the shader is updated to have the same
                 if mesh_body_part_name == 'Body':
-                    body_material = bpy.data.materials.get('miHoYo - Genshin Body')
-                    if not body_material:
-                        body_material = bpy.data.materials.get('miHoYo - Genshin Body1').copy()
-                        body_material.name = 'miHoYo - Genshin Body'
-                        body_material.use_fake_user = True
-                    mesh.material_slots.get(material_name).material = body_material
+                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY)
+                    material_name = body_material.name
+                if mesh_body_part_name == 'Body3':
+                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY3)
                     material_name = body_material.name
 
                 if 'Weapon' in mesh_body_part_name:
-                    weapon_material_name = f'miHoYo - Genshin {mesh_body_part_name}' if \
-                        mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' else 'miHoYo - Genshin Weapon'
-                    body_material = bpy.data.materials.get(weapon_material_name)
+                    weapon_material = self.create_weapon_materials(mesh_body_part_name)
+                    material_name = weapon_material.name
 
-                    if not body_material:
-                        body_material = bpy.data.materials.get('miHoYo - Genshin Body1').copy()
-                        body_material.name = weapon_material_name
-                        body_material.use_fake_user = True
-                    mesh.material_slots.get(material_name).material = body_material
-                    material_name = body_material.name
-
-                honkai_star_rail_material = bpy.data.materials.get(f'miHoYo - Genshin {mesh_body_part_name}')
+                honkai_star_rail_material = bpy.data.materials.get(
+                    f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}'
+                )
 
                 if honkai_star_rail_material:
                     material_slot.material = honkai_star_rail_material
@@ -217,6 +206,8 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             'Hair',
             'Body1',
             'Body2',
+            'Body3',
+            'Body_Trans',
             'Face',
             'EyeShadow',
             'Body',  # Important this is last in the list because it could interfere with Body1 and Body2
@@ -225,3 +216,24 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         for expected_body_part_name in EXPECTED_BODY_PART_NAMES:
             if expected_body_part_name in material_name:
                 return expected_body_part_name
+
+    def create_body_material(self, mesh, material_name):
+        body_material = bpy.data.materials.get(material_name)
+        if not body_material:
+            body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
+            body_material.name = material_name
+            body_material.use_fake_user = True
+        return body_material
+
+    def create_weapon_materials(self, mesh_body_part_name):
+        weapon_material_name = \
+            f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}' if \
+            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' else \
+            f'{Nya222HonkaiStarRailShaderMaterialNames.WEAPON}'
+        weapon_material = bpy.data.materials.get(weapon_material_name)
+
+        if not weapon_material:
+            weapon_material = bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.WEAPON}').copy()
+            weapon_material.name = weapon_material_name
+            weapon_material.use_fake_user = True
+        return weapon_material

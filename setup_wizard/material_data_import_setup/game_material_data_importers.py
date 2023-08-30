@@ -6,13 +6,15 @@ from pathlib import PurePosixPath
 from typing import List
 import bpy
 from bpy.types import Operator, Context, Material
+from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException, UserInputException
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
-from setup_wizard.parsers.material_data_json_parsers import HoyoStudioMaterialDataJsonParser, MaterialDataJsonParser, UABEMaterialDataJsonParser
+from setup_wizard.parsers.material_data_json_parsers import MaterialDataJsonParser, HoyoStudioMaterialDataJsonParser, \
+    UABEMaterialDataJsonParser, UnknownHoyoStudioMaterialDataJsonParser
 from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name
 
 class GameMaterialDataImporter(ABC):
@@ -46,6 +48,14 @@ class GameMaterialDataImporter(ABC):
             except AttributeError:
                 if index == len(self.parsers) - 1:
                     raise UnsupportedMaterialDataJsonFormatException(self.parsers)
+
+    def open_and_load_json_data(self, directory_file_path, file):
+        with open(f'{directory_file_path}/{file.name}') as fp:
+            try:
+                json_material_data = json.load(fp)
+                return json_material_data
+            except UnicodeDecodeError:
+                raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
 
 class GameMaterialDataImporterFactory:
@@ -107,8 +117,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
-            fp = open(f'{directory_file_path}/{file.name}')
-            json_material_data = json.load(fp)
+            json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
             material: Material = self.material or bpy.data.materials.get(f'miHoYo - Genshin {body_part}')
             outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
@@ -149,6 +158,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         self.context: Context = context
         self.parsers = [
             HoyoStudioMaterialDataJsonParser,
+            UnknownHoyoStudioMaterialDataJsonParser,
             UABEMaterialDataJsonParser,
         ]
         self.material = outline_material_group.material
@@ -172,11 +182,10 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             body_part = PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
 
-            fp = open(f'{directory_file_path}/{file.name}')
-            json_material_data = json.load(fp)
+            json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
-            material: Material = self.material or bpy.data.materials.get(f'miHoYo - Genshin {body_part}')
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
+            material: Material = self.material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}')
+            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines')
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
@@ -184,7 +193,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                     f'Continuing to apply other material data, but: \n'
                     f'* Type: {character_type}\n'
                     f'* Material Data JSON "{file.name}" was selected, but unable to determine material to apply this to.\n'
-                    f'* Expected Materials "miHoYo - Genshin {body_part}" and "miHoYo - Genshin {body_part} Outlines"')
+                    f'* Expected Materials "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}" and "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
             material_data_parser = self.get_material_data_json_parser(json_material_data)
