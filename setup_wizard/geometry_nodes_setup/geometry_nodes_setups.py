@@ -159,7 +159,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
-    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = [Nya222HonkaiStarRailShaderMaterialNames.EYESHADOW]
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
