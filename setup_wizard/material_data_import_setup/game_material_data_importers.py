@@ -179,7 +179,8 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             return {'FINISHED'}
 
         for file in self.blender_operator.files:
-            body_part = PurePosixPath(file.name).stem.split('_')[-1]
+            body_part = 'Body_Trans' if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
+                else PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
 
             json_material_data = self.open_and_load_json_data(directory_file_path, file)
