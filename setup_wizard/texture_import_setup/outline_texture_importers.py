@@ -153,7 +153,7 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
                 if original_mesh_material and 'EyeShadow' not in original_mesh_material and 'EyeShadow' not in body_part_material_name:
                     if 'Weapon' in body_part_material_name:
                         actual_material_part_name = 'Weapon'
-                    elif 'Body_Trans' in body_part_material_name:
+                    elif 'Body' in body_part_material_name and 'Trans' in body_part_material_name:
                         actual_material_part_name = 'Body'
                     else:
                         actual_material_part_name = body_part_material_name
