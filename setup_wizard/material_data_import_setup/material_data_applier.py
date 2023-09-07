@@ -326,6 +326,7 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
     }
 
     local_material_mapping = {
+        '_EnableAlphaCutoff': 'Use Alpha',
         '_SpecularColor0': '_SpecularColor0',
         '_SpecularColor1': '_SpecularColor1',
         '_SpecularColor2': '_SpecularColor2',
