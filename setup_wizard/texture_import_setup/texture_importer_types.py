@@ -452,16 +452,14 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 #     self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
                 
                 # Character has Body and no Body1 or Body2?
-                elif self.is_texture_identifiers_in_texture_name(['Body', 'Color'], file) and \
-                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                elif self.is_texture_identifiers_in_texture_name(['Body_', 'Color'], file):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
                     if body_trans_material:
                         self.set_diffuse_texture(TextureType.BODY, body_trans_material, img)
 
                 # Character has Body and no Body1 or Body2?
-                elif self.is_texture_identifiers_in_texture_name(['Body', 'LightMap'], file) and \
-                    self.is_no_texture_identifiers_in_files(['Body1', 'Body2'], files):
+                elif self.is_texture_identifiers_in_texture_name(['Body_', 'LightMap'], file):
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
                     if body_trans_material:
