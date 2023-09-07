@@ -161,7 +161,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY3)
                     material_name = body_material.name
                 if mesh_body_part_name ==  'Body2_Trans':
-                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY2_TRANS) 
+                    body_material = self.create_body_trans_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY2_TRANS) 
                     material_name = body_material.name
 
                 if 'Weapon' in mesh_body_part_name:
@@ -225,6 +225,14 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         body_material = bpy.data.materials.get(material_name)
         if not body_material:
             body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1).copy()
+            body_material.name = material_name
+            body_material.use_fake_user = True
+        return body_material
+
+    def create_body_trans_material(self, mesh, material_name):
+        body_material = bpy.data.materials.get(material_name)
+        if not body_material:
+            body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS).copy()
             body_material.name = material_name
             body_material.use_fake_user = True
         return body_material
