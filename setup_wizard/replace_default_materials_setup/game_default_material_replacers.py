@@ -160,6 +160,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name == 'Body3':
                     body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY3)
                     material_name = body_material.name
+                if mesh_body_part_name ==  'Body2_Trans':
+                    body_material = self.create_body_material(mesh, Nya222HonkaiStarRailShaderMaterialNames.BODY2_TRANS) 
+                    material_name = body_material.name
 
                 if 'Weapon' in mesh_body_part_name:
                     weapon_material = self.create_weapon_materials(mesh_body_part_name)
@@ -205,6 +208,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         EXPECTED_BODY_PART_NAMES = [
             'Hair',
             'Body1',
+            'Body2_Trans',
             'Body2',
             'Body3',
             'Body_Trans',
