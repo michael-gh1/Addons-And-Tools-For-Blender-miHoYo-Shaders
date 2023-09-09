@@ -296,7 +296,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             except AttributeError as ex:
                 print(f'Did not find {material_node_name} in {self.material.name} material using {self} \
                     Falling back to next MaterialDataApplier version')
-                raise ex
+                continue  # This used to be raise ex, but we're setting to Continue for NPCs using V3 Shader
 
 
 class V3_MaterialDataApplier(V2_MaterialDataApplier):

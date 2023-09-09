@@ -38,9 +38,17 @@ class TextureImporterFactory:
                 material_names = FestivityGenshinImpactMaterialNames
             return GenshinAvatarTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.NPC:
-            return GenshinNPCTextureImporter()
+            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = FestivityGenshinImpactMaterialNames
+            return GenshinNPCTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.MONSTER:
-            return GenshinMonsterTextureImporter()
+            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = FestivityGenshinImpactMaterialNames
+            return GenshinMonsterTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.HSR_AVATAR:
             return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
         else:
@@ -274,8 +282,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
 
 class GenshinNPCTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: GameMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
+        self.material_names = material_names
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -285,9 +294,9 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
+                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
+                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -342,8 +351,9 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
 
 class GenshinMonsterTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: GameMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
+        self.material_names = material_names
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -353,9 +363,9 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
+                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
+                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
