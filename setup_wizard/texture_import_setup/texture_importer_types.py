@@ -130,7 +130,24 @@ class GenshinTextureImporter:
             bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
 
     def set_face_diffuse_texture(self, face_material, img):
-        face_material.node_tree.nodes['Face_Diffuse'].image = img        
+        face_material.node_tree.nodes['Face_Diffuse'].image = img
+
+        # Set Built-In Face Lightmap Value for the V3 Shader
+        face_shader_node = face_material.node_tree.nodes.get('Face Shader')
+        if face_shader_node:
+            face_lightmap_input = face_shader_node.inputs.get('[Loli/Boy/Girl/Male/Lady]')
+            if face_lightmap_input:
+                if 'Loli' in img.name:
+                    face_lightmap_input.default_value = 1.0
+                elif 'Boy' in img.name:
+                    face_lightmap_input.default_value = 2.0
+                elif 'Girl' in img.name:
+                    face_lightmap_input.default_value = 3.0
+                elif 'Male' in img.name:
+                    face_lightmap_input.default_value = 4.0
+                elif 'Lady' in img.name:
+                    face_lightmap_input.default_value = 5.0
+
 
     def set_face_shadow_texture(self, face_material, img):
         face_shadow_node_exists = face_material.node_tree.nodes.get('Face_Shadow')
