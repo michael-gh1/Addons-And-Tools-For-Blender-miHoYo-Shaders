@@ -24,7 +24,7 @@ class FestivityGenshinImpactMaterialNames(GameMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
-class BonnyGenshinImpactMaterialNames(GameMaterialNames):
+class V3_BonnyFestivityGenshinImpactMaterialNames(GameMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     BODY = f'{MATERIAL_PREFIX}Body'
     HAIR = f'{MATERIAL_PREFIX}Hair'

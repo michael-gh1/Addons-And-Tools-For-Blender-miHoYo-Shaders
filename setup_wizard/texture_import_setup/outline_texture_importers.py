@@ -8,7 +8,7 @@ from bpy.types import Context, Operator
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
     GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
@@ -63,7 +63,7 @@ class OutlineTextureImporterFactory:
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
             if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = BonnyGenshinImpactMaterialNames
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = FestivityGenshinImpactMaterialNames
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)

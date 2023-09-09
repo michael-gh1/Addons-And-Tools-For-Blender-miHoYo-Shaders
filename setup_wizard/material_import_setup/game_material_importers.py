@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
@@ -101,10 +101,10 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': FestivityGenshinImpactMaterialNames.FACE},
         {'name': FestivityGenshinImpactMaterialNames.HAIR},
         {'name': FestivityGenshinImpactMaterialNames.OUTLINES},
-        {'name': BonnyGenshinImpactMaterialNames.BODY},
-        {'name': BonnyGenshinImpactMaterialNames.FACE},
-        {'name': BonnyGenshinImpactMaterialNames.HAIR},
-        {'name': BonnyGenshinImpactMaterialNames.OUTLINES}
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.BODY},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES}
     ]
 
     def __init__(self, blender_operator, context):

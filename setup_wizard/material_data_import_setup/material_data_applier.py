@@ -8,7 +8,7 @@ from bpy.types import Material
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -385,7 +385,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         base_material_shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
         outline_material_shader_node_tree_inputs = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name].inputs
 
-        if self.material.name == BonnyGenshinImpactMaterialNames.FACE:
+        if self.material.name == V3_BonnyFestivityGenshinImpactMaterialNames.FACE:
             super().apply_material_data(
                 self.face_material_mapping,
                 base_material_shader_node_tree_inputs,

@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
@@ -174,8 +174,8 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context
-        self.material_names = BonnyGenshinImpactMaterialNames
-        self.outline_node_group_name = OutlineNodeGroupNames.BONNY_GENSHIN_OUTLINES
+        self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+        self.outline_node_group_name = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)

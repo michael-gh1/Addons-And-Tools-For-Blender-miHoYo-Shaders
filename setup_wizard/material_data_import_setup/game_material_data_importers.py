@@ -9,7 +9,7 @@ from bpy.types import Operator, Context, Material
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
@@ -74,7 +74,7 @@ class GameMaterialDataImporterFactory:
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
             if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = BonnyGenshinImpactMaterialNames
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = FestivityGenshinImpactMaterialNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
