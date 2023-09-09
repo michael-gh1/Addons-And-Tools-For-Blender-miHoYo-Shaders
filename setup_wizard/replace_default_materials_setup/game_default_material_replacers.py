@@ -7,7 +7,10 @@ from bpy.types import Context, Operator
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
+    GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
@@ -19,9 +22,15 @@ class GameDefaultMaterialReplacer(ABC):
 
 class GameDefaultMaterialReplacerFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactDefaultMaterialReplacer(blender_operator, context)
+            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = BonnyGenshinImpactMaterialNames
+            else:
+                material_names = FestivityGenshinImpactMaterialNames 
+            return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailDefaultMaterialReplacer(blender_operator, context)
         else:
@@ -29,9 +38,10 @@ class GameDefaultMaterialReplacerFactory:
 
 
 class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
-    def __init__(self, blender_operator, context):
+    def __init__(self, blender_operator, context, material_names: GameMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
+        self.material_names = material_names
 
     def replace_default_materials(self):
         meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH']
@@ -52,7 +62,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
-                genshin_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}')
+                genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
                 if genshin_material:
                     material_slot.material = genshin_material
@@ -68,7 +78,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
-                        f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{actual_material_for_dress}', 
+                        f'{self.material_names.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
@@ -112,7 +122,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
-        new_material.name = f'miHoYo - Genshin {mesh_body_part_name}'
+        new_material.name = f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
         new_material.use_fake_user = True
 
         material_slot.material = new_material

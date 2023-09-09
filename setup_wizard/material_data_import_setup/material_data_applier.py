@@ -8,6 +8,7 @@ from bpy.types import Material
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
+from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -21,6 +22,7 @@ class MaterialDataAppliersFactory:
                 ]
             else:
                 return [
+                    V3_MaterialDataApplier(material_data_parser, outline_material_group),
                     V2_MaterialDataApplier(material_data_parser, outline_material_group), 
                     V1_MaterialDataApplier(material_data_parser, outline_material_group),
                 ]
@@ -241,7 +243,9 @@ class V2_MaterialDataApplier(MaterialDataApplier):
     shader_node_tree_node_name = 'Group.006'
     outlines_node_tree_node_name = 'Group.006'
 
-    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup, outlines_node_tree_node_name=None):
+        if outlines_node_tree_node_name:
+            self.outlines_node_tree_node_name = outlines_node_tree_node_name
         super().__init__(material_data_parser, outline_material_group, self.outlines_node_tree_node_name)
 
     def set_up_mesh_material_data(self):
@@ -293,6 +297,110 @@ class V2_MaterialDataApplier(MaterialDataApplier):
                 print(f'Did not find {material_node_name} in {self.material.name} material using {self} \
                     Falling back to next MaterialDataApplier version')
                 raise ex
+
+
+class V3_MaterialDataApplier(V2_MaterialDataApplier):
+    face_material_mapping = {
+        '_FaceBlushColor': 'Face Blush Color',
+        '_FaceBlushStrength': 'Face Blush Strength',
+        '_FaceMapSoftness': 'Face Shadow Softness',  # material data values are either 0.001 or 1E-06
+    }
+
+    outline_mapping = {
+        "_UseMaterial2": 'Use Material 2',
+        "_UseMaterial3": 'Use Material 3',
+        "_UseMaterial4": 'Use Material 4',
+        "_UseMaterial5": 'Use Material 5',
+        '_OutlineColor': 'Outline Color 1',
+        '_OutlineColor2': 'Outline Color 2',
+        '_OutlineColor3': 'Outline Color 3',
+        '_OutlineColor4': 'Outline Color 4',
+        '_OutlineColor5': 'Outline Color 5'
+    }
+
+    local_material_mapping = {
+        "_EmissionColor_MHY": "Emission Tint",
+        "_UseMaterial2": 'Use Material 2',
+        "_UseMaterial3": 'Use Material 3',
+        "_UseMaterial4": 'Use Material 4',
+        "_UseMaterial5": 'Use Material 5',
+        '_UseBumpMap': 'Use Normal Map',
+        '_ShadowRampWidth': 'Shadow Ramp Width',
+        "_ShadowTransitionRange": 'Shadow Transition Range',
+        "_ShadowTransitionRange2": 'Shadow Transition Range 2',
+        "_ShadowTransitionRange3": 'Shadow Transition Range 3',
+        "_ShadowTransitionRange4": 'Shadow Transition Range 4',
+        "_ShadowTransitionRange5": 'Shadow Transition Range 5',
+        "_ShadowTransitionSoftness": 'Shadow Transition Softness',
+        "_ShadowTransitionSoftness2": 'Shadow Transition Softness 2',
+        "_ShadowTransitionSoftness3": 'Shadow Transition Softness 3',
+        "_ShadowTransitionSoftness4": 'Shadow Transition Softness 4',
+        "_ShadowTransitionSoftness5": 'Shadow Transition Softness 5',
+        '_MTMapBrightness': 'Metallic Matcap Brightness',
+        '_MTMapTileScale': 'Metallic Matcap Tile Scale',
+        '_MTMapLightColor': 'Metallic Matcap Light Color',
+        '_MTMapDarkColor': 'Metallic Matcap Dark Color',
+        '_MTShadowMultiColor': 'Metallic Matcap Shadow Multiply Color',
+        '_Shininess': 'Shininess',
+        '_Shininess2': 'Shininess 2',
+        '_Shininess3': 'Shininess 3',
+        '_Shininess4': 'Shininess 4',
+        '_Shininess5': 'Shininess 5',
+        '_SpecMulti': 'Specular Multiplier',
+        '_SpecMulti2': 'Specular Multiplier 2',
+        '_SpecMulti3': 'Specular Multiplier 3',
+        '_SpecMulti4': 'Specular Multiplier 4',
+        '_SpecMulti5': 'Specular Multiplier 5',
+        '_SpecularColor': 'Specular Color',
+        '_MTShininess': 'Metallic Specular Shininess',
+        '_MTSpecularScale': 'Metallic Specular Scale',
+        '_MTSpecularAttenInShadow': 'Metallic Specular Attenuation',
+        '_MTSharpLayerOffset': 'Metallic Specular Sharp Layer Offset',
+        '_MTSpecularColor': 'MT Specular Color',
+        '_MTSharpLayerColor': 'MT Sharp Layer Color',
+        '_MTUseSpecularRamp': 'Use Specular Ramp',
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',
+        '_CoolShadowMultColor2': 'Nighttime Shadow Color 2',
+        '_CoolShadowMultColor3': 'Nighttime Shadow Color 3',
+        '_CoolShadowMultColor4': 'Nighttime Shadow Color 4',
+        '_CoolShadowMultColor5': 'Nighttime Shadow Color 5',
+        '_FirstShadowMultColor': 'Daytime Shadow Color',
+        '_FirstShadowMultColor2': 'Daytime Shadow Color 2',
+        '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
+        '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
+        '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
+        "_UseShadowRamp": "Use Shadow Ramp",
+    }
+
+    body_shader_node_tree_node_name = 'Body Shader'
+    face_shader_node_tree_node_name = 'Face Shader'
+    outlines_node_tree_node_name = 'Outlines'
+
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+        super().__init__(material_data_parser, outline_material_group, self.outlines_node_tree_node_name)
+        self.shader_node_tree_node_name = self.face_shader_node_tree_node_name if 'Face' in self.material.name else \
+            self.body_shader_node_tree_node_name
+
+    def set_up_mesh_material_data(self):
+        base_material_shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+        outline_material_shader_node_tree_inputs = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name].inputs
+
+        if self.material.name == BonnyGenshinImpactMaterialNames.FACE:
+            super().apply_material_data(
+                self.face_material_mapping,
+                base_material_shader_node_tree_inputs,
+            )
+        else:
+            super().apply_material_data(
+                self.local_material_mapping,
+                base_material_shader_node_tree_inputs,
+            )
+        self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+
+        super().apply_material_data(
+            self.outline_mapping,
+            outline_material_shader_node_tree_inputs
+        )
 
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):

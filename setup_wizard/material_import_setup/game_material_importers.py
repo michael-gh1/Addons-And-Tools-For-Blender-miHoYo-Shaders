@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
@@ -14,7 +14,7 @@ from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, ge
 class GameMaterialImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactMaterialImporterFacade(blender_operator, context)
+                return GenshinImpactMaterialImporterFacade(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialImporterFacade(blender_operator, context)
         else:
@@ -95,12 +95,16 @@ class GameMaterialImporter:
 
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
-    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
+    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse_-_Genshin_Impact_-_Goo_Engine_v3.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
         {'name': FestivityGenshinImpactMaterialNames.BODY},
         {'name': FestivityGenshinImpactMaterialNames.FACE},
         {'name': FestivityGenshinImpactMaterialNames.HAIR},
-        {'name': FestivityGenshinImpactMaterialNames.OUTLINES}
+        {'name': FestivityGenshinImpactMaterialNames.OUTLINES},
+        {'name': BonnyGenshinImpactMaterialNames.BODY},
+        {'name': BonnyGenshinImpactMaterialNames.FACE},
+        {'name': BonnyGenshinImpactMaterialNames.HAIR},
+        {'name': BonnyGenshinImpactMaterialNames.OUTLINES}
     ]
 
     def __init__(self, blender_operator, context):

@@ -72,7 +72,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
         else:
             texture_importer_type = TextureImporterType.NPC
 
-        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type, GameType.GENSHIN_IMPACT)
         texture_importer.import_textures(directory)
 
         '''
@@ -142,7 +142,7 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
             return {'FINISHED'}
 
         texture_importer_type = TextureImporterType.HSR_AVATAR
-        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type, GameType.HONKAI_STAR_RAIL)
         texture_importer.import_textures(directory)
 
         self.blender_operator.report({'INFO'}, 'Imported textures')

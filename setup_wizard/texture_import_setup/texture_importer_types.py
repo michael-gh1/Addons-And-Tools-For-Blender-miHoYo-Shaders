@@ -4,7 +4,10 @@ import bpy
 
 import os
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_materials import BonnyGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
+    GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
@@ -25,9 +28,15 @@ class TextureType(Enum):
 
 
 class TextureImporterFactory:
-    def create(texture_importer_type):
+    def create(texture_importer_type, game_type: GameType):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type.name)
+
         if texture_importer_type == TextureImporterType.AVATAR:
-            return GenshinAvatarTextureImporter()
+            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = BonnyGenshinImpactMaterialNames
+            else:
+                material_names = FestivityGenshinImpactMaterialNames
+            return GenshinAvatarTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.NPC:
             return GenshinNPCTextureImporter()
         elif texture_importer_type == TextureImporterType.MONSTER:
@@ -114,22 +123,34 @@ class GenshinTextureImporter:
         bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'{type.value}_Shadow_Ramp'].image = img
 
     def set_specular_ramp_texture(self, type: TextureType, img):
-        img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
+        specular_ramp_node_exists = bpy.data.node_groups.get(f'{type.value} Specular Ramp')
+
+        if specular_ramp_node_exists:
+            img.colorspace_settings.name='Non-Color'
+            bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
 
     def set_face_diffuse_texture(self, face_material, img):
         face_material.node_tree.nodes['Face_Diffuse'].image = img        
 
     def set_face_shadow_texture(self, face_material, img):
-        img.colorspace_settings.name='Non-Color'
-        face_material.node_tree.nodes['Face_Shadow'].image = img        
+        face_shadow_node_exists = face_material.node_tree.nodes.get('Face_Shadow')
+
+        if face_shadow_node_exists:
+            img.colorspace_settings.name='Non-Color'
+            face_material.node_tree.nodes['Face_Shadow'].image = img        
 
     def set_face_lightmap_texture(self, img):
-        img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
+        face_lightmap_node_exist = bpy.data.node_groups.get('Face Lightmap')
+
+        if face_lightmap_node_exist:
+            img.colorspace_settings.name='Non-Color'
+            bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
 
     def set_metalmap_texture(self, img):
-        bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
+        metallic_matcap_node_exists = bpy.data.node_groups.get('Metallic Matcap')
+
+        if metallic_matcap_node_exists:
+            bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
         shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
@@ -186,8 +207,9 @@ class GenshinTextureImporter:
 
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: GameMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
+        self.material_names = material_names
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -197,9 +219,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
+                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
+                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')

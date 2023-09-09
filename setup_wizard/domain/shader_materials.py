@@ -24,6 +24,14 @@ class FestivityGenshinImpactMaterialNames(GameMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
+class BonnyGenshinImpactMaterialNames(GameMaterialNames):
+    MATERIAL_PREFIX = 'HoYoverse - Genshin '
+    BODY = f'{MATERIAL_PREFIX}Body'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+
+
 class Nya222HonkaiStarRailShaderMaterialNames(GameMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
     BODY = 'HSR - Body'
