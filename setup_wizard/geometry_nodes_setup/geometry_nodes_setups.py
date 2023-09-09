@@ -26,6 +26,9 @@ NAME_OF_OUTLINE_3_MASK_INPUT = 'Input_14'
 NAME_OF_OUTLINE_3_MATERIAL_INPUT = 'Input_15'
 NAME_OF_OUTLINE_4_MASK_INPUT = 'Input_18'
 NAME_OF_OUTLINE_4_MATERIAL_INPUT = 'Input_19'
+NAME_OF_OUTLINE_5_MASK_INPUT = 'Input_24'
+NAME_OF_OUTLINE_5_MATERIAL_INPUT = 'Input_25'
+
 
 
 outline_mask_to_material_mapping = {
@@ -211,7 +214,8 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
             'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
             'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
-            # 'Other Outline': 'Other',
+            'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+            'Dress2': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
         }
 
         for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
