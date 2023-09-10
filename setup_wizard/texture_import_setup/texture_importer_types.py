@@ -230,6 +230,26 @@ class GenshinTextureImporter:
                     normal_map_input
                 )
 
+    def set_face_material_id(self, face_material, image):
+        character_to_face_material_id_map = {
+            'Collei': 5,
+            'Cyno': 3,
+            'DilucCostumeFlamme': 3,
+            'Faruzan': 3,
+            'AyakaCostumeFruhling': 5,
+            'Ayato': 3,
+            'Linette': 3,  # Lynette
+            'Nilou': 3,
+            'Kokomi': 3,
+            'Tighnari': 3,
+            'Yelan': 3,
+        }
+
+        for character_name in character_to_face_material_id_map.keys():
+            if character_name in image.name:
+                face_shader_node = face_material.node_tree.nodes['Face Shader']
+                face_shader_node.inputs['Face Material ID'].default_value = character_to_face_material_id_map[character_name]
+
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
     def __init__(self, material_names: GameMaterialNames):
@@ -260,6 +280,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif "Body_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
+                    # Set Face Id in Body_Diffuse because not all Face Diffuse filenames have the full costume name
+                    # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
+                    self.set_face_material_id(face_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Normalmap" in file:
