@@ -42,6 +42,13 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'Mask',
+    'Cap',
+    'Clothes',
+    'Handcuffs',
+    'Hat',
+    'Wriothesley_Gauntlet_L_Model',
+    'Wriothesley_Gauntlet_R_Model',
     'Hair',  # HSR Support
     'Weapon',  # HSR Support
     'Weapon01',  # HSR Support
