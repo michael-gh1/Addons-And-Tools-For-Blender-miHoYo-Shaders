@@ -92,6 +92,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         self.context: Context = context
         self.parsers = [
             HoyoStudioMaterialDataJsonParser,
+            UnknownHoyoStudioMaterialDataJsonParser,
             UABEMaterialDataJsonParser,
         ]
         self.material = outline_material_group.material
