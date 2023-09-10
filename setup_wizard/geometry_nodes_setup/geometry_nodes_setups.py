@@ -217,6 +217,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         modifier[self.USE_VERTEX_COLORS_INPUT] = True
 
         outline_to_material_mapping = {
+            'EffectHair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
             'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
             'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
             'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),

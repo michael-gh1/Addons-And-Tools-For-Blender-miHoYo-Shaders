@@ -32,7 +32,13 @@ class OutlineTextureImporter(ABC):
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
-        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
+        lightmap_filename = ''
+        if body_part_material_name == 'EffectHair':
+            lightmap_filename = [file for file in lightmap_files if 'EffectHair' in file][0]
+        else:
+            lightmap_filename = [file for file in lightmap_files if \
+                                 actual_material_part_name in file and 'EffectHair' not in file][0]
+
         lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
             or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
         self.assign_texture_to_node(lightmap_node, character_model_folder_file_path, lightmap_filename)
@@ -45,7 +51,12 @@ class OutlineTextureImporter(ABC):
             or None  # None for backwards compatibility in v1 where it did not exist
 
         if diffuse_node:
-            diffuse_filename = [file for file in diffuse_files if actual_material_part_name in file][0]
+            diffuse_filename = ''
+            if body_part_material_name == 'EffectHair':
+                diffuse_filename = [file for file in diffuse_files if 'EffectHair' in file][0]
+            else:
+                diffuse_filename = [file for file in diffuse_files if \
+                                    actual_material_part_name in file and 'EffectHair' not in file][0]
             self.assign_texture_to_node(diffuse_node, character_model_folder_file_path, diffuse_filename)
             self.blender_operator.report({'INFO'}, f'Imported "{actual_material_part_name}" diffuse onto material "{outline_material.name}"')
 

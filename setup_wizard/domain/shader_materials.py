@@ -9,6 +9,7 @@ class GameMaterialNames:
     BODY3 = ''
     BODY_TRANS = ''
     BODY2_TRANS = ''
+    EFFECT_HAIR = ''
     HAIR = ''
     FACE = ''
     EYESHADOW = ''
@@ -19,6 +20,7 @@ class GameMaterialNames:
 class FestivityGenshinImpactMaterialNames(GameMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
     BODY = f'{MATERIAL_PREFIX}Body'
+    EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
@@ -27,6 +29,7 @@ class FestivityGenshinImpactMaterialNames(GameMaterialNames):
 class V3_BonnyFestivityGenshinImpactMaterialNames(GameMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     BODY = f'{MATERIAL_PREFIX}Body'
+    EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'

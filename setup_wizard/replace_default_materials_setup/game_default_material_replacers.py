@@ -62,6 +62,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
+                if mesh_body_part_name == 'EffectHair':
+                    hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
+                    material_name = hair_material.name
+
                 genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
                 if genshin_material:
@@ -127,6 +131,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
         material_slot.material = new_material
         return new_material
+
+    def create_hair_material(self, shader_material_names: GameMaterialNames, material_name):
+        hair_material = bpy.data.materials.get(material_name)
+        if not hair_material:
+            hair_material = bpy.data.materials.get(shader_material_names.HAIR).copy()
+            hair_material.name = material_name
+            hair_material.use_fake_user = True
+        return hair_material
 
     '''
     This method was used for V1 shader and should NOT be used for V2 shader because the group name is different.

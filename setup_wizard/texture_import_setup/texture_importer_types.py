@@ -264,16 +264,21 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
-                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
-                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
+                effect_hair_material = bpy.data.materials.get(f'{self.material_names.EFFECT_HAIR}')
+                hair_material = bpy.data.materials.get(f'{self.material_names.HAIR}')
+                face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
+                body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
                 if "Hair_Diffuse" in file and "Eff" not in file:
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
-                elif "Hair_Lightmap" in file:
+                elif "EffectHair_Diffuse" in file:
+                    self.set_diffuse_texture(TextureType.HAIR, effect_hair_material, img)
+                elif "Hair_Lightmap" in file and "Eff" not in file:
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+                elif "EffectHair_Lightmap" in file:
+                    self.set_lightmap_texture(TextureType.HAIR, effect_hair_material, img)
                 elif "Hair_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
@@ -300,7 +305,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "MetalMap" in file:
                     self.set_metalmap_texture(img)
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
@@ -369,7 +374,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
@@ -419,7 +424,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
