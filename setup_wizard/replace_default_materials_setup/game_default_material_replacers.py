@@ -83,7 +83,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     )
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(FestivityGenshinImpactMaterialNames.BODY)
+                    material_slot.material = bpy.data.materials.get(self.material_names.BODY)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
