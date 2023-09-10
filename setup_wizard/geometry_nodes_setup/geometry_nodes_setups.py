@@ -223,6 +223,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
             'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
             'Dress2': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+            'Arm': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
         }
 
         for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
