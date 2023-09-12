@@ -39,7 +39,7 @@ class OutlineTextureImporter(ABC):
             lightmap_filenames = [file for file in lightmap_files if \
                                  actual_material_part_name in file and 'EffectHair' not in file]
         if not lightmap_filenames:
-            self.blender_operator.report({'INFO'}, f'"{actual_material_part_name}" lightmap not found for material "{outline_material.name}"')
+            self.blender_operator.report({'WARNING'}, f'"{actual_material_part_name}" lightmap not found for material "{outline_material.name}"')
             return
         else:
             lightmap_filename = lightmap_filenames[0]
@@ -119,7 +119,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
         
         for name, folder, files in os.walk(character_model_folder_file_path):
             diffuse_files = [file for file in files if 'Diffuse'.lower() in file.lower()]
-            lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower()]
+            lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower() or 'Ligntmap'.lower() in file.lower()]  # Important typo check for: Wrioth
             outline_materials = [material for material in bpy.data.materials.values() if 'Outlines' in material.name and material.name != self.material_names.OUTLINES]
 
             for outline_material in outline_materials:
