@@ -64,7 +64,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
                 if mesh_body_part_name == 'EffectHair':
                     hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
-                    material_name = hair_material.name
+                    material_name = hair_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                elif mesh_body_part_name == 'Helmet':
+                    helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET)
+                    material_name = helmet_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                elif mesh_body_part_name == 'HelmetEmo':
+                    helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET_EMO)
+                    material_name = helmet_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+
 
                 genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 

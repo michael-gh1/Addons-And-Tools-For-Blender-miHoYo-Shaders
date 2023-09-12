@@ -266,6 +266,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
                 effect_hair_material = bpy.data.materials.get(f'{self.material_names.EFFECT_HAIR}')
                 hair_material = bpy.data.materials.get(f'{self.material_names.HAIR}')
+                helmet_material = bpy.data.materials.get(f'{self.material_names.HELMET}')
+                helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
 
@@ -275,10 +277,16 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
                 elif "EffectHair_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.HAIR, effect_hair_material, img)
+                elif 'Helmet_Tex_Diffuse' in file:
+                    self.set_diffuse_texture(TextureType.HAIR, helmet_material, img)
+                elif 'HelmetEmo_Tex_Diffuse' in file:
+                    self.set_diffuse_texture(TextureType.HAIR, helmet_emotion_material, img)
                 elif "Hair_Lightmap" in file and "Eff" not in file:
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
                 elif "EffectHair_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.HAIR, effect_hair_material, img)
+                elif 'Helmet_Tex_Lightmap' in file:
+                    self.set_lightmap_texture(TextureType.HAIR, helmet_material, img)
                 elif "Hair_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
