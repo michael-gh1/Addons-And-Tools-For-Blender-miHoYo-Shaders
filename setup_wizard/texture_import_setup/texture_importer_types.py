@@ -103,7 +103,8 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
 
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Diffuse', img, self.character_type)
+            if not self.is_dress_texture_exist():
+                self.setup_dress_textures(f'{type.value}_Diffuse', img, self.character_type)
 
     def set_lightmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -111,7 +112,8 @@ class GenshinTextureImporter:
         material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
         
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Lightmap', img, self.character_type)
+            if not self.is_dress_texture_exist():
+                self.setup_dress_textures(f'{type.value}_Lightmap', img, self.character_type)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -209,6 +211,13 @@ class GenshinTextureImporter:
                 material_shader_nodes.get(f'{texture_name}_UV1').image = texture_img
                 return
 
+    def is_dress_texture_exist(self):
+        dress_texture_detected = False
+        for file in self.files:
+            if 'Dress' in file:
+                dress_texture_detected = True
+        return dress_texture_detected
+
     '''
     Deprecated: No longer needed after shader rewrite because normal map is plugged by default
     Still maintains backward compatibility by only trying this if `label_name` is found in the node tree.
@@ -258,6 +267,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
@@ -270,6 +280,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
+                dress_material = bpy.data.materials.get(f'{self.material_names.DRESS}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -304,6 +315,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_shadow_ramp_texture(TextureType.BODY, img)
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
                     self.set_specular_ramp_texture(TextureType.BODY, img)
+                elif "Dress" in file:
+                    self.set_diffuse_texture(TextureType.BODY, dress_material, img)
                 elif "Face_Diffuse" in file:
                     self.set_face_diffuse_texture(face_material, img)
                 elif "Face_Shadow" in file:
