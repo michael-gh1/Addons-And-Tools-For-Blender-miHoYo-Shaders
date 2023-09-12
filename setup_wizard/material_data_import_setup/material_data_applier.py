@@ -295,7 +295,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
                 node_input.default_value = material_json_value
             except AttributeError as ex:
                 print(f'Did not find {material_node_name} in {self.material.name} material using {self} \
-                    Falling back to next MaterialDataApplier version')
+                    Skipped.')
                 continue  # This used to be raise ex, but we're setting to Continue for NPCs using V3 Shader
 
 
@@ -396,6 +396,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
                 base_material_shader_node_tree_inputs,
             )
         self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs)
 
         super().apply_material_data(
             self.outline_mapping,
