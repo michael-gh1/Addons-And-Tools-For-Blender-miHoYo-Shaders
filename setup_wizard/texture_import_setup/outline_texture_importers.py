@@ -32,12 +32,17 @@ class OutlineTextureImporter(ABC):
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
-        lightmap_filename = ''
+        lightmap_filenames = []
         if body_part_material_name == 'EffectHair':
-            lightmap_filename = [file for file in lightmap_files if 'EffectHair' in file][0]
+            lightmap_filenames = [file for file in lightmap_files if 'EffectHair' in file]
         else:
-            lightmap_filename = [file for file in lightmap_files if \
-                                 actual_material_part_name in file and 'EffectHair' not in file][0]
+            lightmap_filenames = [file for file in lightmap_files if \
+                                 actual_material_part_name in file and 'EffectHair' not in file]
+        if not lightmap_filenames:
+            self.blender_operator.report({'INFO'}, f'"{actual_material_part_name}" lightmap not found for material "{outline_material.name}"')
+            return
+        else:
+            lightmap_filename = lightmap_filenames[0]
 
         lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
             or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
@@ -51,12 +56,18 @@ class OutlineTextureImporter(ABC):
             or None  # None for backwards compatibility in v1 where it did not exist
 
         if diffuse_node:
-            diffuse_filename = ''
+            diffuse_filenames = []
             if body_part_material_name == 'EffectHair':
-                diffuse_filename = [file for file in diffuse_files if 'EffectHair' in file][0]
+                diffuse_filenames = [file for file in diffuse_files if 'EffectHair' in file]
             else:
-                diffuse_filename = [file for file in diffuse_files if \
-                                    actual_material_part_name in file and 'EffectHair' not in file][0]
+                diffuse_filenames = [file for file in diffuse_files if \
+                                    actual_material_part_name in file and 'EffectHair' not in file]
+        if not diffuse_filenames:
+            self.blender_operator.report({'INFO'}, f'"{actual_material_part_name}" diffuse not found for material "{outline_material.name}"')
+            return
+        else:
+            diffuse_filename = diffuse_filenames[0]
+
             self.assign_texture_to_node(diffuse_node, character_model_folder_file_path, diffuse_filename)
             self.blender_operator.report({'INFO'}, f'Imported "{actual_material_part_name}" diffuse onto material "{outline_material.name}"')
 
