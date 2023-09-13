@@ -62,18 +62,22 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
+                # If material_name is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
                 if mesh_body_part_name == 'EffectHair':  # Furina
                     hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
-                    material_name = hair_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                    material_name = hair_material.name
                 elif mesh_body_part_name == 'Helmet':  # Frem
                     helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET)
-                    material_name = helmet_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                    material_name = helmet_material.name
                 elif mesh_body_part_name == 'HelmetEmo':  # Frem
                     helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET_EMO)
-                    material_name = helmet_material.name  # If this is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                    material_name = helmet_material.name
                 elif mesh_body_part_name == 'Dress':  # Scaramouche
                     dress_material = self.create_body_material(self.material_names, self.material_names.DRESS)
                     material_name = dress_material.name  # Scaramouche has Dress mesh/textures so we shouldn't run into an issue
+                elif mesh_body_part_name == 'Gauntlet':  # Wrioth
+                    gauntlet_material = self.create_body_material(self.material_names, self.material_names.GAUNTLET)
+                    material_name = gauntlet_material.name
 
                 genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
