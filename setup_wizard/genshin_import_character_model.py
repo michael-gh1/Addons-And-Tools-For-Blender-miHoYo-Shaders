@@ -112,12 +112,9 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             )
             self.report({'INFO'}, 'Imported character model')
 
-            for object in bpy.data.objects:
-                if object.type == 'MESH':  # I think this only matters for Body? But adding to all anyways
-                    # Important: This is actually not correct, but it looks better than not having a UV Map
-                    # The outer part will show up as the inner part (ex. inner skirt will be same as outer skirt )
-                    # TODO: Get feedback on whether this is desired or not...
-                    object.data.uv_layers.new(name='UV1')
+        for object in bpy.data.objects:
+            if object.type == 'MESH' and not object.data.uv_layers.get('UV1'):
+                object.data.uv_layers.new(name='UV1')
         # Quick-fix, just want to shove this in here for now...
         # Hide EffectMesh (gets deleted later on) and EyeStar
         for object in bpy.data.objects:
