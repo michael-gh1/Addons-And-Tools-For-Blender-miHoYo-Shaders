@@ -347,6 +347,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
@@ -416,6 +417,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
