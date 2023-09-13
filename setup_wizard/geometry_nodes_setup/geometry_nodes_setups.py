@@ -47,6 +47,7 @@ meshes_to_create_geometry_nodes_on = [
     'Clothes',
     'Handcuffs',
     'Hat',
+    'Helmet',
     'Wriothesley_Gauntlet_L_Model',
     'Wriothesley_Gauntlet_R_Model',
     'Hair',  # HSR Support
@@ -223,10 +224,11 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
             'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
             'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+            'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
             'Dress2': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
             'Arm': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
             'Gauntlet': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
-            # 'Helmet': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+            'HelmetEmo': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
         }
 
         for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
