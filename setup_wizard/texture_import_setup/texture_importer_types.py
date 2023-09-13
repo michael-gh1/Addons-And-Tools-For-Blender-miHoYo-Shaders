@@ -8,6 +8,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
     GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_node_names import V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
@@ -256,8 +257,10 @@ class GenshinTextureImporter:
 
         for character_name in character_to_face_material_id_map.keys():
             if character_name in image.name:
-                face_shader_node = face_material.node_tree.nodes['Face Shader']
-                face_shader_node.inputs['Face Material ID'].default_value = character_to_face_material_id_map[character_name]
+                if face_material.node_tree.nodes.get(V3_GenshinShaderNodeNames.FACE_SHADER):
+                    face_shader_node = face_material.node_tree.nodes[V3_GenshinShaderNodeNames.FACE_SHADER]
+                    face_shader_node.inputs[V3_GenshinShaderNodeNames.FACE_MATERIAL_ID].default_value = \
+                        character_to_face_material_id_map[character_name]
 
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
