@@ -34,18 +34,12 @@ class GameMaterialDataImporter(ABC):
                 break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
             except AttributeError as err:
                 print(err)
-                print('Falling back and trying next version')
+                print('WARNING: Falling back and trying next version')
                 continue # fallback and try next version
             except KeyError as err:
                 print(err)
-
-                if 'Shader" not found' in str(err):
-                    print('Falling back and trying next version')
-                    continue
-                self.blender_operator.report({'WARNING'}, \
-                    f'Continuing to apply other material data, but: \n'
-                    f'* Material Data JSON "{body_part}" was selected, but there is no material named "{self.material_names.MATERIAL_PREFIX}{body_part}"')
-                break
+                print('WARNING: Falling back and trying next version')
+                continue # fallback and try next version
 
     # Originally a "private" method, but moved to public due to inheriting classes
     def get_material_data_json_parser(self, json_material_data):
