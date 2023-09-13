@@ -55,8 +55,8 @@ class OutlineTextureImporter(ABC):
         diffuse_node = outline_material.node_tree.nodes.get(difuse_node_name) \
             or None  # None for backwards compatibility in v1 where it did not exist
 
+        diffuse_filenames = []
         if diffuse_node:
-            diffuse_filenames = []
             if body_part_material_name == 'EffectHair':
                 diffuse_filenames = [file for file in diffuse_files if 'EffectHair' in file]
             else:
