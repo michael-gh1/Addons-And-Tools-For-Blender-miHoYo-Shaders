@@ -72,7 +72,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 elif mesh_body_part_name == 'HelmetEmo':  # Frem
                     helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET_EMO)
                     material_name = helmet_material.name
-                elif mesh_body_part_name == 'Dress':  # Scaramouche
+                elif 'Dress' in mesh.name:  # Scaramouche
                     dress_material = self.create_body_material(self.material_names, self.material_names.DRESS)
                     material_name = dress_material.name  # Scaramouche has Dress mesh/textures so we shouldn't run into an issue
                 elif mesh_body_part_name == 'Gauntlet':  # Wrioth
