@@ -99,22 +99,26 @@ class GenshinTextureImporter:
                     return False
         return True
 
-    def set_diffuse_texture(self, type: TextureType, material, img):
-        material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
-        material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
+    def set_diffuse_texture(self, texture_type: TextureType, material, img):
+        material.node_tree.nodes[f'{texture_type.value}_Diffuse_UV0'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Diffuse_UV1'].image = img
 
         if self.game_type == GameType.GENSHIN_IMPACT:
-            if not self.is_dress_texture_exist():
-                self.setup_dress_textures(f'{type.value}_Diffuse', img, self.character_type)
+            if not self.does_dress_texture_exist_in_directory_files() or \
+                type(self) is GenshinMonsterTextureImporter or \
+                type(self) is GenshinNPCTextureImporter:
+                self.setup_dress_textures(f'{texture_type.value}_Diffuse', img, self.character_type)
 
-    def set_lightmap_texture(self, type: TextureType, material, img):
+    def set_lightmap_texture(self, texture_type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
-        material.node_tree.nodes[f'{type.value}_Lightmap_UV0'].image = img
-        material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Lightmap_UV0'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Lightmap_UV1'].image = img
         
         if self.game_type == GameType.GENSHIN_IMPACT:
-            if not self.is_dress_texture_exist():
-                self.setup_dress_textures(f'{type.value}_Lightmap', img, self.character_type)
+            if not self.does_dress_texture_exist_in_directory_files() or \
+                type(self) is GenshinMonsterTextureImporter or \
+                type(self) is GenshinNPCTextureImporter:
+                self.setup_dress_textures(f'{texture_type.value}_Lightmap', img, self.character_type)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -212,7 +216,7 @@ class GenshinTextureImporter:
                 material_shader_nodes.get(f'{texture_name}_UV1').image = texture_img
                 return
 
-    def is_dress_texture_exist(self):
+    def does_dress_texture_exist_in_directory_files(self):
         dress_texture_detected = False
         for file in self.files:
             if 'Dress' in file:
