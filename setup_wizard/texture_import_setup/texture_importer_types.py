@@ -435,12 +435,30 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
 
-                if self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file):
+                if self.is_texture_identifiers_in_texture_name(['Body', 'Tex', 'Diffuse'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Hair'], files)):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file):
+                elif self.is_texture_identifiers_in_texture_name(['Body', 'Tex', 'Lightmap'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Hair'], files)):
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Tex', 'Diffuse'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Body'], files)):
+                    self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Tex', 'Lightmap'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Body'], files)):
+                    self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body_Shadow_Ramp'], file):
+                    self.set_shadow_ramp_texture(TextureType.BODY, img)
+                elif self.is_texture_identifiers_in_texture_name(['Hair_Shadow_Ramp'], file):
+                    self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif self.is_texture_identifiers_in_texture_name(['Tex', 'Specular_Ramp'], file):
                     self.set_specular_ramp_texture(TextureType.BODY, img)
 
