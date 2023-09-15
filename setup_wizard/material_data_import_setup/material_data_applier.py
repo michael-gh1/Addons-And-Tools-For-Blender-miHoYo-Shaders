@@ -238,7 +238,9 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
         '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
         '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
-        "_UseShadowRamp": "Use Shadow Ramp",
+        '_UseShadowRamp': 'Use Shadow Ramp',
+        '_UseLightMapColorAO': 'Use Lightmap AO',
+        '_UseVertexColorAO': 'Use Vertex Color AO',
     }
 
     shader_node_tree_node_name = 'Group.006'
@@ -371,7 +373,9 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
         '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
         '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
-        "_UseShadowRamp": "Use Shadow Ramp",
+        '_UseShadowRamp': 'Use Shadow Ramp',
+        '_UseLightMapColorAO': 'Use Lightmap AO',
+        '_UseVertexColorAO': 'Use Vertex Color AO',
     }
 
     body_shader_node_tree_node_name = 'Body Shader'
