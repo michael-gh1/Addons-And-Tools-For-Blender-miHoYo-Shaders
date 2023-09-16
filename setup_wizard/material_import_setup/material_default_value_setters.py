@@ -19,7 +19,7 @@ class MaterialDefaultValueSetterFactory:
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return GenshinImpactMaterialDefaultValueSetter(blender_operator, context, V3_BonnyFestivityGenshinImpactMaterialNames, 
                                                                V3_GenshinShaderNodeNames)
             else:

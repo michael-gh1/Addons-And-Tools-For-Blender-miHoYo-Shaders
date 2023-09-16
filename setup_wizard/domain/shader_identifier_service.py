@@ -9,6 +9,7 @@ from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactM
 
 
 class GenshinImpactShaders(Enum):
+    V1_GENSHIN_IMPACT_SHADER = auto()
     V2_GENSHIN_IMPACT_SHADER = auto()
     V3_GENSHIN_IMPACT_SHADER = auto()
 
@@ -25,11 +26,24 @@ class ShaderIdentifierServiceFactory:
 
 class ShaderIdentifierService:
     material_lists_to_search_through = {}
+    node_groups_to_search_through = {}
 
     def __init__(self):
         pass
 
-    def identify_shader(self, materials):
+    def identify_shader(self, materials, node_groups):
+        # Check for V1 shader first
+        for shader, node_group_list in self.node_groups_to_search_through.items():
+            found_all = True
+            for node_group in node_group_list:
+                if node_group not in node_groups:
+                    found_all = False
+                    break
+            if found_all:
+                return shader
+
+        # Check for V2 shader next b/c V1 and V2 have same material names
+        # Then check for later versions (V3, etc.)
         for shader, material_list in self.material_lists_to_search_through.items():
             found_all = True
             for material in material_list:
@@ -56,6 +70,10 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     material_lists_to_search_through = {
         GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER: V3_NAMES_OF_GENSHIN_MATERIALS,
         GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER: V2_NAMES_OF_GENSHIN_MATERIALS,
+    }
+
+    node_groups_to_search_through = {
+        GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER: ['miHoYo - Genshin Face'],
     }
 
     def __init__(self):

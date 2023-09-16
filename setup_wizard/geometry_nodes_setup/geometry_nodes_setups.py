@@ -62,7 +62,7 @@ class GameGeometryNodesSetupFactory:
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
             else:
                 return GenshinImpactGeometryNodesSetup(blender_operator, context)

@@ -33,19 +33,19 @@ class TextureImporterFactory:
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type.name)
 
         if texture_importer_type == TextureImporterType.AVATAR:
-            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = FestivityGenshinImpactMaterialNames
             return GenshinAvatarTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.NPC:
-            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = FestivityGenshinImpactMaterialNames
             return GenshinNPCTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.MONSTER:
-            if shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = FestivityGenshinImpactMaterialNames
@@ -60,6 +60,7 @@ class GenshinTextureImporter:
     def __init__(self, game_type: GameType, character_type: TextureImporterType):
         self.game_type = game_type
         self.character_type = character_type
+        self.genshin_shader_version = None  # purely for syntax highlighting purposes
 
     def import_textures(self, directory):
         raise NotImplementedError()
@@ -260,12 +261,10 @@ class GenshinTextureImporter:
             'Yelan': 3,
         }
 
-        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type.name)
-        genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials)
-        shader_node_names = V2_GenshinShaderNodeNames if genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else \
-            V3_GenshinShaderNodeNames
-        shader_has_face_material_id = genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER or \
-            genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
+        shader_node_names = V2_GenshinShaderNodeNames if \
+            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
+        shader_has_face_material_id = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER or \
+            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
         if shader_has_face_material_id:
             for character_name in character_to_face_material_id_map.keys():
@@ -280,10 +279,8 @@ class GenshinTextureImporter:
             'Funingna': 1,  # Furina
         }
 
-        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type.name)
-        genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials)
         shader_node_names = V3_GenshinShaderNodeNames
-        shader_has_body_hair_ramps = genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
+        shader_has_body_hair_ramps = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
 
         if shader_has_body_hair_ramps:
             for character_name in character_to_body_hair_ramps_map.keys():
@@ -298,6 +295,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
     def __init__(self, material_names: GameMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
         self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -377,6 +377,9 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
         self.material_names = material_names
 
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
             self.files = files
@@ -446,6 +449,9 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
     def __init__(self, material_names: GameMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
         self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
