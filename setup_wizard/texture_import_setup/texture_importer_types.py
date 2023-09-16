@@ -475,7 +475,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Body', 'Tex', 'Lightmap'], file) or \
-                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file) and \
                     not self.is_texture_identifiers_in_files(['Hair'], files)):
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
@@ -485,7 +485,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Tex', 'Lightmap'], file) or \
-                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file) and \
                     not self.is_texture_identifiers_in_files(['Body'], files)):
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
 
