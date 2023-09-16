@@ -185,7 +185,8 @@ class GenshinTextureImporter:
             bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
-        shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
+        shader_dress_materials = [material for material in bpy.data.materials if 
+                                  'Genshin Dress' in material.name and 'Outlines' not in material.name]
         shader_cloak_materials = [material for material in bpy.data.materials
                                   if 'Genshin Arm' in material.name or 'Genshin Cloak' in material.name]
 
