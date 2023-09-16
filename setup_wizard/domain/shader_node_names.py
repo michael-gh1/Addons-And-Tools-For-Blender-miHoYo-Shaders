@@ -23,6 +23,7 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
     BODY_SHADER = 'Body Shader'
     HAIR_SHADER = 'Body Shader'  # Not a typo
     FACE_SHADER = 'Face Shader'
+    BODY_HAIR_RAMPS = 'Body / Hair Ramps'
     FACE_MATERIAL_ID = 'Face Material ID'
     USE_SHADOW_RAMP = 'Use Shadow Ramp'
     USE_LIGHTMAP_AO = 'Use Lightmap AO'

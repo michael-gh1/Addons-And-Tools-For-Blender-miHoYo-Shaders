@@ -266,6 +266,23 @@ class GenshinTextureImporter:
                     face_shader_node.inputs[V3_GenshinShaderNodeNames.FACE_MATERIAL_ID].default_value = \
                         character_to_face_material_id_map[character_name]
 
+    def set_body_hair_ramps_on_face_shader(self, face_material, image):
+        character_to_body_hair_ramps_map = {
+            'Funingna': 1,  # Furina
+        }
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type.name)
+        is_v3_genshin_impact_shader = \
+            shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
+
+        if is_v3_genshin_impact_shader:
+            for character_name in character_to_body_hair_ramps_map.keys():
+                if character_name in image.name:
+                    if face_material.node_tree.nodes.get(V3_GenshinShaderNodeNames.FACE_SHADER):
+                        face_shader_node = face_material.node_tree.nodes[V3_GenshinShaderNodeNames.FACE_SHADER]
+                        face_shader_node.inputs[V3_GenshinShaderNodeNames.BODY_HAIR_RAMPS].default_value = \
+                            character_to_body_hair_ramps_map[character_name]
+
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
     def __init__(self, material_names: GameMaterialNames):
@@ -315,6 +332,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     # Set Face Id in Body_Diffuse because not all Face Diffuse filenames have the full costume name
                     # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
                     self.set_face_material_id(face_material, img)
+                    self.set_body_hair_ramps_on_face_shader(face_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Normalmap" in file:
