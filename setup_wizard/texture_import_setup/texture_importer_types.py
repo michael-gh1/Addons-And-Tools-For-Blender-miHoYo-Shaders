@@ -8,7 +8,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
     GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
-from setup_wizard.domain.shader_node_names import V3_GenshinShaderNodeNames
+from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
@@ -260,12 +260,20 @@ class GenshinTextureImporter:
             'Yelan': 3,
         }
 
-        for character_name in character_to_face_material_id_map.keys():
-            if character_name in image.name:
-                if face_material.node_tree.nodes.get(V3_GenshinShaderNodeNames.FACE_SHADER):
-                    face_shader_node = face_material.node_tree.nodes[V3_GenshinShaderNodeNames.FACE_SHADER]
-                    face_shader_node.inputs[V3_GenshinShaderNodeNames.FACE_MATERIAL_ID].default_value = \
-                        character_to_face_material_id_map[character_name]
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type.name)
+        genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials)
+        shader_node_names = V2_GenshinShaderNodeNames if genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else \
+            V3_GenshinShaderNodeNames
+        shader_has_face_material_id = genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER or \
+            genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
+
+        if shader_has_face_material_id:
+            for character_name in character_to_face_material_id_map.keys():
+                if character_name in image.name:
+                    if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
+                        face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
+                        face_shader_node.inputs[shader_node_names.FACE_MATERIAL_ID].default_value = \
+                            character_to_face_material_id_map[character_name]
 
     def set_body_hair_ramps_on_face_shader(self, face_material, image):
         character_to_body_hair_ramps_map = {
@@ -273,15 +281,16 @@ class GenshinTextureImporter:
         }
 
         shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type.name)
-        is_v3_genshin_impact_shader = \
-            shader_identifier_service.identify_shader(bpy.data.materials) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
+        genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials)
+        shader_node_names = V3_GenshinShaderNodeNames
+        shader_has_body_hair_ramps = genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
 
-        if is_v3_genshin_impact_shader:
+        if shader_has_body_hair_ramps:
             for character_name in character_to_body_hair_ramps_map.keys():
                 if character_name in image.name:
-                    if face_material.node_tree.nodes.get(V3_GenshinShaderNodeNames.FACE_SHADER):
-                        face_shader_node = face_material.node_tree.nodes[V3_GenshinShaderNodeNames.FACE_SHADER]
-                        face_shader_node.inputs[V3_GenshinShaderNodeNames.BODY_HAIR_RAMPS].default_value = \
+                    if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
+                        face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
+                        face_shader_node.inputs[shader_node_names.BODY_HAIR_RAMPS].default_value = \
                             character_to_body_hair_ramps_map[character_name]
 
 
