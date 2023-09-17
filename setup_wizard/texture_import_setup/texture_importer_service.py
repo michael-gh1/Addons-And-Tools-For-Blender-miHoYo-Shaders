@@ -1,6 +1,6 @@
 
 from setup_wizard.texture_import_setup.game_texture_importers import GameTextureImporter
-from setup_wizard.material_import_setup.material_default_value_setters import MaterialDefaultValueSetter
+from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetter
 
 
 class TextureImporterService:

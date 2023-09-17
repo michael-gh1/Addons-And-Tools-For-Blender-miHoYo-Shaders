@@ -8,7 +8,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-from setup_wizard.material_import_setup.material_default_value_setters import MaterialDefaultValueSetterFactory
+from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetterFactory
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 from setup_wizard.texture_import_setup.game_texture_importers import GameTextureImporter, GameTextureImporterFactory
