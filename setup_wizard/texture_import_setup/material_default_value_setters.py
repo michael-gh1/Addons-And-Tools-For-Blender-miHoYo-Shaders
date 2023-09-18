@@ -3,7 +3,6 @@
 import bpy
 
 from abc import abstractmethod
-from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
@@ -15,18 +14,16 @@ from setup_wizard.domain.game_types import GameType
 
 
 class MaterialDefaultValueSetterFactory:
-    def create(game_type: GameType, blender_operator: Operator, context: Context):
+    def create(game_type: GameType):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                return GenshinImpactMaterialDefaultValueSetter(blender_operator, context, V3_BonnyFestivityGenshinImpactMaterialNames, 
-                                                               V3_GenshinShaderNodeNames)
+                return GenshinImpactMaterialDefaultValueSetter(V3_BonnyFestivityGenshinImpactMaterialNames, V3_GenshinShaderNodeNames)
             else:
-                return GenshinImpactMaterialDefaultValueSetter(blender_operator, context, FestivityGenshinImpactMaterialNames, 
-                                                               V2_GenshinShaderNodeNames)
+                return GenshinImpactMaterialDefaultValueSetter(FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            return HonkaiStarRailMaterialDefaultValueSetter(blender_operator, context)
+            return HonkaiStarRailMaterialDefaultValueSetter()
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -72,7 +69,7 @@ class MaterialDefaultValueSetter:
 
 
 class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
-    def __init__(self, blender_operator, context, material_names: GameMaterialNames, shader_node_names: ShaderNodeNames) -> None:
+    def __init__(self, material_names: GameMaterialNames, shader_node_names: ShaderNodeNames) -> None:
         super().__init__(material_names, shader_node_names)
 
     def set_default_values(self):
@@ -90,7 +87,7 @@ class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
 
 
 class HonkaiStarRailMaterialDefaultValueSetter(MaterialDefaultValueSetter):
-    def __init__(self, blender_operator, context) -> None:
+    def __init__(self) -> None:
         return
 
     def set_default_values(self):

@@ -39,7 +39,7 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
     def execute(self, context):
         game_texture_importer: GameTextureImporter = \
             GameTextureImporterFactory.create(self.game_type, self, context)
-        material_default_value_setter = MaterialDefaultValueSetterFactory.create(self.game_type, self, context)
+        material_default_value_setter = MaterialDefaultValueSetterFactory.create(self.game_type)
 
         texture_importer_service = TextureImporterService(game_texture_importer, material_default_value_setter)
         status = texture_importer_service.import_textures()
