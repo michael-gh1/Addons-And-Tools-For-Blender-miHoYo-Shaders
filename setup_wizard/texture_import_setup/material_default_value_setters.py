@@ -6,7 +6,7 @@ from abc import abstractmethod
 
 from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     V3_BonnyFestivityGenshinImpactMaterialNames
 from setup_wizard.domain.shader_node_names import ShaderNodeNames
 
