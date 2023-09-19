@@ -9,7 +9,7 @@ from bpy.types import Operator, Context, Material
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
@@ -70,7 +70,7 @@ class GameMaterialDataImporterFactory:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames
+                material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group)

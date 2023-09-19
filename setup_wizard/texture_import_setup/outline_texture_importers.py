@@ -8,8 +8,8 @@ from bpy.types import Context, Operator
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
-    GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterFactory, TextureImporterType
@@ -17,7 +17,7 @@ from setup_wizard.utils.genshin_body_part_deducer import get_npc_mesh_body_part_
 
 
 class OutlineTextureImporter(ABC):
-    def __init__(self, blender_operator: Operator, context: Context, material_names: GameMaterialNames):
+    def __init__(self, blender_operator: Operator, context: Context, material_names: ShaderMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.material_names = material_names
@@ -87,7 +87,7 @@ class OutlineTextureImporterFactory:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames
+                material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailOutlineTextureImporter(blender_operator, context)

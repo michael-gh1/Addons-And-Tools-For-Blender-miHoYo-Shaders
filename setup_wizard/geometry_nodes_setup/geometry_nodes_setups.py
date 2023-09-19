@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
@@ -78,7 +78,7 @@ class GameGeometryNodesSetup(ABC):
     def setup_geometry_nodes(self):
         raise NotImplementedError
 
-    def clone_outlines(self, game_material_names: GameMaterialNames):
+    def clone_outlines(self, game_material_names: ShaderMaterialNames):
         materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
 
         for material in materials:
@@ -151,7 +151,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         self.context = context
 
     def setup_geometry_nodes(self):
-        self.clone_outlines(FestivityGenshinImpactMaterialNames)
+        self.clone_outlines(V2_FestivityGenshinImpactMaterialNames)
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):

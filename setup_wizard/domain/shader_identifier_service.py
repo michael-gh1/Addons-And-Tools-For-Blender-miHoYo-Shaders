@@ -5,7 +5,7 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
 
 
 class GenshinImpactShaders(Enum):
@@ -56,10 +56,10 @@ class ShaderIdentifierService:
 
 class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     V2_NAMES_OF_GENSHIN_MATERIALS = [
-        FestivityGenshinImpactMaterialNames.BODY,
-        FestivityGenshinImpactMaterialNames.FACE,
-        FestivityGenshinImpactMaterialNames.HAIR,
-        FestivityGenshinImpactMaterialNames.OUTLINES
+        V2_FestivityGenshinImpactMaterialNames.BODY,
+        V2_FestivityGenshinImpactMaterialNames.FACE,
+        V2_FestivityGenshinImpactMaterialNames.HAIR,
+        V2_FestivityGenshinImpactMaterialNames.OUTLINES
     ]
     V3_NAMES_OF_GENSHIN_MATERIALS = [
         V3_BonnyFestivityGenshinImpactMaterialNames.BODY,

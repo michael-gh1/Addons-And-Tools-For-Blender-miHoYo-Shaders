@@ -9,8 +9,8 @@ from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
-    GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
@@ -29,7 +29,7 @@ class GameDefaultMaterialReplacerFactory:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames 
+                material_names = V2_FestivityGenshinImpactMaterialNames 
             return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailDefaultMaterialReplacer(blender_operator, context)
@@ -38,7 +38,7 @@ class GameDefaultMaterialReplacerFactory:
 
 
 class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
-    def __init__(self, blender_operator, context, material_names: GameMaterialNames):
+    def __init__(self, blender_operator, context, material_names: ShaderMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.material_names = material_names
@@ -148,7 +148,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         material_slot.material = new_material
         return new_material
 
-    def create_body_material(self, shader_material_names: GameMaterialNames, material_name):
+    def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
         if not body_material:
             body_material = bpy.data.materials.get(shader_material_names.BODY).copy()
@@ -156,7 +156,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             body_material.use_fake_user = True
         return body_material
 
-    def create_hair_material(self, shader_material_names: GameMaterialNames, material_name):
+    def create_hair_material(self, shader_material_names: ShaderMaterialNames, material_name):
         hair_material = bpy.data.materials.get(material_name)
         if not hair_material:
             hair_material = bpy.data.materials.get(shader_material_names.HAIR).copy()

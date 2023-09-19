@@ -1,7 +1,7 @@
 # Author: michael-gh1
 
 
-class GameMaterialNames:
+class ShaderMaterialNames:
     MATERIAL_PREFIX = ''
     BODY = ''
     BODY1 = ''
@@ -21,7 +21,7 @@ class GameMaterialNames:
     WEAPON = ''
 
 
-class FestivityGenshinImpactMaterialNames(GameMaterialNames):
+class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
     BODY = f'{MATERIAL_PREFIX}Body'
     DRESS = f'{MATERIAL_PREFIX}Dress'
@@ -34,7 +34,7 @@ class FestivityGenshinImpactMaterialNames(GameMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
-class V3_BonnyFestivityGenshinImpactMaterialNames(GameMaterialNames):
+class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     BODY = f'{MATERIAL_PREFIX}Body'
     DRESS = f'{MATERIAL_PREFIX}Dress'
@@ -47,7 +47,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(GameMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
-class Nya222HonkaiStarRailShaderMaterialNames(GameMaterialNames):
+class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
     BODY = 'HSR - Body'
     BODY1 = 'HSR - Body1'

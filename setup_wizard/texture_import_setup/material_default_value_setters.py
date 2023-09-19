@@ -6,7 +6,7 @@ from abc import abstractmethod
 
 from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import GameMaterialNames, FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_materials import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     V3_BonnyFestivityGenshinImpactMaterialNames
 from setup_wizard.domain.shader_node_names import ShaderNodeNames
 
@@ -21,7 +21,7 @@ class MaterialDefaultValueSetterFactory:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return GenshinImpactMaterialDefaultValueSetter(V3_BonnyFestivityGenshinImpactMaterialNames, V3_GenshinShaderNodeNames)
             else:
-                return GenshinImpactMaterialDefaultValueSetter(FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
+                return GenshinImpactMaterialDefaultValueSetter(V2_FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDefaultValueSetter()
         else:
@@ -29,7 +29,7 @@ class MaterialDefaultValueSetterFactory:
 
 
 class MaterialDefaultValueSetter:
-    def __init__(self, material_names: GameMaterialNames, shader_node_names: ShaderNodeNames):
+    def __init__(self, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames):
         self.material_names = material_names
         self.shader_node_names = shader_node_names
 
@@ -69,7 +69,7 @@ class MaterialDefaultValueSetter:
 
 
 class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
-    def __init__(self, material_names: GameMaterialNames, shader_node_names: ShaderNodeNames) -> None:
+    def __init__(self, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames) -> None:
         super().__init__(material_names, shader_node_names)
 
     def set_default_values(self):

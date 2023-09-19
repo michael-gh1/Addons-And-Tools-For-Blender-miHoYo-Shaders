@@ -6,8 +6,8 @@ import os
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, FestivityGenshinImpactMaterialNames, \
-    GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_materials import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
@@ -36,19 +36,19 @@ class TextureImporterFactory:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames
+                material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinAvatarTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.NPC:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames
+                material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinNPCTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.MONSTER:
             if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = FestivityGenshinImpactMaterialNames
+                material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinMonsterTextureImporter(material_names)
         elif texture_importer_type == TextureImporterType.HSR_AVATAR:
             return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
@@ -292,7 +292,7 @@ class GenshinTextureImporter:
 
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
-    def __init__(self, material_names: GameMaterialNames):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
         self.material_names = material_names
 
@@ -373,7 +373,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
 
 
 class GenshinNPCTextureImporter(GenshinTextureImporter):
-    def __init__(self, material_names: GameMaterialNames):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
         self.material_names = material_names
 
@@ -446,7 +446,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
 
 class GenshinMonsterTextureImporter(GenshinTextureImporter):
-    def __init__(self, material_names: GameMaterialNames):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
         self.material_names = material_names
 
