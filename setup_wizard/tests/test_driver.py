@@ -54,7 +54,8 @@ class TestDriver:
                     possible_material_data_folder_file_paths = [
                         str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials')),
                         str(PurePath(characters_folder_file_path, character_folder_file_path, 'Material')),
-                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials'))
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials')),
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'Material'))
                     ]
 
                     for possible_material_data_folder_file_path in possible_material_data_folder_file_paths:
