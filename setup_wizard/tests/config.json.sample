@@ -4,8 +4,10 @@
             "metadata": {
                 "name": "name of environment - vanilla blender",
                 "description": "description of environment",
+                "game_type": "Genshin Impact",
                 "enabled": true,
-                "betterfbx_enabled": true
+                "betterfbx_enabled": true,
+                "save_file": false
             },
             "test_file": "FILE_PATH_TO_TEST_FILE.py",
             "blender_execution_file_path": "FILE_PATH_TO_blender.exe",
@@ -18,15 +20,33 @@
             "metadata": {
                 "name": "name of environment - goo blender",
                 "description": "description of enviornment",
+                "game_type": "Genshin Impact",
                 "enabled": true,
-                "betterfbx_enabled": false
+                "betterfbx_enabled": true,
+                "save_file": true
             },
             "test_file": "FILE_PATH_TO_TEST_FILE.py",
             "blender_execution_file_path": "FILE_PATH_TO_goo_blender.exe",
-            "festivity_root_folder_file_path": "FILE_PATH_TO_festivity_shaders_folder",
+            "festivity_shader_file_path": "FILE_PATH_TO_festivity_shaders_blend_file",
             "festivity_outlines_file_path": "FILE_PATH_TO_festivity_outlines_blend_file",
             "festivity_gran_turismo_file_path": "FILE_PATH_TO_gt_tonemapper_blend_file",
             "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
         },
-    }
+        {
+            "metadata": {
+                "name": "name of environment - goo blender",
+                "description": "description of enviornment",
+                "game_type": "Honkai Star Rail",
+                "enabled": true,
+                "betterfbx_enabled": true,
+                "save_file": true
+            },
+            "test_file": "FILE_PATH_TO_TEST_FILE.py",
+            "blender_execution_file_path": "FILE_PATH_TO_goo_blender.exe",
+            "festivity_shader_file_path": "FILE_PATH_TO_festivity_shaders_blend_file",
+            "festivity_outlines_file_path": "FILE_PATH_TO_festivity_outlines_blend_file",
+            "festivity_gran_turismo_file_path": "FILE_PATH_TO_gt_tonemapper_blend_file",
+            "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
+        }
+    ]
 }
