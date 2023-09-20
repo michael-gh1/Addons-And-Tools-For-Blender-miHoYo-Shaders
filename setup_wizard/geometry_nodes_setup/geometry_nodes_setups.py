@@ -149,9 +149,11 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context
+        self.material_names = V2_FestivityGenshinImpactMaterialNames
+        self.outline_node_group_name = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
 
     def setup_geometry_nodes(self):
-        self.clone_outlines(V2_FestivityGenshinImpactMaterialNames)
+        self.clone_outlines(self.material_names)
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
@@ -164,7 +166,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
         outlines_node_group = \
-            bpy.data.node_groups.get(OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES)
+            bpy.data.node_groups.get(self.outline_node_group_name)
 
         geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
 
