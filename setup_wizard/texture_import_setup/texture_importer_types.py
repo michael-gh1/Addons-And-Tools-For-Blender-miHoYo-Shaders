@@ -37,10 +37,8 @@ class TextureImporterFactory:
 
             if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
-            elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
-                material_names = V2_FestivityGenshinImpactMaterialNames
             else:
-                raise Exception(f'Unexpected shader identified: {shader}')
+                material_names = V2_FestivityGenshinImpactMaterialNames  # V1/V2 have the same material names
 
             if texture_importer_type == TextureImporterType.AVATAR:
                 return GenshinAvatarTextureImporter(material_names)
