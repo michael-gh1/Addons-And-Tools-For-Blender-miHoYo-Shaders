@@ -14,7 +14,7 @@ from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, ge
 class GameMaterialImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         if game_type == GameType.GENSHIN_IMPACT.name:
-                return GenshinImpactMaterialImporterFacade(blender_operator, context)
+            return GenshinImpactMaterialImporterFacade(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialImporterFacade(blender_operator, context)
         else:
