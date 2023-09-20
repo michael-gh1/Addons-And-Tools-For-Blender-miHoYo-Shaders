@@ -32,28 +32,31 @@ class TextureImporterFactory:
     def create(texture_importer_type, game_type: GameType):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type.name)
 
-        if texture_importer_type == TextureImporterType.AVATAR:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+        if game_type is GameType.GENSHIN_IMPACT:
+            shader: GenshinImpactShaders = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
-            else:
+            elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
                 material_names = V2_FestivityGenshinImpactMaterialNames
-            return GenshinAvatarTextureImporter(material_names)
-        elif texture_importer_type == TextureImporterType.NPC:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V2_FestivityGenshinImpactMaterialNames
-            return GenshinNPCTextureImporter(material_names)
-        elif texture_importer_type == TextureImporterType.MONSTER:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+                raise Exception(f'Unexpected shader identified: {shader}')
+
+            if texture_importer_type == TextureImporterType.AVATAR:
+                return GenshinAvatarTextureImporter(material_names)
+            elif texture_importer_type == TextureImporterType.NPC:
+                return GenshinNPCTextureImporter(material_names)
+            elif texture_importer_type == TextureImporterType.MONSTER:
+                return GenshinMonsterTextureImporter(material_names)
             else:
-                material_names = V2_FestivityGenshinImpactMaterialNames
-            return GenshinMonsterTextureImporter(material_names)
-        elif texture_importer_type == TextureImporterType.HSR_AVATAR:
-            return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
+                print(f'Unknown TextureImporterType: {texture_importer_type}')
+        elif game_type is GameType.HONKAI_STAR_RAIL:
+            if texture_importer_type == TextureImporterType.HSR_AVATAR:
+                return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
+            else:
+                print(f'Unknown TextureImporterType: {texture_importer_type}')
         else:
-            print(f'Unknown TextureImporterType: {texture_importer_type}')
+            print(f'Unknown game_type: {game_type}')
 
 
 class GenshinTextureImporter:
