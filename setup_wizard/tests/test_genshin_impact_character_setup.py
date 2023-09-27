@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import PurePath
 from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
-    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
+    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
 
@@ -88,11 +88,14 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
             GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
             GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
+            GenshinImpactTestOperatorExecutioner('rig_character', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH))
         ]
 
         for operator in operators:
             # Important! Running tests in background will hit a RecursionError if no material files
             if operator.operator_name == 'import_material_data' and not material_json_files:
+                continue
+            elif operator.operator_name == 'rig_character' and not operator.filepath:
                 continue
 
             logger.info(f'Executing Operator: {operator.operator_name}')

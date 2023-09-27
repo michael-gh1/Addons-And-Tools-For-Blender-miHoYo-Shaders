@@ -20,6 +20,9 @@ from setup_wizard.cache_operator import ClearCacheOperator
 from setup_wizard.genshin_import_materials import GI_OT_SetUpMaterials
 from setup_wizard.genshin_import_outlines import GI_OT_SetUpOutlines
 from setup_wizard.misc_final_steps import GI_OT_FinishSetup
+from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_RigCharacter
+from setup_wizard.character_rig_setup.character_rigger_props import CharacterRiggerPropertyGroup, \
+    CharacterRiggerPropertyManager
 
 import setup_wizard.ui.gi_ui_setup_wizard_menu
 from setup_wizard.ui.gi_ui_setup_wizard_menu import \
@@ -31,6 +34,7 @@ from setup_wizard.ui.gi_ui_setup_wizard_menu import \
     GI_PT_UI_Materials_Menu, \
     GI_PT_UI_Outlines_Menu, \
     GI_PT_UI_Finish_Setup_Menu, \
+    GI_PT_UI_Character_Rig_Setup_Menu, \
     GI_PT_UI_Gran_Turismo_UI_Layout
 from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_Setup_Wizard_UI_Layout, \
@@ -57,6 +61,8 @@ modules = [
 ]
 
 classes = [
+    CharacterRiggerPropertyGroup,
+    CharacterRiggerPropertyManager,
     GI_PT_Setup_Wizard_UI_Layout, 
     GI_PT_Basic_Setup_Wizard_UI_Layout,
     GI_PT_Advanced_Setup_Wizard_UI_Layout,
@@ -64,12 +70,14 @@ classes = [
     GI_PT_UI_Materials_Menu, 
     GI_PT_UI_Outlines_Menu, 
     GI_PT_UI_Finish_Setup_Menu,
+    GI_PT_UI_Character_Rig_Setup_Menu,
     GI_PT_UI_Gran_Turismo_UI_Layout,
     GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,
     GI_OT_SetUpMaterials,
     GI_OT_SetUpOutlines,
     GI_OT_FinishSetup,
+    GI_OT_RigCharacter,
     HSR_PT_Setup_Wizard_UI_Layout,
     HSR_PT_Basic_Setup_Wizard_UI_Layout,
     HSR_PT_Advanced_Setup_Wizard_UI_Layout,

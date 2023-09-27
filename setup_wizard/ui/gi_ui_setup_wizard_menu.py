@@ -101,6 +101,8 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.GENSHIN_IMPACT.name,
         )
 
+        OperatorFactory.create_rig_character_ui(sub_layout)
+
 
 class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Advanced Setup'
@@ -265,6 +267,34 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
+class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
+    bl_label = 'Character Rig Menu'
+    bl_idname = 'GI_PT_Rigify_Setup_Menu'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
+
+    def draw(self, context):
+        layout = self.layout
+        sub_layout = layout.column()
+        box = sub_layout.box()
+
+        character_rigger_props = context.scene.character_rigger_props
+
+        OperatorFactory.create_rig_character_ui(box)
+
+        box = sub_layout.box()        
+        box.label(text='Settings')
+
+        col = box.column()
+        col.prop(character_rigger_props, 'allow_arm_ik_stretch')
+        col.prop(character_rigger_props, 'allow_leg_ik_stretch')
+        col.prop(character_rigger_props, 'use_arm_ik_poles')
+        col.prop(character_rigger_props, 'use_leg_ik_poles')
+        col.prop(character_rigger_props, 'add_children_of_constraints')
+        col.prop(character_rigger_props, 'use_head_tracker')
+
+
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
     bl_label = "Gran Turismo Tonemapper"
     bl_idname = "GI_PT_Gran_Turismo_Tonemapper_UI_Layout"
@@ -325,3 +355,21 @@ class OperatorFactory:
 
         for key, value in kwargs.items():
             setattr(ui_object, key, value)
+
+    @staticmethod
+    def create_rig_character_ui(
+        ui_object: UILayout,
+    ):
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        row = ui_object.row()
+        row.enabled = True if expy_kit_installed else False
+        OperatorFactory.create(
+            row,
+            'hoyoverse.set_up_character_rig',
+            'Rig Character',
+            'OUTLINER_OB_ARMATURE',
+            game_type=GameType.GENSHIN_IMPACT.name,
+        )
+        if not row.enabled:
+            row = ui_object.row()
+            row.label(text='ExpyKit required', icon='ERROR')

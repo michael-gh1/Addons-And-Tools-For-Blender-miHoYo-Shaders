@@ -1,0 +1,62 @@
+# Author: michael-gh1
+
+import bpy
+
+# ImportHelper is a helper class, defines filename and
+# invoke() function which calls the file selector.
+from bpy_extras.io_utils import ImportHelper
+from bpy.props import StringProperty
+from bpy.types import Operator
+
+from setup_wizard.character_rig_setup.rigify_character_service import RigifyCharacterService
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
+
+
+class GI_OT_RigCharacter(Operator, BasicSetupUIOperator):
+    '''Sets Up Rig for Character'''
+    bl_idname = 'hoyoverse.set_up_character_rig'
+    bl_label = 'HoYoverse: Set Up Character Rig (UI)'
+
+
+class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProperties):
+    """Select the .blend file with the Root_Shape"""
+    bl_idname = "hoyoverse.rig_character"  # important since its how we chain file dialogs
+    bl_label = "Select Root_Shape .blend File"
+
+    # ImportHelper mixin class uses this
+    filename_ext = "*.*"
+
+    import_path: StringProperty(
+        name="Path",
+        description="Root_Shape .blend File",
+        default="",
+        subtype='DIR_PATH'
+    )
+
+    filter_glob: StringProperty(
+        default="*.*",
+        options={'HIDDEN'},
+        maxlen=255,  # Max internal buffer length, longer would be clamped.
+    )
+
+    def execute(self, context):
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+
+        if not expy_kit_installed:
+            self.report(
+                {'WARNING'},
+                'Rigging skipped. ExpyKit required.'
+            )
+            return {'FINISHED'}
+
+        try:
+            rigify_character_service = RigifyCharacterService(self.game_type, self, context)
+            rigify_character_service.rig_character()
+        except Exception as ex:
+            raise ex
+        finally:
+            super().clear_custom_properties()
+        return {'FINISHED'}
+
+
+register, unregister = bpy.utils.register_classes_factory(GI_OT_CharacterRiggerOperator)
