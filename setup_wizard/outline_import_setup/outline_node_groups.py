@@ -2,5 +2,5 @@
 
 
 class OutlineNodeGroupNames:
-    FESTIVITY_GENSHIN_OUTLINES = 'miHoYo - Outlines'
+    FESTIVITY_GENSHIN_OUTLINES = 'Genshin - Outlines GN'
     NYA222_HSR_OUTLINES = 'HoYoverse - Outlines'
