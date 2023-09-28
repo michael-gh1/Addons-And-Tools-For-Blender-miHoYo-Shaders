@@ -361,15 +361,20 @@ class OperatorFactory:
         ui_object: UILayout,
     ):
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
-        row = ui_object.row()
-        row.enabled = True if expy_kit_installed else False
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+
+        column = ui_object.column()
+        column.enabled = True if expy_kit_installed and betterfbx_installed else False
         OperatorFactory.create(
-            row,
+            column,
             'hoyoverse.set_up_character_rig',
             'Rig Character',
             'OUTLINER_OB_ARMATURE',
             game_type=GameType.GENSHIN_IMPACT.name,
         )
-        if not row.enabled:
-            row = ui_object.row()
-            row.label(text='ExpyKit required', icon='ERROR')
+        if not column.enabled:
+            column = ui_object.column()
+            if not expy_kit_installed:
+                column.label(text='ExpyKit required', icon='ERROR')
+            if not betterfbx_installed:
+                column.label(text='BetterFBX required', icon='ERROR')
