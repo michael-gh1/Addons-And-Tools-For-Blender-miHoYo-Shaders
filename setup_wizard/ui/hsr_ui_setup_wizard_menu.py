@@ -22,14 +22,17 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
         version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
-        row = layout.row()
+        run_entire_setup_column = sub_layout.column()
         OperatorFactory.create(
-            sub_layout,
+            run_entire_setup_column,
             'genshin.setup_wizard_ui',
             'Run Entire Setup',
             'PLAY',
             game_type=GameType.HONKAI_STAR_RAIL.name
         )
+        OperatorFactory.create_betterfbx_required_ui(run_entire_setup_column)
+
+        row = layout.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -38,11 +41,6 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             'TRASH',
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
-
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
-        if betterfbx_installed:
-            row2 = layout.row()
-            row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
 
 class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
@@ -56,13 +54,16 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         layout = self.layout
         sub_layout = layout.box()
 
+        set_up_character_column = sub_layout.column()
         OperatorFactory.create(
-            sub_layout,
+            set_up_character_column,
             'genshin.set_up_character',
             'Set Up Character',
             icon='OUTLINER_OB_ARMATURE',
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
+        OperatorFactory.create_betterfbx_required_ui(set_up_character_column)
+
         OperatorFactory.create(
             sub_layout,
             'genshin.set_up_materials',
@@ -110,14 +111,17 @@ class HSR_PT_UI_Character_Model_Menu(Panel):
 
     def draw(self, context):
         layout = self.layout
-        sub_layout = layout.column()
+        sub_layout = layout.box()
 
+        import_character_model_column = sub_layout.column()
         OperatorFactory.create(
-            sub_layout,
+            import_character_model_column,
             'genshin.import_model',
             'Import Character Model',
             'OUTLINER_OB_ARMATURE',
         )
+        OperatorFactory.create_betterfbx_required_ui(import_character_model_column)
+
         OperatorFactory.create(
             sub_layout,
             'genshin.delete_empties',
@@ -307,3 +311,13 @@ class OperatorFactory:
 
         for key, value in kwargs.items():
             setattr(ui_object, key, value)
+
+    @staticmethod
+    def create_betterfbx_required_ui(
+        ui_object: UILayout,
+    ):
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        if not betterfbx_installed:
+            ui_object.column()
+            ui_object.enabled = False
+            ui_object.label(text='BetterFBX required', icon='ERROR')
