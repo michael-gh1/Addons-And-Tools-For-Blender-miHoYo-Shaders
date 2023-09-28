@@ -1,7 +1,7 @@
 # Author: michael-gh1
 
 import bpy
-from bpy.types import Operator
+from bpy.types import Armature, Operator
 
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
@@ -20,8 +20,14 @@ class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
 
     def execute(self, context):
         bpy.ops.object.select_all(action='DESELECT')
-        armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
+        armature: Armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
         armature.select_set(True)
+
+        # I don't want to modify any characters unless absolutely necessary
+        # So, as Dehya comes with keyframes and is not in an A-Pose by default, let's clean her character
+        #   - This must be done before the rigging step, otherwise the rig setup will not be upright!
+        if 'Dehya' in armature.name and armature.animation_data:
+            self.clean_character(armature)
 
         bpy.ops.object.scale_clear()
         bpy.ops.object.rotation_clear()
@@ -52,6 +58,17 @@ class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
                 game_type=self.game_type,
             )
         return {'FINISHED'}
+
+    def clean_character(self, armature):
+        armature.animation_data_clear()
+        self.reset_pose(armature)
+
+    def reset_pose(self, armature):
+        pose = armature.pose
+
+        for bone in pose.bones:
+            bone: bpy.types.PoseBone
+            bone.matrix_basis.identity()
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_FixTransformations)
