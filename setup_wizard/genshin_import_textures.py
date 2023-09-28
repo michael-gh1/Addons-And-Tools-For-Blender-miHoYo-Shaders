@@ -8,6 +8,7 @@ import bpy
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
+from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetterFactory
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 from setup_wizard.texture_import_setup.game_texture_importers import GameTextureImporter, GameTextureImporterFactory
@@ -38,12 +39,16 @@ class GI_OT_GenshinImportTextures(Operator, ImportHelper, CustomOperatorProperti
     def execute(self, context):
         game_texture_importer: GameTextureImporter = \
             GameTextureImporterFactory.create(self.game_type, self, context)
+        material_default_value_setter = MaterialDefaultValueSetterFactory.create(self.game_type)
 
-        texture_importer_service = TextureImporterService(game_texture_importer)
+        texture_importer_service = TextureImporterService(game_texture_importer, material_default_value_setter)
         status = texture_importer_service.import_textures()
 
+        if status == {'FINISHED'}:
+            texture_importer_service.set_default_values()
+
         super().clear_custom_properties()
-        return status or {'FINISHED'}
+        return {'FINISHED'}
 
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_GenshinImportTextures)

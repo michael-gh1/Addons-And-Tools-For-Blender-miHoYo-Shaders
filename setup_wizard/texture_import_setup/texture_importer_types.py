@@ -4,7 +4,11 @@ import bpy
 
 import os
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
@@ -25,23 +29,39 @@ class TextureType(Enum):
 
 
 class TextureImporterFactory:
-    def create(texture_importer_type):
-        if texture_importer_type == TextureImporterType.AVATAR:
-            return GenshinAvatarTextureImporter()
-        elif texture_importer_type == TextureImporterType.NPC:
-            return GenshinNPCTextureImporter()
-        elif texture_importer_type == TextureImporterType.MONSTER:
-            return GenshinMonsterTextureImporter()
-        elif texture_importer_type == TextureImporterType.HSR_AVATAR:
-            return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
+    def create(texture_importer_type, game_type: GameType):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type.name)
+
+        if game_type is GameType.GENSHIN_IMPACT:
+            shader: GenshinImpactShaders = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = V2_FestivityGenshinImpactMaterialNames  # V1/V2 have the same material names
+
+            if texture_importer_type == TextureImporterType.AVATAR:
+                return GenshinAvatarTextureImporter(material_names)
+            elif texture_importer_type == TextureImporterType.NPC:
+                return GenshinNPCTextureImporter(material_names)
+            elif texture_importer_type == TextureImporterType.MONSTER:
+                return GenshinMonsterTextureImporter(material_names)
+            else:
+                print(f'Unknown TextureImporterType: {texture_importer_type}')
+        elif game_type is GameType.HONKAI_STAR_RAIL:
+            if texture_importer_type == TextureImporterType.HSR_AVATAR:
+                return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
+            else:
+                print(f'Unknown TextureImporterType: {texture_importer_type}')
         else:
-            print(f'Unknown TextureImporterType: {texture_importer_type}')
+            print(f'Unknown game_type: {game_type}')
 
 
 class GenshinTextureImporter:
     def __init__(self, game_type: GameType, character_type: TextureImporterType):
         self.game_type = game_type
         self.character_type = character_type
+        self.genshin_shader_version = None  # purely for syntax highlighting purposes
 
     def import_textures(self, directory):
         raise NotImplementedError()
@@ -81,20 +101,26 @@ class GenshinTextureImporter:
                     return False
         return True
 
-    def set_diffuse_texture(self, type: TextureType, material, img):
-        material.node_tree.nodes[f'{type.value}_Diffuse_UV0'].image = img
-        material.node_tree.nodes[f'{type.value}_Diffuse_UV1'].image = img
+    def set_diffuse_texture(self, texture_type: TextureType, material, img):
+        material.node_tree.nodes[f'{texture_type.value}_Diffuse_UV0'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Diffuse_UV1'].image = img
 
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Diffuse', img, self.character_type)
+            if not self.does_dress_texture_exist_in_directory_files() or \
+                type(self) is GenshinMonsterTextureImporter or \
+                type(self) is GenshinNPCTextureImporter:
+                self.setup_dress_textures(f'{texture_type.value}_Diffuse', img, self.character_type)
 
-    def set_lightmap_texture(self, type: TextureType, material, img):
+    def set_lightmap_texture(self, texture_type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
-        material.node_tree.nodes[f'{type.value}_Lightmap_UV0'].image = img
-        material.node_tree.nodes[f'{type.value}_Lightmap_UV1'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Lightmap_UV0'].image = img
+        material.node_tree.nodes[f'{texture_type.value}_Lightmap_UV1'].image = img
         
         if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Lightmap', img, self.character_type)
+            if not self.does_dress_texture_exist_in_directory_files() or \
+                type(self) is GenshinMonsterTextureImporter or \
+                type(self) is GenshinNPCTextureImporter:
+                self.setup_dress_textures(f'{texture_type.value}_Lightmap', img, self.character_type)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
@@ -114,25 +140,55 @@ class GenshinTextureImporter:
         bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'{type.value}_Shadow_Ramp'].image = img
 
     def set_specular_ramp_texture(self, type: TextureType, img):
-        img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
+        specular_ramp_node_exists = bpy.data.node_groups.get(f'{type.value} Specular Ramp')
+
+        if specular_ramp_node_exists:
+            img.colorspace_settings.name='Non-Color'
+            bpy.data.node_groups[f'{type.value} Specular Ramp'].nodes[f'{type.value}_Specular_Ramp'].image = img        
 
     def set_face_diffuse_texture(self, face_material, img):
-        face_material.node_tree.nodes['Face_Diffuse'].image = img        
+        face_material.node_tree.nodes['Face_Diffuse'].image = img
+
+        # Set Built-In Face Lightmap Value for the V3 Shader
+        face_shader_node = face_material.node_tree.nodes.get('Face Shader')
+        if face_shader_node:
+            face_lightmap_input = face_shader_node.inputs.get('[Loli/Boy/Girl/Male/Lady]')
+            if face_lightmap_input:
+                if 'Loli' in img.name:
+                    face_lightmap_input.default_value = 1.0
+                elif 'Boy' in img.name:
+                    face_lightmap_input.default_value = 2.0
+                elif 'Girl' in img.name:
+                    face_lightmap_input.default_value = 3.0
+                elif 'Male' in img.name:
+                    face_lightmap_input.default_value = 4.0
+                elif 'Lady' in img.name:
+                    face_lightmap_input.default_value = 5.0
+
 
     def set_face_shadow_texture(self, face_material, img):
-        img.colorspace_settings.name='Non-Color'
-        face_material.node_tree.nodes['Face_Shadow'].image = img        
+        face_shadow_node_exists = face_material.node_tree.nodes.get('Face_Shadow')
+
+        if face_shadow_node_exists:
+            img.colorspace_settings.name='Non-Color'
+            face_material.node_tree.nodes['Face_Shadow'].image = img        
 
     def set_face_lightmap_texture(self, img):
-        img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
+        face_lightmap_node_exist = bpy.data.node_groups.get('Face Lightmap')
+
+        if face_lightmap_node_exist:
+            img.colorspace_settings.name='Non-Color'
+            bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
 
     def set_metalmap_texture(self, img):
-        bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
+        metallic_matcap_node_exists = bpy.data.node_groups.get('Metallic Matcap')
+
+        if metallic_matcap_node_exists:
+            bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
-        shader_dress_materials = [material for material in bpy.data.materials if 'Genshin Dress' in material.name]
+        shader_dress_materials = [material for material in bpy.data.materials if 
+                                  'Genshin Dress' in material.name and 'Outlines' not in material.name]
         shader_cloak_materials = [material for material in bpy.data.materials
                                   if 'Genshin Arm' in material.name or 'Genshin Cloak' in material.name]
 
@@ -163,6 +219,58 @@ class GenshinTextureImporter:
                 material_shader_nodes.get(f'{texture_name}_UV1').image = texture_img
                 return
 
+    def does_dress_texture_exist_in_directory_files(self):
+        dress_texture_detected = False
+        for file in self.files:
+            if 'Dress' in file:
+                dress_texture_detected = True
+        return dress_texture_detected
+
+    def set_face_material_id(self, face_material, image):
+        character_to_face_material_id_map = {
+            'Collei': 5,
+            'Cyno': 3,
+            'DilucCostumeFlamme': 3,
+            'Faruzan': 3,
+            'AyakaCostumeFruhling': 5,
+            'Ayato': 3,
+            'Linette': 3,  # Lynette
+            'Liney': 3,  # Lyney
+            'Nilou': 3,
+            'Kokomi': 3,
+            'Tighnari': 3,
+            'Yelan': 3,
+        }
+
+        shader_node_names = V2_GenshinShaderNodeNames if \
+            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
+        shader_has_face_material_id = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER or \
+            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
+
+        if shader_has_face_material_id:
+            for character_name in character_to_face_material_id_map.keys():
+                if character_name in image.name:
+                    if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
+                        face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
+                        face_shader_node.inputs[shader_node_names.FACE_MATERIAL_ID].default_value = \
+                            character_to_face_material_id_map[character_name]
+
+    def set_body_hair_ramps_on_face_shader(self, face_material, image):
+        character_to_body_hair_ramps_map = {
+            'Funingna': 1,  # Furina
+        }
+
+        shader_node_names = V3_GenshinShaderNodeNames
+        shader_has_body_hair_ramps = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
+
+        if shader_has_body_hair_ramps:
+            for character_name in character_to_body_hair_ramps_map.keys():
+                if character_name in image.name:
+                    if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
+                        face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
+                        face_shader_node.inputs[shader_node_names.BODY_HAIR_RAMPS].default_value = \
+                            character_to_body_hair_ramps_map[character_name]
+
     '''
     Deprecated: No longer needed after shader rewrite because normal map is plugged by default
     Still maintains backward compatibility by only trying this if `label_name` is found in the node tree.
@@ -186,33 +294,57 @@ class GenshinTextureImporter:
 
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                effect_hair_material = bpy.data.materials.get(f'{self.material_names.EFFECT_HAIR}')
+                hair_material = bpy.data.materials.get(f'{self.material_names.HAIR}')
+                helmet_material = bpy.data.materials.get(f'{self.material_names.HELMET}')
+                helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
+                face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
+                body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
+                dress_material = bpy.data.materials.get(f'{self.material_names.DRESS}')
+                gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
                 if "Hair_Diffuse" in file and "Eff" not in file:
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
-                elif "Hair_Lightmap" in file:
+                elif "EffectHair_Diffuse" in file:
+                    self.set_diffuse_texture(TextureType.HAIR, effect_hair_material, img)
+                elif 'Helmet_Tex_Diffuse' in file:
+                    self.set_diffuse_texture(TextureType.HAIR, helmet_material, img)
+                elif 'HelmetEmo_Tex_Diffuse' in file:
+                    self.set_diffuse_texture(TextureType.HAIR, helmet_emotion_material, img)
+                elif "Hair_Lightmap" in file and "Eff" not in file:
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+                elif "EffectHair_Lightmap" in file:
+                    self.set_lightmap_texture(TextureType.HAIR, effect_hair_material, img)
+                elif 'Helmet_Tex_Lightmap' in file:
+                    self.set_lightmap_texture(TextureType.HAIR, helmet_material, img)
                 elif "Hair_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
                     self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif "Body_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
+                    # Set Face Id in Body_Diffuse because not all Face Diffuse filenames have the full costume name
+                    # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
+                    self.set_face_material_id(face_material, img)
+                    self.set_body_hair_ramps_on_face_shader(face_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Normalmap" in file:
@@ -221,6 +353,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_shadow_ramp_texture(TextureType.BODY, img)
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
                     self.set_specular_ramp_texture(TextureType.BODY, img)
+                elif "Dress" in file:
+                    self.set_diffuse_texture(TextureType.BODY, dress_material, img)
                 elif "Face_Diffuse" in file:
                     self.set_face_diffuse_texture(face_material, img)
                 elif "Face_Shadow" in file:
@@ -229,26 +363,37 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_lightmap_texture(img)
                 elif "MetalMap" in file:
                     self.set_metalmap_texture(img)
+                elif "Gauntlet_Diffuse" in file:
+                    self.set_diffuse_texture(TextureType.BODY, gauntlet_material, img)
+                elif "Gauntlet_Lightmap" in file:
+                    self.set_lightmap_texture(TextureType.BODY, gauntlet_material, img)
+                elif "Gauntlet_Normalmap" in file:
+                    self.set_normalmap_texture(TextureType.BODY, gauntlet_material, img)
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
 class GenshinNPCTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
+                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
+                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -298,35 +443,58 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
 class GenshinMonsterTextureImporter(GenshinTextureImporter):
-    def __init__(self):
+    def __init__(self, material_names: ShaderMaterialNames):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
+            self.files = files
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get('miHoYo - Genshin Hair')
-                face_material = bpy.data.materials.get('miHoYo - Genshin Face')
-                body_material = bpy.data.materials.get('miHoYo - Genshin Body')
+                hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
+                face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
+                body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
 
-                if self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file):
+                if self.is_texture_identifiers_in_texture_name(['Body', 'Tex', 'Diffuse'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Hair'], files)):
                     self.set_diffuse_texture(TextureType.BODY, body_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file):
+                elif self.is_texture_identifiers_in_texture_name(['Body', 'Tex', 'Lightmap'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file) and \
+                    not self.is_texture_identifiers_in_files(['Hair'], files)):
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
 
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Tex', 'Diffuse'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Diffuse'], file) and \
+                    not self.is_texture_identifiers_in_files(['Body'], files)):
+                    self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hair', 'Tex', 'Lightmap'], file) or \
+                    (self.is_texture_identifiers_in_texture_name(['Tex', 'Lightmap'], file) and \
+                    not self.is_texture_identifiers_in_files(['Body'], files)):
+                    self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Body_Shadow_Ramp'], file):
+                    self.set_shadow_ramp_texture(TextureType.BODY, img)
+                elif self.is_texture_identifiers_in_texture_name(['Hair_Shadow_Ramp'], file):
+                    self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif self.is_texture_identifiers_in_texture_name(['Tex', 'Specular_Ramp'], file):
                     self.set_specular_ramp_texture(TextureType.BODY, img)
 
@@ -347,7 +515,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 else:
-                    pass
+                    print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 

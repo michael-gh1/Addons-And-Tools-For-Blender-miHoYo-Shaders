@@ -6,7 +6,10 @@ from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterFactory, TextureImporterType
@@ -14,9 +17,10 @@ from setup_wizard.utils.genshin_body_part_deducer import get_npc_mesh_body_part_
 
 
 class OutlineTextureImporter(ABC):
-    def __init__(self, blender_operator: Operator, context: Context):
+    def __init__(self, blender_operator: Operator, context: Context, material_names: ShaderMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
+        self.material_names = material_names
 
     @abstractmethod
     def import_textures(self):
@@ -25,10 +29,21 @@ class OutlineTextureImporter(ABC):
     def assign_lightmap_texture(self, character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name):
         v1_lightmap_node_name = 'Image Texture'
         v2_lightmap_node_name = 'Outline_Lightmap'
-        outline_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
-        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
+        lightmap_filenames = []
+        if body_part_material_name == 'EffectHair':
+            lightmap_filenames = [file for file in lightmap_files if 'EffectHair' in file]
+        else:
+            lightmap_filenames = [file for file in lightmap_files if \
+                                 actual_material_part_name in file and 'EffectHair' not in file]
+        if not lightmap_filenames:
+            self.blender_operator.report({'WARNING'}, f'"{actual_material_part_name}" lightmap not found for material "{outline_material.name}"')
+            return
+        else:
+            lightmap_filename = lightmap_filenames[0]
+
         lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
             or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
         self.assign_texture_to_node(lightmap_node, character_model_folder_file_path, lightmap_filename)
@@ -36,12 +51,23 @@ class OutlineTextureImporter(ABC):
 
     def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
         difuse_node_name = 'Outline_Diffuse'
-        outline_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
         diffuse_node = outline_material.node_tree.nodes.get(difuse_node_name) \
             or None  # None for backwards compatibility in v1 where it did not exist
 
+        diffuse_filenames = []
         if diffuse_node:
-            diffuse_filename = [file for file in diffuse_files if actual_material_part_name in file][0]
+            if body_part_material_name == 'EffectHair':
+                diffuse_filenames = [file for file in diffuse_files if 'EffectHair' in file]
+            else:
+                diffuse_filenames = [file for file in diffuse_files if \
+                                    actual_material_part_name in file and 'EffectHair' not in file]
+        if not diffuse_filenames:
+            self.blender_operator.report({'INFO'}, f'"{actual_material_part_name}" diffuse not found for material "{outline_material.name}"')
+            return
+        else:
+            diffuse_filename = diffuse_filenames[0]
+
             self.assign_texture_to_node(diffuse_node, character_model_folder_file_path, diffuse_filename)
             self.blender_operator.report({'INFO'}, f'Imported "{actual_material_part_name}" diffuse onto material "{outline_material.name}"')
 
@@ -54,9 +80,15 @@ class OutlineTextureImporter(ABC):
 
 class OutlineTextureImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactOutlineTextureImporter(blender_operator, context)
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+            return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailOutlineTextureImporter(blender_operator, context)
         else:
@@ -64,8 +96,9 @@ class OutlineTextureImporterFactory:
 
 
 class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
-    def __init__(self, blender_operator, context):
-        super().__init__(blender_operator, context)
+    def __init__(self, blender_operator, context, material_names):
+        super().__init__(blender_operator, context, material_names)
+        self.material_names = material_names
 
     def import_textures(self):
         cache_enabled = self.context.window_manager.cache_enabled
@@ -86,8 +119,8 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
         
         for name, folder, files in os.walk(character_model_folder_file_path):
             diffuse_files = [file for file in files if 'Diffuse'.lower() in file.lower()]
-            lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower()]
-            outline_materials = [material for material in bpy.data.materials.values() if 'Outlines' in material.name and material.name != FestivityGenshinImpactMaterialNames.OUTLINES]
+            lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower() or 'Ligntmap'.lower() in file.lower()]  # Important typo check for: Wrioth
+            outline_materials = [material for material in bpy.data.materials.values() if 'Outlines' in material.name and material.name != self.material_names.OUTLINES]
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
@@ -122,7 +155,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
 
 class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
     def __init__(self, blender_operator, context):
-        super().__init__(blender_operator, context)
+        super().__init__(blender_operator, context, Nya222HonkaiStarRailShaderMaterialNames)
 
     def import_textures(self):
         cache_enabled = self.context.window_manager.cache_enabled
@@ -179,7 +212,7 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
         texture_img.alpha_mode = 'CHANNEL_PACKED'
 
-        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR)
+        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR, GameType.HONKAI_STAR_RAIL)
         hsr_texture_importer.set_lightmap_texture(None, outline_material, texture_img)
 
     def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
@@ -192,5 +225,5 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
         texture_img.alpha_mode = 'CHANNEL_PACKED'
 
-        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR)
+        hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR, GameType.HONKAI_STAR_RAIL)
         hsr_texture_importer.set_diffuse_texture(None, outline_material, texture_img)

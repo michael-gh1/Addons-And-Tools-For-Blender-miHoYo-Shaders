@@ -44,7 +44,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
     The stacktrace will contain the method name (game name).
     '''
     def import_textures(self):
-        self.__import_genshin_impact_textures()
+        return self.__import_genshin_impact_textures()
 
     def __import_genshin_impact_textures(self):
         cache_enabled = self.context.window_manager.cache_enabled
@@ -61,7 +61,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
                 high_level_step_name=self.blender_operator.high_level_step_name,
                 game_type=GameType.GENSHIN_IMPACT.name,
             )
-            return {'FINISHED'}
+            return {'SKIP'}
 
         texture_importer_type = ''
         
@@ -72,7 +72,7 @@ class GenshinImpactTextureImporterFacade(GameTextureImporter):
         else:
             texture_importer_type = TextureImporterType.NPC
 
-        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type, GameType.GENSHIN_IMPACT)
         texture_importer.import_textures(directory)
 
         '''
@@ -122,7 +122,7 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
     The stacktrace will contain the method name (game name).
     '''
     def import_textures(self):
-        self.__import_honkai_star_rail_textures()
+        return self.__import_honkai_star_rail_textures()
 
     def __import_honkai_star_rail_textures(self):
         cache_enabled = self.context.window_manager.cache_enabled
@@ -142,7 +142,7 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
             return {'FINISHED'}
 
         texture_importer_type = TextureImporterType.HSR_AVATAR
-        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type)
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type, GameType.HONKAI_STAR_RAIL)
         texture_importer.import_textures(directory)
 
         self.blender_operator.report({'INFO'}, 'Imported textures')

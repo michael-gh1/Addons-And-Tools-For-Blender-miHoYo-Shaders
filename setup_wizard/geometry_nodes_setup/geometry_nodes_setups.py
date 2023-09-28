@@ -4,7 +4,9 @@ import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, GameMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
@@ -24,6 +26,9 @@ NAME_OF_OUTLINE_3_MASK_INPUT = 'Input_14'
 NAME_OF_OUTLINE_3_MATERIAL_INPUT = 'Input_15'
 NAME_OF_OUTLINE_4_MASK_INPUT = 'Input_18'
 NAME_OF_OUTLINE_4_MATERIAL_INPUT = 'Input_19'
+NAME_OF_OUTLINE_5_MASK_INPUT = 'Input_24'
+NAME_OF_OUTLINE_5_MATERIAL_INPUT = 'Input_25'
+
 
 
 outline_mask_to_material_mapping = {
@@ -37,6 +42,14 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'Mask',
+    'Cap',
+    'Clothes',
+    'Handcuffs',
+    'Hat',
+    'Helmet',
+    'Wriothesley_Gauntlet_L_Model',
+    'Wriothesley_Gauntlet_R_Model',
     'Hair',  # HSR Support
     'Weapon',  # HSR Support
     'Weapon01',  # HSR Support
@@ -46,8 +59,13 @@ meshes_to_create_geometry_nodes_on = [
 
 class GameGeometryNodesSetupFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactGeometryNodesSetup(blender_operator, context)
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
+            else:
+                return GenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailGeometryNodesSetup(blender_operator, context)
         else:
@@ -60,7 +78,7 @@ class GameGeometryNodesSetup(ABC):
     def setup_geometry_nodes(self):
         raise NotImplementedError
 
-    def clone_outlines(self, game_material_names: GameMaterialNames):
+    def clone_outlines(self, game_material_names: ShaderMaterialNames):
         materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
 
         for material in materials:
@@ -131,9 +149,11 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context
+        self.material_names = V2_FestivityGenshinImpactMaterialNames
+        self.outline_node_group_name = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
 
     def setup_geometry_nodes(self):
-        self.clone_outlines(FestivityGenshinImpactMaterialNames)
+        self.clone_outlines(self.material_names)
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
@@ -146,7 +166,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
         outlines_node_group = \
-            bpy.data.node_groups.get(OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES)
+            bpy.data.node_groups.get(self.outline_node_group_name)
 
         geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
 
@@ -156,6 +176,70 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
         self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier
+
+
+class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    BASE_GEOMETRY_INPUT = 'Input_12'
+    USE_VERTEX_COLORS_INPUT = 'Input_13'
+
+
+    def __init__(self, blender_operator, context):
+        self.blender_operator = blender_operator
+        self.context = context
+        self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+        self.outline_node_group_name = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+
+    def setup_geometry_nodes(self):
+        self.clone_outlines(self.material_names)
+        for mesh_name in meshes_to_create_geometry_nodes_on:
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
+
+        face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Eye' not in mesh_name]
+        self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def create_geometry_nodes_modifier(self, mesh_name):
+        mesh = bpy.context.scene.objects[mesh_name]
+        outlines_node_group = \
+            bpy.data.node_groups.get(self.outline_node_group_name)
+
+        geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+
+        if not geometry_nodes_modifier:
+            geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+            geometry_nodes_modifier.node_group = outlines_node_group
+
+        self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+        return geometry_nodes_modifier 
+
+    def set_up_modifier_default_values(self, modifier, mesh):
+        modifier[self.BASE_GEOMETRY_INPUT] = True
+        modifier[self.USE_VERTEX_COLORS_INPUT] = True
+
+        outline_to_material_mapping = {
+            'EffectHair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
+            'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
+            'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+            'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+            'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+            'Dress2': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+            'Arm': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+            'Gauntlet': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+            'HelmetEmo': (NAME_OF_OUTLINE_5_MASK_INPUT, NAME_OF_OUTLINE_5_MATERIAL_INPUT),
+        }
+
+        for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
+            material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name}'
+            outline_material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name} Outlines'
+
+            if bpy.data.materials.get(material_name) and bpy.data.materials.get(outline_material_name):
+                modifier[material_input_accessor] = bpy.data.materials.get(material_name)
+                modifier[outline_material_input_accessor] = bpy.data.materials.get(outline_material_name)
 
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):

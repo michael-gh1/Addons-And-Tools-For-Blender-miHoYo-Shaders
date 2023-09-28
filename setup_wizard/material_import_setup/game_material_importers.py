@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
@@ -95,12 +95,16 @@ class GameMaterialImporter:
 
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
-    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'miHoYo - Genshin Impact.blend'
+    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse_-_Genshin_Impact_-_Goo_Engine_v3.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
-        {'name': FestivityGenshinImpactMaterialNames.BODY},
-        {'name': FestivityGenshinImpactMaterialNames.FACE},
-        {'name': FestivityGenshinImpactMaterialNames.HAIR},
-        {'name': FestivityGenshinImpactMaterialNames.OUTLINES}
+        {'name': V2_FestivityGenshinImpactMaterialNames.BODY},
+        {'name': V2_FestivityGenshinImpactMaterialNames.FACE},
+        {'name': V2_FestivityGenshinImpactMaterialNames.HAIR},
+        {'name': V2_FestivityGenshinImpactMaterialNames.OUTLINES},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.BODY},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES}
     ]
 
     def __init__(self, blender_operator, context):

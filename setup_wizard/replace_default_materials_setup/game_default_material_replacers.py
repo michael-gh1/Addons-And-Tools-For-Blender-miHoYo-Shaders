@@ -7,7 +7,10 @@ from bpy.types import Context, Operator
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_materials import FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 
 
@@ -19,9 +22,15 @@ class GameDefaultMaterialReplacer(ABC):
 
 class GameDefaultMaterialReplacerFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactDefaultMaterialReplacer(blender_operator, context)
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = V2_FestivityGenshinImpactMaterialNames 
+            return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailDefaultMaterialReplacer(blender_operator, context)
         else:
@@ -29,9 +38,10 @@ class GameDefaultMaterialReplacerFactory:
 
 
 class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
-    def __init__(self, blender_operator, context):
+    def __init__(self, blender_operator, context, material_names: ShaderMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
+        self.material_names = material_names
 
     def replace_default_materials(self):
         meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH']
@@ -52,7 +62,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
-                genshin_material = bpy.data.materials.get(f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}')
+                # If material_name is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
+                material_name = self.create_shader_material_if_unique_mesh(mesh, mesh_body_part_name, material_name)
+                genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
                 if genshin_material:
                     material_slot.material = genshin_material
@@ -68,12 +80,12 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
-                        f'{FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX}{actual_material_for_dress}', 
+                        f'{self.material_names.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(FestivityGenshinImpactMaterialNames.BODY)
+                    material_slot.material = bpy.data.materials.get(self.material_names.BODY)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
@@ -85,6 +97,24 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 #     genshin_main_shader_node = genshin_material.node_tree.nodes.get('Group.001')
                 #     genshin_main_shader_node.node_tree = self.__clone_shader_node_and_rename(genshin_material, mesh_body_part_name)
         self.blender_operator.report({'INFO'}, 'Replaced default materials with Genshin shader materials...')
+
+    def create_shader_material_if_unique_mesh(self, mesh, mesh_body_part_name, material_name):
+        if mesh_body_part_name == 'EffectHair':  # Furina
+            hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
+            material_name = hair_material.name
+        elif mesh_body_part_name == 'Helmet':  # Frem
+            helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET)
+            material_name = helmet_material.name
+        elif mesh_body_part_name == 'HelmetEmo':  # Frem
+            helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET_EMO)
+            material_name = helmet_material.name
+        elif 'Dress' in mesh.name:  # Scaramouche
+            dress_material = self.create_body_material(self.material_names, self.material_names.DRESS)
+            material_name = dress_material.name  # Scaramouche has Dress mesh/textures so we shouldn't run into an issue
+        elif mesh_body_part_name == 'Gauntlet':  # Wrioth
+            gauntlet_material = self.create_body_material(self.material_names, self.material_names.GAUNTLET)
+            material_name = gauntlet_material.name
+        return material_name
 
     def __get_npc_mesh_body_part_name(self, material_name):
         if 'Hair' in material_name:
@@ -112,11 +142,27 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
-        new_material.name = f'miHoYo - Genshin {mesh_body_part_name}'
+        new_material.name = f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
         new_material.use_fake_user = True
 
         material_slot.material = new_material
         return new_material
+
+    def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
+        body_material = bpy.data.materials.get(material_name)
+        if not body_material:
+            body_material = bpy.data.materials.get(shader_material_names.BODY).copy()
+            body_material.name = material_name
+            body_material.use_fake_user = True
+        return body_material
+
+    def create_hair_material(self, shader_material_names: ShaderMaterialNames, material_name):
+        hair_material = bpy.data.materials.get(material_name)
+        if not hair_material:
+            hair_material = bpy.data.materials.get(shader_material_names.HAIR).copy()
+            hair_material.name = material_name
+            hair_material.use_fake_user = True
+        return hair_material
 
     '''
     This method was used for V1 shader and should NOT be used for V2 shader because the group name is different.

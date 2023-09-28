@@ -6,7 +6,11 @@ from pathlib import PurePosixPath
 from typing import List
 import bpy
 from bpy.types import Operator, Context, Material
-from setup_wizard.domain.shader_materials import Nya222HonkaiStarRailShaderMaterialNames
+
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+    Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
 from setup_wizard.domain.game_types import GameType
@@ -59,9 +63,15 @@ class GameMaterialDataImporter(ABC):
 
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group)
+            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group)
         else:
@@ -71,15 +81,17 @@ class GameMaterialDataImporterFactory:
 class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
     WEAPON_NAME_IDENTIFIER = 'Mat'
 
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
             HoyoStudioMaterialDataJsonParser,
+            UnknownHoyoStudioMaterialDataJsonParser,
             UABEMaterialDataJsonParser,
         ]
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
+        self.material_names = material_names
 
     def import_material_data(self):
         self.__validate_UI_inputs_for_targeted_material_data_import()
@@ -118,8 +130,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
-            material: Material = self.material or bpy.data.materials.get(f'miHoYo - Genshin {body_part}')
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'miHoYo - Genshin {body_part} Outlines')
+            material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}')
+            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines')
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
@@ -127,7 +139,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                     f'Continuing to apply other material data, but: \n'
                     f'* Type: {character_type}\n'
                     f'* Material Data JSON "{file.name}" was selected, but unable to determine material to apply this to.\n'
-                    f'* Expected Materials "miHoYo - Genshin {body_part}" and "miHoYo - Genshin {body_part} Outlines"')
+                    f'* Expected Materials "{self.material_names.MATERIAL_PREFIX}{body_part}" and "{self.material_names.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
             material_data_parser = self.get_material_data_json_parser(json_material_data)
