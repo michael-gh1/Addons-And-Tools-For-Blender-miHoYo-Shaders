@@ -15,7 +15,8 @@
             "setup_head_driver",
             "set_color_management_to_standard",
             "delete_specific_objects",
-            "set_up_armtwist_bone_constraints"
+            "set_up_armtwist_bone_constraints",
+            "rig_character"
         ],
         "GENSHIN_OT_setup_wizard_ui_no_outlines": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_setup_wizard_ui",
@@ -28,7 +29,8 @@
             "setup_head_driver",
             "set_color_management_to_standard",
             "delete_specific_objects",
-            "set_up_armtwist_bone_constraints"
+            "set_up_armtwist_bone_constraints",
+            "rig_character"
         ],
         "GENSHIN_OT_set_up_character": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_character",
@@ -55,6 +57,10 @@
             "set_color_management_to_standard",
             "delete_specific_objects",
             "set_up_armtwist_bone_constraints"
+        ],
+        "HOYOVERSE_OT_set_up_character_rig": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_final_steps",
+            "rig_character"
         ]
     }
 }
