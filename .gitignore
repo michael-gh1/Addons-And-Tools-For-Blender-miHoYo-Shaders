@@ -1,7 +1,7 @@
 *.tmp
 *.log
-*.blend
-*.blend1
+setup_wizard/tests/**/*.blend
+setup_wizard/tests/**/*.blend1
 setup_wizard/tests/config.json
 
 
