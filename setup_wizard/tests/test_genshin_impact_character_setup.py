@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import PurePath
 from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
-    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
+    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, RIG_CHARACTER
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
 
@@ -88,14 +88,15 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
             GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
             GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
-            GenshinImpactTestOperatorExecutioner('rig_character', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH))
+            GenshinImpactTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
+            GenshinImpactTestOperatorExecutioner('rig_character', config=config)
         ]
 
         for operator in operators:
             # Important! Running tests in background will hit a RecursionError if no material files
             if operator.operator_name == 'import_material_data' and not material_json_files:
                 continue
-            elif operator.operator_name == 'rig_character' and not operator.filepath:
+            elif operator.operator_name == 'rig_character' and not config.get(RIG_CHARACTER):
                 continue
 
             logger.info(f'Executing Operator: {operator.operator_name}')
@@ -126,7 +127,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             os.makedirs(f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact', exist_ok=True)
             bpy.ops.wm.save_as_mainfile(filepath=f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact/{filename}')
             logger.info(f'Saved file for {character_name} as: {filename}')
-    bpy.ops.wm.quit_blender()
+        bpy.ops.wm.quit_blender()
 
 
 setup_character(arg_config, arg_character_name, arg_character_folder_file_path, arg_material_data_folder)
