@@ -1,6 +1,8 @@
 # Author: michael-gh1
 
 import bpy
+import os
+
 from setup_wizard.character_rig_setup.rig_script import rig_character
 
 from abc import ABC, abstractmethod
@@ -43,15 +45,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         filepath = get_cache(cache_enabled).get(self.rigify_bone_shapes_file_path) or self.blender_operator.filepath
 
         if not filepath:
-            bpy.ops.hoyoverse.rig_character(
-                'INVOKE_DEFAULT',
-                next_step_idx=self.blender_operator.next_step_idx, 
-                file_directory=self.blender_operator.file_directory,
-                invoker_type=self.blender_operator.invoker_type,
-                high_level_step_name=self.blender_operator.high_level_step_name,
-                game_type=self.blender_operator.game_type,
-            )
-            return {'FINISHED'}
+            filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
 
         armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
@@ -82,8 +76,6 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         # self.__set_head_tracker_constraint_influence(head_tracker_constraint_influence)
 
         self.blender_operator.report({'INFO'}, 'Successfully rigged character')
-        if cache_enabled and filepath:
-            cache_using_cache_key(get_cache(cache_enabled), self.rigify_bone_shapes_file_path, filepath)
 
         NextStepInvoker().invoke(
             self.blender_operator.next_step_idx,

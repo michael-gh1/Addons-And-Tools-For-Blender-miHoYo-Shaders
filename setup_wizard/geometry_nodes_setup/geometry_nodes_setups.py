@@ -30,7 +30,6 @@ NAME_OF_OUTLINE_5_MASK_INPUT = 'Input_24'
 NAME_OF_OUTLINE_5_MATERIAL_INPUT = 'Input_25'
 
 
-
 outline_mask_to_material_mapping = {
     NAME_OF_OUTLINE_1_MASK_INPUT: NAME_OF_OUTLINE_1_MATERIAL_INPUT,
     NAME_OF_OUTLINE_2_MASK_INPUT: NAME_OF_OUTLINE_2_MATERIAL_INPUT,
@@ -73,6 +72,10 @@ class GameGeometryNodesSetupFactory:
 
 class GameGeometryNodesSetup(ABC):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+
+    def __init__(self, blender_operator, context):
+        self.blender_operator = blender_operator
+        self.context = context
 
     @abstractmethod
     def setup_geometry_nodes(self):
@@ -132,8 +135,8 @@ class GameGeometryNodesSetup(ABC):
             face_mesh_object = bpy.data.objects.get(face_mesh.name)
 
             if not face_mesh or not face_mesh_object:
-                self.report_message_level = {'ERROR'}
-                self.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
+                self.blender_operator.report_message_level = {'ERROR'}
+                self.blender_operator.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
                 return
             bpy.context.view_layer.objects.active = face_mesh_object  # Select 'Face' mesh before swapping material slots
 
@@ -147,10 +150,9 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
         self.material_names = V2_FestivityGenshinImpactMaterialNames
-        self.outline_node_group_name = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
+        self.outlines_node_group_names = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
@@ -165,16 +167,18 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
-        outlines_node_group = \
-            bpy.data.node_groups.get(self.outline_node_group_name)
 
-        geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+        for outlines_node_group_name in self.outlines_node_group_names:
+            outlines_node_group = bpy.data.node_groups.get(outlines_node_group_name)
+            geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
 
-        if not geometry_nodes_modifier:
-            geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
-            geometry_nodes_modifier.node_group = outlines_node_group
-
-        self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+            if not outlines_node_group:
+                continue
+                
+            if not geometry_nodes_modifier:
+                geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+                geometry_nodes_modifier.node_group = outlines_node_group
+            self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier
 
 
@@ -185,10 +189,9 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
-        self.outline_node_group_name = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+        self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
@@ -203,16 +206,18 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
-        outlines_node_group = \
-            bpy.data.node_groups.get(self.outline_node_group_name)
 
-        geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+        for outlines_node_group_name in self.outlines_node_group_names:
+            outlines_node_group = bpy.data.node_groups.get(outlines_node_group_name)
+            geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
 
-        if not geometry_nodes_modifier:
-            geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
-            geometry_nodes_modifier.node_group = outlines_node_group
+            if not outlines_node_group:
+                continue
 
-        self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+            if not geometry_nodes_modifier:
+                geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+                geometry_nodes_modifier.node_group = outlines_node_group
+            self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier 
 
     def set_up_modifier_default_values(self, modifier, mesh):
@@ -246,11 +251,12 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
+        self.material_names = Nya222HonkaiStarRailShaderMaterialNames
+        self.outlines_node_group_names = OutlineNodeGroupNames.NYA222_HSR_OUTLINES
 
     def setup_geometry_nodes(self):
-        self.clone_outlines(Nya222HonkaiStarRailShaderMaterialNames)
+        self.clone_outlines(self.material_names)
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
@@ -262,14 +268,16 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
 
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
-        outlines_node_group = \
-            bpy.data.node_groups.get(OutlineNodeGroupNames.NYA222_HSR_OUTLINES)
 
-        geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+        for outlines_node_group_name in self.outlines_node_group_names:
+            outlines_node_group = bpy.data.node_groups.get(outlines_node_group_name)
+            geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
 
-        if not geometry_nodes_modifier:
-            geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
-            geometry_nodes_modifier.node_group = outlines_node_group
+            if not outlines_node_group:
+                continue
 
-        self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+            if not geometry_nodes_modifier:
+                geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+                geometry_nodes_modifier.node_group = outlines_node_group
+            self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier

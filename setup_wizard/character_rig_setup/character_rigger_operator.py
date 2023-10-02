@@ -19,13 +19,14 @@ class GI_OT_RigCharacter(Operator, BasicSetupUIOperator):
 
 
 class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProperties):
-    """Select the .blend file with the Root_Shape"""
+    """Sets Up Rig for Character"""
     bl_idname = "hoyoverse.rig_character"  # important since its how we chain file dialogs
-    bl_label = "Select Root_Shape .blend File"
+    bl_label = "Rigs Character"
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"
 
+    # DEPRECATED, replaced by GI_OT_RootShape_FilePath_Setter_Operator 
     import_path: StringProperty(
         name="Path",
         description="Root_Shape .blend File",

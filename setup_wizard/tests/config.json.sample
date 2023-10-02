@@ -15,7 +15,8 @@
             "festivity_outlines_file_path": FILE_PATH_TO_festivity_outlines_blend_file",
             "festivity_gran_turismo_file_path": "FILE_PATH_TO_gt_tonemapper_blend_file",
             "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
-            "genshin_rigify_bone_shapes_file_path": "FILE_PATH_TO_root_shape_blend_file"
+            "genshin_rigify_bone_shapes_file_path": "FILE_PATH_TO_root_shape_blend_file",
+            "rig_character": true
         },
         {
             "metadata": {
@@ -32,7 +33,8 @@
             "festivity_outlines_file_path": "FILE_PATH_TO_festivity_outlines_blend_file",
             "festivity_gran_turismo_file_path": "FILE_PATH_TO_gt_tonemapper_blend_file",
             "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
-            "genshin_rigify_bone_shapes_file_path": "FILE_PATH_TO_root_shape_blend_file"
+            "genshin_rigify_bone_shapes_file_path": "FILE_PATH_TO_root_shape_blend_file",
+            "rig_character": true
         },
         {
             "metadata": {
@@ -48,8 +50,7 @@
             "festivity_shader_file_path": "FILE_PATH_TO_festivity_shaders_blend_file",
             "festivity_outlines_file_path": "FILE_PATH_TO_festivity_outlines_blend_file",
             "festivity_gran_turismo_file_path": "FILE_PATH_TO_gt_tonemapper_blend_file",
-            "characters_folder_file_path": "FILE_PATH_TO_characters_folder",
-            "genshin_rigify_bone_shapes_file_path": "FILE_PATH_TO_root_shape_blend_file"
+            "characters_folder_file_path": "FILE_PATH_TO_characters_folder"
         }
     ]
 }

@@ -265,6 +265,8 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.change_bpy_context
         elif component_name == 'rig_character':
             return bpy.ops.hoyoverse.rig_character
+        elif component_name == 'rootshape_filepath_setter':
+            return bpy.ops.hoyoverse.rootshape_filepath_setter
         elif component_name == 'gran_turismo_tonemapper_setup':
             return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:

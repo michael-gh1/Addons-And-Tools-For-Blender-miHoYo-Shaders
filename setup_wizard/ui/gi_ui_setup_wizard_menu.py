@@ -287,6 +287,15 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
         box.label(text='Settings')
 
         col = box.column()
+        OperatorFactory.create(
+            col,
+            'hoyoverse.rootshape_filepath_setter',
+            'Override RootShape Filepath',
+            'FILE_FOLDER',
+            game_type=GameType.GENSHIN_IMPACT.name,
+            operator_context='INVOKE_DEFAULT'
+        )
+        col = box.column()
         col.prop(character_rigger_props, 'allow_arm_ik_stretch')
         col.prop(character_rigger_props, 'allow_leg_ik_stretch')
         col.prop(character_rigger_props, 'use_arm_ik_poles')
