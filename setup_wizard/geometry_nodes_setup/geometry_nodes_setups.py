@@ -30,7 +30,6 @@ NAME_OF_OUTLINE_5_MASK_INPUT = 'Input_24'
 NAME_OF_OUTLINE_5_MATERIAL_INPUT = 'Input_25'
 
 
-
 outline_mask_to_material_mapping = {
     NAME_OF_OUTLINE_1_MASK_INPUT: NAME_OF_OUTLINE_1_MATERIAL_INPUT,
     NAME_OF_OUTLINE_2_MASK_INPUT: NAME_OF_OUTLINE_2_MATERIAL_INPUT,
@@ -73,6 +72,10 @@ class GameGeometryNodesSetupFactory:
 
 class GameGeometryNodesSetup(ABC):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+
+    def __init__(self, blender_operator, context):
+        self.blender_operator = blender_operator
+        self.context = context
 
     @abstractmethod
     def setup_geometry_nodes(self):
@@ -132,8 +135,8 @@ class GameGeometryNodesSetup(ABC):
             face_mesh_object = bpy.data.objects.get(face_mesh.name)
 
             if not face_mesh or not face_mesh_object:
-                self.report_message_level = {'ERROR'}
-                self.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
+                self.blender_operator.report_message_level = {'ERROR'}
+                self.blender_operator.report_message.append('Failed to reorder face material slots to fix face outlines. Not a catastrophic error. Continuing.')
                 return
             bpy.context.view_layer.objects.active = face_mesh_object  # Select 'Face' mesh before swapping material slots
 
@@ -147,8 +150,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
         self.material_names = V2_FestivityGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
 
@@ -187,8 +189,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
 
@@ -250,8 +251,7 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
     def __init__(self, blender_operator, context):
-        self.blender_operator = blender_operator
-        self.context = context
+        super().__init__(blender_operator, context)
         self.material_names = Nya222HonkaiStarRailShaderMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.NYA222_HSR_OUTLINES
 
