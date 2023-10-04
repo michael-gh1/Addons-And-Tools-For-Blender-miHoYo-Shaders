@@ -37,5 +37,7 @@ Thanks to all those who helped answer the questions I had while building out thi
 * @M4urlcl0
 * @Modder4869 
 * [@Bonny](https://www.youtube.com/@BonnyAnimations)
+* [@Enthralpy](https://www.youtube.com/@Enthralpy)
+* [@OctavoPE](https://github.com/OctavoPE)
 
 Cheers and Happy Blending!
