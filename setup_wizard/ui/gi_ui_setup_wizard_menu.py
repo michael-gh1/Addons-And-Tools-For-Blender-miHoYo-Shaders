@@ -304,9 +304,9 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
-class GI_PT_UI_Optimizer_Menu(Panel):
-    bl_label = 'Optimizer'
-    bl_idname = 'GI_PT_UI_Optimizer_Menu'
+class GI_PT_UI_Optimization_Menu(Panel):
+    bl_label = 'Optimizations'
+    bl_idname = 'GI_PT_UI_Optimization_Menu'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Genshin Impact'
