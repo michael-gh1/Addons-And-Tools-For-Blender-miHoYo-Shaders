@@ -31,6 +31,7 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
 
                     if is_original_material and self.__get_original_material(material.name):
                         emissive_material = self.__get_emissive_material(material.name)
+                        self.__set_outlines(mesh, False)
 
                         if emissive_material:
                             material_slot.material = emissive_material
@@ -47,11 +48,10 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
                         emissive_material.node_tree.nodes.get('Image Texture').image = texture_image
 
                         material_slot.material = emissive_material
-                        
                     elif not is_original_material and self.__get_emissive_material(material.name):
+                        self.__set_outlines(mesh, True)
                         original_material = self.__get_original_material(material.name)
                         material_slot.material = original_material
-
         self.__set_selected_objects(selected_objects)
         super().clear_custom_properties()
         return {'FINISHED'}
@@ -75,6 +75,16 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
 
     def __get_emissive_material(self, material_name):
         return bpy.data.materials.get(f"{material_name}{EMISSIVE_MATERIAL_SUFFIX}") if EMISSIVE_MATERIAL_SUFFIX not in material_name else bpy.data.materials.get(material_name)
+
+    def __set_outlines(self, mesh, enabled):
+        OUTLINES_KEYWORD_IDENTIFIER = 'GeometryNodes'  # TODO: May need to consider handling multiple identifiers
+
+        print(f'{mesh}: {enabled}')
+
+        outlines_modifiers = \
+            [modifier for modifier in mesh.modifiers.values() if OUTLINES_KEYWORD_IDENTIFIER in modifier.name]
+        if outlines_modifiers:
+            outlines_modifiers[0].show_viewport = enabled
 
     def __set_selected_objects(self, selected_objects):
         bpy.ops.object.select_all(action='DESELECT')
