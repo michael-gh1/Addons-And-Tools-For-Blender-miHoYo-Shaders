@@ -17,6 +17,8 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
     bl_label = "Swaps shader materials with optimized material"
 
     def execute(self, context):
+        original_mode = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='OBJECT')
         selected_objects = bpy.context.selected_objects
 
         for armature in [obj for obj in selected_objects if obj.type == 'ARMATURE']:
@@ -53,6 +55,7 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
                         original_material = self.__get_original_material(material.name)
                         material_slot.material = original_material
         self.__set_selected_objects(selected_objects)
+        bpy.ops.object.mode_set(mode=original_mode)
         super().clear_custom_properties()
         return {'FINISHED'}
 
@@ -78,8 +81,6 @@ class GI_OT_Emissive_Optimizer(Operator, CustomOperatorProperties):
 
     def __set_outlines(self, mesh, enabled):
         OUTLINES_KEYWORD_IDENTIFIER = 'GeometryNodes'  # TODO: May need to consider handling multiple identifiers
-
-        print(f'{mesh}: {enabled}')
 
         outlines_modifiers = \
             [modifier for modifier in mesh.modifiers.values() if OUTLINES_KEYWORD_IDENTIFIER in modifier.name]
