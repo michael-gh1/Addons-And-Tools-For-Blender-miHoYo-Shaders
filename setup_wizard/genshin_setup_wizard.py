@@ -81,6 +81,7 @@ def setup_dependencies():
     import setup_wizard.misc_operations
     import setup_wizard.character_rig_setup.character_rigger_operator
     import setup_wizard.character_rig_setup.rootshape_filepath_setter_operator
+    import setup_wizard.optimization.emissive_optimizer
     import setup_wizard.genshin_gran_turismo_tonemapper_setup
     import setup_wizard.change_bpy_context
 
@@ -99,6 +100,7 @@ def setup_dependencies():
     importlib.reload(setup_wizard.misc_operations)
     importlib.reload(setup_wizard.character_rig_setup.character_rigger_operator)
     importlib.reload(setup_wizard.character_rig_setup.rootshape_filepath_setter_operator)
+    importlib.reload(setup_wizard.optimization.emissive_optimizer)
     importlib.reload(setup_wizard.genshin_gran_turismo_tonemapper_setup)
     importlib.reload(setup_wizard.change_bpy_context)
 
@@ -120,6 +122,7 @@ def setup_dependencies():
         setup_wizard.misc_operations.GI_OT_SetUpArmTwistBoneConstraints,
         setup_wizard.character_rig_setup.character_rigger_operator.GI_OT_CharacterRiggerOperator,
         setup_wizard.character_rig_setup.rootshape_filepath_setter_operator.GI_OT_RootShape_FilePath_Setter_Operator,
+        setup_wizard.optimization.emissive_optimizer.GI_OT_Emissive_Optimizer,
         setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
         setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context,
     ]:
@@ -147,6 +150,7 @@ def unregister():
         GI_OT_SetUpArmTwistBoneConstraints
     from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_CharacterRiggerOperator
     from setup_wizard.character_rig_setup.rootshape_filepath_setter_operator import GI_OT_RootShape_FilePath_Setter_Operator
+    from setup_wizard.optimization.emissive_optimizer import GI_OT_Emissive_Optimizer
     from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup
     from setup_wizard.change_bpy_context import GI_OT_Change_BPY_Context
 
@@ -167,6 +171,7 @@ def unregister():
         GI_OT_SetUpArmTwistBoneConstraints,
         GI_OT_CharacterRiggerOperator,
         GI_OT_RootShape_FilePath_Setter_Operator,
+        GI_OT_Emissive_Optimizer,
         GI_OT_GenshinGranTurismoTonemapperSetup,
         GI_OT_Change_BPY_Context,
     ]:
