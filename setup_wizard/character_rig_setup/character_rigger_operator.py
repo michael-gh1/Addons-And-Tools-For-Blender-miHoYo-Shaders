@@ -41,12 +41,17 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
     )
 
     def execute(self, context):
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
 
-        if not expy_kit_installed:
+        if not betterfbx_installed or not expy_kit_installed or not rigify_installed:
             self.report(
                 {'WARNING'},
-                'Rigging skipped. ExpyKit required.'
+                'Rigging skipped. BetterFBX, ExpyKit and Rigify are required.\n'
+                f'BetterFBX: {"Installed" if betterfbx_installed else "Missing"}\n'
+                f'ExpyKit: {"Installed" if expy_kit_installed else "Missing"}\n'
+                f'Rigify: {"Installed" if rigify_installed else "Missing"}'
             )
             return {'FINISHED'}
 
