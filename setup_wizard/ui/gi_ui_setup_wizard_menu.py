@@ -371,9 +371,10 @@ class OperatorFactory:
     ):
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
 
         column = ui_object.column()
-        column.enabled = True if expy_kit_installed and betterfbx_installed else False
+        column.enabled = True if expy_kit_installed and betterfbx_installed and rigify_installed else False
         OperatorFactory.create(
             column,
             'hoyoverse.set_up_character_rig',
@@ -383,7 +384,9 @@ class OperatorFactory:
         )
         if not column.enabled:
             column = ui_object.column()
-            if not expy_kit_installed:
-                column.label(text='ExpyKit required', icon='ERROR')
             if not betterfbx_installed:
                 column.label(text='BetterFBX required', icon='ERROR')
+            if not expy_kit_installed:
+                column.label(text='ExpyKit required', icon='ERROR')
+            if not rigify_installed:
+                column.label(text='Rigify required', icon='ERROR')
