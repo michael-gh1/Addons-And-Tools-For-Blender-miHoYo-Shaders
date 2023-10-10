@@ -54,10 +54,9 @@ class GenshinImpactCharacterRigger(CharacterRigger):
 
         if not is_player_hand:
             self.blender_operator.report(
-                {'ERROR'}, \
-                '\n\n[INFO] Setup Wizard has finished setup and stopped before attempting to rig character.\n'
-                'Only Playable characters are supported.\n'
-                'If you are rigging a playable character and you see this, please report which character you are using.\n'
+                {'INFO'}, \
+                'Setup Wizard has finished setup and stopped before attempting to rig character.\n'
+                'Only Playable characters are currently supported.\n'
             )
             return
 
