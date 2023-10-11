@@ -43,6 +43,14 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             'PLAY',
             game_type=GameType.GENSHIN_IMPACT.name
         )
+
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
+
+        if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
+            sub_layout.label(text='Rigging Disabled', icon='ERROR')
+
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -52,7 +60,6 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.GENSHIN_IMPACT.name,
         )
 
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
         if betterfbx_installed:
             row2 = layout.row()
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
