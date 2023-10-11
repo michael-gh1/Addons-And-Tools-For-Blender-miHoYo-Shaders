@@ -2,6 +2,7 @@
 
 
 class ShaderMaterialNames:
+    EMISSIVE_TEMPLATE_MATERIAL_NAME = 'HoYoverse - HELPER Template'
     MATERIAL_PREFIX = ''
     BODY = ''
     BODY1 = ''
