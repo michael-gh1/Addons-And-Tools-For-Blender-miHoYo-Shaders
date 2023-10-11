@@ -307,6 +307,9 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_FaceBlushColor': 'Face Blush Color',
         '_FaceBlushStrength': 'Face Blush Strength',
         '_FaceMapSoftness': 'Face Shadow Softness',  # material data values are either 0.001 or 1E-06
+        '_UseShadowRamp': 'Use Shadow Ramp',
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',
+        '_FirstShadowMultColor': 'Daytime Shadow Color',
     }
 
     outline_mapping = {

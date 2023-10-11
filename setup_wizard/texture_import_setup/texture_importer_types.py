@@ -234,6 +234,7 @@ class GenshinTextureImporter:
             'Faruzan': 3,
             'AyakaCostumeFruhling': 5,
             'Ayato': 3,
+            'KleeCostumeWitch': 3,
             'Linette': 3,  # Lynette
             'Liney': 3,  # Lyney
             'Nilou': 3,
