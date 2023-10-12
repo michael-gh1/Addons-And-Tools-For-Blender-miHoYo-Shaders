@@ -44,7 +44,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         self.material_names = material_names
 
     def replace_default_materials(self):
-        meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH']
+        mesh_ignore_list = [
+            'Dress',  # Scaramouche
+        ]
+        meshes = [mesh for mesh in bpy.context.scene.objects if mesh.type == 'MESH' and mesh.name not in mesh_ignore_list]
 
         for mesh in meshes:
             for material_slot in mesh.material_slots:
@@ -108,9 +111,6 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'HelmetEmo':  # Frem
             helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET_EMO)
             material_name = helmet_material.name
-        elif 'Dress' in mesh.name:  # Scaramouche
-            dress_material = self.create_body_material(self.material_names, self.material_names.DRESS)
-            material_name = dress_material.name  # Scaramouche has Dress mesh/textures so we shouldn't run into an issue
         elif mesh_body_part_name == 'Gauntlet':  # Wrioth
             gauntlet_material = self.create_body_material(self.material_names, self.material_names.GAUNTLET)
             material_name = gauntlet_material.name

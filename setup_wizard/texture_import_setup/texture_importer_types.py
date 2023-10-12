@@ -317,7 +317,6 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
-                dress_material = bpy.data.materials.get(f'{self.material_names.DRESS}')
                 gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
 
                 # Implement the texture in the correct node
@@ -354,8 +353,6 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_shadow_ramp_texture(TextureType.BODY, img)
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
                     self.set_specular_ramp_texture(TextureType.BODY, img)
-                elif "Dress" in file:
-                    self.set_diffuse_texture(TextureType.BODY, dress_material, img)
                 elif "Face_Diffuse" in file:
                     self.set_face_diffuse_texture(face_material, img)
                 elif "Face_Shadow" in file:
