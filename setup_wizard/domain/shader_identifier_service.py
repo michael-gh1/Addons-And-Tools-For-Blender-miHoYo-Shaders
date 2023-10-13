@@ -5,7 +5,8 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import Nya222HonkaiStarRailShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
+from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames
 
 
 class GenshinImpactShaders(Enum):
@@ -53,6 +54,25 @@ class ShaderIdentifierService:
             if found_all:
                 return shader
 
+    def get_shader_material_names(self, game_type, materials, node_groups):
+        if game_type == GameType.GENSHIN_IMPACT.name:
+            game_shader = self.identify_shader(materials, node_groups)
+            if game_shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                return V3_BonnyFestivityGenshinImpactMaterialNames
+            else:
+                return V2_FestivityGenshinImpactMaterialNames
+        elif game_type == GameType.HONKAI_STAR_RAIL.name:
+            return Nya222HonkaiStarRailShaderMaterialNames
+        else:
+            raise Exception(f'Unknown {GameType}: {game_type}')
+
+    def get_shader_texture_node_names(self, game_type, materials, node_groups):
+        if game_type == GameType.GENSHIN_IMPACT.name:
+            return GenshinImpactTextureNodeNames
+        elif game_type == GameType.HONKAI_STAR_RAIL.name:
+            return Nya222HonkaiStarRailTextureNodeNames
+        else:
+            raise Exception(f'Unknown {GameType}: {game_type}')
 
 class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     V2_NAMES_OF_GENSHIN_MATERIALS = [
