@@ -97,6 +97,13 @@ class GameGeometryNodesSetup(ABC):
                     new_outline_material.name = new_outline_name
                     new_outline_material.use_fake_user = True
 
+    def set_face_outlines_material_default_values(self, game_material_names: ShaderMaterialNames):
+        face_outlines_material = bpy.data.materials.get(f'{game_material_names.FACE} Outlines')
+        if face_outlines_material:
+            node_name = 'Outlines'
+            input_name = 'Use Face Shader'
+            face_outlines_material.node_tree.nodes.get(node_name).inputs.get(input_name).default_value = 1.0
+
     def set_up_modifier_default_values(self, modifier, mesh):
         if modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute'] == 0:
             # Important! Override object key so we don't use the context (ex. selected object)
@@ -197,6 +204,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
+        self.set_face_outlines_material_default_values(self.material_names)
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
