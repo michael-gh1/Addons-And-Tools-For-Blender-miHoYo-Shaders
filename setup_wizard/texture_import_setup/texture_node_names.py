@@ -3,6 +3,7 @@
 
 class TextureNodeNames:
     DIFFUSE = ''
+    BODY_DIFFUSE_UV0 = ''
     LIGHTMAP = ''
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
@@ -17,6 +18,10 @@ class TextureNodeNames:
     FACE_EXPRESSION_MAP = ''
     WEAPON_RAMP_NODE_GROUP = ''
     WEAPON_RAMP = ''
+
+
+class GenshinImpactTextureNodeNames(TextureNodeNames):
+    BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     DIFFUSE = '画像テクスチャ'
