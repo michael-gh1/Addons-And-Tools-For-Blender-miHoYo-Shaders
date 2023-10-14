@@ -657,6 +657,7 @@ def rig_character(
     bpy.data.objects["rigify"].show_in_front = True
 
     # Symmetrize clothes/hair bones
+    bpy.ops.object.mode_set(mode='EDIT')
     for bone in rigifyr.data.edit_bones:
         if " L " in bone.name:  # Finds clothes/hair bones with symmetrical bones
             y = bone.name.find(' L ')  # Finds index of "Hair L 1"
@@ -1142,15 +1143,33 @@ def rig_character(
         
     # After straightened, For skirt bone 'layers' at depth we need to line them up with the tails of the previous bones in the chain
     def fix_skirt_depth(bone_name):
-        depth_num = int(bone_name[-1])
-        if depth_num > 1:
-            this_bone = armature.edit_bones[bone_name]
-            head = this_bone.head
-            try:
-                higher_bone = armature.edit_bones[bone_name.replace(str(depth_num), str(depth_num-1))]
-                head.z = higher_bone.tail.z 
-            except:
-                pass
+        backwards_correct = -1
+        if " CB " not in bone_name and " CF " not in bone_name:
+            backwards_correct = -3
+        
+        print(bone_name)
+
+        try:
+            depth_num = int(bone_name[backwards_correct])
+            if depth_num > 1:
+                this_bone = armature.edit_bones[bone_name]
+                head = this_bone.head
+                try:
+                    higher_bone = armature.edit_bones[bone_name.replace(str(depth_num), str(depth_num-1))]
+                    head.z = higher_bone.tail.z 
+                except:
+                    pass
+        except:
+            depth_num = int(bone_name[-1])
+            if depth_num > 1:
+                this_bone = armature.edit_bones[bone_name]
+                head = this_bone.head
+                try:
+                    higher_bone = armature.edit_bones[bone_name.replace(str(depth_num), str(depth_num-1))]
+                    head.z = higher_bone.tail.z 
+                except:
+                    pass
+
               
 
     for bone in front_skirt_bones:
@@ -1270,7 +1289,8 @@ def rig_character(
         co.map_to_z_from = map_z
         co.to_min_z_rot = t_min_z
         co.to_max_z_rot = t_max_z
-         
+        
+       
     def add_leg_follow_const(bone_name, area):
     # skirt_bone, name, bone, f_min_x=calc(-1), f_max_x=calc(1), f_min_y=0, f_max_y=0, f_min_z=0, f_max_z=0, map_x='X', map_y='Y', map_z='Z', t_min_x=0, t_max_x=0, t_min_y=0, t_max_y=0, t_min_z=0, t_max_y=0
 
@@ -1290,6 +1310,16 @@ def rig_character(
                     add_const(bone_name, "Left Leg", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="X", map_z="X", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0.5,True), t_max_y=calc(-0.5,True), t_min_z=calc(0.125,True), t_max_z=calc(-0.125,True))
                     add_const(bone_name, "Right Leg", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="X", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(-0.5,True), t_max_y=calc(0.5,True), t_min_z=calc(0), t_max_z=calc(0))
              # Front Left
+            elif ".L" in bone_name:
+                if bone_name[-3] == "1":
+                    add_const(bone_name, "X+", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.75,True), t_max_x=calc(0.75,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "X-", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3,True), t_max_x=calc(0.3,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "Z+", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", f_min_x=0, f_max_x=0, f_min_z=calc(-1), f_max_z=calc(1), map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.1,True), t_max_z=calc(0.1,True))
+
+                elif bone_name[-3] == "2":
+                    add_const(bone_name, "Transformation", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="X", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0.125,True), t_max_z=calc(0.0))
+                elif bone_name[-3] == "3":   
+                    add_const(bone_name, "Transformation", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
             elif " L " in bone_name:
                 if bone_name[-1] == "1":
                     add_const(bone_name, "X+", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.75,True), t_max_x=calc(0.75,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
@@ -1302,6 +1332,15 @@ def rig_character(
                     add_const(bone_name, "Transformation", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
 
             # Front Right
+            elif ".R" in bone_name:
+                if bone_name[-3] == "1":       
+                    add_const(bone_name, "X+", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.75,True), t_max_x=calc(0.75,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "X-", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3,True), t_max_x=calc(0.3,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "Z+", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", f_min_x=0, f_max_x=0, f_min_z=calc(-1), f_max_z=calc(1), map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.1), t_max_z=calc(0.1,True))
+                elif bone_name[-3] == "2":       
+                    add_const(bone_name, "Transformation", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="X", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.125,True), t_max_z=calc(0))
+                elif bone_name[-3] == "3":    
+                    add_const(bone_name, "Transformation", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
             elif " R " in bone_name:
                 if bone_name[-1] == "1":       
                     add_const(bone_name, "X+", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.75,True), t_max_x=calc(0.75,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
@@ -1311,10 +1350,21 @@ def rig_character(
                     add_const(bone_name, "Transformation", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="X", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.125,True), t_max_z=calc(0))
                 elif bone_name[-1] == "3":    
                     add_const(bone_name, "Transformation", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0.25,True), t_max_x=calc(-0.25,True), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+        
          # SIDE
         elif area == "SIDE": 
             # Side Left
-            if " L " in bone_name:
+            if ".L" in bone_name:
+                if bone_name[-3] == "1":
+                    add_const(bone_name, "X", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", driver=False, map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.15), t_max_x=calc(0.15), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "Z+", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", trans_rot="ROT_Z",f_min_x=0,f_max_x=0,f_min_z=calc(-1),f_max_z=calc(1),map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.2), t_max_z=calc(0.2))
+            
+            # Side Right
+            elif ".R" in bone_name:
+                if bone_name[-3] == "1":
+                    add_const(bone_name, "X", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", driver=False, map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.15), t_max_x=calc(0.15), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    add_const(bone_name, "Z+", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", trans_rot="ROT_Z",f_min_x=0,f_max_x=0,f_min_z=calc(-1),f_max_z=calc(1),map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.2), t_max_z=calc(0.2))
+            elif " L " in bone_name:
                 if bone_name[-1] == "1":
                     add_const(bone_name, "X", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", driver=False, map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.15), t_max_x=calc(0.15), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
                     add_const(bone_name, "Z+", "DEF-thigh.L", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", trans_rot="ROT_Z",f_min_x=0,f_max_x=0,f_min_z=calc(-1),f_max_z=calc(1),map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.2), t_max_z=calc(0.2))
@@ -1324,18 +1374,28 @@ def rig_character(
                 if bone_name[-1] == "1":
                     add_const(bone_name, "X", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", driver=False, map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.15), t_max_x=calc(0.15), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
                     add_const(bone_name, "Z+", "DEF-thigh.R", "0.35 + 0.65 * max(0, min(1, (bone*-1)*3))", trans_rot="ROT_Z",f_min_x=0,f_max_x=0,f_min_z=calc(-1),f_max_z=calc(1),map_x="X", map_y="Y", map_z="Z", t_min_x=calc(0), t_max_x=calc(0), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(-0.2), t_max_z=calc(0.2))
+        
         # BACK
         elif area == "BACK":
             # Back Left
-            if " L " in bone_name:
+            if ".L" in bone_name:
+                if bone_name[-3] == "1":
+                    add_const(bone_name, "Transformation", "DEF-thigh.L", "0.5 + 0.5 * max(0, min(1, (bone)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3), t_max_x=calc(0.3), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+            
+            # Back Right
+            if ".R" in bone_name:
+                if bone_name[-3] == "1":
+                    add_const(bone_name, "Transformation", "DEF-thigh.R", "0.5 + 0.5 * max(0, min(1, (bone)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3), t_max_x=calc(0.3), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
+                    # Back Left
+            elif " L " in bone_name:
                 if bone_name[-1] == "1":
                     add_const(bone_name, "Transformation", "DEF-thigh.L", "0.5 + 0.5 * max(0, min(1, (bone)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3), t_max_x=calc(0.3), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
             
             # Back Right
-            if " R " in bone_name:
+            elif " R " in bone_name:
                 if bone_name[-1] == "1":
                     add_const(bone_name, "Transformation", "DEF-thigh.R", "0.5 + 0.5 * max(0, min(1, (bone)*3))", map_x="X", map_y="Y", map_z="Z", t_min_x=calc(-0.3), t_max_x=calc(0.3), t_min_y=calc(0), t_max_y=calc(0), t_min_z=calc(0), t_max_z=calc(0))
-                    
+                        
             # Back Center
             if " CB " in bone_name:
                 if bone_name[-1] == "1":
@@ -1393,8 +1453,8 @@ def rig_character(
         makeCon("Brow_Down_R","Brow-R-Control","bone * -4","LOC_Y")
         makeCon("Brow_Up_L","Brow-L-Control","bone * 4","LOC_Y")
         makeCon("Brow_Up_R","Brow-R-Control","bone * 4","LOC_Y")
-        makeCon("Brow_Trouble_L", "Brow-Trouble-Control-L", "bone * 2", "LOC_X")   
-        makeCon("Brow_Trouble_R", "Brow-Trouble-Control-R", "bone * 2", "LOC_X")   
+        makeCon("Brow_Trouble_L", "Brow-Trouble-L-Control", "bone * 2", "LOC_X")   
+        makeCon("Brow_Trouble_R", "Brow-Trouble-R-Control", "bone * 2", "LOC_X")   
         makeCon("Brow_Smily_R", "Brow-Smily-R-Control", "bone * 2", "LOC_X")   
         makeCon("Brow_Smily_L", "Brow-Smily-L-Control", "bone * 2", "LOC_X")   
         makeCon("Brow_Angry_L", "Brow-Angry-L-Control", "bone * 2", "LOC_X")   
@@ -1730,8 +1790,8 @@ def rig_character(
 
     assign_bone_to_group("Wink-Control-R", "Face")
     assign_bone_to_group("Wink-Control-L", "Face")
-    assign_bone_to_group("Brow-Trouble-Control-L", "Face")
-    assign_bone_to_group("Brow-Trouble-Control-R", "Face")
+    assign_bone_to_group("Brow-Trouble-L-Control", "Face")
+    assign_bone_to_group("Brow-Trouble-R-Control", "Face")
     assign_bone_to_group("Brow-Shy-R-Control", "Face")
     assign_bone_to_group("Brow-Shy-L-Control", "Face")
     assign_bone_to_group("Brow-Angry-R-Control", "Face")
@@ -1777,4 +1837,3 @@ def rig_character(
     # Deselect everything, we're done.
     for bone in bpy.context.active_object.pose.bones:
         bone.bone.select = False
-
