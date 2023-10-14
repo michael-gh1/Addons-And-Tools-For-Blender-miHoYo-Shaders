@@ -8,6 +8,7 @@ class ShaderNodeNames:
     FACE_MATERIAL_ID = ''
     USE_SHADOW_RAMP = ''
     USE_LIGHTMAP_AO = ''
+    DEPTH_BASED_RIM = ''
 
 
 class V2_GenshinShaderNodeNames(ShaderNodeNames):
@@ -17,6 +18,7 @@ class V2_GenshinShaderNodeNames(ShaderNodeNames):
     FACE_MATERIAL_ID = 'Face Material ID'
     USE_SHADOW_RAMP = 'Use Shadow Ramp'
     USE_LIGHTMAP_AO = 'Use Lightmap AO'
+    DEPTH_BASED_RIM = 'Group.010'
 
 
 class V3_GenshinShaderNodeNames(ShaderNodeNames):

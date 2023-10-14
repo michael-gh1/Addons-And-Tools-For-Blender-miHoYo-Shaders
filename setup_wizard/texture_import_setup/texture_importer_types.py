@@ -261,8 +261,10 @@ class GenshinTextureImporter:
             'Funingna': 1,  # Furina
         }
 
-        shader_node_names = V3_GenshinShaderNodeNames
+        shader_node_names = V2_GenshinShaderNodeNames if \
+            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
         shader_has_body_hair_ramps = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
+        shader_has_body_hair_output = self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
         if shader_has_body_hair_ramps:
             for character_name in character_to_body_hair_ramps_map.keys():
@@ -271,6 +273,29 @@ class GenshinTextureImporter:
                         face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
                         face_shader_node.inputs[shader_node_names.BODY_HAIR_RAMPS].default_value = \
                             character_to_body_hair_ramps_map[character_name]
+        elif shader_has_body_hair_output:
+            for character_name in character_to_body_hair_ramps_map.keys():
+                if character_name in image.name and face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
+                    face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
+                    face_shader_node_hair_output = face_shader_node.outputs.get('Hair')
+
+                    depth_based_rim_node = face_material.node_tree.nodes.get(shader_node_names.DEPTH_BASED_RIM)
+                    is_depth_based_rim_node = depth_based_rim_node and depth_based_rim_node.inputs.get('Lit Factor')
+
+                    if is_depth_based_rim_node:
+                        depth_based_rim_node_input = depth_based_rim_node.inputs.get('Input')
+                        face_material.node_tree.links.new(
+                            face_shader_node_hair_output,
+                            depth_based_rim_node_input
+                        )
+                    else:
+                        material_output_node = face_material.node_tree.nodes.get('Material Output')
+                        material_output_node_surface_input = material_output_node.inputs.get('Surface')
+                        face_material.node_tree.links.new(
+                            face_shader_node_hair_output,
+                            material_output_node_surface_input
+                        )
+
 
     '''
     Deprecated: No longer needed after shader rewrite because normal map is plugged by default
