@@ -307,9 +307,13 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_FaceBlushColor': 'Face Blush Color',
         '_FaceBlushStrength': 'Face Blush Strength',
         '_FaceMapSoftness': 'Face Shadow Softness',  # material data values are either 0.001 or 1E-06
-        '_UseShadowRamp': 'Use Shadow Ramp',
-        '_CoolShadowMultColor': 'Nighttime Shadow Color',
-        '_FirstShadowMultColor': 'Daytime Shadow Color',
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',  # Teeth
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',  # Teeth
+        '_CoolShadowMultColor2': 'Nighttime Shadow Color 2',  # Teeth
+        '_CoolShadowMultColor3': 'Nighttime Shadow Color 3',  # Teeth
+        '_FirstShadowMultColor': 'Daytime Shadow Color',  # Teeth
+        '_FirstShadowMultColor2': 'Daytime Shadow Color 2',  # Teeth
+        '_FirstShadowMultColor3': 'Daytime Shadow Color 3',  # Teeth
     }
 
     outline_mapping = {

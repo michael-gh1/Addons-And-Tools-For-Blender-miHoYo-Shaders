@@ -245,9 +245,9 @@ class GenshinTextureImporter:
 
         shader_node_names = V2_GenshinShaderNodeNames if \
             self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
-        shader_has_face_material_id = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER or \
-            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
+        shader_has_face_material_id = self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
+        # No longer a field in V3 shader
         if shader_has_face_material_id:
             for character_name in character_to_face_material_id_map.keys():
                 if character_name in image.name:
@@ -256,25 +256,17 @@ class GenshinTextureImporter:
                         face_shader_node.inputs[shader_node_names.FACE_MATERIAL_ID].default_value = \
                             character_to_face_material_id_map[character_name]
 
-    def set_body_hair_ramps_on_face_shader(self, face_material, image):
-        character_to_body_hair_ramps_map = {
-            'Funingna': 1,  # Furina
-        }
+    def set_body_hair_output_on_face_shader(self, face_material, image):
+        characters_needing_hair_output = [
+            'Funingna',  # Furina
+        ]
 
         shader_node_names = V2_GenshinShaderNodeNames if \
             self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
-        shader_has_body_hair_ramps = self.genshin_shader_version is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER
         shader_has_body_hair_output = self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
-        if shader_has_body_hair_ramps:
-            for character_name in character_to_body_hair_ramps_map.keys():
-                if character_name in image.name:
-                    if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
-                        face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
-                        face_shader_node.inputs[shader_node_names.BODY_HAIR_RAMPS].default_value = \
-                            character_to_body_hair_ramps_map[character_name]
-        elif shader_has_body_hair_output:
-            for character_name in character_to_body_hair_ramps_map.keys():
+        if shader_has_body_hair_output:
+            for character_name in characters_needing_hair_output:
                 if character_name in image.name and face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
                     face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
                     face_shader_node_hair_output = face_shader_node.outputs.get('Hair')
@@ -369,7 +361,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     # Set Face Id in Body_Diffuse because not all Face Diffuse filenames have the full costume name
                     # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
                     self.set_face_material_id(face_material, img)
-                    self.set_body_hair_ramps_on_face_shader(face_material, img)
+                    self.set_body_hair_output_on_face_shader(face_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                 elif "Body_Normalmap" in file:
