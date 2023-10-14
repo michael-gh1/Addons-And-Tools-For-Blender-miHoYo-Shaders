@@ -379,6 +379,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_UseShadowRamp': 'Use Shadow Ramp',
         '_UseLightMapColorAO': 'Use Lightmap AO',
         '_UseVertexColorAO': 'Use Vertex Color AO',
+        '_MainTexAlphaCutoff': 'Transparency Cutoff',
     }
 
     body_shader_node_tree_node_name = 'Body Shader'
