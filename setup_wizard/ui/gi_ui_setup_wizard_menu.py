@@ -9,6 +9,11 @@ from setup_wizard.domain.game_types import GameType
 class UI_Properties:
     @staticmethod
     def create_custom_ui_properties():
+        bpy.types.WindowManager.setup_wizard_full_run_rigging_enabled = bpy.props.BoolProperty(
+            name = " Rigging Enabled",
+            default = True
+        )
+
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -35,7 +40,6 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
-        row = layout.row()
         OperatorFactory.create(
             sub_layout,
             'genshin.setup_wizard_ui',
@@ -51,6 +55,9 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
             sub_layout.label(text='Rigging Disabled', icon='ERROR')
 
+        sub_layout.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
+
+        row = layout.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
