@@ -201,6 +201,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         super().__init__(blender_operator, context)
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+        self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
@@ -208,11 +209,27 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                    self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
         face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Eye' not in mesh_name]
         self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def create_light_vectors_modifier(self, mesh_name):
+        mesh = bpy.context.scene.objects[mesh_name]
+
+        for light_vectors_node_group_name in self.light_vectors_node_group_names:
+            light_vectors_node_group = bpy.data.node_groups.get(light_vectors_node_group_name)
+            light_vectors_modifier = mesh.modifiers.get(f'{light_vectors_node_group_name} {mesh_name}')
+
+            if not light_vectors_node_group:
+                continue
+
+            if not light_vectors_modifier:
+                light_vectors_modifier = mesh.modifiers.new(f'{light_vectors_node_group_name} {mesh_name}', 'NODES')
+                light_vectors_modifier.node_group = light_vectors_node_group
+        return light_vectors_modifier
 
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]
