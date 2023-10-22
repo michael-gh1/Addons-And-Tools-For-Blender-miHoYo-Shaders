@@ -831,7 +831,7 @@ def rig_character(
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
-    head_driver_obj = bpy.data.objects.get("Head Driver")
+    head_driver_obj = bpy.data.objects.get("Head Driver") or bpy.data.objects.get("Head Origin")
     if head_driver_obj:
         head_driver_obj.hide_select = True
         head_driver_obj.hide_viewport = True
