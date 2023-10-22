@@ -13,7 +13,7 @@ from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGro
 
 
 # Constants
-NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
+NAME_OF_GEOMETRY_NODES_MODIFIER = 'Outlines'
 NAME_OF_VERTEX_COLORS_INPUT = 'Input_3'
 OUTLINE_THICKNESS_INPUT = 'Input_7'
 BODY_PART_SUFFIX = ''
