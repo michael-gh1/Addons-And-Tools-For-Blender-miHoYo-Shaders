@@ -259,7 +259,8 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             sub_layout,
             'genshin.setup_head_driver',
             'Set Up Head Driver',
-            'CONSTRAINT'
+            'CONSTRAINT',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,

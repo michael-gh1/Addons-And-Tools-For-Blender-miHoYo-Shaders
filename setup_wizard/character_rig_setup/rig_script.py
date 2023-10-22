@@ -823,14 +823,19 @@ def rig_character(
     move_into_collection("Head Driver",char_name)
     move_into_collection("Main Light Direction",char_name)
 
+    # V3 Shader Support - New empty names
+    move_into_collection("Head Origin",char_name)
+    move_into_collection("Light Direction",char_name)
+
     bpy.data.collections["wgt"].hide_select = True
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
     head_driver_obj = bpy.data.objects.get("Head Driver")
-    head_driver_obj.hide_select = True
-    head_driver_obj.hide_viewport = True
-    head_driver_obj.hide_render = True
+    if head_driver_obj:
+        head_driver_obj.hide_select = True
+        head_driver_obj.hide_viewport = True
+        head_driver_obj.hide_render = True
 
     head_forward_obj = bpy.data.objects.get("Head Forward")
     head_forward_obj.hide_select = True
