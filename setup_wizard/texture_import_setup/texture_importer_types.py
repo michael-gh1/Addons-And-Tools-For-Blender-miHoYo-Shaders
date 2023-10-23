@@ -380,7 +380,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
                 elif "Gauntlet_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, gauntlet_material, img)
-                elif "Gauntlet_Lightmap" in file:
+                elif "Gauntlet_Ligntmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, gauntlet_material, img)
