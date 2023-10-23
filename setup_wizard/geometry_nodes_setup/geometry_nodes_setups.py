@@ -57,11 +57,6 @@ meshes_to_create_geometry_nodes_on = [
     'Weapon02',  # HSR Support
 ]
 
-meshes_to_create_light_vectors_on = meshes_to_create_geometry_nodes_on + [
-    'Brow',
-    'EyeStar',
-]
-
 
 class GameGeometryNodesSetupFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
@@ -211,7 +206,10 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
         self.set_face_outlines_material_default_values(self.material_names)
-        for mesh_name in meshes_to_create_light_vectors_on:  # It is important that this is created before Outlines!!
+        character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
+        character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
+
+        for mesh_name in character_armature_mesh_names:  # It is important that this is created and placed before Outlines!!
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
