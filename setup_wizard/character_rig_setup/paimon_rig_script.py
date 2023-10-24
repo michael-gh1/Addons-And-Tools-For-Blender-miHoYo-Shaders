@@ -2,9 +2,7 @@
 # Setup Wizard Integration by michael-gh1
 
 import bpy
-import os
-from mathutils import Color, Vector
-from math import pi
+
 
 def rig_character(
         file_path, 
