@@ -751,9 +751,11 @@ def rig_character(
     except:
         pass
 
+    # Fix face shading being offset 90 degrees
     bpy.ops.object.mode_set(mode='OBJECT')
     try:
-        bpy.context.view_layer.objects.active = bpy.data.objects["Head Driver"]
+        head_driver_obj = bpy.data.objects.get("Head Driver") or bpy.data.objects.get("Head Origin")
+        bpy.context.view_layer.objects.active = head_driver_obj
         bpy.ops.constraint.childof_set_inverse(constraint="Child Of", owner='OBJECT')
     except:
         pass
