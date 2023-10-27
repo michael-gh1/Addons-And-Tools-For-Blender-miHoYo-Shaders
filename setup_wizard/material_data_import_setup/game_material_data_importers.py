@@ -16,6 +16,7 @@ from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 from setup_wizard.exceptions import UnsupportedMaterialDataJsonFormatException, UserInputException
+from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, get_cache
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import MaterialDataJsonParser, HoyoStudioMaterialDataJsonParser, \
     UABEMaterialDataJsonParser, UnknownHoyoStudioMaterialDataJsonParser
@@ -96,9 +97,37 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
     def import_material_data(self):
         self.__validate_UI_inputs_for_targeted_material_data_import()
 
-        directory_file_path = os.path.dirname(self.blender_operator.filepath)
+        # Attempt to use the Material or Materials folder in the cached character folder to import material data json
+        # It's possible these folders are in the parent folder for characters with skins, however, it's not possible to
+        # easily determine which material data json to apply to the character, so in that scenario,
+        # pop-up the File Explorer window and ask the user to select material data json files (old flow)
+        cache_enabled = self.context.window_manager.cache_enabled
+        character_directory = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.blender_operator.filepath)
+        character_material_data_directory = os.path.join(character_directory, 'Material')
+        character_materials_data_directory = os.path.join(character_directory, 'Materials')
+        material_data_directory_exists = os.path.isdir(character_material_data_directory) or \
+            os.path.isdir(character_materials_data_directory)
+        material_data_directory = character_material_data_directory if os.path.isdir(character_material_data_directory) else \
+            character_materials_data_directory if os.path.isdir(character_materials_data_directory) else None
 
-        if not self.blender_operator.filepath or not self.blender_operator.files:
+        directory_file_path = os.path.dirname(self.blender_operator.filepath) or material_data_directory
+        
+        material_data_files = []
+        if material_data_directory:
+            # Need to set the 'name' field of an object to match the Operator file
+            class Object(object):
+                pass
+            for filename in os.listdir(material_data_directory):
+                temp_object = Object()
+                temp_object.name = filename
+                material_data_files.append(temp_object)
+        
+        material_data_files = self.blender_operator.files or material_data_files
+
+        if not material_data_directory_exists and \
+            (not self.blender_operator.filepath or not self.blender_operator.files):
             bpy.ops.genshin.import_material_data(
                 'INVOKE_DEFAULT',
                 next_step_idx=self.blender_operator.next_step_idx, 
@@ -107,11 +136,11 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 high_level_step_name=self.blender_operator.high_level_step_name,
                 game_type=self.blender_operator.game_type,
             )
-            return {'FINISHED'}
+            return {'SKIP'}
 
-        self.__validate_num_of_file_inputs_for_targeted_material_data_import()
+        self.__validate_num_of_file_inputs_for_targeted_material_data_import(material_data_files)
 
-        for file in self.blender_operator.files:
+        for file in material_data_files:
             body_part = None
 
             if 'Monster' in file.name:
@@ -150,6 +179,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 character_type
             )
             self.apply_material_data(body_part, material_data_appliers)
+        return {'FINISHED'}
 
     def __validate_UI_inputs_for_targeted_material_data_import(self):
         if self.material and not self.outlines_material:
@@ -157,8 +187,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         elif not self.material and self.outlines_material:
             raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Target Material" input')
 
-    def __validate_num_of_file_inputs_for_targeted_material_data_import(self):
-        num_of_files = len(self.blender_operator.files)
+    def __validate_num_of_file_inputs_for_targeted_material_data_import(self, material_data_files):
+        num_of_files = len(material_data_files)
         if self.material and self.outlines_material and num_of_files != 1:
             raise UserInputException(f'\n\n>>> Select only 1 material data file to apply to the material. You selected {num_of_files} material data files to apply on 1 material.')
 
