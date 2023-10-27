@@ -233,6 +233,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 'Import Material Data',
                 'FILE',
                 game_type=GameType.GENSHIN_IMPACT.name,
+                setup_mode='ADVANCED',
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')

@@ -124,10 +124,13 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 temp_object.name = filename
                 material_data_files.append(temp_object)
         
-        material_data_files = self.blender_operator.files or material_data_files
+        is_targeted_material_data_import = self.material and self.outlines_material
+        material_data_files = self.blender_operator.files or (material_data_files if not is_targeted_material_data_import else None)
 
-        if not material_data_directory_exists and \
-            (not self.blender_operator.filepath or not self.blender_operator.files):
+        caller_is_advanced_setup = self.blender_operator.setup_mode == 'ADVANCED'
+        no_material_data_files = not material_data_directory_exists and \
+            (not self.blender_operator.filepath or not self.blender_operator.files)
+        if caller_is_advanced_setup or no_material_data_files:
             bpy.ops.genshin.import_material_data(
                 'INVOKE_DEFAULT',
                 next_step_idx=self.blender_operator.next_step_idx, 
@@ -159,8 +162,22 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
-            material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}')
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines')
+            # Order of Selection
+            # 1. Target Material selected.
+            # 2. Shader Materials not renamed (regular setup).
+            # 3. Shader Materials renamed. Search for material.
+            searched_materials = [material for material in bpy.data.materials.values() if f' {body_part}' in material.name and 'Outlines' not in material.name]
+            searched_material = searched_materials[0] if searched_materials else None
+            material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
+
+            # Order of Selection
+            # 1. Outline Material selected.
+            # 2. Shader Materials not renamed (regular setup).
+            # 3. Shader Materials renamed. Search for material.
+            searched_outlines_materials = [material for material in bpy.data.materials.values() if f' {body_part} Outlines' in material.name]
+            searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
+            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
+                
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
