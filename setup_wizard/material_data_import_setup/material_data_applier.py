@@ -260,7 +260,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             base_material_shader_node_tree_inputs,
         )
         self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
-        self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs, outlines_alpha_only=True)
 
         super().apply_material_data(
             self.local_material_mapping,
