@@ -5,7 +5,8 @@ import subprocess
 import os
 from pathlib import Path, PurePath
 from setup_wizard.services.config_service import ConfigService
-from setup_wizard.tests.constants import BLENDER_EXECUTION_FILE_PATH, CHARACTERS_FOLDER_FILE_PATH, RIG_CHARACTER
+from setup_wizard.tests.constants import BLENDER_EXECUTION_FILE_PATH, CHARACTERS_FOLDER_FILE_PATH, RIG_CHARACTER, \
+    USER_INPUTTED_MATERIAL_JSONS
 
 IGNORE_LIST = [
     'Asmoday',
@@ -53,10 +54,14 @@ class TestDriver:
 
                     possible_material_data_folder_file_paths = [
                         str(PurePath(characters_folder_file_path, character_folder_file_path, 'materials')),
-                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'Material')),
-                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials')),
-                        str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'Material'))
+                        str(PurePath(characters_folder_file_path, character_folder_file_path, 'Material'))
                     ]
+
+                    if environment_config.get(USER_INPUTTED_MATERIAL_JSONS):
+                        possible_material_data_folder_file_paths += [
+                            str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'materials')),
+                            str(PurePath(characters_folder_file_path, character_folder_file_path, nested_character_folder_item, 'Material'))
+                        ]
 
                     for possible_material_data_folder_file_path in possible_material_data_folder_file_paths:
                         if os.path.isdir(possible_material_data_folder_file_path):
