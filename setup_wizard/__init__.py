@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HoYoverse Setup Wizard",
     "author": "Mken",
-    "version": (2, 0, 0),
+    "version": (2, 1, 0),
     "blender": (3, 3, 0),
     "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail",
     "description": "An addon to streamline the character model setup process when using Festivity or Nya222's Shaders",
@@ -35,7 +35,6 @@ from setup_wizard.ui.gi_ui_setup_wizard_menu import \
     GI_PT_UI_Outlines_Menu, \
     GI_PT_UI_Finish_Setup_Menu, \
     GI_PT_UI_Character_Rig_Setup_Menu, \
-    GI_PT_UI_Optimization_Menu, \
     GI_PT_UI_Gran_Turismo_UI_Layout
 from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_Setup_Wizard_UI_Layout, \
@@ -72,7 +71,6 @@ classes = [
     GI_PT_UI_Outlines_Menu, 
     GI_PT_UI_Finish_Setup_Menu,
     GI_PT_UI_Character_Rig_Setup_Menu,
-    GI_PT_UI_Optimization_Menu, 
     GI_PT_UI_Gran_Turismo_UI_Layout,
     GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,

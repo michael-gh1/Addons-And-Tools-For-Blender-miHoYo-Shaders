@@ -4,6 +4,7 @@ import bpy
 import os
 
 from setup_wizard.character_rig_setup.rig_script import rig_character
+from setup_wizard.character_rig_setup.paimon_rig_script import rig_character as rig_paimon
 
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
@@ -61,15 +62,27 @@ class GenshinImpactCharacterRigger(CharacterRigger):
             return
 
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
-        rig_character(
-            filepath,
-            not character_rigger_props.allow_arm_ik_stretch,
-            not character_rigger_props.allow_leg_ik_stretch,
-            character_rigger_props.use_arm_ik_poles,
-            character_rigger_props.use_leg_ik_poles,
-            character_rigger_props.add_children_of_constraints,
-            character_rigger_props.use_head_tracker
-        )
+
+        if [material for material in bpy.data.materials.values() if 'Paimon' in material.name]:
+            rig_paimon(
+                filepath,
+                not character_rigger_props.allow_arm_ik_stretch,
+                not character_rigger_props.allow_leg_ik_stretch,
+                character_rigger_props.use_arm_ik_poles,
+                character_rigger_props.use_leg_ik_poles,
+                character_rigger_props.add_children_of_constraints,
+                character_rigger_props.use_head_tracker
+            )
+        else:
+            rig_character(
+                filepath,
+                not character_rigger_props.allow_arm_ik_stretch,
+                not character_rigger_props.allow_leg_ik_stretch,
+                character_rigger_props.use_arm_ik_poles,
+                character_rigger_props.use_leg_ik_poles,
+                character_rigger_props.add_children_of_constraints,
+                character_rigger_props.use_head_tracker
+            )
 
         # head_tracker_constraint_influence = 1.0 if character_rigger_props.use_head_tracker else 0.0
         # self.__set_head_tracker_constraint_influence(head_tracker_constraint_influence)

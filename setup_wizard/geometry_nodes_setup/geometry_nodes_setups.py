@@ -13,7 +13,7 @@ from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGro
 
 
 # Constants
-NAME_OF_GEOMETRY_NODES_MODIFIER = 'GeometryNodes'
+NAME_OF_GEOMETRY_NODES_MODIFIER = 'Outlines'
 NAME_OF_VERTEX_COLORS_INPUT = 'Input_3'
 OUTLINE_THICKNESS_INPUT = 'Input_7'
 BODY_PART_SUFFIX = ''
@@ -201,10 +201,18 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         super().__init__(blender_operator, context)
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+        self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
         self.set_face_outlines_material_default_values(self.material_names)
+        character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
+        character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
+
+        for mesh_name in character_armature_mesh_names:  # It is important that this is created and placed before Outlines!!
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                    self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
@@ -213,6 +221,21 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
         face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Eye' not in mesh_name]
         self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def create_light_vectors_modifier(self, mesh_name):
+        mesh = bpy.context.scene.objects[mesh_name]
+
+        for light_vectors_node_group_name in self.light_vectors_node_group_names:
+            light_vectors_node_group = bpy.data.node_groups.get(light_vectors_node_group_name)
+            light_vectors_modifier = mesh.modifiers.get(f'{light_vectors_node_group_name} {mesh_name}')
+
+            if not light_vectors_node_group:
+                continue
+
+            if not light_vectors_modifier:
+                light_vectors_modifier = mesh.modifiers.new(f'{light_vectors_node_group_name} {mesh_name}', 'NODES')
+                light_vectors_modifier.node_group = light_vectors_node_group
+        return light_vectors_modifier
 
     def create_geometry_nodes_modifier(self, mesh_name):
         mesh = bpy.context.scene.objects[mesh_name]

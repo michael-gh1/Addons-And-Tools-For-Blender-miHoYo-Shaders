@@ -260,6 +260,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
             base_material_shader_node_tree_inputs,
         )
         self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs, outlines_alpha_only=True)
 
         super().apply_material_data(
             self.local_material_mapping,
@@ -267,7 +268,7 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         )
 
     # We should consider abstracting this logic if we need to add additional logic for other material data values
-    def set_up_alpha_options_material_data(self, node_inputs):
+    def set_up_alpha_options_material_data(self, node_inputs, outlines_alpha_only=False):
         _MainTexAlphaUse_name = '_MainTexAlphaUse'
         _MainTexAlphaUse_mapping = {
             0: {
@@ -290,6 +291,10 @@ class V2_MaterialDataApplier(MaterialDataApplier):
 
         if _MainTexAlphaUse_value is None:  # explicitly check for None
             self.__handle_material_value_not_found(_MainTexAlphaUse_name)
+            return
+        elif outlines_alpha_only and _MainTexAlphaUse_value != 1:
+            # For outlines ignore 0, 2
+            # Only apply material data if it's 1
             return
 
         for material_node_name, material_json_value in _MainTexAlphaUse_material_node_dict.items():
@@ -410,6 +415,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
                 base_material_shader_node_tree_inputs,
             )
         self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
+        self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs, outlines_alpha_only=True)
 
         super().apply_material_data(
             self.outline_mapping,

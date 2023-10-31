@@ -9,6 +9,11 @@ from setup_wizard.domain.game_types import GameType
 class UI_Properties:
     @staticmethod
     def create_custom_ui_properties():
+        bpy.types.WindowManager.setup_wizard_full_run_rigging_enabled = bpy.props.BoolProperty(
+            name = " Rigging Enabled",
+            default = True
+        )
+
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -35,7 +40,6 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
-        row = layout.row()
         OperatorFactory.create(
             sub_layout,
             'genshin.setup_wizard_ui',
@@ -51,6 +55,9 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
             sub_layout.label(text='Rigging Disabled', icon='ERROR')
 
+        sub_layout.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
+
+        row = layout.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -226,6 +233,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
                 'Import Material Data',
                 'FILE',
                 game_type=GameType.GENSHIN_IMPACT.name,
+                setup_mode='ADVANCED',
             )
         else:
             layout.label(text='(Outlines Disabled < v3.3.0)')
@@ -252,7 +260,8 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             sub_layout,
             'genshin.setup_head_driver',
             'Set Up Head Driver',
-            'CONSTRAINT'
+            'CONSTRAINT',
+            game_type=GameType.GENSHIN_IMPACT.name,
         )
         OperatorFactory.create(
             sub_layout,
@@ -316,26 +325,6 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_leg_ik_poles')
         col.prop(character_rigger_props, 'add_children_of_constraints')
         col.prop(character_rigger_props, 'use_head_tracker')
-
-
-class GI_PT_UI_Optimization_Menu(Panel):
-    bl_label = 'Optimizations'
-    bl_idname = 'GI_PT_UI_Optimization_Menu'
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'Genshin Impact'
-
-    def draw(self, context):
-        layout = self.layout
-        sub_layout = layout.box()
-
-        OperatorFactory.create(
-            sub_layout,
-            'hoyoverse.emissive_optimizer',
-            'Performance Toggle',
-            'TIME',
-            game_type=GameType.GENSHIN_IMPACT.name,
-        )
 
 
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):

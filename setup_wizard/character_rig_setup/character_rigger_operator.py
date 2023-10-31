@@ -41,10 +41,18 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
     )
 
     def execute(self, context):
+        rigging_enabled = bpy.context.window_manager.setup_wizard_full_run_rigging_enabled or \
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui'
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
         rigify_installed = bpy.context.preferences.addons.get('rigify')
 
+        if not rigging_enabled:
+            self.report(
+                {'WARNING'},
+                'Rigging skipped. Rigging not enabled on Run Entire Setup.'
+            )
+            return {'FINISHED'}
         if not betterfbx_installed or not expy_kit_installed or not rigify_installed:
             self.report(
                 {'WARNING'},

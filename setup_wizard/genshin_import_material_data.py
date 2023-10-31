@@ -57,10 +57,10 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(selected_material, outlines_material)
 
             game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
-            game_material_data_importer.import_material_data()
+            status = game_material_data_importer.import_material_data()
 
             self.report({'INFO'}, 'Imported material data')
-            if self.filepath or self.files:
+            if status == {'FINISHED'}:
                 NextStepInvoker().invoke(
                     self.next_step_idx, 
                     self.invoker_type, 

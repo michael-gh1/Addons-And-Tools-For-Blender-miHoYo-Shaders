@@ -7,15 +7,16 @@ from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 HEAD_DRIVER_OBJECT_NAME = 'Head Driver'
+HEAD_ORIGIN_OBJECT_NAME = 'Head Origin'
 
 
 class GI_OT_SetUpHeadDriver(Operator, CustomOperatorProperties):
     '''Sets up Head Driver'''
     bl_idname = 'genshin.setup_head_driver'
-    bl_label = 'Genshin: Setup HeadDriver'
+    bl_label = 'Genshin: Setup Head Driver'
 
     def execute(self, context):
-        head_driver_object = bpy.data.objects.get(HEAD_DRIVER_OBJECT_NAME)
+        head_driver_object = bpy.data.objects.get(HEAD_DRIVER_OBJECT_NAME) or bpy.data.objects.get(HEAD_ORIGIN_OBJECT_NAME)
         child_of_constraint = head_driver_object.constraints[0]  # expecting 1 constraint head driver
 
         armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature

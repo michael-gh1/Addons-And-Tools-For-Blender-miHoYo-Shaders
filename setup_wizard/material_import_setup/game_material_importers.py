@@ -9,6 +9,7 @@ from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinIm
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
+from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 
 
 class GameMaterialImporterFactory:
@@ -79,9 +80,10 @@ class GameMaterialImporter:
                 files=self.names_of_game_materials,
                 set_fake=True
             )
+            self.import_light_vectors_geometry_node(shader_blend_file_path)
         except RuntimeError as ex:
             self.blender_operator.report({'ERROR'}, \
-                f"ERROR: Error when trying to append materials. \n\
+                f"ERROR: Error when trying to append materials and Light Vector geometry node. \n\
                 Did not find `{self.game_default_blend_file_with_materials}` in the directory you selected. \n\
                 Try selecting the exact blend file you want to use.")
             raise ex
@@ -93,6 +95,17 @@ class GameMaterialImporter:
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
+
+    def import_light_vectors_geometry_node(self, filepath):
+        filepath = filepath.rsplit('\\', 1)[0]  # Strip '\\Material' from end of filepath, use 'NodeTree' below
+        for outline_node_group_name in OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES:
+            if not bpy.data.node_groups.get(outline_node_group_name):
+                inner_path = 'NodeTree'
+                bpy.ops.wm.append(
+                    filepath=os.path.join(filepath, inner_path, outline_node_group_name),
+                    directory=os.path.join(filepath, inner_path),
+                    filename=outline_node_group_name
+                )
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse_-_Genshin_Impact_-_Goo_Engine_v3.blend'
