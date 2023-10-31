@@ -67,13 +67,13 @@ class GenshinImpactOutlineNodeGroupImporter(GameOutlineNodeGroupImporter):
                 )
                 if cache_enabled and filepath:
                     cache_using_cache_key(get_cache(cache_enabled), self.outlines_file_path, filepath)
-                
-                NextStepInvoker().invoke(
-                    self.blender_operator.next_step_idx, 
-                    self.blender_operator.invoker_type,
-                    high_level_step_name=self.blender_operator.high_level_step_name,
-                    game_type=self.blender_operator.game_type,
-                )
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
 
 class HonkaiStarRailOutlineNodeGroupImporter(GameOutlineNodeGroupImporter):
     def __init__(self, blender_operator, context):
