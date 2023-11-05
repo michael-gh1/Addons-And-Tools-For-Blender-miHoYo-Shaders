@@ -7,7 +7,7 @@ from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.paimon_rig_script import rig_character as rig_paimon
 
 from abc import ABC, abstractmethod
-from bpy.types import Operator, Context
+from bpy.types import Armature, Operator, Context
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, NextStepInvoker, cache_using_cache_key, \
@@ -63,6 +63,13 @@ class GenshinImpactCharacterRigger(CharacterRigger):
 
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
 
+        # Important that the Armature is selected before performing rigging operations
+        bpy.ops.object.select_all(action='DESELECT')
+        armature: Armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
+        bpy.context.view_layer.objects.active = armature
+        armature.select_set(True)
+
+        meshes_joined = not (bpy.data.objects.get('Body') and bpy.data.objects.get('Face'))
         if [material for material in bpy.data.materials.values() if 'Paimon' in material.name]:
             rig_paimon(
                 filepath,
@@ -71,7 +78,8 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                 character_rigger_props.use_arm_ik_poles,
                 character_rigger_props.use_leg_ik_poles,
                 character_rigger_props.add_children_of_constraints,
-                character_rigger_props.use_head_tracker
+                character_rigger_props.use_head_tracker,
+                meshes_joined=meshes_joined
             )
         else:
             rig_character(
@@ -81,7 +89,8 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                 character_rigger_props.use_arm_ik_poles,
                 character_rigger_props.use_leg_ik_poles,
                 character_rigger_props.add_children_of_constraints,
-                character_rigger_props.use_head_tracker
+                character_rigger_props.use_head_tracker,
+                meshes_joined=meshes_joined
             )
 
         # head_tracker_constraint_influence = 1.0 if character_rigger_props.use_head_tracker else 0.0

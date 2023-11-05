@@ -265,6 +265,8 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.clear_cache_operator
         elif component_name == 'change_bpy_context':
             return bpy.ops.genshin.change_bpy_context
+        elif component_name == 'join_meshes_on_armature':
+            return bpy.ops.hoyoverse.join_meshes_on_armature
         elif component_name == 'rig_character':
             return bpy.ops.hoyoverse.rig_character
         elif component_name == 'rootshape_filepath_setter':
