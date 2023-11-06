@@ -14,7 +14,7 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
     bl_label = 'HoYoverse: Join Meshes on Armature'
 
     def execute(self, context):
-        join_meshes_enabled = self.game_type is GameType.GENSHIN_IMPACT.name and \
+        join_meshes_enabled = self.game_type == GameType.GENSHIN_IMPACT.name and \
             (bpy.context.window_manager.setup_wizard_join_meshes_enabled or \
             self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui')
 
