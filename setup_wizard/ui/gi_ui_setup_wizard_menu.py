@@ -299,6 +299,7 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'hoyoverse.join_meshes_on_armature',
             'Join Meshes on Armature',
             'RNA',
+            game_type=GameType.GENSHIN_IMPACT.name
         )
 
 

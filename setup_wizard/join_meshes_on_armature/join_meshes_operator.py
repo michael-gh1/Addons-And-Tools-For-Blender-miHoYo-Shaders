@@ -3,6 +3,7 @@
 import bpy
 from bpy.types import Operator
 
+from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
@@ -13,8 +14,9 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
     bl_label = 'HoYoverse: Join Meshes on Armature'
 
     def execute(self, context):
-        join_meshes_enabled = bpy.context.window_manager.setup_wizard_join_meshes_enabled or \
-            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui'
+        join_meshes_enabled = self.game_type is GameType.GENSHIN_IMPACT.name and \
+            (bpy.context.window_manager.setup_wizard_join_meshes_enabled or \
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui')
 
         if join_meshes_enabled:
             character_model = None
