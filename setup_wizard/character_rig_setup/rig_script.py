@@ -1476,7 +1476,7 @@ def rig_character(
 
     try:
         # EYE SHAPE KEYS
-        obj = bpy.data.objects.get("Face_Eye") or bpy.data.objects.get("Body") if meshes_joined else None
+        obj = bpy.data.objects.get("Face_Eye") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("Eye_WinkA_L","WinkA-L-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkA_R","WinkA-R-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkB_L","WinkB-L-Invis","bone * -.82","LOC_Y")
@@ -1494,14 +1494,14 @@ def rig_character(
         makeCon("Eye_Lowereyelid","Eye-LowerEyelid-Control","bone * -2.22","LOC_Y")
 
         # Pupils shape key drivers are set up below
-        obj = bpy.data.objects.get("EyeStar") or bpy.data.objects.get("Body") if meshes_joined else None
+        obj = bpy.data.objects.get("EyeStar") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("EyeStar","Eye-Star-Control","1+(bone*2.23)","LOC_Y")
         
     except: 
         pass
 
     # MOUTH SHAPE KEYS
-    obj = bpy.data.objects.get("Face") or bpy.data.objects.get("Body") if meshes_joined else None
+    obj = bpy.data.objects.get("Face") or (bpy.data.objects.get("Body") if meshes_joined else None)
     makeCon("Mouth_Default","Mouth-Default-Control","bone * 1.67","LOC_X")
     makeCon("Mouth_A01","Mouth-Control","bone * -1.33","LOC_Y")
     makeCon("Mouth_Open01","Mouth-Control","bone * 1.33","LOC_Y")
