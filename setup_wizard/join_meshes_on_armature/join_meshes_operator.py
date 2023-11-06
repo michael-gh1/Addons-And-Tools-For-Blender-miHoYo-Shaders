@@ -13,21 +13,25 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
     bl_label = 'HoYoverse: Join Meshes on Armature'
 
     def execute(self, context):
-        character_model = None
-        for object in bpy.context.scene.objects:
-            if object.type == 'ARMATURE':
-                character_model = object
-                continue
+        join_meshes_enabled = bpy.context.window_manager.setup_wizard_join_meshes_enabled or \
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui'
 
-        character_model_body = [body_part for body_part in character_model.children if body_part.name == 'Body'][0]
-        character_model_children = [body_part for body_part in character_model.children if body_part]
+        if join_meshes_enabled:
+            character_model = None
+            for object in bpy.context.scene.objects:
+                if object.type == 'ARMATURE':
+                    character_model = object
+                    continue
 
-        for character_model_child in character_model_children:
-            print(f'Selecting {character_model_child} to join')
-            character_model_child.select_set(True)
-        bpy.context.view_layer.objects.active = character_model_body
-        print(f'Joining children body parts to {character_model_body}')
-        bpy.ops.object.join()
+            character_model_body = [body_part for body_part in character_model.children if body_part.name == 'Body'][0]
+            character_model_children = [body_part for body_part in character_model.children if body_part]
+
+            for character_model_child in character_model_children:
+                print(f'Selecting {character_model_child} to join')
+                character_model_child.select_set(True)
+            bpy.context.view_layer.objects.active = character_model_body
+            print(f'Joining children body parts to {character_model_body}')
+            bpy.ops.object.join()
 
         if self.next_step_idx:
             NextStepInvoker().invoke(
