@@ -43,6 +43,7 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'EffectHair',
     'Mask',
     'Cap',
     'Clothes',
