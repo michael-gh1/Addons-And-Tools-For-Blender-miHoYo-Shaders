@@ -108,7 +108,7 @@ class GameMaterialImporter:
                 )
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
-    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse_-_Genshin_Impact_-_Goo_Engine_v3.blend'
+    DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse - Genshin Impact - Goo Engine v3.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
         {'name': V2_FestivityGenshinImpactMaterialNames.BODY},
         {'name': V2_FestivityGenshinImpactMaterialNames.FACE},
