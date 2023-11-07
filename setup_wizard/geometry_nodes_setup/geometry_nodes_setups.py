@@ -195,7 +195,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
     BASE_GEOMETRY_INPUT = 'Input_12'
     USE_VERTEX_COLORS_INPUT = 'Input_13'
-
+    OUTLINE_THICKNESS_INPUT = 'Input_7'
 
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
@@ -256,6 +256,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def set_up_modifier_default_values(self, modifier, mesh):
         modifier[self.BASE_GEOMETRY_INPUT] = True
         modifier[self.USE_VERTEX_COLORS_INPUT] = True
+        modifier[self.OUTLINE_THICKNESS_INPUT] = 0.25
 
         outline_to_material_mapping = {
             'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
