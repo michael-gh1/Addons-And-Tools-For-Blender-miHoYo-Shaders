@@ -88,6 +88,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
             GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
             GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
+            GenshinImpactTestOperatorExecutioner('join_meshes_on_armature'),
             GenshinImpactTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
             GenshinImpactTestOperatorExecutioner('rig_character', config=config)
         ]
