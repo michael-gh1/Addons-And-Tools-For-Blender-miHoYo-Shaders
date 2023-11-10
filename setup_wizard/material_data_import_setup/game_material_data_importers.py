@@ -61,6 +61,25 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
+    def find_material_and_outline_material_for_body_part(self, body_part) -> (Material, Material):
+        # Order of Selection
+        # 1. Target Material selected.
+        # 2. Shader Materials not renamed (regular setup).
+        # 3. Shader Materials renamed. Search for material.
+        searched_materials = [material for material in bpy.data.materials.values() if f' {body_part}' in material.name and 'Outlines' not in material.name]
+        searched_material = searched_materials[0] if searched_materials else None
+        material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
+
+        # Order of Selection
+        # 1. Outline Material selected.
+        # 2. Shader Materials not renamed (regular setup).
+        # 3. Shader Materials renamed. Search for material.
+        searched_outlines_materials = [material for material in bpy.data.materials.values() if f' {body_part} Outlines' in material.name]
+        searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
+        outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
+
+        return (material, outlines_material)
+
 
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
@@ -74,7 +93,8 @@ class GameMaterialDataImporterFactory:
                 material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group)
+            material_names = Nya222HonkaiStarRailShaderMaterialNames
+            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -162,22 +182,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
-            # Order of Selection
-            # 1. Target Material selected.
-            # 2. Shader Materials not renamed (regular setup).
-            # 3. Shader Materials renamed. Search for material.
-            searched_materials = [material for material in bpy.data.materials.values() if f' {body_part}' in material.name and 'Outlines' not in material.name]
-            searched_material = searched_materials[0] if searched_materials else None
-            material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
-
-            # Order of Selection
-            # 1. Outline Material selected.
-            # 2. Shader Materials not renamed (regular setup).
-            # 3. Shader Materials renamed. Search for material.
-            searched_outlines_materials = [material for material in bpy.data.materials.values() if f' {body_part} Outlines' in material.name]
-            searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
-                
+            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
@@ -211,7 +216,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -221,6 +226,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         ]
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
+        self.material_names = material_names
 
     def import_material_data(self):
         directory_file_path = os.path.dirname(self.blender_operator.filepath)
@@ -243,8 +249,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(directory_file_path, file)
 
-            material: Material = self.material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}')
-            outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines')
+            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
