@@ -222,7 +222,7 @@ class GenshinTextureImporter:
     def does_dress_texture_exist_in_directory_files(self):
         dress_texture_detected = False
         for file in self.files:
-            if 'Dress' in file:
+            if 'Dress' in file and '.png' in file:
                 dress_texture_detected = True
         return dress_texture_detected
 
