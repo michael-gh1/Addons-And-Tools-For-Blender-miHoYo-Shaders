@@ -79,7 +79,6 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                 character_rigger_props.use_leg_ik_poles,
                 character_rigger_props.add_children_of_constraints,
                 character_rigger_props.use_head_tracker,
-                meshes_joined=meshes_joined
             )
         else:
             rig_character(
