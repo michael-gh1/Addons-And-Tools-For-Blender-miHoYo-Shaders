@@ -1456,7 +1456,7 @@ def rig_character(
     # BROW SHAPE KEYS 
     # Get the selected object with the shape key
     try:
-        obj = bpy.data.objects.get("Brow") or bpy.data.objects.get("Body") if meshes_joined else None
+        obj = bpy.data.objects.get("Brow") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("Brow_Down_L","Brow-L-Control","bone * -4","LOC_Y")
         makeCon("Brow_Down_R","Brow-R-Control","bone * -4","LOC_Y")
         makeCon("Brow_Up_L","Brow-L-Control","bone * 4","LOC_Y")
