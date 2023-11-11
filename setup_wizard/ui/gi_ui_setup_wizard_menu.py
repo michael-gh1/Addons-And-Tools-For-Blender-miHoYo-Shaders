@@ -14,6 +14,11 @@ class UI_Properties:
             default = True
         )
 
+        bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
+            name = " Join Meshes Enabled",
+            default = True
+        )
+
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -56,6 +61,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             sub_layout.label(text='Rigging Disabled', icon='ERROR')
 
         sub_layout.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
+        sub_layout.prop(window_manager, 'setup_wizard_join_meshes_enabled')
 
         row = layout.row()
         row.prop(window_manager, 'cache_enabled')
@@ -287,6 +293,13 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'genshin.set_up_armtwist_bone_constraints',
             'Set Up ArmTwist Bone Constraints',
             'CONSTRAINT_BONE'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.join_meshes_on_armature',
+            'Join Meshes on Armature',
+            'RNA',
+            game_type=GameType.GENSHIN_IMPACT.name
         )
 
 

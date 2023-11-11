@@ -13,7 +13,8 @@ def rig_character(
         use_arm_ik_poles,
         use_leg_ik_poles,
         add_child_of_constraints,
-        use_head_tracker):
+        use_head_tracker,
+        meshes_joined=False):
     
     head_bone_arm_target = bpy.context.active_object
     temp_armature = head_bone_arm_target.data
@@ -1455,7 +1456,7 @@ def rig_character(
     # BROW SHAPE KEYS 
     # Get the selected object with the shape key
     try:
-        obj = bpy.data.objects.get("Brow")   
+        obj = bpy.data.objects.get("Brow") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("Brow_Down_L","Brow-L-Control","bone * -4","LOC_Y")
         makeCon("Brow_Down_R","Brow-R-Control","bone * -4","LOC_Y")
         makeCon("Brow_Up_L","Brow-L-Control","bone * 4","LOC_Y")
@@ -1475,7 +1476,7 @@ def rig_character(
 
     try:
         # EYE SHAPE KEYS
-        obj = bpy.data.objects.get("Face_Eye")
+        obj = bpy.data.objects.get("Face_Eye") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("Eye_WinkA_L","WinkA-L-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkA_R","WinkA-R-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkB_L","WinkB-L-Invis","bone * -.82","LOC_Y")
@@ -1493,14 +1494,14 @@ def rig_character(
         makeCon("Eye_Lowereyelid","Eye-LowerEyelid-Control","bone * -2.22","LOC_Y")
 
         # Pupils shape key drivers are set up below
-        obj = bpy.data.objects.get("EyeStar")
+        obj = bpy.data.objects.get("EyeStar") or (bpy.data.objects.get("Body") if meshes_joined else None)
         makeCon("EyeStar","Eye-Star-Control","1+(bone*2.23)","LOC_Y")
         
     except: 
         pass
 
     # MOUTH SHAPE KEYS
-    obj = bpy.data.objects.get("Face")
+    obj = bpy.data.objects.get("Face") or (bpy.data.objects.get("Body") if meshes_joined else None)
     makeCon("Mouth_Default","Mouth-Default-Control","bone * 1.67","LOC_X")
     makeCon("Mouth_A01","Mouth-Control","bone * -1.33","LOC_Y")
     makeCon("Mouth_Open01","Mouth-Control","bone * 1.33","LOC_Y")

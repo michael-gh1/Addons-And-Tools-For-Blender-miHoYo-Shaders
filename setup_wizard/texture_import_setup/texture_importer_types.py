@@ -222,7 +222,7 @@ class GenshinTextureImporter:
     def does_dress_texture_exist_in_directory_files(self):
         dress_texture_detected = False
         for file in self.files:
-            if 'Dress' in file:
+            if 'Dress' in file and '.png' in file:
                 dress_texture_detected = True
         return dress_texture_detected
 
@@ -673,8 +673,9 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Body3', 'LightMap'], file):
                     self.set_lightmap_texture(TextureType.BODY, body3_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file) or \
-                    self.is_texture_identifiers_in_texture_name(['Body_Ramp'], file):  # Not Hair, so ramp must be Body
+                elif (self.is_texture_identifiers_in_texture_name(['Warm_Ramp'], file) or \
+                    self.is_texture_identifiers_in_texture_name(['Body_Ramp'], file)) and \
+                        not self.is_texture_identifiers_in_texture_name(['Weapon'], file):  # Not Hair, so ramp must be Body
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
                     self.set_weapon_ramp_texture(img)
 

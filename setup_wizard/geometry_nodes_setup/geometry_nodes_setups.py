@@ -43,6 +43,7 @@ meshes_to_create_geometry_nodes_on = [
     'Body',
     'Face',
     'Face_Eye',
+    'EffectHair',
     'Mask',
     'Cap',
     'Clothes',
@@ -195,7 +196,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
     BASE_GEOMETRY_INPUT = 'Input_12'
     USE_VERTEX_COLORS_INPUT = 'Input_13'
-
+    OUTLINE_THICKNESS_INPUT = 'Input_7'
 
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
@@ -256,9 +257,9 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def set_up_modifier_default_values(self, modifier, mesh):
         modifier[self.BASE_GEOMETRY_INPUT] = True
         modifier[self.USE_VERTEX_COLORS_INPUT] = True
+        modifier[self.OUTLINE_THICKNESS_INPUT] = 0.25
 
         outline_to_material_mapping = {
-            'EffectHair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
             'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
             'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
             'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
@@ -267,6 +268,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
             'Dress2': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
             'Arm': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+            'EffectHair': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
             'Gauntlet': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
             'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         }

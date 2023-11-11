@@ -79,6 +79,7 @@ def setup_dependencies():
     import setup_wizard.set_up_head_driver
     import setup_wizard.fix_mouth_outlines
     import setup_wizard.misc_operations
+    import setup_wizard.join_meshes_on_armature.join_meshes_operator
     import setup_wizard.character_rig_setup.character_rigger_operator
     import setup_wizard.character_rig_setup.rootshape_filepath_setter_operator
     import setup_wizard.optimization.emissive_optimizer
@@ -98,6 +99,7 @@ def setup_dependencies():
     importlib.reload(setup_wizard.set_up_head_driver)
     importlib.reload(setup_wizard.fix_mouth_outlines)
     importlib.reload(setup_wizard.misc_operations)
+    importlib.reload(setup_wizard.join_meshes_on_armature.join_meshes_operator)
     importlib.reload(setup_wizard.character_rig_setup.character_rigger_operator)
     importlib.reload(setup_wizard.character_rig_setup.rootshape_filepath_setter_operator)
     importlib.reload(setup_wizard.optimization.emissive_optimizer)
@@ -121,6 +123,7 @@ def setup_dependencies():
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
         setup_wizard.misc_operations.GI_OT_SetUpArmTwistBoneConstraints,
         setup_wizard.misc_operations.GI_OT_RenameShaderMaterials,
+        setup_wizard.join_meshes_on_armature.join_meshes_operator.GI_OT_JoinMeshesOnArmature,
         setup_wizard.character_rig_setup.character_rigger_operator.GI_OT_CharacterRiggerOperator,
         setup_wizard.character_rig_setup.rootshape_filepath_setter_operator.GI_OT_RootShape_FilePath_Setter_Operator,
         setup_wizard.optimization.emissive_optimizer.GI_OT_Emissive_Optimizer,
@@ -149,6 +152,7 @@ def unregister():
     from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
     from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects, \
         GI_OT_SetUpArmTwistBoneConstraints, GI_OT_RenameShaderMaterials
+    from setup_wizard.join_meshes_on_armature.join_meshes_operator import GI_OT_JoinMeshesOnArmature
     from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_CharacterRiggerOperator
     from setup_wizard.character_rig_setup.rootshape_filepath_setter_operator import GI_OT_RootShape_FilePath_Setter_Operator
     from setup_wizard.optimization.emissive_optimizer import GI_OT_Emissive_Optimizer
@@ -171,6 +175,7 @@ def unregister():
         GI_OT_DeleteSpecificObjects,
         GI_OT_RenameShaderMaterials,
         GI_OT_SetUpArmTwistBoneConstraints,
+        GI_OT_JoinMeshesOnArmature,
         GI_OT_CharacterRiggerOperator,
         GI_OT_RootShape_FilePath_Setter_Operator,
         GI_OT_Emissive_Optimizer,
