@@ -105,7 +105,7 @@ def rig_character(
     override = get_override( 'VIEW_3D', 'WINDOW' )
 
     # Function to create shape keys from given arguments: Works with only one element in vg to parse
-    def create_shape_key(obj_get, is_basis, shape_name, shape_index, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
+    def create_shape_key(obj_get, is_basis, shape_name, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
         bpy.context.view_layer.objects.active = head_bone_arm_target
         bpy.ops.object.mode_set(mode='EDIT')
         for this_group in vertex_groups_to_parse:
@@ -135,6 +135,7 @@ def rig_character(
             sk = this_obj.data.shape_keys.key_blocks[-1]
             sk.name = shape_name
             sk.value = 1
+            shape_index = this_obj.data.shape_keys.key_blocks.keys().index(shape_name)
             bpy.context.object.active_shape_key_index = shape_index
             
             bpy.ops.object.mode_set(mode='EDIT')
@@ -162,7 +163,7 @@ def rig_character(
             bpy.context.scene.cursor.location = (0.0,0.0,0.0)
       
     # Function to create shape keys that works with 2 elementsa        
-    def create_shape_key2(obj_get, is_basis, shape_name, shape_index, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
+    def create_shape_key2(obj_get, is_basis, shape_name, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
         bpy.context.view_layer.objects.active = head_bone_arm_target
         bpy.ops.object.mode_set(mode='EDIT')
         if use_eye_1:
@@ -191,6 +192,7 @@ def rig_character(
         sk = this_obj.data.shape_keys.key_blocks[-1]
         sk.name = shape_name
         sk.value = 1
+        shape_index = this_obj.data.shape_keys.key_blocks.keys().index(shape_name)
         bpy.context.object.active_shape_key_index = shape_index
         
         bpy.ops.object.mode_set(mode='EDIT')
@@ -263,10 +265,10 @@ def rig_character(
 
 
     # Shape key to shrink pupils    
-    create_shape_key2("Body", True, "pupils", 1, "CURSOR", ["+EyeBone L A02","+EyeBone R A02"], "RESIZE", (0.5,0.5,0.5))
+    create_shape_key2("Body", True, "pupils", "CURSOR", ["+EyeBone L A02","+EyeBone R A02"], "RESIZE", (0.5,0.5,0.5))
     # Shape keys to adjust eye during blink
-    create_shape_key("Body", False, "pupil-pushback-R", 2, "CURSOR", ["+EyeBone R A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True) # 0.0069, 70
-    create_shape_key("Body", False, "pupil-pushback-L", 3, "CURSOR", ["+EyeBone L A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True)
+    create_shape_key("Body", False, "pupil-pushback-R", "CURSOR", ["+EyeBone R A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True) # 0.0069, 70
+    create_shape_key("Body", False, "pupil-pushback-L", "CURSOR", ["+EyeBone L A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True)
 
     try:
         # Bring back EyeStar
@@ -275,7 +277,7 @@ def rig_character(
         bpy.data.objects["EyeStar"].hide_render = False
 
         # Shape key to enable EyeStar growth/shrinkage
-        create_shape_key2("EyeStar", True, "EyeStar", 1, "CURSOR", ["+EyeBone R A02","+EyeBone L A02"], "RESIZE", (0,0,0))
+        create_shape_key2("EyeStar", True, "EyeStar", "CURSOR", ["+EyeBone R A02","+EyeBone L A02"], "RESIZE", (0,0,0))
     except:
         pass
 
