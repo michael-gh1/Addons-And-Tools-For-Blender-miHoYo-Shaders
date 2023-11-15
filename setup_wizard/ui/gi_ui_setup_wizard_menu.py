@@ -60,10 +60,10 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
             sub_layout.label(text='Rigging Disabled', icon='ERROR')
 
-        sub_layout.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
-        sub_layout.prop(window_manager, 'setup_wizard_join_meshes_enabled')
+        settings_box = layout.box()
+        settings_box.label(text='Global Settings', icon='WORLD')
 
-        row = layout.row()
+        row = settings_box.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -74,9 +74,11 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         )
 
         if betterfbx_installed:
-            row2 = layout.row()
+            row2 = settings_box.row()
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
+        settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
+        settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
 
 class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'
