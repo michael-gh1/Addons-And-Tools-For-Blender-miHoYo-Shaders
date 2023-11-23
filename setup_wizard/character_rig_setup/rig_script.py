@@ -641,6 +641,10 @@ def rig_character(
 
 
     bpy.context.view_layer.objects.active = bpy.data.objects["rigify"]
+
+    setup_neck_and_head_follow(neck_follow_value=1.0, head_follow_value=1.0)
+    setup_finger_scale_controls_on_x_axis_to_curl_just_the_fingertips(rigifyr)
+
     bpy.ops.object.mode_set(mode='EDIT')
 
     #### whats this for???
@@ -1847,3 +1851,26 @@ def rig_character(
     # Deselect everything, we're done.
     for bone in bpy.context.active_object.pose.bones:
         bone.bone.select = False
+
+
+# 
+def setup_neck_and_head_follow(neck_follow_value, head_follow_value):
+    bpy.context.object.pose.bones["torso"]["neck_follow"] = neck_follow_value
+    bpy.context.object.pose.bones["torso"]["head_follow"] = head_follow_value
+
+
+# Make it so that the finger scale controls can be scaled on the X axis to curl in just the fingertips instead of the entire finger.
+def setup_finger_scale_controls_on_x_axis_to_curl_just_the_fingertips(rigified_rig):
+    bpy.ops.object.mode_set(mode='POSE')
+
+    for oDrv in rigified_rig.animation_data.drivers:
+        for variable in oDrv.driver.variables:
+            for target in variable.targets:
+                if ".03" in oDrv.data_path and target.data_path[-7:] == "scale.y":
+                    target.data_path = target.data_path[:-1] + "x"
+
+
+    fingerlist = ["thumb.01_master", "f_index.01_master", "f_middle.01_master", "f_ring.01_master", "f_pinky.01_master"]
+    for side in [".L", ".R"]:
+        for bone in fingerlist:
+            rigified_rig.pose.bones[bone + side].lock_scale[0] = False
