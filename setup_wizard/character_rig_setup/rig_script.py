@@ -422,7 +422,7 @@ def rig_character(
                                     
                                                                                                                                 
     for bone in armature.edit_bones:
-        if "thumb" in bone.name or "index" in bone.name or "middle" in bone.name or "ring" in bone.name or "pinky" in bone.name:
+        if "thumb" in bone.name:
             if ".L" in bone.name:
                 armature.edit_bones[bone.name].roll -= 1.571 
             else:
@@ -542,9 +542,6 @@ def rig_character(
     # Fixes the finger rolls
     bpy.ops.object.mode_set(mode='OBJECT')
     metapose = bpy.data.objects['metarig'].pose
-    for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
-        metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = '-Z'
-        metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = 'Z'
                                                                                
     metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = '-X'
     metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = '-X'                                                                           
