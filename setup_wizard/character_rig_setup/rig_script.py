@@ -706,18 +706,6 @@ def rig_character(
     x = original_name.split("_")
     char_name = x[-1]
     bpy.data.objects["rigify"].name = char_name + "Rig"
-
-
-    # Change any physics bones attached to shoulder to be attached to spine instead bc it's a pain in the ass
-    bpy.ops.object.mode_set(mode='EDIT')
-    bones = rigifyr.data.edit_bones[:]
-
-    for bone in bones:
-        if bone.parent:
-            if bone.name not in pre_res and bone.parent.name in ["DEF-shoulder.L", "DEF-shoulder.R"]:
-                print(bone)
-                #this is a physics bone, so duplicate it.
-                bone.parent = rigifyr.data.edit_bones["DEF-spine.004"]
                 
     bpy.ops.object.mode_set(mode='POSE')   
     bpy.ops.pose.select_all(action='DESELECT')
