@@ -22,16 +22,8 @@ jobs:
           rm -r setup_wizard/tests
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
-      - name: Extract Branch/Tag Name
-        id: extract_branch_or_tag_name
-        run: |
-          if [ "${{ steps.check_if_tag.outputs.is_tag }}" == "true" ]; then
-            echo "branch_or_tag_name=$(echo $GITHUB_REF | sed 's/refs\/tags\///')" >> $GITHUB_ENV
-          else
-            echo "branch_or_tag_name=branch_${{ github.event.ref_slug }}" >> $GITHUB_ENV
-          fi
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
         with:
-          name: Charcter_Setup_Wizard_Addon_${{ env.branch_or_tag_name }}
+          name: Charcter_Setup_Wizard_Addon_$GITHUB_REF_NAME
           path: dist/setup_wizard/
