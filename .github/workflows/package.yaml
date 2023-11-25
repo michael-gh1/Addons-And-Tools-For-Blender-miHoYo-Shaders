@@ -26,9 +26,9 @@ jobs:
         id: extract_branch_or_tag_name
         run: |
           if [ "${{ steps.check_if_tag.outputs.is_tag }}" == "true" ]; then
-            echo "{branch_or_tag_name}={$(echo $GITHUB_REF | sed 's/refs\/tags\///')}" >> $GITHUB_OUTPUT
+            echo "branch_or_tag_name=$(echo $GITHUB_REF | sed 's/refs\/tags\///')" >> $GITHUB_OUTPUT
           else
-            echo "{branch_or_tag_name}={branch_${{ github.event.ref_slug }}}" >> $GITHUB_OUTPUT
+            echo "branch_or_tag_name=branch_${{ github.event.ref_slug }}" >> $GITHUB_OUTPUT
           fi
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
