@@ -3,7 +3,9 @@ name: Package Addons
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
+    tags:
+      - '*'
     paths-ignore:
       - '**/.tmp'
       - '**/.gitignore'
