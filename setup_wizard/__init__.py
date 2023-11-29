@@ -45,6 +45,14 @@ from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_UI_Outlines_Menu, \
     HSR_PT_UI_Finish_Setup_Menu, \
     HSR_PT_UI_Gran_Turismo_UI_Layout
+from setup_wizard.ui.pgr_ui_setup_wizard_menu import \
+    PGR_PT_Setup_Wizard_UI_Layout, \
+    PGR_PT_Basic_Setup_Wizard_UI_Layout, \
+    PGR_PT_Advanced_Setup_Wizard_UI_Layout, \
+    PGR_PT_UI_Character_Model_Menu, \
+    PGR_PT_UI_Materials_Menu, \
+    PGR_PT_UI_Outlines_Menu, \
+    PGR_PT_UI_Finish_Setup_Menu
 
 from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
@@ -86,6 +94,13 @@ classes = [
     HSR_PT_UI_Outlines_Menu,
     HSR_PT_UI_Finish_Setup_Menu,
     HSR_PT_UI_Gran_Turismo_UI_Layout,
+    PGR_PT_Setup_Wizard_UI_Layout,
+    PGR_PT_Basic_Setup_Wizard_UI_Layout,
+    PGR_PT_Advanced_Setup_Wizard_UI_Layout,
+    PGR_PT_UI_Character_Model_Menu,
+    PGR_PT_UI_Materials_Menu,
+    PGR_PT_UI_Outlines_Menu,
+    PGR_PT_UI_Finish_Setup_Menu,
     ClearCacheOperator,
 ]
 

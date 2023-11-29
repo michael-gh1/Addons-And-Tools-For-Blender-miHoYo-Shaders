@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
@@ -52,10 +52,16 @@ meshes_to_create_geometry_nodes_on = [
     'Helmet',
     'Wriothesley_Gauntlet_L_Model',
     'Wriothesley_Gauntlet_R_Model',
-    'Hair',  # HSR Support
-    'Weapon',  # HSR Support
-    'Weapon01',  # HSR Support
-    'Weapon02',  # HSR Support
+    # HSR
+    'Hair',
+    'Weapon',
+    'Weapon01',
+    'Weapon02',
+    # PGR
+    'Down',
+    'Upper',
+    'Cloth',
+    'Clothes',
 ]
 
 
@@ -70,11 +76,17 @@ class GameGeometryNodesSetupFactory:
                 return GenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailGeometryNodesSetup(blender_operator, context)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            for outline_node_group_name in OutlineNodeGroupNames.V2_JAREDNYTS_PGR_OUTLINES:
+                if bpy.data.node_groups.get(outline_node_group_name):
+                    return V2_PunishingGrayRavenGeometryNodesSetup(blender_operator, context)
+            return PunishingGrayRavenGeometryNodesSetup(blender_operator, context)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
 class GameGeometryNodesSetup(ABC):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    DEFAULT_OUTLINE_THICKNESS = 0.25
 
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
@@ -114,7 +126,7 @@ class GameGeometryNodesSetup(ABC):
                 modifier_name=modifier.name)
 
         modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_attribute_name'] = 'Col'
-        modifier[OUTLINE_THICKNESS_INPUT] = 0.25
+        modifier[OUTLINE_THICKNESS_INPUT] = self.DEFAULT_OUTLINE_THICKNESS
 
         for (mask_input, material_input), material in zip(outline_mask_to_material_mapping.items(), mesh.material_slots):
             if bpy.data.materials.get(material.name) and bpy.data.materials.get(f'{material.name} Outlines'):
@@ -299,6 +311,138 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
         face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Mask' not in mesh_name]
+        self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def create_geometry_nodes_modifier(self, mesh_name):
+        mesh = bpy.context.scene.objects[mesh_name]
+
+        for outlines_node_group_name in self.outlines_node_group_names:
+            outlines_node_group = bpy.data.node_groups.get(outlines_node_group_name)
+            geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+
+            if not outlines_node_group:
+                continue
+
+            if not geometry_nodes_modifier:
+                geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+                geometry_nodes_modifier.node_group = outlines_node_group
+            self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+        return geometry_nodes_modifier
+
+
+class PunishingGrayRavenGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    MESH_IGNORE_LIST = [
+        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE
+    ]
+
+    def __init__(self, blender_operator, context):
+        super().__init__(blender_operator, context)
+        self.material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
+        self.outlines_node_group_names = OutlineNodeGroupNames.V3_JAREDNYTS_PGR_OUTLINES
+
+    def setup_geometry_nodes(self):
+        self.clone_outlines(self.material_names)
+
+        local_mesh_names_to_create_geometry_nodes_on = [
+            mesh.name for mesh in bpy.data.meshes if [
+                material for material in mesh.materials if material.name.startswith(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX)
+            ]
+        ]
+
+        local_mesh_names_to_create_geometry_nodes_on = [
+            mesh_name for mesh_name in local_mesh_names_to_create_geometry_nodes_on if 
+                mesh_name not in self.MESH_IGNORE_LIST and
+                'Alpha' not in mesh_name
+        ]
+
+        for mesh_name in [item for item in local_mesh_names_to_create_geometry_nodes_on]:
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if object_data.type == 'MESH' and (mesh_name.lower() in object_name.lower()):
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
+
+        face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'face' in mesh_name.lower()]
+        self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def create_geometry_nodes_modifier(self, mesh_name):
+        mesh = bpy.context.scene.objects[mesh_name]
+
+        for outlines_node_group_name in self.outlines_node_group_names:
+            outlines_node_group = bpy.data.node_groups.get(outlines_node_group_name)
+            geometry_nodes_modifier = mesh.modifiers.get(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}')
+
+            if not outlines_node_group:
+                continue
+
+            if not geometry_nodes_modifier:
+                geometry_nodes_modifier = mesh.modifiers.new(f'{NAME_OF_GEOMETRY_NODES_MODIFIER} {mesh_name}', 'NODES')
+                geometry_nodes_modifier.node_group = outlines_node_group
+            self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
+        return geometry_nodes_modifier
+
+    def set_up_modifier_default_values(self, modifier, mesh):
+        modifier[self.BASE_GEOMETRY_INPUT] = True
+        modifier[self.USE_VERTEX_COLORS_INPUT] = True
+        modifier[self.OUTLINE_THICKNESS_INPUT] = 0.1
+
+        outline_to_material_mapping = {
+            'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Hair01': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
+            'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
+            'Down': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Clothes': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+            'Hair02': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+            'Upper': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        }
+
+        for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
+            material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name}'
+            outline_material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name} Outlines'
+
+            if bpy.data.materials.get(material_name) and bpy.data.materials.get(outline_material_name):
+                modifier[material_input_accessor] = bpy.data.materials.get(material_name)
+                modifier[outline_material_input_accessor] = bpy.data.materials.get(outline_material_name)
+
+
+class V2_PunishingGrayRavenGeometryNodesSetup(GameGeometryNodesSetup):
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    MESH_IGNORE_LIST = [
+        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE
+    ]
+    DEFAULT_OUTLINE_THICKNESS = 0.1
+
+    def __init__(self, blender_operator, context):
+        super().__init__(blender_operator, context)
+        self.material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
+        self.outlines_node_group_names = OutlineNodeGroupNames.V2_JAREDNYTS_PGR_OUTLINES
+
+    def setup_geometry_nodes(self):
+        self.clone_outlines(self.material_names)
+
+        local_mesh_names_to_create_geometry_nodes_on = [
+            mesh.name for mesh in bpy.data.meshes if [
+                material for material in mesh.materials if material.name.startswith(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX)
+            ]
+        ]
+
+        local_mesh_names_to_create_geometry_nodes_on = [
+            mesh_name for mesh_name in local_mesh_names_to_create_geometry_nodes_on if 
+                mesh_name not in self.MESH_IGNORE_LIST and
+                'Alpha' not in mesh_name
+        ]
+
+        for mesh_name in [item for item in local_mesh_names_to_create_geometry_nodes_on]:
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if object_data.type == 'MESH' and (mesh_name.lower() in object_name.lower()):
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
+
+        face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'face' in mesh_name.lower()]
         self.fix_face_outlines_by_reordering_material_slots(face_meshes)
 
     def create_geometry_nodes_modifier(self, mesh_name):

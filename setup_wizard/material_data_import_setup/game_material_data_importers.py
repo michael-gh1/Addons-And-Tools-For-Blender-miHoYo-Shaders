@@ -9,7 +9,7 @@ from bpy.types import Operator, Context, Material
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
@@ -95,6 +95,9 @@ class GameMaterialDataImporterFactory:
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             material_names = Nya222HonkaiStarRailShaderMaterialNames
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
+            return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -268,3 +271,21 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 character_type
             )
             self.apply_material_data(body_part, material_data_appliers)
+
+
+# Unused.
+class PunishingGrayRavenMaterialDataImporter(GameMaterialDataImporter):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+        self.blender_operator: Operator = blender_operator
+        self.context: Context = context
+        self.parsers = [
+            HoyoStudioMaterialDataJsonParser,
+            UnknownHoyoStudioMaterialDataJsonParser,
+            UABEMaterialDataJsonParser,
+        ]
+        self.material = outline_material_group.material
+        self.outlines_material = outline_material_group.outlines_material
+        self.material_names = material_names
+
+    def import_material_data(self):
+        return {'FINISHED'}

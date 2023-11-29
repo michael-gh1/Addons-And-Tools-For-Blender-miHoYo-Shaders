@@ -24,6 +24,9 @@ CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'nya222_honkai_star_rail_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'nya222_honkai_star_rail_shader_file_path'
 NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'nya222_honkai_star_rail_outlines_file_path'
+JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH = 'jarednyts_pgr_folder_file_path'
+JAREDNYTS_PGR_SHADER_FILE_PATH = 'jarednyts_pgr_shader_file_path'
+JAREDNYTS_PGR_OUTLINES_FILE_PATH = 'jarednyts_pgr_outlines_file_path'
 
 
 class NextStepInvoker:

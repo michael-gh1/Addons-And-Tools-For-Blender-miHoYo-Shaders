@@ -5,10 +5,12 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, \
+    V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
+    JaredNytsPunishingGrayRavenShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
-    NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH
+    NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH, JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH, JAREDNYTS_PGR_SHADER_FILE_PATH
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 
 
@@ -18,6 +20,8 @@ class GameMaterialImporterFactory:
             return GenshinImpactMaterialImporterFacade(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialImporterFacade(blender_operator, context)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenMaterialImporterFacade(blender_operator, context)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -196,6 +200,49 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
             or os.path.dirname(self.blender_operator.filepath)
 
         # Important that this is called here so that 'Use Nodes' is set on all original materials before Replace Default Materials
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx, 
+            self.blender_operator.invoker_type, 
+            file_path_to_cache=project_root_directory_file_path,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=self.blender_operator.game_type,
+        )
+
+
+class PunishingGrayRavenMaterialImporterFacade(GameMaterialImporter):
+    DEFAULT_BLEND_FILE_WITH_PGR_MATERIALS = 'PGR_Shader.blend'
+    NAMES_OF_PUNISHING_GRAY_RAVEN_MATERIALS = [
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.ALPHA},
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.EYE},
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.FACE},
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR},
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN},
+        {'name': JaredNytsPunishingGrayRavenShaderMaterialNames.OUTLINES},
+    ]
+
+    def __init__(self, blender_operator, context):
+        super().__init__(
+            blender_operator,
+            context,
+            JAREDNYTS_PGR_SHADER_FILE_PATH,
+            JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH,
+            self.DEFAULT_BLEND_FILE_WITH_PGR_MATERIALS,
+            self.NAMES_OF_PUNISHING_GRAY_RAVEN_MATERIALS
+        )
+
+    def import_materials(self):
+        status = super().import_materials()  # Punishing Gray Raven Material Importer
+
+        # EXEC_DEFAULT hits this if INVOKE_DEFAULT is executed above.
+        # Ensure it ends here otherwise it will error below due to the materia
+        if status == {'FINISHED'}:
+            return status
+
+        cache_enabled = self.context.window_manager.cache_enabled
+        project_root_directory_file_path = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(self.game_shader_folder_path) \
+            or os.path.dirname(self.blender_operator.filepath)
+
         NextStepInvoker().invoke(
             self.blender_operator.next_step_idx, 
             self.blender_operator.invoker_type, 

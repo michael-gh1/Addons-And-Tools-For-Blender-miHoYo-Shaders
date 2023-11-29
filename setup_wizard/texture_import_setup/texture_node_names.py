@@ -19,6 +19,17 @@ class TextureNodeNames:
     WEAPON_RAMP_NODE_GROUP = ''
     WEAPON_RAMP = ''
 
+    # PGR
+    EYE = ''
+    FACE_DIFFUSE = ''
+    FACE_HEAO_NODE_GROUP = ''
+    FACE_HEAO = ''
+    FACE_LUT = ''
+    LUT = ''
+    NORMALMAP = ''
+    PBR = ''
+    METALLIC_MATCAP_NODE_GROUP = ''
+    METALLIC_MATCAP = ''
 
 class GenshinImpactTextureNodeNames(TextureNodeNames):
     BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'
@@ -41,3 +52,24 @@ class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     WEAPON_RAMP = 'Image Texture.002'
 
 
+class JaredNytsPunishingGrayRavenTextureNodeNames(TextureNodeNames):
+    # Common, reused across shader
+    DIFFUSE = 'Body_Diffuse_UV0'
+    LIGHTMAP = 'Body_Lightmap_UV0'
+    LUT = 'Image Texture'
+    NORMALMAP = 'Body_Normalmap_UV0'
+    PBR = 'PBR_UV0.001'
+
+    # Eyes
+    EYE = 'Image Texture'
+
+    # Face
+    FACE_DIFFUSE = 'Face_Diffuse'
+    FACE_SHADOW_MAP = 'Image Texture'
+    FACE_LUT = 'Image Texture.001'
+    FACE_HEAO_NODE_GROUP = 'Face HEAO'
+    FACE_HEAO = 'Face_HEAO'
+
+    # Metallic Matcap
+    METALLIC_MATCAP_NODE_GROUP = 'Metallic Matcap'
+    METALLIC_MATCAP = 'MetalMap'

@@ -22,6 +22,8 @@ class CharacterRiggerFactory:
             return GenshinImpactCharacterRigger(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailCharacterRigger(blender_operator, context)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenCharacterRigger(blender_operator, context)
         else:
             raise Exception(f'Unexpected input GameType "{game_type}" for CharacterRiggerFactory')
 
@@ -113,6 +115,16 @@ class GenshinImpactCharacterRigger(CharacterRigger):
     #     bpy.data.objects[character_rig.name].pose.bones['head-controller'].constraints['Damped Track'].influence = influence_value
 
 class HonkaiStarRailCharacterRigger(CharacterRigger):
+    def __init__(self, blender_operator, context):
+        self.blender_operator = blender_operator
+        self.context = context
+        self.rigify_bone_shapes_file_path = 'PLACEHOLDER'
+
+    def rig_character(self):
+        return
+
+
+class PunishingGrayRavenCharacterRigger(CharacterRigger):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context

@@ -5,8 +5,8 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import Nya222HonkaiStarRailShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
-from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
+from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames
 
 
 class GenshinImpactShaders(Enum):
@@ -15,12 +15,17 @@ class GenshinImpactShaders(Enum):
     V3_GENSHIN_IMPACT_SHADER = auto()
 
 
+class PunishingGrayRavenShaders(Enum):
+    V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER = auto()
+
 class ShaderIdentifierServiceFactory:
     def create(game_type):
         if game_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactShaderIdentifierService()
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailShaderIdentifierService()
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenShaderIdentifierService()
         else:
             raise Exception(f'Unexpected input GameType "{game_type}" for ShaderIdentifierServiceFactory')
 
@@ -63,6 +68,8 @@ class ShaderIdentifierService:
                 return V2_FestivityGenshinImpactMaterialNames
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return Nya222HonkaiStarRailShaderMaterialNames
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return JaredNytsPunishingGrayRavenShaderMaterialNames
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -71,6 +78,8 @@ class ShaderIdentifierService:
             return GenshinImpactTextureNodeNames
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return Nya222HonkaiStarRailTextureNodeNames
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return JaredNytsPunishingGrayRavenTextureNodeNames
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -99,6 +108,25 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     def __init__(self):
         super().__init__()
 
+# Unused.
 class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
+    def __init__(self):
+        super().__init__()
+
+
+# Unused.
+class PunishingGrayRavenShaderIdentifierService(ShaderIdentifierService):
+    V1_NAMES_OF_PGR_MATERIALS = [
+        JaredNytsPunishingGrayRavenShaderMaterialNames.ALPHA,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.FACE,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.OUTLINES,
+    ]
+    material_lists_to_search_through = {
+        PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER: V1_NAMES_OF_PGR_MATERIALS
+    }
+
     def __init__(self):
         super().__init__()
