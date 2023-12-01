@@ -409,6 +409,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
                 face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
                 body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
+                item_material = bpy.data.materials.get(f'{self.material_names.ITEM}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -456,6 +457,11 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
                     self.set_metalmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Item', 'Diffuse'], file):
+                    self.set_diffuse_texture(TextureType.BODY, item_material, img)
+                elif self.is_texture_identifiers_in_texture_name(['Item', 'Lightmap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, item_material, img)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')

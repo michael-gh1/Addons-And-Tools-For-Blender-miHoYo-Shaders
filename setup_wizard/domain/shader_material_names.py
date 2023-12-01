@@ -19,6 +19,7 @@ class ShaderMaterialNames:
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    ITEM = ''
     WEAPON = ''
 
 
@@ -33,6 +34,7 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    ITEM = f'{MATERIAL_PREFIX}Item'
 
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
@@ -46,6 +48,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    ITEM = f'{MATERIAL_PREFIX}Item'
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
