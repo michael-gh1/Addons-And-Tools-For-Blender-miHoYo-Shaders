@@ -84,7 +84,6 @@
             "set_color_management_to_standard",
             "delete_specific_objects",
             "rename_shader_materials",
-            "set_up_armtwist_bone_constraints",
             "join_meshes_on_armature"
         ],
         "PGR_OT_finish_setup": [
@@ -94,7 +93,6 @@
             "set_color_management_to_standard",
             "delete_specific_objects",
             "rename_shader_materials",
-            "set_up_armtwist_bone_constraints",
             "join_meshes_on_armature"
         ]
     }
