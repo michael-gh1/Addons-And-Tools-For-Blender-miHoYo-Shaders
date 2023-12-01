@@ -411,9 +411,7 @@ class PunishingGrayRavenGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
 
 class V2_PunishingGrayRavenGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
-    MESH_IGNORE_LIST = [
-        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE
-    ]
+    MESH_IGNORE_LIST = []
     DEFAULT_OUTLINE_THICKNESS = 0.1
 
     def __init__(self, blender_operator, context):
@@ -432,7 +430,7 @@ class V2_PunishingGrayRavenGeometryNodesSetup(GameGeometryNodesSetup):
 
         local_mesh_names_to_create_geometry_nodes_on = [
             mesh_name for mesh_name in local_mesh_names_to_create_geometry_nodes_on if 
-                mesh_name not in self.MESH_IGNORE_LIST and
+                'Eye' not in mesh_name and
                 'Alpha' not in mesh_name
         ]
 
