@@ -875,8 +875,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         elif 'HEAO' in file:
                             if 'Face' in file:
                                 self.set_face_heao_texture(img)
-                            # else:
-                            #     self.set_lightmap_texture(TextureType.BODY, material, img)
+                            else:
+                                self.set_lightmap_texture(TextureType.BODY, material, img)
                         elif 'NM' in file:
                             self.set_normalmap_texture(TextureType.BODY, material, img)
                         elif 'PBR' in file:
