@@ -14,9 +14,11 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
     bl_label = 'HoYoverse: Join Meshes on Armature'
 
     def execute(self, context):
+        is_advanced_setup = self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui' and \
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui_no_outlines' and \
+            self.high_level_step_name != 'GENSHIN_OT_finish_setup'
         join_meshes_enabled = self.game_type == GameType.GENSHIN_IMPACT.name and \
-            (bpy.context.window_manager.setup_wizard_join_meshes_enabled or \
-            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui')
+            (bpy.context.window_manager.setup_wizard_join_meshes_enabled or is_advanced_setup)
 
         if join_meshes_enabled:
             character_model = None

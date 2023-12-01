@@ -3,7 +3,9 @@ name: Package Addons
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
+    tags:
+      - '*'
     paths-ignore:
       - '**/.tmp'
       - '**/.gitignore'
@@ -23,5 +25,5 @@ jobs:
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
         with:
-          name: Setup_Wizard_UI_Addon
+          name: "Charcter_Setup_Wizard_Addon_${{github.ref_name}}"
           path: dist/setup_wizard/
