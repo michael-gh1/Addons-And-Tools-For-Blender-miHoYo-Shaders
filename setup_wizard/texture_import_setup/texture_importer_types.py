@@ -394,8 +394,8 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.NPC)
         self.material_names = material_names
 
-        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
-        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        self.shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = self.shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -409,7 +409,6 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
                 face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
                 body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
-                item_material = bpy.data.materials.get(f'{self.material_names.ITEM}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -459,9 +458,21 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Diffuse'], file):
-                    self.set_diffuse_texture(TextureType.BODY, item_material, img)
+                    material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
+                    # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
+                    item_materials = [material for material in bpy.data.materials if 
+                                      material.name.split('_Mat')[0].replace(material_names.MATERIAL_PREFIX, '') in file]
+                    if item_materials:
+                        item_material = item_materials[0]
+                        self.set_diffuse_texture(TextureType.BODY, item_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Lightmap'], file):
-                    self.set_lightmap_texture(TextureType.BODY, item_material, img)
+                    material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
+                    # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
+                    item_materials = [material for material in bpy.data.materials if 
+                                      material.name.split('_Mat')[0].replace(material_names.MATERIAL_PREFIX, '') in file]
+                    if item_materials:
+                        item_material = item_materials[0]
+                        self.set_lightmap_texture(TextureType.BODY, item_material, img)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')

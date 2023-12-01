@@ -66,6 +66,14 @@ class ShaderIdentifierService:
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
+    def get_shader_material_names_using_shader(self, shader: GenshinImpactShaders):
+        if shader == GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader == GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+            return V2_FestivityGenshinImpactMaterialNames
+        elif shader == GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            return V3_BonnyFestivityGenshinImpactMaterialNames
+        else:
+            return V3_BonnyFestivityGenshinImpactMaterialNames
+
     def get_shader_texture_node_names(self, game_type, materials, node_groups):
         if game_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactTextureNodeNames
