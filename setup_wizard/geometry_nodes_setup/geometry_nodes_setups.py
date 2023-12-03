@@ -392,31 +392,31 @@ class PunishingGrayRavenGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         modifier[self.OUTLINE_THICKNESS_INPUT] = 0.1
 
         # V2
-        self.DEFAULT_OUTLINE_THICKNESS = 0.1
-        GenshinImpactGeometryNodesSetup.set_up_modifier_default_values(self, modifier, mesh)
+        # self.DEFAULT_OUTLINE_THICKNESS = 0.1
+        # GenshinImpactGeometryNodesSetup.set_up_modifier_default_values(self, modifier, mesh)
 
         # V3
-        # outline_to_material_mapping = {
-        #     'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
-        #     'Hair01': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
-        #     'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
-        #     'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
-        #     'Down': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
-        #     'Cloth': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
-        #     'Clothes': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
-        #     'Cloth01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
-        #     'Cloth02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
-        #     'Hair02': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-        #     'Upper': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-        # }
+        outline_to_material_mapping = {
+            'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Hair01': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+            'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
+            'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
+            'Down': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Clothes': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),  # Dress slot
+            'Cloth02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+            'Hair02': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+            'Upper': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        }
 
-        # for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
-        #     material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name}'
-        #     outline_material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name} Outlines'
+        for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
+            material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name}'
+            outline_material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name} Outlines'
 
-        #     if bpy.data.materials.get(material_name) and bpy.data.materials.get(outline_material_name):
-        #         modifier[material_input_accessor] = bpy.data.materials.get(material_name)
-        #         modifier[outline_material_input_accessor] = bpy.data.materials.get(outline_material_name)
+            if bpy.data.materials.get(material_name) and bpy.data.materials.get(outline_material_name):
+                modifier[material_input_accessor] = bpy.data.materials.get(material_name)
+                modifier[outline_material_input_accessor] = bpy.data.materials.get(outline_material_name)
 
 
 class V2_PunishingGrayRavenGeometryNodesSetup(GameGeometryNodesSetup):
