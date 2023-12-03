@@ -172,9 +172,9 @@ class GI_OT_SetUpArmTwistBoneConstraints(Operator, CustomOperatorProperties):
     def set_up_armtwist_bone_constraints(self, armature):
         if self.game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             self.set_up_armtwist_bone_constraint(armature, self.LEFT_UPPERARM_TWIST, self.LEFT_FOREARM, self.ARMTWIST_A01_INFLUENCE)
-            self.set_up_armtwist_bone_constraint(armature, self.LEFT_FOREARM_TWIST, self.LEFT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
+            # self.set_up_armtwist_bone_constraint(armature, self.LEFT_FOREARM_TWIST, self.LEFT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
             self.set_up_armtwist_bone_constraint(armature, self.RIGHT_UPPERARM_TWIST, self.RIGHT_FOREARM, self.ARMTWIST_A01_INFLUENCE)
-            self.set_up_armtwist_bone_constraint(armature, self.RIGHT_FOREARM_TWIST, self.RIGHT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
+            # self.set_up_armtwist_bone_constraint(armature, self.RIGHT_FOREARM_TWIST, self.RIGHT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
         else:
             self.set_up_armtwist_bone_constraint(armature, self.LEFT_ARMTWIST_A01, self.LEFT_FOREARM, self.ARMTWIST_A01_INFLUENCE)
             self.set_up_armtwist_bone_constraint(armature, self.LEFT_ARMTWIST_A02, self.LEFT_FOREARM, self.ARMTWIST_A02_INFLUENCE)
