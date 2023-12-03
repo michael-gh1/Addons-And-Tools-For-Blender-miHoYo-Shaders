@@ -58,7 +58,7 @@ class JaredNytsPunishingGrayRavenTextureNodeNames(TextureNodeNames):
     LIGHTMAP = 'Body_Lightmap_UV0'
     LUT = 'Image Texture'
     NORMALMAP = 'Body_Normalmap_UV0'
-    PBR = 'PBR_UV0.001'
+    PBR = 'Body_Lightmap_UV0.001'
 
     # Eyes
     EYE = 'Image Texture'
@@ -68,7 +68,7 @@ class JaredNytsPunishingGrayRavenTextureNodeNames(TextureNodeNames):
     FACE_SHADOW_MAP = 'Image Texture'
     FACE_LUT = 'Image Texture.001'
     FACE_HEAO_NODE_GROUP = 'Face HEAO'
-    FACE_HEAO = 'Face_HEAO'
+    FACE_HEAO = 'Face_Lightmap.004'
 
     # Metallic Matcap
     METALLIC_MATCAP_NODE_GROUP = 'Metallic Matcap'

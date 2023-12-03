@@ -79,7 +79,7 @@ class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
     FACE = f'{MATERIAL_PREFIX}Face'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     MAIN = f'{MATERIAL_PREFIX}Main'
-    OUTLINES = f'{MATERIAL_PREFIX}Outline'
+    OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
     # Custom
     BODY = f'{MATERIAL_PREFIX}Body'

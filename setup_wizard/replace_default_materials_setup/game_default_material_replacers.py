@@ -321,8 +321,10 @@ class PunishingGrayRavenDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name
 
                 if mesh_body_part_name and 'Alpha' not in mesh_body_part_name:
+                    material_type = JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR if 'Hair' in mesh_body_part_name else \
+                        JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN
                     material_name = f'{JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}'
-                    self.create_main_material(mesh, material_name)
+                    self.create_main_material(mesh, material_type, material_name)
                 elif mesh_body_part_name and 'Alpha' in mesh_body_part_name:
                     material_name = JaredNytsPunishingGrayRavenShaderMaterialNames.ALPHA
                     mesh_body_part_name = 'Alpha'
@@ -392,10 +394,10 @@ class PunishingGrayRavenDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             if expected_body_part_name in material_name:
                 return expected_body_part_name
 
-    def create_main_material(self, mesh, material_name):
+    def create_main_material(self, mesh, material_type: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
         if not body_material:
-            body_material = bpy.data.materials.get(JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN).copy()
+            body_material = bpy.data.materials.get(material_type).copy()
             body_material.name = material_name
             body_material.use_fake_user = True
         return body_material
