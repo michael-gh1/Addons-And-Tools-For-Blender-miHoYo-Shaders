@@ -24,6 +24,7 @@ class GameMaterialImporterFactory:
 
 class GameMaterialImporter:
     MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
+    NODE_TREE_PATH_INSIDE_BLEND_FILE = 'NodeTree'
 
     def __init__(self, 
                  blender_operator: Operator, 
@@ -72,6 +73,17 @@ class GameMaterialImporter:
             self.MATERIAL_PATH_INSIDE_BLEND_FILE
         )
 
+        blend_file_with_genshin_node_tree = os.path.join(
+            user_selected_shader_blend_file_path,
+            self.NODE_TREE_PATH_INSIDE_BLEND_FILE
+        ) if user_selected_shader_blend_file_path else None
+
+        default_blend_file_path_node_tree = os.path.join(
+            project_root_directory_file_path,
+            self.game_default_blend_file_with_materials,
+            self.NODE_TREE_PATH_INSIDE_BLEND_FILE
+        )
+
         try:
             # Use the exact file the user selected, otherwise fallback to the non-Goo blender file in the directory
             shader_blend_file_path = blend_file_with_genshin_materials or default_blend_file_path
@@ -80,7 +92,8 @@ class GameMaterialImporter:
                 files=self.names_of_game_materials,
                 set_fake=True
             )
-            self.import_light_vectors_geometry_node(shader_blend_file_path)
+            shader_blend_node_tree_file_path = blend_file_with_genshin_node_tree or default_blend_file_path_node_tree
+            self.import_light_vectors_geometry_node(shader_blend_node_tree_file_path)
         except RuntimeError as ex:
             self.blender_operator.report({'ERROR'}, \
                 f"ERROR: Error when trying to append materials and Light Vector geometry node. \n\
@@ -97,13 +110,11 @@ class GameMaterialImporter:
 
 
     def import_light_vectors_geometry_node(self, filepath):
-        filepath = filepath.rsplit('\\', 1)[0]  # Strip '\\Material' from end of filepath, use 'NodeTree' below
         for outline_node_group_name in OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES:
             if not bpy.data.node_groups.get(outline_node_group_name):
-                inner_path = 'NodeTree'
                 bpy.ops.wm.append(
-                    filepath=os.path.join(filepath, inner_path, outline_node_group_name),
-                    directory=os.path.join(filepath, inner_path),
+                    filepath=os.path.join(filepath, outline_node_group_name),
+                    directory=os.path.join(filepath),
                     filename=outline_node_group_name
                 )
 

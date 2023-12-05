@@ -114,7 +114,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Gauntlet':  # Wrioth
             gauntlet_material = self.create_body_material(self.material_names, self.material_names.GAUNTLET)
             material_name = gauntlet_material.name
-        elif 'Item' in mesh_body_part_name:  # NPCs
+        elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name
         return material_name
