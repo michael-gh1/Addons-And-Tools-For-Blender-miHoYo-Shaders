@@ -25,6 +25,7 @@ class TextureNodeNames:
     FACE_HEAO_NODE_GROUP = ''
     FACE_HEAO = ''
     FACE_LUT = ''
+    CHIBI_FACE = ''
     LUT = ''
     NORMALMAP = ''
     PBR = ''
@@ -69,6 +70,7 @@ class JaredNytsPunishingGrayRavenTextureNodeNames(TextureNodeNames):
     FACE_LUT = 'Image Texture.001'
     FACE_HEAO_NODE_GROUP = 'Face HEAO'
     FACE_HEAO = 'Face_Lightmap.004'
+    CHIBI_FACE = 'Image Texture'
 
     # Metallic Matcap
     METALLIC_MATCAP_NODE_GROUP = 'Metallic Matcap'

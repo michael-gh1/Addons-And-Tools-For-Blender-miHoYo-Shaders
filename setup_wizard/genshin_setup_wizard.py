@@ -103,6 +103,7 @@ def setup_dependencies():
     import setup_wizard.optimization.emissive_optimizer
     import setup_wizard.genshin_gran_turismo_tonemapper_setup
     import setup_wizard.change_bpy_context
+    import setup_wizard.mesh_import_setup.chibi_face_setup
 
     importlib.reload(setup_wizard.import_order)
     importlib.reload(setup_wizard.genshin_import_character_model)
@@ -123,6 +124,7 @@ def setup_dependencies():
     importlib.reload(setup_wizard.optimization.emissive_optimizer)
     importlib.reload(setup_wizard.genshin_gran_turismo_tonemapper_setup)
     importlib.reload(setup_wizard.change_bpy_context)
+    importlib.reload(setup_wizard.mesh_import_setup.chibi_face_setup)
 
     for class_to_register in [
         setup_wizard.genshin_import_character_model.GI_OT_GenshinImportModel,
@@ -150,6 +152,8 @@ def setup_dependencies():
         setup_wizard.optimization.emissive_optimizer.GI_OT_Emissive_Optimizer,
         setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
         setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context,
+        setup_wizard.mesh_import_setup.chibi_face_setup.PGR_OT_SetUpChibiFace,
+        setup_wizard.mesh_import_setup.chibi_face_setup.PGR_OT_ImportChibiFaceTexture,
     ]:
         try:
             bpy.utils.register_class(class_to_register)
@@ -179,6 +183,7 @@ def unregister():
     from setup_wizard.optimization.emissive_optimizer import GI_OT_Emissive_Optimizer
     from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup
     from setup_wizard.change_bpy_context import GI_OT_Change_BPY_Context
+    from setup_wizard.mesh_import_setup.chibi_face_setup import PGR_OT_SetUpChibiFace, PGR_OT_ImportChibiFaceTexture
 
     for class_to_unregister in [
         GI_OT_GenshinImportModel,
@@ -202,6 +207,8 @@ def unregister():
         GI_OT_Emissive_Optimizer,
         GI_OT_GenshinGranTurismoTonemapperSetup,
         GI_OT_Change_BPY_Context,
+        PGR_OT_SetUpChibiFace,
+        PGR_OT_ImportChibiFaceTexture,
     ]:
         try:
             bpy.utils.unregister_class(class_to_unregister)

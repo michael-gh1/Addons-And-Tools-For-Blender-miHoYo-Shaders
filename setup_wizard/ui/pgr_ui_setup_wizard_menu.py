@@ -151,6 +151,23 @@ class PGR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.PUNISHING_GRAY_RAVEN.name,
         )
 
+        chibi_helpers = sub_layout.box()
+        chibi_helpers.label(text='Chibi Face Setup')
+        OperatorFactory.create(
+            chibi_helpers,
+            'punishing_gray_raven.set_up_chibi_face_mesh',
+            'Set Up Chibi Face Mesh',
+            'OUTLINER_OB_MESH',
+            game_type=GameType.PUNISHING_GRAY_RAVEN.name,
+        )
+        OperatorFactory.create(
+            chibi_helpers,
+            'punishing_gray_raven.import_chibi_face_texture',
+            'Import Face Texture',
+            'TEXTURE',
+            game_type=GameType.PUNISHING_GRAY_RAVEN.name,
+        )
+
 
 class PGR_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Advanced Setup'

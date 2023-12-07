@@ -28,6 +28,8 @@ class ShaderMaterialNames:
     MAIN = ''
     OUTLINES = ''
     BODY = ''
+    XDEFAULTMATERIAL = ''
+    CHIBIFACE = ''
 
 class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
@@ -83,3 +85,5 @@ class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
 
     # Custom
     BODY = f'{MATERIAL_PREFIX}Body'
+    XDEFAULTMATERIAL = f'{MATERIAL_PREFIX}XDefaultMaterial'  # Chibi Body
+    CHIBIFACE = 'ChibiFace'  # Chibi Face

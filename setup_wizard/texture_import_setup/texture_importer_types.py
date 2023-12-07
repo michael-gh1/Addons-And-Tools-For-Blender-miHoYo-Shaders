@@ -871,7 +871,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                     material_identifer_service = PunishingGrayRavenMaterialIdentifierService()
                     texture_body_part_name = material_identifer_service.get_body_part_name(file)
 
-                    if not texture_body_part_name:
+                    if not texture_body_part_name or '.fbx' in file:
                         continue
 
                     materials = [material for material in bpy.data.materials if material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '') in texture_body_part_name]
@@ -884,7 +884,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         materials = [material for material in bpy.data.materials if material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '') in texture_body_part_name]
 
                     if materials:
-                        material = bpy.data.materials.get(max([material.name for material in materials]))
+                        material = bpy.data.materials.get(max([material.name for material in materials], key=len))
                         body_part_name = material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '')
                         if 'AO' in file and \
                             not self.is_one_texture_identifier_in_texture_name(['HEAO'], file):
@@ -910,7 +910,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                                 self.set_diffuse_texture(TextureType.BODY, material, img)
                         else:
                             print(f'WARN: Unexpected texture {file}')
-                            if file.endswith(f'{body_part_name}.png'):
+                            if file.endswith(f'{body_part_name}.png') or \
+                                material.name == JaredNytsPunishingGrayRavenShaderMaterialNames.XDEFAULTMATERIAL:
                                 print(f'WARN: Default setting Diffuse to {material.name}')
                                 try:
                                     self.set_diffuse_texture(TextureType.BODY, material, img)

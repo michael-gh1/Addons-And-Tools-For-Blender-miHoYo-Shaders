@@ -65,6 +65,10 @@ class PunishingGrayRavenMaterialIdentifierService:
             if f'{base_texture_name}.png' == base_color_texture_image_name:
                 body_part_name = original_material.name[last_index_of_first_group_of_numbers + 1:]
                 return body_part_name
+
+        # No texture image found, check if Chibi material
+        if original_material.name == 'XDefaultMaterial':
+            return 'XDefaultMaterial'
         return None
 
     # Get "real" body part name via original texture for this material (Cloth01 using Cloth)
