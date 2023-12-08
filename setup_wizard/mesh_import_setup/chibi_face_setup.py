@@ -5,7 +5,9 @@ import os
 
 from bpy_extras.io_utils import ImportHelper
 from bpy.types import Operator
+
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.geometry_nodes_setup.geometry_nodes_setups import PunishingGrayRavenGeometryNodesSetup
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH, NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
@@ -40,6 +42,7 @@ class PGR_OT_SetUpChibiFace(Operator, ImportHelper, CustomOperatorProperties):
 
                 self.__parent_mesh_to_armature(chibi_face_mesh, character_armature)
                 self.__set_up_armature_modifier(chibi_face_mesh, character_armature)
+                PunishingGrayRavenGeometryNodesSetup(self, context).create_light_vectors_modifier(chibi_face_mesh.name)
 
             self.report({'INFO'}, 'Finished setting up Chibi Face mesh')
             if self.next_step_idx:
@@ -111,6 +114,8 @@ class PGR_OT_ImportChibiFaceTexture(Operator, ImportHelper, CustomOperatorProper
     bl_idname = 'punishing_gray_raven.import_chibi_face_texture'
     bl_label = 'Select Character Folder'
 
+    texture_node_names = JaredNytsPunishingGrayRavenTextureNodeNames
+
     def execute(self, context):
         try:
             cache_enabled = context.window_manager.cache_enabled
@@ -138,7 +143,7 @@ class PGR_OT_ImportChibiFaceTexture(Operator, ImportHelper, CustomOperatorProper
                     if 'Base' in file:
                         chibi_face_material = bpy.data.materials.get('ChibiFace')
                         if chibi_face_material:
-                            chibi_face_material.node_tree.nodes.get(JaredNytsPunishingGrayRavenTextureNodeNames.CHIBI_FACE).image = img
+                            chibi_face_material.node_tree.nodes.get(self.texture_node_names.CHIBI_FACE).image = img
                 break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
             if self.next_step_idx:
