@@ -50,9 +50,12 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
     )
 
     def execute(self, context):
-        character_model_folder_file_path = self.file_directory or os.path.dirname(self.filepath)
+        is_character_model_file = not os.path.isdir(self.filepath)
+        character_model_directory = os.path.dirname(self.filepath)
+        character_model_file_path_or_directory = self.filepath if is_character_model_file else \
+            self.file_directory or character_model_directory
 
-        if not character_model_folder_file_path:
+        if not character_model_file_path_or_directory:
             bpy.ops.genshin.import_model(
                 'INVOKE_DEFAULT',
                 next_step_idx=self.next_step_idx, 
@@ -70,14 +73,14 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             # TODO: Confirm if this issue is due to the Color Attribute name being named differently in each language
             # TODO: rename_mesh_color_attribute_name() should address this issue and not require us to set language
             bpy.context.preferences.view.language = 'en_US'
-            self.import_character_model(character_model_folder_file_path)
+            self.import_character_model(character_model_file_path_or_directory, is_character_model_file)
             self.reset_pose_location_and_rotation()
             self.rename_mesh_color_attribute_name(SHADER_COLOR_ATTRIBUTE_NAME)  # Blender 3.4 changed default name to 'Attribute', revert it
         finally:
             bpy.context.preferences.view.language = original_language
 
-        if context.window_manager.cache_enabled and character_model_folder_file_path:
-            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_folder_file_path)
+        if context.window_manager.cache_enabled and character_model_directory:
+            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_directory)
 
         # Add fake user to all materials that were added when importing character model (to prevent unused materials from being cleaned up)
         materials_imported_from_character_model = [material for material in bpy.data.materials.values() if material not in existing_materials]
@@ -86,15 +89,16 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         NextStepInvoker().invoke(
             self.next_step_idx, 
             self.invoker_type, 
-            file_path_to_cache=character_model_folder_file_path,
+            file_path_to_cache=character_model_directory,
             high_level_step_name=self.high_level_step_name,
             game_type=self.game_type,
         )
         super().clear_custom_properties()
         return {'FINISHED'}
 
-    def import_character_model(self, character_model_file_path_directory):
-        character_model_file_path = self.__find_fbx_file(character_model_file_path_directory)
+    def import_character_model(self, character_model_file_path_or_directory, is_character_model_file):
+        character_model_file_path = character_model_file_path_or_directory if is_character_model_file else \
+            self.__find_fbx_file(character_model_file_path_or_directory)
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
         betterfbx_enabled = bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
 
