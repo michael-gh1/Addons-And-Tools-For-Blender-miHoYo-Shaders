@@ -324,6 +324,8 @@ class PunishingGrayRavenDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 mesh_body_part_name = \
                     material_identifier_service.get_body_part_name_of_shared_material(material_name) or \
                     mesh_body_part_name
+                if 'Face' in mesh_body_part_name:  # 6.Karenina_Ember (material w/ Face in it, but no called just Face)
+                    mesh_body_part_name = 'Face'
 
                 if mesh_body_part_name and 'Alpha' not in mesh_body_part_name:
                     material_type = JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR if 'Hair' in mesh_body_part_name else \
