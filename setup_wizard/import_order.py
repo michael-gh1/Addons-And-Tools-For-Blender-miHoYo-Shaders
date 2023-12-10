@@ -275,6 +275,10 @@ class ComponentFunctionFactory:
             return bpy.ops.hoyoverse.rig_character
         elif component_name == 'rootshape_filepath_setter':
             return bpy.ops.hoyoverse.rootshape_filepath_setter
+        elif component_name == 'set_up_chibi_face_mesh':
+            return bpy.ops.punishing_gray_raven.set_up_chibi_face_mesh
+        elif component_name == 'import_chibi_face_texture':
+            return bpy.ops.punishing_gray_raven.import_chibi_face_texture
         elif component_name == 'gran_turismo_tonemapper_setup':
             return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:

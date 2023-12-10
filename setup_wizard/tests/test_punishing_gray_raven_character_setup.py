@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from pathlib import PurePath
+from setup_wizard.import_order import JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH
 from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
     FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, RIG_CHARACTER
 from setup_wizard.tests.logger import Logger
@@ -102,6 +103,16 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
 
             logger.info(f'Executing Operator: {operator.operator_name}')
             operator.execute()
+
+        chibi_operators = [
+            PunishingGrayRavenTestOperatorExecutioner('set_up_chibi_face_mesh', filepath=config.get(JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH)),
+            PunishingGrayRavenTestOperatorExecutioner('import_chibi_face_texture', file_directory=character_folder_file_path),
+        ]
+        if [material for material in bpy.data.materials if 'XDefaultMaterial' in material.name]:
+            for chibi_operator in chibi_operators:
+                logger.info(f'Executing Operator: {chibi_operator.operator_name}')
+                chibi_operator.execute()
+
         logger.info(f'Completed test for {character_name}')
     except Exception as ex:
         logger.error(ex)
