@@ -21,6 +21,7 @@ class TextureImporterType(Enum):
     NPC = auto()
     HSR_AVATAR = auto()
     PGR_AVATAR = auto()
+    PGR_CHIBI = auto()
 
 
 class TextureType(Enum):
@@ -918,3 +919,15 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                                 except:
                                     pass  # Unexpected or unused textures hit here!
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+
+
+class PunishingGrayRavenChibiTextureImporter(PunishingGrayRavenTextureImporter):
+    def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
+        super().__init__(GameType.PUNISHING_GRAY_RAVEN, TextureImporterType.PGR_CHIBI, texture_node_names)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.PUNISHING_GRAY_RAVEN.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+    def import_textures(self, directory):
+        pass
