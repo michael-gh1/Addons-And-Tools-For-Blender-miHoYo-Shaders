@@ -36,7 +36,7 @@ class PGR_OT_SetUpChibiFace(Operator, ImportHelper, CustomOperatorProperties):
                     return status
 
                 chibi_face_mesh = [obj for obj in bpy.data.objects if obj.name == self.material_names.CHIBIFACE][0]
-                character_armature = [obj for obj in bpy.context.scene.objects if object.type == 'ARMATURE'][0]
+                character_armature = [obj for obj in bpy.context.scene.objects if obj.type == 'ARMATURE'][0]
 
                 self.__parent_mesh_to_armature(chibi_face_mesh, character_armature)
                 self.__set_up_armature_modifier(chibi_face_mesh, character_armature)
