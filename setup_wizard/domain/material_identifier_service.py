@@ -85,6 +85,8 @@ class PunishingGrayRavenMaterialIdentifierService:
 
         try:
             last_index_of_first_group_of_numbers = self.__find_second_group_of_numbers(base_color_texture_image_name)
+            if last_index_of_first_group_of_numbers is None:
+                return None
         except:
             return None
 
