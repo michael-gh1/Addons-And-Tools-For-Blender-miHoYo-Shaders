@@ -50,10 +50,10 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
     )
 
     def execute(self, context):
-        is_character_model_file = not os.path.isdir(self.filepath)
-        character_model_directory = os.path.dirname(self.filepath)
+        is_character_model_file = not os.path.isdir(self.filepath) and self.filepath
+        character_model_directory = os.path.dirname(self.filepath) or self.file_directory
         character_model_file_path_or_directory = self.filepath if is_character_model_file else \
-            self.file_directory or character_model_directory
+            (self.file_directory or character_model_directory)
 
         if not character_model_file_path_or_directory:
             bpy.ops.genshin.import_model(
