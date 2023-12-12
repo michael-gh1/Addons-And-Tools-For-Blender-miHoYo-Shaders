@@ -854,7 +854,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
-                img = bpy.data.images.load(filepath = img_path, check_existing=True)
+                # check_existing set explicitly False, in case texture name is same as original material's texture name
+                img = bpy.data.images.load(filepath = img_path, check_existing=False)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
                 alpha_material = bpy.data.materials.get(f'{self.material_names.ALPHA}') 
@@ -912,6 +913,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         else:
                             print(f'WARN: Unexpected texture {file}')
                             if file.endswith(f'{body_part_name}.png') or \
+                                body_part_name == 'Cloth' or \
                                 material.name == JaredNytsPunishingGrayRavenShaderMaterialNames.XDEFAULTMATERIAL:
                                 print(f'WARN: Default setting Diffuse to {material.name}')
                                 try:
