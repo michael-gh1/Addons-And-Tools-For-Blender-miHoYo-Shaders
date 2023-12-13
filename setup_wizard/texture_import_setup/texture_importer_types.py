@@ -930,7 +930,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                                     self.set_diffuse_texture(TextureType.BODY, material, img)
                                 except:
                                     pass  # Unexpected or unused textures hit here!
-                            elif ('Body' in body_part_name or 'Cloth' in body_part_name) and 'UV' not in file:
+                            elif ('Body' in body_part_name or 'Cloth' in body_part_name) and \
+                                not self.is_one_texture_identifier_in_texture_name(['UV', 'MC'], file):
                                 print(f'WARN: Default setting Diffuse to {material.name}')
                                 try:
                                     img = self.reload_texture(img, img_path)  # reloads only if the texture already exists
