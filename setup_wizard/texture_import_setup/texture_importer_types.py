@@ -776,11 +776,18 @@ class PunishingGrayRavenTextureImporter(GenshinTextureImporter):
         super().__init__(game_type, character_type)
         self.texture_node_names: TextureNodeNames = texture_node_names
 
-    def set_diffuse_texture(self, type: TextureType, material, img):
+    def set_diffuse_texture(self, type: TextureType, material, img, override=False):
         img.colorspace_settings.name = 'sRGB'
+
         if type is TextureType.FACE:
+            texture_image = material.node_tree.nodes[self.texture_node_names.FACE_DIFFUSE].image
+            if texture_image and not override:
+                return
             material.node_tree.nodes[self.texture_node_names.FACE_DIFFUSE].image = img
         else:
+            texture_image = material.node_tree.nodes[self.texture_node_names.DIFFUSE].image
+            if texture_image and not override:
+                return
             material.node_tree.nodes[self.texture_node_names.DIFFUSE].image = img
 
     def set_lightmap_texture(self, type: TextureType, material, img):
@@ -854,8 +861,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
             for file in files:
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
-                # check_existing set explicitly False, in case texture name is same as original material's texture name
-                img = bpy.data.images.load(filepath = img_path, check_existing=False)
+                img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
                 alpha_material = bpy.data.materials.get(f'{self.material_names.ALPHA}') 
@@ -890,7 +896,12 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         body_part_name = material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '')
                         if 'AO' in file and \
                             not self.is_one_texture_identifier_in_texture_name(['HEAO'], file):
-                            self.set_lightmap_texture(TextureType.BODY, material, img)
+                            if 'Cloth' in body_part_name and 'UV' not in file:
+                                cloth_materials = [material for material in bpy.data.materials if 'Cloth' in material.name]
+                                for material in cloth_materials:
+                                    self.set_lightmap_texture(TextureType.BODY, material, img)
+                            else:
+                                self.set_lightmap_texture(TextureType.BODY, material, img)
                         elif 'HEAO' in file:
                             if 'Face' in file:
                                 self.set_face_heao_texture(img)
@@ -913,15 +924,38 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         else:
                             print(f'WARN: Unexpected texture {file}')
                             if file.endswith(f'{body_part_name}.png') or \
-                                body_part_name == 'Cloth' or \
                                 material.name == JaredNytsPunishingGrayRavenShaderMaterialNames.XDEFAULTMATERIAL:
                                 print(f'WARN: Default setting Diffuse to {material.name}')
                                 try:
                                     self.set_diffuse_texture(TextureType.BODY, material, img)
                                 except:
                                     pass  # Unexpected or unused textures hit here!
+                            elif ('Body' in body_part_name or 'Cloth' in body_part_name) and 'UV' not in file:
+                                print(f'WARN: Default setting Diffuse to {material.name}')
+                                try:
+                                    img = self.reload_texture(img, img_path)  # reloads only if the texture already exists
+                                    fallback_materials = [material for material in bpy.data.materials if
+                                                       JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX and
+                                                       ('Body' in material.name or 'Cloth' in material.name)]
+                                    for material in fallback_materials:
+                                        self.set_diffuse_texture(TextureType.BODY, material, img)
+                                except:
+                                    pass  # Unexpected or unused textures hit here!
+
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
+    # Fix characters with blank textures in their original material texture
+    # We do this by deleting the original texture and loading the new texture
+    # This happens on characters with textures named the same as their model
+    # MUST BE DONE AFTER search_original_material_user_for_body_part_name() is called
+    # Ex. Sophia_Silverfang
+    def reload_texture(self, img, img_path):
+        image_exists = [image for image in bpy.data.images.values() if image.name == img.name]
+        if image_exists:
+            bpy.data.images.remove(image_exists[0])
+            img = bpy.data.images.load(filepath = img_path, check_existing=True)
+            img.alpha_mode = 'CHANNEL_PACKED'
+        return img
 
 class PunishingGrayRavenChibiTextureImporter(PunishingGrayRavenTextureImporter):
     def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
