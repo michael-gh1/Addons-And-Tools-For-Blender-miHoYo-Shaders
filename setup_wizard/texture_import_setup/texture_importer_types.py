@@ -896,7 +896,9 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                         body_part_name = material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '')
                         if 'AO' in file and \
                             not self.is_one_texture_identifier_in_texture_name(['HEAO'], file):
-                            if 'Cloth' in body_part_name and 'UV' not in file:
+                            if 'Face' in file:
+                                self.set_face_heao_texture(img)
+                            elif 'Cloth' in body_part_name and 'UV' not in file:
                                 cloth_materials = [material for material in bpy.data.materials if 'Cloth' in material.name]
                                 for material in cloth_materials:
                                     self.set_lightmap_texture(TextureType.BODY, material, img)
