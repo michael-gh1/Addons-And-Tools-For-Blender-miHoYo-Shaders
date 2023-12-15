@@ -894,6 +894,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                     if materials:
                         material = bpy.data.materials.get(max([material.name for material in materials], key=len))
                         body_part_name = material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '')
+                        img = self.reload_texture(img, img_path)  # reloads only if the texture already exists
+
                         if 'AO' in file and \
                             not self.is_one_texture_identifier_in_texture_name(['HEAO'], file):
                             if 'Face' in file:
@@ -936,7 +938,6 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                                 not self.is_one_texture_identifier_in_texture_name(['UV', 'MC'], file):
                                 print(f'WARN: Default setting Diffuse to {material.name}')
                                 try:
-                                    img = self.reload_texture(img, img_path)  # reloads only if the texture already exists
                                     fallback_materials = [material for material in bpy.data.materials if
                                                        JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX and
                                                        ('Body' in material.name or 'Cloth' in material.name)]
@@ -955,6 +956,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
     def reload_texture(self, img, img_path):
         image_exists = [image for image in bpy.data.images.values() if image.name == img.name]
         if image_exists:
+            print(f'Reloading texture! {img}')
             bpy.data.images.remove(image_exists[0])
             img = bpy.data.images.load(filepath = img_path, check_existing=True)
             img.alpha_mode = 'CHANNEL_PACKED'
