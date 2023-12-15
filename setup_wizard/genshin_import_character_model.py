@@ -152,8 +152,11 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items()]
 
         for mesh in meshes:
-            if mesh.color_attributes.active_color:
-                mesh.color_attributes.active_color.name = name
+            if len(mesh.color_attributes) == 1:
+                mesh.color_attributes[0].name = name  # PGR: Named "VertexColors" and may not be the active color
+            else:
+                if mesh.color_attributes.active_color:
+                    mesh.color_attributes.active_color.name = name
 
     def __find_fbx_file(self, directory):
         for root, folder, files in os.walk(directory):

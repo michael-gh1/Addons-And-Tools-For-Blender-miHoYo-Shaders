@@ -222,7 +222,10 @@ class PGR_OT_PaintVertexColors(Operator, CustomOperatorProperties):
         for mesh in meshes:
             if not mesh.vertex_colors:
                 mesh.vertex_colors.new()
-            color_layer = mesh.vertex_colors['Col']
+            color_layer = mesh.vertex_colors.get('Col')
+
+            if not color_layer:
+                continue
 
             color_layer_index = 0
             for poly in mesh.polygons:
