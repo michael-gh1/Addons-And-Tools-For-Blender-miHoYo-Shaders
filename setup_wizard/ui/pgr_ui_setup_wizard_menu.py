@@ -50,7 +50,7 @@ class PGR_PT_Setup_Wizard_UI_Layout(Panel):
         sub_layout = layout.box()
         OperatorFactory.create(
             sub_layout,
-            'genshin.setup_wizard_ui',
+            'punishing_gray_raven.setup_wizard_ui',
             'Run Entire Setup',
             'PLAY',
             game_type=GameType.PUNISHING_GRAY_RAVEN.name

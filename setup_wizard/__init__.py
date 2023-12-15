@@ -57,7 +57,7 @@ from setup_wizard.ui.pgr_ui_setup_wizard_menu import \
 from setup_wizard.genshin_import_character_model import GI_OT_SetUpCharacter
 
 import setup_wizard.genshin_setup_wizard
-from setup_wizard.genshin_setup_wizard import GI_OT_GenshinSetupWizardUI, register as register_genshin_setup_wizard, setup_dependencies
+from setup_wizard.genshin_setup_wizard import GI_OT_GenshinSetupWizardUI, PGR_OT_SetupWizardUI, register as register_genshin_setup_wizard, setup_dependencies
 
 register_genshin_setup_wizard()
 setup_dependencies()
@@ -94,6 +94,7 @@ classes = [
     HSR_PT_UI_Outlines_Menu,
     HSR_PT_UI_Finish_Setup_Menu,
     HSR_PT_UI_Gran_Turismo_UI_Layout,
+    PGR_OT_SetupWizardUI,
     PGR_PT_Setup_Wizard_UI_Layout,
     PGR_PT_Basic_Setup_Wizard_UI_Layout,
     PGR_PT_Advanced_Setup_Wizard_UI_Layout,
