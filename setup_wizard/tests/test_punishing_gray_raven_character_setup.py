@@ -91,7 +91,8 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             PunishingGrayRavenTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             PunishingGrayRavenTestOperatorExecutioner('join_meshes_on_armature'),
             PunishingGrayRavenTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
-            PunishingGrayRavenTestOperatorExecutioner('rig_character', config=config)
+            PunishingGrayRavenTestOperatorExecutioner('rig_character', config=config),
+            PunishingGrayRavenTestOperatorExecutioner('paint_vertex_colors'),
         ]
 
         for operator in operators:
