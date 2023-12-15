@@ -879,7 +879,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                     material_identifer_service = PunishingGrayRavenMaterialIdentifierService()
                     texture_body_part_name = material_identifer_service.get_body_part_name(file)
 
-                    if not texture_body_part_name or '.fbx' in file:
+                    if not texture_body_part_name or '.fbx' in file or 'Mt4Ejector' in file or 'Mb1Motor' in file or \
+                        'Mt2Machinehand' in file:
                         continue
 
                     materials = [material for material in bpy.data.materials if material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '') in texture_body_part_name]
