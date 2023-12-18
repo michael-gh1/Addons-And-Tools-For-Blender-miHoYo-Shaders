@@ -176,11 +176,11 @@ class GenshinTextureImporter:
                     face_lightmap_input.default_value = 1.0
                 elif 'Boy' in img.name:
                     face_lightmap_input.default_value = 2.0
-                elif 'Girl' in img.name:
+                elif 'Girl' in img.name or 'Female' in img.name:
                     face_lightmap_input.default_value = 3.0
                 elif 'Male' in img.name:
                     face_lightmap_input.default_value = 4.0
-                elif 'Lady' in img.name or 'Female' in img.name:
+                elif 'Lady' in img.name:
                     face_lightmap_input.default_value = 5.0
 
 
