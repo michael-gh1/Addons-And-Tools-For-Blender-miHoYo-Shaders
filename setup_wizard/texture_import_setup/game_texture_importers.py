@@ -25,6 +25,8 @@ class GameTextureImporterFactory:
             return GenshinImpactTextureImporterFacade(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailTextureImporterFacade(blender_operator, context)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenTextureImporterFacade(blender_operator, context)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -155,4 +157,55 @@ class HonkaiStarRailTextureImporterFacade(GameTextureImporter):
             file_path_to_cache=directory,
             high_level_step_name=self.blender_operator.high_level_step_name,
             game_type=GameType.HONKAI_STAR_RAIL.name
+        )
+
+
+'''
+PGR Texture Importer Abstraction Layer
+Facade class intended to help abstract the Blender Operator layer from the Texture Importing layer.
+Also named as a Facade in order to differentiate from the actual Texture Importers.
+'''
+class PunishingGrayRavenTextureImporterFacade(GameTextureImporter):
+    def __init__(self, blender_operator, context):
+        self.blender_operator: Operator = blender_operator
+        self.context: Context = context
+
+    '''
+    This does look odd, but is intended to help with troubleshooting errors that users may encounter.
+    The stacktrace will contain the method name (game name).
+    '''
+    def import_textures(self):
+        return self.__import_punishing_gray_raven_textures()
+
+    def __import_punishing_gray_raven_textures(self):
+        cache_enabled = self.context.window_manager.cache_enabled
+        directory = self.blender_operator.file_directory \
+            or get_cache(cache_enabled).get(CHARACTER_MODEL_FOLDER_FILE_PATH) \
+            or os.path.dirname(self.blender_operator.filepath)
+
+        if not directory:
+            bpy.ops.genshin.import_textures(
+                'INVOKE_DEFAULT',
+                next_step_idx=self.blender_operator.next_step_idx, 
+                file_directory=self.blender_operator.file_directory,
+                invoker_type=self.blender_operator.invoker_type,
+                high_level_step_name=self.blender_operator.high_level_step_name,
+                game_type=GameType.PUNISHING_GRAY_RAVEN.name,
+            )
+            return {'FINISHED'}
+
+        texture_importer_type = TextureImporterType.PGR_AVATAR
+        texture_importer: GenshinTextureImporter = TextureImporterFactory.create(texture_importer_type, GameType.PUNISHING_GRAY_RAVEN)
+        texture_importer.import_textures(directory)
+
+        self.blender_operator.report({'INFO'}, 'Imported textures')
+        if cache_enabled and directory:
+            cache_using_cache_key(get_cache(cache_enabled), CHARACTER_MODEL_FOLDER_FILE_PATH, directory)
+
+        NextStepInvoker().invoke(
+            self.blender_operator.next_step_idx,
+            self.blender_operator.invoker_type,
+            file_path_to_cache=directory,
+            high_level_step_name=self.blender_operator.high_level_step_name,
+            game_type=GameType.PUNISHING_GRAY_RAVEN.name
         )

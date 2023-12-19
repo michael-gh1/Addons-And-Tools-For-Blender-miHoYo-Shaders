@@ -8,7 +8,7 @@ from bpy.types import Context, Operator
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
@@ -91,6 +91,8 @@ class OutlineTextureImporterFactory:
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailOutlineTextureImporter(blender_operator, context)
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenOutlineTextureImporter(blender_operator, context)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -227,3 +229,11 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
 
         hsr_texture_importer = TextureImporterFactory.create(TextureImporterType.HSR_AVATAR, GameType.HONKAI_STAR_RAIL)
         hsr_texture_importer.set_diffuse_texture(None, outline_material, texture_img)
+
+
+class PunishingGrayRavenOutlineTextureImporter(OutlineTextureImporter):
+    def __init__(self, blender_operator, context):
+        super().__init__(blender_operator, context, JaredNytsPunishingGrayRavenShaderMaterialNames)
+
+    def import_textures(self):
+        return

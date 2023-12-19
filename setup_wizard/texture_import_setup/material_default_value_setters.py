@@ -24,6 +24,8 @@ class MaterialDefaultValueSetterFactory:
                 return GenshinImpactMaterialDefaultValueSetter(V2_FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDefaultValueSetter()
+        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+            return PunishingGrayRavenMaterialDefaultValueSetter()
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -87,6 +89,14 @@ class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
 
 
 class HonkaiStarRailMaterialDefaultValueSetter(MaterialDefaultValueSetter):
+    def __init__(self) -> None:
+        return
+
+    def set_default_values(self):
+        return
+
+
+class PunishingGrayRavenMaterialDefaultValueSetter(MaterialDefaultValueSetter):
     def __init__(self) -> None:
         return
 

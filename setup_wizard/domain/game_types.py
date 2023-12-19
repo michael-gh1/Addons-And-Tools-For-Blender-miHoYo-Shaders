@@ -9,3 +9,4 @@ This would result in a circular dependency if it existed in import_order or a Se
 class GameType(Enum):
     GENSHIN_IMPACT = auto()
     HONKAI_STAR_RAIL = auto()
+    PUNISHING_GRAY_RAVEN = auto()

@@ -25,5 +25,5 @@ jobs:
       - name: Upload Setup Wizard Package
         uses: actions/upload-artifact@v3
         with:
-          name: "Charcter_Setup_Wizard_Addon_${{github.ref_name}}"
+          name: "Character_Setup_Wizard_Addon_${{github.ref_name}}"
           path: dist/setup_wizard/

@@ -8,6 +8,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
 
+from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.character_rig_setup.rigify_character_service import RigifyCharacterService
 from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
 
@@ -67,6 +68,14 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
         try:
             rigify_character_service = RigifyCharacterService(self.game_type, self, context)
             rigify_character_service.rig_character()
+
+            if self.next_step_idx:
+                NextStepInvoker().invoke(
+                    self.next_step_idx, 
+                    self.invoker_type, 
+                    high_level_step_name=self.high_level_step_name,
+                    game_type=self.game_type,
+                )
         except Exception as ex:
             raise ex
         finally:

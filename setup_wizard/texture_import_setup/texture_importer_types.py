@@ -3,16 +3,16 @@ from typing import List
 import bpy
 
 import os
+from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
-from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
+from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
-from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
-from setup_wizard.texture_import_setup.texture_node_names import Nya222HonkaiStarRailTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, TextureNodeNames
 
 
 class TextureImporterType(Enum):
@@ -20,6 +20,8 @@ class TextureImporterType(Enum):
     MONSTER = auto()
     NPC = auto()
     HSR_AVATAR = auto()
+    PGR_AVATAR = auto()
+    PGR_CHIBI = auto()
 
 
 class TextureType(Enum):
@@ -53,6 +55,12 @@ class TextureImporterFactory:
                 return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
             else:
                 print(f'Unknown TextureImporterType: {texture_importer_type}')
+        elif game_type is GameType.PUNISHING_GRAY_RAVEN:
+            if texture_importer_type == TextureImporterType.PGR_AVATAR:
+                return PunishingGrayRavenAvatarTextureImporter(JaredNytsPunishingGrayRavenShaderMaterialNames, 
+                                                               JaredNytsPunishingGrayRavenTextureNodeNames)
+            else:
+                print(f'Unknown TextureImporterType: {texture_importer_type}')
         else:
             print(f'Unknown game_type: {game_type}')
 
@@ -77,6 +85,16 @@ class GenshinTextureImporter:
             if texture_identifier.lower() not in texture_name.lower():
                 return False
         return True
+
+    def is_one_texture_identifier_in_texture_name(self, texture_identifiers: List[str], texture_name: str, normalize=False):
+        for texture_identifier in texture_identifiers:
+            if normalize:
+                if texture_identifier.lower() in texture_name.lower():
+                    return True
+            else:
+                if texture_identifier in texture_name:
+                    return True
+        return False
 
     '''
     Checks a groups of files to see if there is a file that has all texture identifiers in the filename
@@ -158,7 +176,7 @@ class GenshinTextureImporter:
                     face_lightmap_input.default_value = 1.0
                 elif 'Boy' in img.name:
                     face_lightmap_input.default_value = 2.0
-                elif 'Girl' in img.name:
+                elif 'Girl' in img.name or 'Female' in img.name:
                     face_lightmap_input.default_value = 3.0
                 elif 'Male' in img.name:
                     face_lightmap_input.default_value = 4.0
@@ -752,3 +770,206 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
+
+class PunishingGrayRavenTextureImporter(GenshinTextureImporter):
+    def __init__(self, game_type: GameType, character_type: TextureImporterType, texture_node_names: TextureNodeNames):
+        super().__init__(game_type, character_type)
+        self.texture_node_names: TextureNodeNames = texture_node_names
+
+    def set_diffuse_texture(self, type: TextureType, material, img, override=False):
+        img.colorspace_settings.name = 'sRGB'
+
+        if type is TextureType.FACE:
+            texture_image = material.node_tree.nodes[self.texture_node_names.FACE_DIFFUSE].image
+            if texture_image and not override:
+                return
+            material.node_tree.nodes[self.texture_node_names.FACE_DIFFUSE].image = img
+        else:
+            texture_image = material.node_tree.nodes[self.texture_node_names.DIFFUSE].image
+            if texture_image and not override:
+                return
+            material.node_tree.nodes[self.texture_node_names.DIFFUSE].image = img
+
+    def set_lightmap_texture(self, type: TextureType, material, img):
+        img.colorspace_settings.name = 'Non-Color'
+        lightmap_node = material.node_tree.nodes.get(self.texture_node_names.LIGHTMAP)
+
+        if lightmap_node:
+            lightmap_node.image = img
+
+    def set_pbr_texture(self, type: TextureType, material, img):
+        img.colorspace_settings.name = 'Non-Color'
+        material.node_tree.nodes.get(self.texture_node_names.PBR).image = img
+
+    def set_normalmap_texture(self, type: TextureType, material, img):
+        img.colorspace_settings.name = 'Non-Color'
+        normal_map_node = material.node_tree.nodes.get(self.texture_node_names.NORMALMAP)
+
+        if normal_map_node:
+            normal_map_node.image = img
+
+    def set_lut_texture(self, type: TextureType, material, img):
+        if type is TextureType.FACE:
+            lut_node = material.node_tree.nodes.get(self.texture_node_names.FACE_LUT)
+        else:
+            lut_node = material.node_tree.nodes.get(self.texture_node_names.LUT)
+
+        if lut_node:
+            lut_node.image = img
+            shader_node_name = JaredNyts_PunishingGrayRavenNodeNames.FACE_SHADER if type is TextureType.FACE else \
+                JaredNyts_PunishingGrayRavenNodeNames.MAIN_SHADER
+            if type is not TextureType.FACE:  # TODO: Something is wrong when LUT enabled on face
+                self.set_lut_value(material, shader_node_name, True)
+
+    def set_lut_value(self, material, shader_node_name, enabled):
+        lut_value = 1.0 if enabled else 0.0
+
+        material.node_tree.nodes.get(shader_node_name) \
+            .inputs.get(JaredNyts_PunishingGrayRavenNodeNames.USE_LUT).default_value = lut_value
+
+    def set_eye_diffuse_texture(self, material, img):
+        eye_node = material.node_tree.nodes.get(self.texture_node_names.EYE)
+
+        if eye_node:
+            eye_node.image = img
+
+    def set_face_heao_texture(self, img):
+        face_heao_node = bpy.data.node_groups.get(self.texture_node_names.FACE_HEAO_NODE_GROUP)
+
+        if face_heao_node:
+            img.colorspace_settings.name = 'Non-Color'
+            face_heao_node.nodes.get(self.texture_node_names.FACE_HEAO).image = img
+
+    def set_metalmap_texture(self, img):
+        metallic_matcap_node = bpy.data.node_groups.get(self.texture_node_names.METALLIC_MATCAP_NODE_GROUP)
+
+        if metallic_matcap_node:
+            metallic_matcap_node.nodes[self.texture_node_names.METALLIC_MATCAP].image = img
+
+
+class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter):
+    def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
+        super().__init__(GameType.PUNISHING_GRAY_RAVEN, TextureImporterType.PGR_AVATAR, texture_node_names)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.PUNISHING_GRAY_RAVEN.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+    def import_textures(self, directory):
+        for name, folder, files in os.walk(directory):
+            self.files = files
+            for file in files:
+                # load the file with the correct alpha mode
+                img_path = directory + "/" + file
+                img = bpy.data.images.load(filepath = img_path, check_existing=True)
+                img.alpha_mode = 'CHANNEL_PACKED'
+
+                alpha_material = bpy.data.materials.get(f'{self.material_names.ALPHA}') 
+                eye_material = bpy.data.materials.get(f'{self.material_names.EYE}')
+
+                # Implement the texture in the correct node
+                print(f'Importing texture {file} using {self.__class__.__name__}')
+
+                # Eyes
+                if self.is_texture_identifiers_in_texture_name(['Eye'], file) and \
+                    not self.is_one_texture_identifier_in_texture_name(['HET'], file):
+                    self.set_eye_diffuse_texture(eye_material, img)
+
+                else:
+                    material_identifer_service = PunishingGrayRavenMaterialIdentifierService()
+                    texture_body_part_name = material_identifer_service.get_body_part_name(file)
+
+                    if not texture_body_part_name or '.fbx' in file or 'Mt4Ejector' in file or 'Mb1Motor' in file or \
+                        'Mt2Machinehand' in file:
+                        continue
+
+                    materials = [material for material in bpy.data.materials if material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '') in texture_body_part_name]
+
+                    # Check cases where textures are not prefixed with body part names
+                    if not materials:
+                        texture_body_part_name = material_identifer_service.search_original_material_user_for_body_part_name(file)
+                        if not texture_body_part_name:
+                            continue
+                        materials = [material for material in bpy.data.materials if material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '') in texture_body_part_name]
+
+                    if materials:
+                        material = bpy.data.materials.get(max([material.name for material in materials], key=len))
+                        body_part_name = material.name.replace(JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX, '')
+                        img = self.reload_texture(img, img_path)  # reloads only if the texture already exists
+
+                        if 'AO' in file and \
+                            not self.is_one_texture_identifier_in_texture_name(['HEAO'], file):
+                            if 'Face' in file:
+                                self.set_face_heao_texture(img)
+                            elif 'Cloth' in body_part_name and 'UV' not in file:
+                                cloth_materials = [material for material in bpy.data.materials if 'Cloth' in material.name]
+                                for material in cloth_materials:
+                                    self.set_lightmap_texture(TextureType.BODY, material, img)
+                            else:
+                                self.set_lightmap_texture(TextureType.BODY, material, img)
+                        elif 'HEAO' in file:
+                            if 'Face' in file:
+                                self.set_face_heao_texture(img)
+                            else:
+                                self.set_lightmap_texture(TextureType.BODY, material, img)
+                        elif 'NM' in file:
+                            self.set_normalmap_texture(TextureType.BODY, material, img)
+                        elif 'PBR' in file:
+                            self.set_pbr_texture(TextureType.BODY, material, img)
+                        elif 'Skin' in file:
+                            if 'Face' in file:
+                                self.set_lut_texture(TextureType.FACE, material, img)
+                            else:
+                                self.set_lut_texture(TextureType.BODY, material, img)
+                        elif file.endswith(f'{body_part_name}.png'):
+                            if 'Face' in file:
+                                self.set_diffuse_texture(TextureType.FACE, material, img)
+                            else:
+                                self.set_diffuse_texture(TextureType.BODY, material, img)
+                        else:
+                            print(f'WARN: Unexpected texture {file}')
+                            if file.endswith(f'{body_part_name}.png') or \
+                                material.name == JaredNytsPunishingGrayRavenShaderMaterialNames.XDEFAULTMATERIAL:
+                                print(f'WARN: Default setting Diffuse to {material.name}')
+                                try:
+                                    self.set_diffuse_texture(TextureType.BODY, material, img)
+                                except:
+                                    pass  # Unexpected or unused textures hit here!
+                            elif ('Body' in body_part_name or 'Cloth' in body_part_name) and \
+                                not self.is_one_texture_identifier_in_texture_name(['UV', 'MC'], file):
+                                print(f'WARN: Default setting Diffuse to {material.name}')
+                                try:
+                                    fallback_materials = [material for material in bpy.data.materials if
+                                                       JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX and
+                                                       ('Body' in material.name or 'Cloth' in material.name)]
+                                    for material in fallback_materials:
+                                        self.set_diffuse_texture(TextureType.BODY, material, img)
+                                except:
+                                    pass  # Unexpected or unused textures hit here!
+
+            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+
+    # Fix characters with blank textures in their original material texture
+    # We do this by deleting the original texture and loading the new texture
+    # This happens on characters with textures named the same as their model
+    # MUST BE DONE AFTER search_original_material_user_for_body_part_name() is called
+    # Ex. Sophia_Silverfang
+    def reload_texture(self, img, img_path):
+        image_exists = [image for image in bpy.data.images.values() if image.name == img.name]
+        if image_exists:
+            print(f'Reloading texture! {img}')
+            bpy.data.images.remove(image_exists[0])
+            img = bpy.data.images.load(filepath = img_path, check_existing=True)
+            img.alpha_mode = 'CHANNEL_PACKED'
+        return img
+
+class PunishingGrayRavenChibiTextureImporter(PunishingGrayRavenTextureImporter):
+    def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
+        super().__init__(GameType.PUNISHING_GRAY_RAVEN, TextureImporterType.PGR_CHIBI, texture_node_names)
+        self.material_names = material_names
+
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.PUNISHING_GRAY_RAVEN.name)
+        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+    def import_textures(self, directory):
+        pass

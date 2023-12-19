@@ -24,6 +24,10 @@ CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'nya222_honkai_star_rail_folder_file_path'
 NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'nya222_honkai_star_rail_shader_file_path'
 NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'nya222_honkai_star_rail_outlines_file_path'
+JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH = 'jarednyts_pgr_folder_file_path'
+JAREDNYTS_PGR_SHADER_FILE_PATH = 'jarednyts_pgr_shader_file_path'
+JAREDNYTS_PGR_OUTLINES_FILE_PATH = 'jarednyts_pgr_outlines_file_path'
+JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH = 'jarednyts_pgr_chibi_mesh_file_path'
 
 
 class NextStepInvoker:
@@ -271,6 +275,12 @@ class ComponentFunctionFactory:
             return bpy.ops.hoyoverse.rig_character
         elif component_name == 'rootshape_filepath_setter':
             return bpy.ops.hoyoverse.rootshape_filepath_setter
+        elif component_name == 'set_up_chibi_face_mesh':
+            return bpy.ops.punishing_gray_raven.set_up_chibi_face_mesh
+        elif component_name == 'import_chibi_face_texture':
+            return bpy.ops.punishing_gray_raven.import_chibi_face_texture
+        elif component_name == 'paint_vertex_colors':
+            return bpy.ops.punishing_gray_raven.paint_vertex_colors
         elif component_name == 'gran_turismo_tonemapper_setup':
             return bpy.ops.genshin.gran_turismo_tonemapper_setup
         else:

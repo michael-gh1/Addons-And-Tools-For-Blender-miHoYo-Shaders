@@ -48,3 +48,8 @@ class GenshinImpactTestOperatorExecutioner(TestOperatorExecutioner):
 class HonkaiStarRailTestOperatorExecutioner(TestOperatorExecutioner):
     def __init__(self, operator_name, file_directory='', filepath='', files=[], config={}):
         super().__init__(operator_name, file_directory, filepath, files, config, GameType.HONKAI_STAR_RAIL.name)
+
+
+class PunishingGrayRavenTestOperatorExecutioner(TestOperatorExecutioner):
+    def __init__(self, operator_name, file_directory='', filepath='', files=[], config={}):
+        super().__init__(operator_name, file_directory, filepath, files, config, GameType.PUNISHING_GRAY_RAVEN.name)

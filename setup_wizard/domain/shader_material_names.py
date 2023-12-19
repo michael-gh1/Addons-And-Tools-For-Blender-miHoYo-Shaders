@@ -20,7 +20,16 @@ class ShaderMaterialNames:
     EYESHADOW = ''
     OUTLINES = ''
     WEAPON = ''
-
+    # PGR
+    ALPHA = ''
+    EYE = ''
+    FACE = ''
+    HAIR = ''
+    MAIN = ''
+    OUTLINES = ''
+    BODY = ''
+    XDEFAULTMATERIAL = ''
+    CHIBIFACE = ''
 
 class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
@@ -63,3 +72,18 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     WEAPON = 'HSR - Weapon'
     WEAPON01 = 'HSR - Weapon01'
     WEAPON02 = 'HSR - Weapon02'
+
+
+class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
+    MATERIAL_PREFIX = 'PGR - '
+    ALPHA = f'{MATERIAL_PREFIX}Alpha'
+    EYE = f'{MATERIAL_PREFIX}Eye'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    MAIN = f'{MATERIAL_PREFIX}Main'
+    OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+
+    # Custom
+    BODY = f'{MATERIAL_PREFIX}Body'
+    XDEFAULTMATERIAL = f'{MATERIAL_PREFIX}XDefaultMaterial'  # Chibi Body
+    CHIBIFACE = 'ChibiFace'  # Chibi Face
