@@ -134,7 +134,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
                 {'ERROR'}, 
                 'Attempted to import model, but no armature found after import. Likely failed to import from FBX file.\n'
                 '- Try again with BetterFBX disabled.\n'
-                "- Otherwise, I'm not sure. Perhaps there's an issue with the FBX file."
+                "- Try renaming and removing any special characters (like star symbols) from any folders in the filepath"
             )
             raise err
         bpy.context.view_layer.objects.active = armature
