@@ -6,7 +6,8 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 **Important**: This tool is intended to be used with:
 * Festivity's Genshin Impact Shader, found here: https://github.com/festivize/Blender-miHoYo-Shaders
-* Nya222's Honkai Star Rail Shader, found here: https://discord.com/channels/894925535870865498/1127604826885328926
+* Nya222's Honkai: Star Rail Shader, found here: https://discord.com/channels/894925535870865498/1127604826885328926 (Omatsuri Discord Server)
+* JaredNyts' Punishing: Gray Raven Shader, found here: https://discord.com/channels/894925535870865498/1186597049198727259 (Omatsuri Discord Server)
 
 **Compatibility**: This tool has been tested on **Blender (and Goo Blender) Version >= 3.3.0** and attempts to support older versions of Blender, but working functionality is not guaranteed.
 
@@ -268,6 +269,10 @@ This Setup Wizard should work on all playable characters, but if you do find any
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
+Shoutout to those in the #help channel assisting others, hats off to you for your hard work and dedication to helping others.
+<br>
+And lastly all the wonderful people who I've collaborated, it's an been an absolutely tremendous and wonderful journey and experience.
+<br>
 * [@Festivity](https://github.com/festivities)
 * @TheyCallMeSpy
 * @Sultana
@@ -276,5 +281,7 @@ Thanks to all those who helped answer the questions I had while building out thi
 * [@Bonny](https://www.youtube.com/@BonnyAnimations)
 * [@Enthralpy](https://www.youtube.com/@Enthralpy)
 * [@OctavoPE](https://github.com/OctavoPE)
+* [@JaredNyts](https://twitter.com/jared_nyts)
+* @SubutaiProduction [[Twitter](https://twitter.com/SubutaiEdits)] / [[Youtube](https://www.youtube.com/@SubutaiProduction)]
 
 Cheers and Happy Blending
