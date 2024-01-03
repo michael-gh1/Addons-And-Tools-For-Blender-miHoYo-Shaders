@@ -88,6 +88,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     if actual_material_for_dress == 'Cloak':
                         # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
                         continue
+                    elif actual_material_for_dress == 'Effect':  # Dress2 material w/ Effect texture filename (Skirk support)
+                        # (dangerous) assumption that all Dress w/ Effect texture filename are Hair-type
+                        actual_material_for_dress = 'Hair'
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 

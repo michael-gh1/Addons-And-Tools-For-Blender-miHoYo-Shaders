@@ -353,6 +353,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
                 gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
+                dress2_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Dress2')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -402,6 +403,10 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_lightmap_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, gauntlet_material, img)
+                elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
+                    self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
+                elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
+                    self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
