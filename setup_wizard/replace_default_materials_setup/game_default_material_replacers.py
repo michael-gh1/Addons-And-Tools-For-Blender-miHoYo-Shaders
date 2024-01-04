@@ -58,11 +58,6 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 mesh_body_part_name = None
                 character_type = None
 
-                # Handle Avatar Furina, which has the material inconsistently named (ends w/ Effect, not EffectHair)
-                if mesh.name == 'EffectHair' and material_name == 'Avatar_Girl_Sword_Furina_Mat_Effect':
-                    material_slot.material.name = 'Avatar_Girl_Sword_Furina_Mat_EffectHair'
-                    material_name = material_slot.name
-
                 if material_name.startswith('NPC'):
                     mesh_body_part_name = self.__get_npc_mesh_body_part_name(material_name)
                     character_type = TextureImporterType.NPC
@@ -115,6 +110,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def create_shader_material_if_unique_mesh(self, mesh, mesh_body_part_name, material_name):
         if mesh_body_part_name == 'EffectHair':  # Furina
             hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
+            material_name = hair_material.name
+        elif mesh_body_part_name == 'Effect':  # Furina (Default)
+            hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT)
             material_name = hair_material.name
         elif mesh_body_part_name == 'Helmet':  # Frem
             helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET)

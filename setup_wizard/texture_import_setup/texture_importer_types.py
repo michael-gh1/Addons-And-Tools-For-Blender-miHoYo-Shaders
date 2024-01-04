@@ -346,7 +346,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                effect_hair_material = bpy.data.materials.get(f'{self.material_names.EFFECT_HAIR}')
+                effect_hair_material = bpy.data.materials.get(f'{self.material_names.EFFECT_HAIR}') or \
+                    bpy.data.materials.get(f'{self.material_names.EFFECT}')
                 hair_material = bpy.data.materials.get(f'{self.material_names.HAIR}')
                 helmet_material = bpy.data.materials.get(f'{self.material_names.HELMET}')
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
