@@ -83,6 +83,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     if actual_material_for_dress == 'Cloak':
                         # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
                         continue
+                    elif actual_material_for_dress == 'Effect':  # Dress2 material w/ Effect texture filename (Skirk support)
+                        # (dangerous) assumption that all Dress w/ Effect texture filename are Hair-type
+                        actual_material_for_dress = 'Hair'
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
@@ -107,6 +110,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def create_shader_material_if_unique_mesh(self, mesh, mesh_body_part_name, material_name):
         if mesh_body_part_name == 'EffectHair':  # Furina
             hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
+            material_name = hair_material.name
+        elif mesh_body_part_name == 'Effect':  # Furina (Default)
+            hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT)
             material_name = hair_material.name
         elif mesh_body_part_name == 'Helmet':  # Frem
             helmet_material = self.create_hair_material(self.material_names, self.material_names.HELMET)

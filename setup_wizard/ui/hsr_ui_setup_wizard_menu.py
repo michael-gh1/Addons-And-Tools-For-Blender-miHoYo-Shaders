@@ -240,7 +240,7 @@ class HSR_PT_UI_Finish_Setup_Menu(Panel):
         OperatorFactory.create(
             sub_layout,
             'genshin.delete_specific_objects',
-            'Delete EffectMesh',
+            'Clean Up Extra Meshes',
             'TRASH'
         )
         OperatorFactory.create(
