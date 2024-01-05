@@ -31,19 +31,27 @@ class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
 
 
 class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
-    '''Deletes EffectMesh'''
+    '''Cleans up extra meshes'''
     bl_idname = 'genshin.delete_specific_objects'
-    bl_label = 'Genshin: Delete EffectMesh'
+    bl_label = 'Genshin: Clean up extra meshes'
 
     def execute(self, context):
         scene = bpy.context.scene
         objects_to_delete = [
             'EffectMesh'
         ]  # be extremely careful, we will be deleting anything that contains these object names
+        delete_objects_that_start_with = [
+            'AO_'
+        ]  # Furina (Default)
 
         for object in scene.objects:
             for object_to_delete in objects_to_delete:
                 if object_to_delete in object.name and object.type == 'MESH':
+                    bpy.data.objects.remove(object)
+
+        for object in scene.objects:
+            for object_start_with in delete_objects_that_start_with:
+                if object.name.startswith(object_start_with) and object.type == 'MESH':
                     bpy.data.objects.remove(object)
 
         if self.next_step_idx:
