@@ -41,14 +41,15 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
             'EffectMesh'
         ]  # be extremely careful, we will be deleting anything that contains these object names
         delete_objects_that_start_with = [
-            'AO_'
-        ]  # Furina (Default)
+            'AO_',  # Furina (Default)
+        ]
 
         for object in scene.objects:
             for object_to_delete in objects_to_delete:
                 if object_to_delete in object.name and object.type == 'MESH':
                     bpy.data.objects.remove(object)
 
+        # lazy separate for-loop because object may already be deleted when reaching second for-loop
         for object in scene.objects:
             for object_start_with in delete_objects_that_start_with:
                 if object.name.startswith(object_start_with) and object.type == 'MESH':
