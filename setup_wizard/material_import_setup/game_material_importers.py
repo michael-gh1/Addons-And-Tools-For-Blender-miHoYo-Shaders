@@ -136,7 +136,9 @@ class GameMaterialImporter:
                     filename=outline_node_group_name
                 )
 
-        if not [empty for empty in LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES if bpy.data.objects.get(empty)]:
+        light_direction_empties = [empty_name for empty_name in LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES 
+                                   if bpy.data.objects.get(empty_name)]
+        if not light_direction_empties:
             bpy.ops.wm.append(
                 directory=os.path.join(object_file_path),
                 files=LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES_FILE_IMPORT
