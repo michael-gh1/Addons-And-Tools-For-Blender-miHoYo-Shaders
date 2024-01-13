@@ -120,11 +120,19 @@ class GameGeometryNodesSetup(ABC):
 
     def set_up_modifier_default_values(self, modifier, mesh):
         if modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute'] == 0:
-            # Important! Override object key so we don't use the context (ex. selected object)
-            bpy.ops.object.geometry_nodes_input_attribute_toggle(
-                {"object": bpy.data.objects[mesh.name]},
-                prop_path=f"[\"{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute\"]", 
-                modifier_name=modifier.name)
+            with bpy.context.temp_override(active_object=bpy.data.objects[mesh.name]):
+                bpy.context.view_layer.objects.active = bpy.context.active_object
+
+                if bpy.app.version >= (4,0,0):
+                    bpy.ops.object.geometry_nodes_input_attribute_toggle(
+                        input_name=NAME_OF_VERTEX_COLORS_INPUT, 
+                        modifier_name=modifier.name
+                    )
+                else:
+                    bpy.ops.object.geometry_nodes_input_attribute_toggle(
+                        prop_path=f"[\"{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute\"]", 
+                        modifier_name=modifier.name
+                    )
 
         modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_attribute_name'] = 'Col'
         modifier[OUTLINE_THICKNESS_INPUT] = self.DEFAULT_OUTLINE_THICKNESS
