@@ -9,6 +9,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 
 
@@ -30,6 +31,11 @@ NAME_OF_DRESS2_MASK_INPUT = 'Input_24'
 NAME_OF_DRESS2_MATERIAL_INPUT = 'Input_25'
 NAME_OF_OUTLINE_OTHER_MASK_INPUT = 'Input_26'
 NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT = 'Input_27'
+
+LIGHT_VECTORS_LIGHT_DIRECTION = 'Input_3'
+LIGHT_VECTORS_HEAD_ORIGIN = 'Input_4'
+LIGHT_VECTORS_HEAD_FORWARD = 'Input_5'
+LIGHT_VECTORS_HEAD_UP = 'Input_6'
 
 
 outline_mask_to_material_mapping = {
@@ -189,7 +195,14 @@ class GameGeometryNodesSetup(ABC):
             if not light_vectors_modifier:
                 light_vectors_modifier = mesh.modifiers.new(f'{light_vectors_node_group_name} {mesh_name}', 'NODES')
                 light_vectors_modifier.node_group = light_vectors_node_group
+                self.set_up_light_vectors_modifier(light_vectors_modifier)
         return light_vectors_modifier
+
+    def set_up_light_vectors_modifier(self, light_vectors_modifier):
+        light_vectors_modifier[LIGHT_VECTORS_LIGHT_DIRECTION] = bpy.data.objects.get(LightDirectionEmptyNames.LIGHT_DIRECTION)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_ORIGIN] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_ORIGIN)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_FORWARD] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_FORWARD)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_UP] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_UP)
 
 
 class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
