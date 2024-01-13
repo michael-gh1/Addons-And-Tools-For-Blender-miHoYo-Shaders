@@ -1,7 +1,7 @@
 # Author: michael-gh1
 
 
-class EmptyNames:
+class LightDirectionEmptyNames:
     HEAD_ORIGIN = 'Head Origin'
     HEAD_FORWARD = 'Head Forward'
     HEAD_UP = 'Head Up'

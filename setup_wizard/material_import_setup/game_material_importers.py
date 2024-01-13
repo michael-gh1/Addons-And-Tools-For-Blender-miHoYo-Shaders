@@ -11,7 +11,7 @@ from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinIm
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     FESTIVITY_ROOT_FOLDER_FILE_PATH, FESTIVITY_SHADER_FILE_PATH, NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH, JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH, JAREDNYTS_PGR_SHADER_FILE_PATH
-from setup_wizard.material_import_setup.empty_names import EmptyNames
+from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 
 
@@ -136,10 +136,10 @@ class GameMaterialImporter:
                     filename=outline_node_group_name
                 )
 
-        if not [empty for empty in EmptyNames.LIGHT_DIRECTION_EMPTIES if bpy.data.objects.get(empty)]:
+        if not [empty for empty in LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES if bpy.data.objects.get(empty)]:
             bpy.ops.wm.append(
                 directory=os.path.join(object_file_path),
-                files=EmptyNames.LIGHT_DIRECTION_EMPTIES_FILE_IMPORT
+                files=LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES_FILE_IMPORT
             )
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
