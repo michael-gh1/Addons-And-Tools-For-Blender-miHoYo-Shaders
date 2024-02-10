@@ -5,6 +5,7 @@ import os
 
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.paimon_rig_script import rig_character as rig_paimon
+from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc                                                                                 
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -55,14 +56,6 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         number_of_hand_bone_children = max([len(hand_bone.children) for hand_bone in hand_bones])
         is_player_hand = number_of_hand_bone_children >= 5
 
-        if not is_player_hand:
-            self.blender_operator.report(
-                {'INFO'}, \
-                'Setup Wizard has finished setup and stopped before attempting to rig character.\n'
-                'Only Playable characters are currently supported.\n'
-            )
-            return
-
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
 
         # Important that the Armature is selected before performing rigging operations
@@ -82,6 +75,16 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                 character_rigger_props.add_children_of_constraints,
                 character_rigger_props.use_head_tracker,
             )
+        elif not is_player_hand:
+            rig_npc(
+                filepath,
+                not character_rigger_props.allow_arm_ik_stretch,
+                not character_rigger_props.allow_leg_ik_stretch,
+                character_rigger_props.use_arm_ik_poles,
+                character_rigger_props.use_leg_ik_poles,
+                character_rigger_props.add_children_of_constraints,
+                character_rigger_props.use_head_tracker,
+            )                                 
         else:
             rig_character(
                 filepath,
