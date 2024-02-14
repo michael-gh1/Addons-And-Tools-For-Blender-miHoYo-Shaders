@@ -4,7 +4,6 @@ import bpy
 import os
 
 from setup_wizard.character_rig_setup.rig_script import rig_character
-from setup_wizard.character_rig_setup.paimon_rig_script import rig_character as rig_paimon
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc                                                                                 
 
 from abc import ABC, abstractmethod
@@ -66,7 +65,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
 
         meshes_joined = not (bpy.data.objects.get('Body') and bpy.data.objects.get('Face'))
         if [material for material in bpy.data.materials.values() if 'Paimon' in material.name]:
-            rig_paimon(
+            rig_npc(
                 filepath,
                 not character_rigger_props.allow_arm_ik_stretch,
                 not character_rigger_props.allow_leg_ik_stretch,
