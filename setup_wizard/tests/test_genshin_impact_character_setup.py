@@ -128,7 +128,10 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             os.makedirs(f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact', exist_ok=True)
             bpy.ops.wm.save_as_mainfile(filepath=f'{os.path.abspath(arg_logs_directory_path)}/GenshinImpact/{filename}')
             logger.info(f'Saved file for {character_name} as: {filename}')
+        logger.info(f'Quit Blender for {character_name}')
         bpy.ops.wm.quit_blender()
+    logger.info(f'Quit (2) Blender for {character_name}')
+    bpy.ops.wm.quit_blender()
 
 
 setup_character(arg_config, arg_character_name, arg_character_folder_file_path, arg_material_data_folder)
