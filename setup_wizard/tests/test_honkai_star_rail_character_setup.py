@@ -16,12 +16,13 @@ arg_logs_directory_path = argv[0]
 arg_config = json.loads(argv[1])
 arg_character_name = argv[2]
 arg_character_folder_file_path = argv[3]
+arg_material_data_folder = argv[4]
 
 Logger(f'{arg_logs_directory_path}/tests.log')
 logger = logging.getLogger(__name__)
 
 
-def setup_character(config, character_name, character_folder_file_path):
+def setup_character(config, character_name, character_folder_file_path, arg_material_data_folder):
     logger.info(f'Starting test for {character_name}')
     logger.info(f'Emptying scene...')
 
@@ -49,10 +50,17 @@ def setup_character(config, character_name, character_folder_file_path):
     logger.info(f"{bpy.context.preferences.addons.get('better_fbx')}")
 
     try:
-        material_json_files = os.listdir(PurePath(character_folder_file_path, 'materials'))
+        material_json_files = []
+        try:
+            material_json_files = os.listdir(PurePath(arg_material_data_folder))
+        except FileNotFoundError as ex:
+            pass  # eat the error, NPCs do not have material data
+
         material_json_files = [
             { 'name': material_json_file } for material_json_file in material_json_files if material_json_file.endswith('.json')
         ]
+
+        logger.info(material_json_files)
 
         operators = [
             HonkaiStarRailTestOperatorExecutioner('clear_cache_operator'),
@@ -69,7 +77,7 @@ def setup_character(config, character_name, character_folder_file_path):
             HonkaiStarRailTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
             HonkaiStarRailTestOperatorExecutioner('import_material_data', 
                                                   files=material_json_files, 
-                                                  filepath=str(PurePath(character_folder_file_path, "materials", "placeholder_value")), 
+                                                  filepath=str(PurePath(arg_material_data_folder, "placeholder_value")), 
                                                   config=config),
             HonkaiStarRailTestOperatorExecutioner('fix_transformations'),
             HonkaiStarRailTestOperatorExecutioner('setup_head_driver'),
@@ -113,4 +121,4 @@ def setup_character(config, character_name, character_folder_file_path):
     bpy.ops.wm.quit_blender()
 
 
-setup_character(arg_config, arg_character_name, arg_character_folder_file_path)
+setup_character(arg_config, arg_character_name, arg_character_folder_file_path, arg_material_data_folder)
