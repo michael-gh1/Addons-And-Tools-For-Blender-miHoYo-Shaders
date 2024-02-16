@@ -3,6 +3,7 @@ import bpy
 import json
 import subprocess
 import os
+import sys
 from pathlib import Path, PurePath
 from setup_wizard.services.config_service import ConfigService
 from setup_wizard.tests.constants import BLENDER_EXECUTION_FILE_PATH, CHARACTERS_FOLDER_FILE_PATH, RIG_CHARACTER, \
@@ -16,8 +17,8 @@ IGNORE_LIST = [
 ]  # Broken characters
 
 class TestDriver:
-    def __init__(self):
-        self.config_service = ConfigService('setup_wizard/tests/config.json')
+    def __init__(self, relative_path_to_config_json):
+        self.config_service = ConfigService(relative_path_to_config_json)
 
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
         self.logs_directory_path = f'setup_wizard/tests/logs/{timestamp}'
@@ -74,6 +75,7 @@ class TestDriver:
                             '-b',
                             '--python',
                             test_file,
+                            '-noaudio',
                             '--',
                             f'{self.logs_directory_path}',
                             f'{environment_config_str}',
@@ -92,6 +94,7 @@ class TestDriver:
                         '-b',
                         '--python',
                         test_file,
+                        '-noaudio',
                         '--',
                         f'{self.logs_directory_path}',
                         f'{environment_config_str}',
@@ -103,6 +106,10 @@ class TestDriver:
                         blender_execution_commands.remove('-b')
                     subprocess.run(blender_execution_commands)
 
+argv = sys.argv
+argv = argv[argv.index('--') + 1:]
 
-TestDriver().execute()
+test_json_filename = argv[0]
+TestDriver(f'setup_wizard/tests/{test_json_filename}').execute()
+
 bpy.ops.wm.quit_blender()
