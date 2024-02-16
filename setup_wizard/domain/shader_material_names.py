@@ -73,6 +73,7 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     EYESHADOW = 'HSR - EyeShadow'
     OUTLINES = 'HSR - Outlines'
     WEAPON = 'HSR - Weapon'
+    WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
     WEAPON01 = 'HSR - Weapon01'
     WEAPON02 = 'HSR - Weapon02'
 
