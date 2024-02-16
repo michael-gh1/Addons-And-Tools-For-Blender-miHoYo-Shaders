@@ -678,14 +678,34 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body_', 'Color'], file):
-                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
+                    if body_material:
+                        self.set_diffuse_texture(TextureType.BODY, body_material, img)
+
+                    # If NOT Body material, but Body texture, check for Body1/Body2 (Firefly)
+                    if not body_material:
+                        if body1_material:
+                            self.set_diffuse_texture(TextureType.BODY, body1_material, img)
+                        if body2_material:
+                            self.set_diffuse_texture(TextureType.BODY, body2_material, img)
+                            if body2_trans_material:
+                                self.set_diffuse_texture(TextureType.BODY, body2_trans_material, img)
 
                     if body_trans_material:
                         self.set_diffuse_texture(TextureType.BODY, body_trans_material, img)
 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body_', 'LightMap'], file):
-                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
+                    if body_material:
+                        self.set_lightmap_texture(TextureType.BODY, body_material, img)
+
+                    # If NOT Body material, but Body texture, check for Body1/Body2 (Firefly)
+                    if not body_material:
+                        if body1_material:
+                            self.set_lightmap_texture(TextureType.BODY, body1_material, img)
+                        if body2_material:
+                            self.set_lightmap_texture(TextureType.BODY, body2_material, img)
+                            if body2_trans_material:
+                                self.set_lightmap_texture(TextureType.BODY, body2_trans_material, img)
 
                     if body_trans_material:
                         self.set_lightmap_texture(TextureType.BODY, body_trans_material, img)

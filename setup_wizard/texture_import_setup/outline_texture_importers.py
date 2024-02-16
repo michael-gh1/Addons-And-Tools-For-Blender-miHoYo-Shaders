@@ -183,12 +183,14 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
-                original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')]
+                original_mesh_material = [material for material in bpy.data.materials if f'Mat_{body_part_material_name}' in material.name]
 
                 if original_mesh_material and 'EyeShadow' not in original_mesh_material and 'EyeShadow' not in body_part_material_name:
                     if 'Weapon' in body_part_material_name:
                         actual_material_part_name = 'Weapon'
                     elif 'Body' in body_part_material_name and 'Trans' in body_part_material_name:
+                        actual_material_part_name = 'Body'
+                    elif 'Body1' in body_part_material_name and [file for file in files if 'Body' in file and not 'Body1' in file and not 'Body2' in file]:
                         actual_material_part_name = 'Body'
                     else:
                         actual_material_part_name = body_part_material_name
@@ -208,7 +210,11 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
             f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
 
         # Genshin Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
-        lightmap_filename = [file for file in lightmap_files if actual_material_part_name in file][0]
+        lightmap_filenames = [file for file in lightmap_files if actual_material_part_name in file]
+        if not lightmap_filenames:
+            print(f'Warn: Did not find lightmap for {actual_material_part_name} in {lightmap_files} when setting up outline textures')
+            return
+        lightmap_filename = lightmap_filenames[0]
 
         texture_img_path = character_model_folder_file_path + "/" + lightmap_filename
         texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
@@ -221,7 +227,11 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
         outline_material = bpy.data.materials.get(
             f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part_material_name} Outlines')
 
-        diffuse_filename = [file for file in diffuse_files if actual_material_part_name in file][0]
+        diffuse_filenames = [file for file in diffuse_files if actual_material_part_name in file]
+        if not diffuse_filenames:
+            print(f'Warn: Did not find diffuse for {actual_material_part_name} in {diffuse_files} when setting up outline textures')
+            return
+        diffuse_filename = diffuse_filenames[0]
 
         texture_img_path = character_model_folder_file_path + "/" + diffuse_filename
         texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)

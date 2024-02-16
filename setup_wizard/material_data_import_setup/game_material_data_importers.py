@@ -246,7 +246,10 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             return {'FINISHED'}
 
         for file in self.blender_operator.files:
+            is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'
+
             body_part = 'Body_Trans' if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
+                else PurePosixPath(file.name).stem.split('_')[-2] if is_firefly \
                 else PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
 
