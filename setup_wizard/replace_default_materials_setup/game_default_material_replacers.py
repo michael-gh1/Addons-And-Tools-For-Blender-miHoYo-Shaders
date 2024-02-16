@@ -300,7 +300,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def create_weapon_materials(self, mesh_body_part_name):
         weapon_material_name = \
             f'{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{mesh_body_part_name}' if \
-            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' else \
+            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' else \
             f'{Nya222HonkaiStarRailShaderMaterialNames.WEAPON}'
         weapon_material = bpy.data.materials.get(weapon_material_name)
 

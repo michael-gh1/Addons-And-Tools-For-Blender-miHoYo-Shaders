@@ -655,9 +655,10 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS)
                 body2_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2_TRANS)
                 weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON)
+                weapon1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON1)
                 weapon01_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01)
                 weapon02_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON02)
-                weapon_materials = [weapon_material, weapon01_material, weapon02_material]
+                weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material]
 
                 # Implement the texture in the correct node
                 print(f'INFO: Importing texture {file} using {self.__class__.__name__}')
