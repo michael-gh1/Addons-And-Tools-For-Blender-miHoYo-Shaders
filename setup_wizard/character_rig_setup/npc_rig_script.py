@@ -559,6 +559,10 @@ def rig_character(
             except:
                 pass
 
+    # Fix hand bones being rotated 90 degrees sideways and arm deformation bones being wonky
+    if "Child" in obj.name:
+        metarm.edit_bones["upper_arm.L"].tail.y += .003
+        metarm.edit_bones["upper_arm.R"].tail.y += .003
 
     ###########  DETACH PHYSICS BONES,  
 
