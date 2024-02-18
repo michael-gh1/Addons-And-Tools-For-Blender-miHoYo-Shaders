@@ -636,6 +636,10 @@ def rig_character(
         if "f_" in bone.name or "thumb" in bone.name:
             bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
 
+    # Fix hand bones being rotated 90 degrees sideways and arm deformation bones being wonky
+    if "Loli" in obj.name:
+        metarm.edit_bones["upper_arm.L"].tail.y += .003
+        metarm.edit_bones["upper_arm.R"].tail.y += .003
 
     ##########  DETACH PHYSICS BONES,  
 
