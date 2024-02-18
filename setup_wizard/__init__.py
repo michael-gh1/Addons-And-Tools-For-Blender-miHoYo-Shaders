@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HoYoverse Setup Wizard",
     "author": "Mken",
-    "version": (2, 3, 2),
+    "version": (2, 3, 3),
     "blender": (3, 3, 0),
     "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail",
     "description": "An addon to streamline the character model setup process when using Festivity or Nya222's Shaders",
