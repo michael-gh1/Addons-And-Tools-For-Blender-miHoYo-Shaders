@@ -88,7 +88,8 @@ class GenshinTextureImporter:
     Checks if all texture identifiers are in the texture name
     Use Case: I want to check if a texture has [X, Y, Z] in it.
     '''
-    def is_texture_identifiers_in_texture_name(self, texture_identifiers, texture_name: str):
+    def is_texture_identifiers_in_texture_name(self, texture_identifiers: List[str], texture_name: str):
+        assert(type(texture_identifiers) is list)  # TODO: Write unit test, programming error, input is wrong type!
         texture_identifier: str
 
         for texture_identifier in texture_identifiers:
@@ -838,13 +839,13 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_face_expression_texture(face_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file) and \
-                    not self.is_texture_identifiers_in_texture_name('Screen', file):  # Pela, Silverwolf
+                    not self.is_texture_identifiers_in_texture_name(['Screen'], file):  # Pela, Silverwolf
                     for weapon_material in weapon_materials:
                         if weapon_material:
                             self.set_diffuse_texture(TextureType.WEAPON, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'LightMap'], file) or \
-                    self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo
+                    self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo (Asta)
 
                     for weapon_material in weapon_materials:
                         if weapon_material:
