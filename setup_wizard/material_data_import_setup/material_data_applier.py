@@ -28,8 +28,8 @@ class MaterialDataAppliersFactory:
                 ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
-                V2_HSR_MaterialDataApplier(material_data_parser, outline_material_group), 
                 StellarToon_MaterialDataApplier(material_data_parser, outline_material_group),
+                V2_HSR_MaterialDataApplier(material_data_parser, outline_material_group),
             ]
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
