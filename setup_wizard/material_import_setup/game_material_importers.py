@@ -5,7 +5,7 @@ import os
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
     JaredNytsPunishingGrayRavenShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
@@ -189,7 +189,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
-    DEFAULT_BLEND_FILE_WITH_HSR_MATERIALS = 'miHoYo_-_Star_Rail.blend'
+    DEFAULT_BLEND_FILE_WITH_HSR_MATERIALS = 'StellarToon.blend'
     NAMES_OF_HONKAI_STAR_RAIL_MATERIALS = [
         {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY1},
         {'name': Nya222HonkaiStarRailShaderMaterialNames.BODY2},
@@ -199,6 +199,14 @@ class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
         {'name': Nya222HonkaiStarRailShaderMaterialNames.EYESHADOW},
         {'name': Nya222HonkaiStarRailShaderMaterialNames.OUTLINES},
         {'name': Nya222HonkaiStarRailShaderMaterialNames.WEAPON},
+        {'name': StellarToonShaderMaterialNames.BASE},
+        {'name': StellarToonShaderMaterialNames.HAIR},
+        {'name': StellarToonShaderMaterialNames.FACE},
+        {'name': StellarToonShaderMaterialNames.WEAPON},
+        {'name': StellarToonShaderMaterialNames.BASE_OUTLINES},
+        {'name': StellarToonShaderMaterialNames.HAIR_OUTLINES},
+        {'name': StellarToonShaderMaterialNames.FACE_OUTLINES},
+        {'name': StellarToonShaderMaterialNames.WEAPON_OUTLINES},
     ]
 
     def __init__(self, blender_operator, context):

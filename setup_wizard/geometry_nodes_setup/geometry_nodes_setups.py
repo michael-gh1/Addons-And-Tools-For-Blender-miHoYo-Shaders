@@ -5,8 +5,8 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
-from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
@@ -74,14 +74,29 @@ meshes_to_create_geometry_nodes_on = [
 class GameGeometryNodesSetupFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
             else:
                 return GenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            return HonkaiStarRailGeometryNodesSetup(blender_operator, context)
+            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+                return HonkaiStarRailGeometryNodesSetup(
+                    blender_operator, 
+                    context, 
+                    Nya222HonkaiStarRailShaderMaterialNames, 
+                    OutlineNodeGroupNames.NYA222_HSR_OUTLINES
+                )
+            else:  # is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER
+                return StellarToonGeometryNodesSetup(
+                    blender_operator, 
+                    context, 
+                    StellarToonShaderMaterialNames, 
+                    OutlineNodeGroupNames.STELLARTOON_HSR_OUTLINES,
+                    OutlineNodeGroupNames.STELLARTOON_LIGHT_VECTORS_GEOMETRY_NODES
+                )
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             for outline_node_group_name in OutlineNodeGroupNames.V2_JAREDNYTS_PGR_OUTLINES:
                 if bpy.data.node_groups.get(outline_node_group_name):
@@ -198,11 +213,17 @@ class GameGeometryNodesSetup(ABC):
                 self.set_up_light_vectors_modifier(light_vectors_modifier)
         return light_vectors_modifier
 
+    '''
+    Use existing object if it exists, otherwise attempt to set it with known object names for GI or HSR shaders
+    '''
     def set_up_light_vectors_modifier(self, light_vectors_modifier):
-        light_vectors_modifier[LIGHT_VECTORS_LIGHT_DIRECTION] = bpy.data.objects.get(LightDirectionEmptyNames.LIGHT_DIRECTION)
-        light_vectors_modifier[LIGHT_VECTORS_HEAD_ORIGIN] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_ORIGIN)
-        light_vectors_modifier[LIGHT_VECTORS_HEAD_FORWARD] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_FORWARD)
-        light_vectors_modifier[LIGHT_VECTORS_HEAD_UP] = bpy.data.objects.get(LightDirectionEmptyNames.HEAD_UP)
+        light_vectors_modifier[LIGHT_VECTORS_LIGHT_DIRECTION] = \
+            light_vectors_modifier[LIGHT_VECTORS_LIGHT_DIRECTION] or \
+            bpy.data.objects.get(LightDirectionEmptyNames.LIGHT_DIRECTION) or \
+            bpy.data.objects.get(LightDirectionEmptyNames.MAIN_LIGHT_DIRECTION)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_ORIGIN] = light_vectors_modifier[LIGHT_VECTORS_HEAD_ORIGIN] or bpy.data.objects.get(LightDirectionEmptyNames.HEAD_ORIGIN)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_FORWARD] = light_vectors_modifier[LIGHT_VECTORS_HEAD_FORWARD] or bpy.data.objects.get(LightDirectionEmptyNames.HEAD_FORWARD)
+        light_vectors_modifier[LIGHT_VECTORS_HEAD_UP] = light_vectors_modifier[LIGHT_VECTORS_HEAD_UP] or bpy.data.objects.get(LightDirectionEmptyNames.HEAD_UP) 
 
 
 class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
@@ -320,10 +341,10 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
 
-    def __init__(self, blender_operator, context):
+    def __init__(self, blender_operator, context, material_names, outline_node_group_names):
         super().__init__(blender_operator, context)
-        self.material_names = Nya222HonkaiStarRailShaderMaterialNames
-        self.outlines_node_group_names = OutlineNodeGroupNames.NYA222_HSR_OUTLINES
+        self.material_names = material_names
+        self.outlines_node_group_names = outline_node_group_names
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
@@ -351,6 +372,44 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
                 geometry_nodes_modifier.node_group = outlines_node_group
             self.set_up_modifier_default_values(geometry_nodes_modifier, mesh)
         return geometry_nodes_modifier
+
+
+class StellarToonGeometryNodesSetup(HonkaiStarRailGeometryNodesSetup):
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    LIGHTDIR_OUTPUT_ATTRIBUTE = 'Output_7_attribute_name'
+    HEADFORWARD_OUTPUT_ATTRIBUTE = 'Output_8_attribute_name'
+    HEADUP_OUTPUT_ATTRIBUTE = 'Output_9_attribute_name'
+
+    def __init__(self, blender_operator, context, material_names, outline_node_group_names, light_vector_node_group_names):
+        super().__init__(blender_operator, context, material_names, outline_node_group_names)
+        self.material_names = material_names
+        self.outlines_node_group_names = outline_node_group_names
+        self.light_vectors_node_group_names = light_vector_node_group_names or []
+
+    def setup_geometry_nodes(self):
+        self.clone_outlines(self.material_names)
+
+        if self.light_vectors_node_group_names:
+            character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
+            character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
+            for mesh_name in character_armature_mesh_names:  # It is important that this is created and placed before Outlines!!
+                for object_name, object_data in bpy.context.scene.objects.items():
+                    if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                        light_vectors_modifier = self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                        self.__set_light_vectors_default_output_attributes(light_vectors_modifier)
+        for mesh_name in meshes_to_create_geometry_nodes_on:
+            for object_name, object_data in bpy.context.scene.objects.items():
+                if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
+
+        face_meshes = [mesh for mesh_name, mesh in bpy.data.meshes.items() if 'Face' in mesh_name and 'Face_Mask' not in mesh_name]
+        self.fix_face_outlines_by_reordering_material_slots(face_meshes)
+
+    def __set_light_vectors_default_output_attributes(self, light_vectors_modifier):
+        light_vectors_modifier[self.LIGHTDIR_OUTPUT_ATTRIBUTE] = 'lightDir'
+        light_vectors_modifier[self.HEADFORWARD_OUTPUT_ATTRIBUTE] = 'headForward'
+        light_vectors_modifier[self.HEADUP_OUTPUT_ATTRIBUTE] = 'headUp'
 
 
 class PunishingGrayRavenGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):

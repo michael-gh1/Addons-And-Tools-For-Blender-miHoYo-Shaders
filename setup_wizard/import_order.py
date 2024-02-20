@@ -259,6 +259,10 @@ class ComponentFunctionFactory:
             return bpy.ops.genshin.fix_transformations
         elif component_name == 'set_color_management_to_standard':
             return bpy.ops.genshin.set_color_management_to_standard
+        elif component_name == 'set_up_screen_space_reflections':
+            return bpy.ops.hoyoverse.set_up_screen_space_reflections
+        elif component_name == 'vertex_paint_face_see_through_effect':
+            return bpy.ops.hoyoverse.vertex_paint_face_see_through_effect
         elif component_name == 'setup_head_driver':
             return bpy.ops.genshin.setup_head_driver
         elif component_name == 'rename_shader_materials':

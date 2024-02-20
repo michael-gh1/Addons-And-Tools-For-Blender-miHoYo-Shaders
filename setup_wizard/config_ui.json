@@ -68,6 +68,74 @@
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_final_steps",
             "rig_character"
         ],
+        "HONKAI_STAR_RAIL_OT_setup_wizard_ui": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_setup_wizard_ui",
+            "import_character_model", 
+            "delete_empties",
+            "import_materials",
+            "replace_default_materials",
+            "import_character_textures",
+            "import_outlines",
+            "setup_geometry_nodes",
+            "import_outline_lightmaps",
+            "import_material_data",
+            "fix_transformations",
+            "setup_head_driver",
+            "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
+            "vertex_paint_face_see_through_effect",
+            "delete_specific_objects",
+            "rename_shader_materials",
+            "set_up_armtwist_bone_constraints",
+            "join_meshes_on_armature"
+        ],
+        "HONKAI_STAR_RAIL_OT_setup_wizard_ui_no_outlines": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_setup_wizard_ui",
+            "import_character_model", 
+            "delete_empties",
+            "import_materials",
+            "replace_default_materials",
+            "import_character_textures",
+            "fix_transformations",
+            "setup_head_driver",
+            "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
+            "vertex_paint_face_see_through_effect",
+            "delete_specific_objects",
+            "rename_shader_materials",
+            "set_up_armtwist_bone_constraints",
+            "join_meshes_on_armature"
+        ],
+        "HONKAI_STAR_RAIL_OT_set_up_character": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_character",
+            "import_character_model", 
+            "delete_empties"
+        ],
+        "HONKAI_STAR_RAIL_OT_set_up_materials": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_materials",
+            "import_materials",
+            "replace_default_materials",
+            "import_character_textures"
+        ],
+        "HONKAI_STAR_RAIL_OT_set_up_outlines": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_outlines",
+            "import_outlines",
+            "setup_geometry_nodes",
+            "import_outline_lightmaps",
+            "import_material_data"
+        ],
+        "HONKAI_STAR_RAIL_OT_finish_setup": [
+            "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_finish_setup",
+            "fix_transformations",
+            "setup_head_driver",
+            "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
+            "vertex_paint_face_see_through_effect",
+            "delete_specific_objects",
+            "rename_shader_materials",
+            "set_up_armtwist_bone_constraints",
+            "join_meshes_on_armature"
+        ],
         "PUNISHING_GRAY_RAVEN_OT_setup_wizard_ui": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_setup_wizard_ui",
             "import_character_model", 

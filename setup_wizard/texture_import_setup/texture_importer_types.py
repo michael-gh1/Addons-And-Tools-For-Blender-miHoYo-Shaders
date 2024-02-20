@@ -5,14 +5,14 @@ import bpy
 import os
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
-from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
+from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
-from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, TextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames
 
 
 class TextureImporterType(Enum):
@@ -28,6 +28,7 @@ class TextureType(Enum):
     HAIR = 'Hair'
     BODY = 'Body'
     FACE = 'Face'
+    WEAPON = 'Weapon'
 
 
 class TextureImporterFactory:
@@ -51,8 +52,17 @@ class TextureImporterFactory:
             else:
                 print(f'Unknown TextureImporterType: {texture_importer_type}')
         elif game_type is GameType.HONKAI_STAR_RAIL:
+            shader: HonkaiStarRailShaders = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+                material_names = Nya222HonkaiStarRailShaderMaterialNames
+                texture_names = Nya222HonkaiStarRailTextureNodeNames
+            else:  # shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER
+                material_names = StellarToonShaderMaterialNames
+                texture_names = StellarToonTextureNodeNames
+
             if texture_importer_type == TextureImporterType.HSR_AVATAR:
-                return HonkaiStarRailAvatarTextureImporter(Nya222HonkaiStarRailTextureNodeNames)
+                return HonkaiStarRailAvatarTextureImporter(material_names, texture_names)
             else:
                 print(f'Unknown TextureImporterType: {texture_importer_type}')
         elif game_type is GameType.PUNISHING_GRAY_RAVEN:
@@ -576,34 +586,64 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
 
 class HonkaiStarRailTextureImporter(GenshinTextureImporter):
-    def __init__(self, game_type: GameType, character_type: TextureImporterType, texture_node_names: TextureNodeNames):
+    def __init__(self, game_type: GameType, character_type: TextureImporterType, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
         super().__init__(game_type, character_type)
+        self.material_names = material_names
         self.texture_node_names: TextureNodeNames = texture_node_names
 
+    '''
+    Lazy attempt at setting all known diffuses across Nya222 HSR Shader and StellarToon
+    If the material has the texture node, set it.
+    '''
     def set_diffuse_texture(self, type: TextureType, material, img):
-        material.node_tree.nodes[self.texture_node_names.DIFFUSE].image = img
+        nya222_or_outline_diffuse_node = material.node_tree.nodes.get(self.texture_node_names.DIFFUSE)
+        diffuse_uv0_node = material.node_tree.nodes.get(f'{type.value}{self.texture_node_names.DIFFUSE_UV0_SUFFIX}')
+        diffuse_uv1_node = material.node_tree.nodes.get(f'{type.value}{self.texture_node_names.DIFFUSE_UV1_SUFFIX}')
+        face_color_node = material.node_tree.nodes.get(f'{type.value}{self.texture_node_names.FACE_COLOR_SUFFIX}')
+        
+        for diffuse_node in [nya222_or_outline_diffuse_node, diffuse_uv0_node, diffuse_uv1_node, face_color_node]:
+            if diffuse_node:
+                diffuse_node.image = img
 
+    '''
+    Lazy attempt at setting all known lightmaps across Nya222 HSR Shader and StellarToon.
+    If the material has the texture node, set it.
+    '''
     def set_lightmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
-        material.node_tree.nodes[self.texture_node_names.LIGHTMAP].image = img
+        lightmap_nya222_node = material.node_tree.nodes.get(self.texture_node_names.LIGHTMAP)
+        lightmap_uv0_node = material.node_tree.nodes.get(f'{type.value}{self.texture_node_names.LIGHTMAP_UV0_SUFFIX}')
+        lightmap_uv1_node = material.node_tree.nodes.get(f'{type.value}{self.texture_node_names.LIGHTMAP_UV1_SUFFIX}')
+
+        for lightmap_node in [lightmap_nya222_node, lightmap_uv0_node, lightmap_uv1_node]:
+            if lightmap_node:
+                lightmap_node.image = img
 
     def set_warm_shadow_ramp_texture(self, type: TextureType, img):
         ramp_node_name = \
-            self.texture_node_names.BODY_RAMP if type is TextureType.BODY else \
-            self.texture_node_names.HAIR_RAMP
+            self.texture_node_names.BODY_WARM_RAMP if type is TextureType.BODY else \
+            self.texture_node_names.HAIR_WARM_RAMP
 
-        ramp_texture_node = bpy.data.node_groups.get('Body_Ramp').nodes[ramp_node_name] if \
-            type is TextureType.BODY else bpy.data.node_groups.get('Hair_Ramp').nodes[ramp_node_name]
+        ramp_texture_node = bpy.data.node_groups.get(self.texture_node_names.BODY_WARM_RAMP_NODE_GROUP).nodes[ramp_node_name] if \
+            type is TextureType.BODY else bpy.data.node_groups.get(self.texture_node_names.HAIR_WARM_RAMP_NODE_GROUP).nodes[ramp_node_name]
         ramp_texture_node.image = img
 
-    # TODO: Not currently called, but should be supported in the future
     def set_cool_shadow_ramp_texture(self, type: TextureType, img):
-        # Yes, the Hair_Shadow_Ramp Cool Ramp is also named Body_Shadow_Ramp.001
-        bpy.data.node_groups[f'{type.value} Shadow Ramp'].nodes[f'Body_Shadow_Ramp.001'].image = img
+        if not bpy.data.node_groups.get(self.texture_node_names.BODY_COOL_RAMP_NODE_GROUP) or \
+            not bpy.data.node_groups.get(self.texture_node_names.HAIR_COOL_RAMP_NODE_GROUP):
+            return
+
+        ramp_node_name = \
+            self.texture_node_names.BODY_COOL_RAMP if type is TextureType.BODY else \
+            self.texture_node_names.HAIR_COOL_RAMP
+
+        ramp_texture_node = bpy.data.node_groups.get(self.texture_node_names.BODY_COOL_RAMP_NODE_GROUP).nodes[ramp_node_name] if \
+            type is TextureType.BODY else bpy.data.node_groups.get(self.texture_node_names.HAIR_COOL_RAMP_NODE_GROUP).nodes[ramp_node_name]
+        ramp_texture_node.image = img
 
     def set_weapon_ramp_texture(self, img, override=False):
-        weapon_ramp_node = bpy.data.node_groups[f'{Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP_NODE_GROUP}'].nodes[
-            Nya222HonkaiStarRailTextureNodeNames.WEAPON_RAMP
+        weapon_ramp_node = bpy.data.node_groups[f'{self.texture_node_names.WEAPON_RAMP_NODE_GROUP}'].nodes[
+            self.texture_node_names.WEAPON_RAMP
         ]
         
         if override or not weapon_ramp_node.image:
@@ -616,27 +656,48 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
 
     def set_face_expression_texture(self, face_material, img):
         img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups[self.texture_node_names.FACE_EXPRESSION_NODE_GROUP].nodes[
-            self.texture_node_names.FACE_EXPRESSION_MAP].image = img
+
+        # Nya222 Shader has it inside a node group
+        face_expression_node_group = bpy.data.node_groups.get(self.texture_node_names.FACE_EXPRESSION_NODE_GROUP)
+        if face_expression_node_group:
+            face_expression_node_group.nodes[self.texture_node_names.FACE_EXPRESSION_MAP].image = img
+        
+        # Stellartoon
+        face_expression_node = face_material.node_tree.nodes.get(self.texture_node_names.FACE_EXPRESSION_MAP)
+        if face_expression_node:
+            face_expression_node.image = img
 
     def set_stocking_texture(self, type: TextureType, material, img):
-        body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
-        body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
+        body_material = bpy.data.materials.get(self.material_names.BODY)
+        body1_material = bpy.data.materials.get(self.material_names.BODY1)
         img.colorspace_settings.name='Non-Color'
 
         # If Body material or Body1 material apply to Body1 Stockings
         # Else Body2 material or Body Stockings texture with Body1/Body2 materials apply to Body2 Stockings
         if (body_material and material is body_material) or (body1_material and material is body1_material):
-            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP].nodes[
-                self.texture_node_names.STOCKINGS].image = img
+            stockings_body1_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP)
+            body_stockings_node = material.node_tree.nodes.get(self.texture_node_names.STOCKINGS)
+
+            if stockings_body1_node_group:  # Nya222
+                stockings_body1_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
+            if body_stockings_node:  # Stellartoon
+                body_stockings_node.image = img
+                material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get('Enable Stockings').default_value = 1.0
         else:
-            bpy.data.node_groups[self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP].nodes[
-                self.texture_node_names.STOCKINGS].image = img
+            stockings_body2_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP)
+            if stockings_body2_node_group:  # Nya222
+                stockings_body2_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
 
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
-    def __init__(self, texture_node_names: TextureNodeNames):
-        super().__init__(GameType.HONKAI_STAR_RAIL, TextureImporterType.HSR_AVATAR, texture_node_names)
+    def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
+        super().__init__(
+            GameType.HONKAI_STAR_RAIL, 
+            TextureImporterType.HSR_AVATAR, 
+            material_names, 
+            texture_node_names
+        )
+        self.material_names = material_names
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -646,18 +707,18 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
-                hair_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.HAIR)
-                face_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.FACE)
-                body_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY)
-                body1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY1)
-                body2_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2)
-                body3_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY3)
-                body_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY_TRANS)
-                body2_trans_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.BODY2_TRANS)
-                weapon_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON)
-                weapon1_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON1)
-                weapon01_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON01)
-                weapon02_material = bpy.data.materials.get(Nya222HonkaiStarRailShaderMaterialNames.WEAPON02)
+                hair_material = bpy.data.materials.get(self.material_names.HAIR)
+                face_material = bpy.data.materials.get(self.material_names.FACE)
+                body_material = bpy.data.materials.get(self.material_names.BODY)
+                body1_material = bpy.data.materials.get(self.material_names.BODY1)
+                body2_material = bpy.data.materials.get(self.material_names.BODY2)
+                body3_material = bpy.data.materials.get(self.material_names.BODY3)
+                body_trans_material = bpy.data.materials.get(self.material_names.BODY_TRANS)
+                body2_trans_material = bpy.data.materials.get(self.material_names.BODY2_TRANS)
+                weapon_material = bpy.data.materials.get(self.material_names.WEAPON)
+                weapon1_material = bpy.data.materials.get(self.material_names.WEAPON1)
+                weapon01_material = bpy.data.materials.get(self.material_names.WEAPON01)
+                weapon02_material = bpy.data.materials.get(self.material_names.WEAPON02)
                 weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material]
 
                 # Implement the texture in the correct node
@@ -674,8 +735,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_warm_shadow_ramp_texture(TextureType.HAIR, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Hair', 'Cool_Ramp'], file):
-                    pass
-                #     self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
+                    self.set_cool_shadow_ramp_texture(TextureType.HAIR, img)
                 
                 # Character has Body and no Body1 or Body2?
                 elif self.is_texture_identifiers_in_texture_name(['Body_', 'Color'], file):
@@ -741,12 +801,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_warm_shadow_ramp_texture(TextureType.BODY, img)
                     self.set_weapon_ramp_texture(img)
 
-                # TODO: RAMPS? Only supporting Warm Ramps for now
-                elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):  # Not Hair, so ramp must be Body
-                    pass
-                #     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
+                # Not Hair, so ramp must be Body
+                elif self.is_texture_identifiers_in_texture_name(['Cool_Ramp'], file):
+                    self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
                 # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
+                # TODO: Sampo Hangbag (unknown other uses, previously this was to handle Svarog, but was updated)
                 elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
 
@@ -777,17 +837,18 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Face_ExpressionMap'], file):
                     self.set_face_expression_texture(face_material, img)
 
-                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file):
+                elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Color'], file) and \
+                    not self.is_texture_identifiers_in_texture_name('Screen', file):  # Pela, Silverwolf
                     for weapon_material in weapon_materials:
                         if weapon_material:
-                            self.set_diffuse_texture(TextureType.BODY, weapon_material, img)
+                            self.set_diffuse_texture(TextureType.WEAPON, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'LightMap'], file) or \
                     self.is_texture_identifiers_in_texture_name(['Weapon', 'LigthMap'], file):  # Yes, intentional typo
 
                     for weapon_material in weapon_materials:
                         if weapon_material:
-                            self.set_lightmap_texture(TextureType.BODY, weapon_material, img)
+                            self.set_lightmap_texture(TextureType.WEAPON, weapon_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
                     # Set Weapon Ramp, if none exists use Body Ramp

@@ -29,6 +29,7 @@ class MaterialDataAppliersFactory:
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
                 V2_HSR_MaterialDataApplier(material_data_parser, outline_material_group), 
+                StellarToon_MaterialDataApplier(material_data_parser, outline_material_group),
             ]
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
@@ -69,7 +70,13 @@ class MaterialDataApplier(ABC):
                 self.__handle_material_value_not_found(material_json_name)
                 continue
 
-            node_input = node_inputs.get(material_node_name)
+            # StellarToon: handle two "Stockings Color" inputs in same shader node
+            if material_node_name == 'Stockings Color':
+                stockings_color_inputs = [node_input for node_input in node_inputs if node_input.name == 'Stockings Color']
+                if len(stockings_color_inputs) > 1:
+                    node_input = stockings_color_inputs[1]
+            else:
+                node_input = node_inputs.get(material_node_name)
             try:
                 # Convert to sRGB to Hex to RGB for Nya222 Shader 
                 # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
@@ -512,3 +519,108 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
             self.local_material_mapping,
             shader_node_tree_inputs,
         )
+
+
+class StellarToon_MaterialDataApplier(V2_MaterialDataApplier):
+    outline_mapping = {
+        '_OutlineColor0': 'Outline Color 1',
+        '_OutlineColor1': 'Outline Color 2',
+        '_OutlineColor2': 'Outline Color 3',
+        '_OutlineColor3': 'Outline Color 4',
+        '_OutlineColor4': 'Outline Color 5',
+        '_OutlineColor5': 'Outline Color 6',
+        '_OutlineColor6': 'Outline Color 7',
+        '_OutlineColor7': 'Outline Color 8',
+    }
+
+    face_outline_mapping = {
+        '_OutlineColor': 'Outline Color 1',
+    }
+
+    hair_material_mapping = {
+        '_SpecularColor0': 'Specular Color',
+        '_SpecularRoughness0': 'Specular Roughness',
+        '_SpecularIntensity0': 'Specular Intensity',
+        '_SpecularShininess0': 'Specular Shininess',
+    }
+
+    face_material_mapping = {
+        '_EyeShadowColor': 'Eye Shadow Color',
+        '_ShadowColor': 'Warm Shadow Color',
+        '_DarkColor': 'Cool Shadow Color',
+        '_NoseLinePower': 'Nose Line Power',
+        '_NoseLineColor': 'Nose Line Color',
+    }
+
+    local_material_mapping = {
+        '_SpecularColor0': 'Specular Color 1',
+        '_SpecularColor1': 'Specular Color 2',
+        '_SpecularColor2': 'Specular Color 3',
+        '_SpecularColor3': 'Specular Color 4',
+        '_SpecularColor4': 'Specular Color 5',
+        '_SpecularColor5': 'Specular Color 6',
+        '_SpecularColor6': 'Specular Color 7',
+        '_SpecularColor7': 'Specular Color 8',
+        '_SpecularRoughness0': 'Specular Roughness 1',
+        '_SpecularRoughness1': 'Specular Roughness 2',
+        '_SpecularRoughness2': 'Specular Roughness 3',
+        '_SpecularRoughness3': 'Specular Roughness 4',
+        '_SpecularRoughness4': 'Specular Roughness 5',
+        '_SpecularRoughness5': 'Specular Roughness 6',
+        '_SpecularRoughness6': 'Specular Roughness 7',
+        '_SpecularRoughness7': 'Specular Roughness 8',
+        '_SpecularIntensity0': 'Specular Intensity 1',
+        '_SpecularIntensity1': 'Specular Intensity 2',
+        '_SpecularIntensity2': 'Specular Intensity 3',
+        '_SpecularIntensity3': 'Specular Intensity 4',
+        '_SpecularIntensity4': 'Specular Intensity 5',
+        '_SpecularIntensity5': 'Specular Intensity 6',
+        '_SpecularIntensity6': 'Specular Intensity 7',
+        '_SpecularIntensity7': 'Specular Intensity 8',
+        '_SpecularShininess0': 'Specular Shininess 1',
+        '_SpecularShininess1': 'Specular Shininess 2',
+        '_SpecularShininess2': 'Specular Shininess 3',
+        '_SpecularShininess3': 'Specular Shininess 4',
+        '_SpecularShininess4': 'Specular Shininess 5',
+        '_SpecularShininess5': 'Specular Shininess 6',
+        '_SpecularShininess6': 'Specular Shininess 7',
+        '_SpecularShininess7': 'Specular Shininess 8',
+        '_Stockcolor': 'Stockings Color',
+        '_StockDarkcolor': 'Stockings Darkened Color',
+        '_StockDarkWidth': 'Stockings Rim Width',
+        '_Stockpower': 'Stockings Power',
+        '_Stockpower1': 'Stockings Lighted Width',
+        '_StockSP': 'Stockings Lighted Intensity',
+        '_StockRoughness': 'Stockings Texture Intensity',
+        '_Stockthickness': 'Stockings Thickness',
+    }
+
+    shader_node_tree_node_name = 'Group.006'
+    outlines_node_tree_node_name = 'Group.006'
+
+    def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
+        super().__init__(material_data_parser, outline_material_group)
+
+        if 'Face' in self.material.name:
+            self.outline_mapping = self.face_outline_mapping
+
+    def set_up_mesh_material_data(self):
+        shader_node_tree_inputs = self.material.node_tree.nodes[self.shader_node_tree_node_name].inputs
+
+        if 'Hair' in self.material.name:
+            super().apply_material_data(
+                self.hair_material_mapping,
+                shader_node_tree_inputs,
+            )
+        elif 'Face' in self.material.name:
+            super().apply_material_data(
+                self.face_material_mapping,
+                shader_node_tree_inputs,
+            )
+            self.material.node_tree.nodes.get(self.shader_node_tree_node_name).inputs.get('Enable Emission').default_value = 1.0
+        else:
+            super().apply_material_data(
+                self.local_material_mapping,
+                shader_node_tree_inputs,
+            )
+

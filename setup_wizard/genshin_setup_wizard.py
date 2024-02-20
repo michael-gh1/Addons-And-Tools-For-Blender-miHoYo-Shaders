@@ -27,6 +27,24 @@ class GI_OT_GenshinSetupWizardUI(Operator, BasicSetupUIOperator):
         return {'FINISHED'}
 
 
+class HSR_OT_HonkaiStarRailSetupWizardUI(Operator, BasicSetupUIOperator):
+    '''Runs through entire setup process'''
+    bl_idname = 'honkai_star_rail.setup_wizard_ui'
+    bl_label = 'Honkai Star Rail: Setup Wizard (UI)'
+
+    def execute(self, context):
+        next_step_index = 0
+
+        NextStepInvoker().invoke(
+            next_step_index,
+            'invoke_next_step_ui', 
+            high_level_step_name=self.bl_idname if bpy.app.version >= (3,3,0) >= (3,3,0) \
+                else self.bl_idname + '_no_outlines',
+            game_type=self.game_type,
+        )
+        return {'FINISHED'}
+
+
 class PGR_OT_SetupWizardUI(Operator, BasicSetupUIOperator):
     '''Runs through entire setup process'''
     bl_idname = 'punishing_gray_raven.setup_wizard_ui'
@@ -140,6 +158,8 @@ def setup_dependencies():
         setup_wizard.misc_final_steps.GI_OT_FixTransformations,
         setup_wizard.set_up_head_driver.GI_OT_SetUpHeadDriver,
         setup_wizard.misc_operations.GI_OT_SetColorManagementToStandard,
+        setup_wizard.misc_operations.HYV_OT_SetUpScreenSpaceReflections,
+        setup_wizard.misc_operations.HYV_OT_VertexPaintFaceSeeThroughEffect,
         setup_wizard.misc_operations.GI_OT_DeleteSpecificObjects,
         setup_wizard.misc_operations.GI_OT_SetUpArmTwistBoneConstraints,
         setup_wizard.misc_operations.GI_OT_RenameShaderMaterials,
@@ -175,8 +195,9 @@ def unregister():
     from setup_wizard.genshin_import_material_data import GI_OT_GenshinImportMaterialData
     from setup_wizard.misc_final_steps import GI_OT_FixTransformations
     from setup_wizard.set_up_head_driver import GI_OT_SetUpHeadDriver
-    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, GI_OT_DeleteSpecificObjects, \
-        GI_OT_SetUpArmTwistBoneConstraints, GI_OT_RenameShaderMaterials
+    from setup_wizard.misc_operations import GI_OT_SetColorManagementToStandard, HYV_OT_SetUpScreenSpaceReflections, \
+        HYV_OT_VertexPaintFaceSeeThroughEffect, GI_OT_DeleteSpecificObjects, GI_OT_SetUpArmTwistBoneConstraints, \
+        GI_OT_RenameShaderMaterials
     from setup_wizard.join_meshes_on_armature.join_meshes_operator import GI_OT_JoinMeshesOnArmature
     from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_CharacterRiggerOperator
     from setup_wizard.character_rig_setup.rootshape_filepath_setter_operator import GI_OT_RootShape_FilePath_Setter_Operator
@@ -198,6 +219,8 @@ def unregister():
         GI_OT_FixTransformations,
         GI_OT_SetUpHeadDriver,
         GI_OT_SetColorManagementToStandard,
+        HYV_OT_SetUpScreenSpaceReflections,
+        HYV_OT_VertexPaintFaceSeeThroughEffect,
         GI_OT_DeleteSpecificObjects,
         GI_OT_RenameShaderMaterials,
         GI_OT_SetUpArmTwistBoneConstraints,

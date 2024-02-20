@@ -35,6 +35,10 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
     USE_LIGHTMAP_AO = 'Use Lightmap AO'
 
 
+class StellarToonShaderNodeNames(ShaderNodeNames):
+    MAIN_SHADER = 'Group.006'
+    BODY_SHADER = 'Group.006'
+
 class JaredNyts_PunishingGrayRavenNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.001'
     FACE_SHADER = 'Group'
