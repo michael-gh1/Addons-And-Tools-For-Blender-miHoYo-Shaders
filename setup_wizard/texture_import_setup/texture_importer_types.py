@@ -749,8 +749,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                             self.set_diffuse_texture(TextureType.BODY, body1_material, img)
                         if body2_material:
                             self.set_diffuse_texture(TextureType.BODY, body2_material, img)
-                            if body2_trans_material:
-                                self.set_diffuse_texture(TextureType.BODY, body2_trans_material, img)
+                        if body2_trans_material:
+                            self.set_diffuse_texture(TextureType.BODY, body2_trans_material, img)
 
                     if body_trans_material:
                         self.set_diffuse_texture(TextureType.BODY, body_trans_material, img)
@@ -766,8 +766,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                             self.set_lightmap_texture(TextureType.BODY, body1_material, img)
                         if body2_material:
                             self.set_lightmap_texture(TextureType.BODY, body2_material, img)
-                            if body2_trans_material:
-                                self.set_lightmap_texture(TextureType.BODY, body2_trans_material, img)
+                        if body2_trans_material:
+                            self.set_lightmap_texture(TextureType.BODY, body2_trans_material, img)
 
                     if body_trans_material:
                         self.set_lightmap_texture(TextureType.BODY, body_trans_material, img)
