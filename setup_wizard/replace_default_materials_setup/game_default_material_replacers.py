@@ -232,6 +232,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name == 'Body3':
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY3)
                     material_name = body_material.name
+                if mesh_body_part_name ==  'Body_Trans':
+                    body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY_TRANS) 
+                    material_name = body_material.name
                 if mesh_body_part_name ==  'Body2_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY2_TRANS) 
                     material_name = body_material.name
