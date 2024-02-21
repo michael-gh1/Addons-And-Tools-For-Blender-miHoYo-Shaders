@@ -523,6 +523,7 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
 
 class StellarToon_MaterialDataApplier(V2_MaterialDataApplier):
     outline_mapping = {
+        '_OutlineColorIntensity': 'Outline Intensity',
         '_OutlineColor0': 'Outline Color 1',
         '_OutlineColor1': 'Outline Color 2',
         '_OutlineColor2': 'Outline Color 3',
@@ -542,6 +543,8 @@ class StellarToon_MaterialDataApplier(V2_MaterialDataApplier):
         '_SpecularRoughness0': 'Specular Roughness',
         '_SpecularIntensity0': 'Specular Intensity',
         '_SpecularShininess0': 'Specular Shininess',
+        '_SpecularShadowOffset': 'Specular Shadow Offset',
+        '_SpecularShadowIntensity': 'Specular Shadow Intensity',
     }
 
     face_material_mapping = {
