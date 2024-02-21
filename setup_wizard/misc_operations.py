@@ -36,8 +36,12 @@ class HYV_OT_SetUpScreenSpaceReflections(Operator, CustomOperatorProperties):
     bl_label = 'HoYoverse: Set Up Screen Space Reflections'
 
     def execute(self, context):
-        bpy.context.scene.eevee.use_ssr = True
-        bpy.context.scene.eevee.use_ssr_refraction = True
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+        if shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+            bpy.context.scene.eevee.use_ssr = True
+            bpy.context.scene.eevee.use_ssr_refraction = True
 
         if self.next_step_idx:
             NextStepInvoker().invoke(
