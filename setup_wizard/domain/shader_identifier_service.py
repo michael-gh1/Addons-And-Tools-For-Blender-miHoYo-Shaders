@@ -6,7 +6,7 @@ from enum import Enum, auto
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
-from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames
 
 
 class GenshinImpactShaders(Enum):
@@ -78,22 +78,32 @@ class ShaderIdentifierService:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
     def get_shader_material_names_using_shader(self, shader: GenshinImpactShaders):
-        if shader == GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader == GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
             return V2_FestivityGenshinImpactMaterialNames
-        elif shader == GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+        elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
             return V3_BonnyFestivityGenshinImpactMaterialNames
+        elif shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+            return Nya222HonkaiStarRailShaderMaterialNames
+        elif shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+            return StellarToonShaderMaterialNames
+        elif shader is PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER:
+            return JaredNytsPunishingGrayRavenShaderMaterialNames
         else:
-            return V3_BonnyFestivityGenshinImpactMaterialNames
+            raise Exception(f'Unknown Shader: {shader}')
 
-    def get_shader_texture_node_names(self, game_type, materials, node_groups):
-        if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactTextureNodeNames
-        elif game_type == GameType.HONKAI_STAR_RAIL.name:
+    def get_shader_texture_node_names(self, shader):
+        if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or \
+            shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
+            shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                return GenshinImpactTextureNodeNames
+        elif shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
             return Nya222HonkaiStarRailTextureNodeNames
-        elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+        elif shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+            return StellarToonTextureNodeNames
+        elif shader is PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER:
             return JaredNytsPunishingGrayRavenTextureNodeNames
         else:
-            raise Exception(f'Unknown {GameType}: {game_type}')
+            raise Exception(f'Unknown Shader: {shader}')
 
 class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     V2_NAMES_OF_GENSHIN_MATERIALS = [
