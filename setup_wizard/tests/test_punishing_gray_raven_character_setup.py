@@ -87,6 +87,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             PunishingGrayRavenTestOperatorExecutioner('fix_transformations'),
             PunishingGrayRavenTestOperatorExecutioner('setup_head_driver'),
             PunishingGrayRavenTestOperatorExecutioner('set_color_management_to_standard'),
+            PunishingGrayRavenTestOperatorExecutioner('rename_shader_materials'),
             PunishingGrayRavenTestOperatorExecutioner('delete_specific_objects'),
             PunishingGrayRavenTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             PunishingGrayRavenTestOperatorExecutioner('join_meshes_on_armature'),
