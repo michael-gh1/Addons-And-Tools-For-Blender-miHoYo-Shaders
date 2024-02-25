@@ -247,7 +247,8 @@ class HSR_PT_UI_Finish_Setup_Menu(Panel):
             sub_layout,
             'hoyoverse.set_up_screen_space_reflections',
             'Enable SSR',
-            'SCENE'
+            'SCENE',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,
