@@ -136,13 +136,13 @@ class GameMaterialImporter:
                     filename=outline_node_group_name
                 )
 
-        light_direction_empties = [empty_name for empty_name in LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES 
-                                   if bpy.data.objects.get(empty_name)]
-        if not light_direction_empties:
-            bpy.ops.wm.append(
-                directory=os.path.join(object_file_path),
-                files=LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES_FILE_IMPORT
-            )
+        light_direction_empties_to_append = \
+            [empty_object for empty_object in LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES_FILE_IMPORT 
+             if not bpy.data.objects.get(empty_object.get('name'))]
+        bpy.ops.wm.append(
+            directory=os.path.join(object_file_path),
+            files=light_direction_empties_to_append
+        )
 
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse - Genshin Impact - Goo Engine v3.blend'
