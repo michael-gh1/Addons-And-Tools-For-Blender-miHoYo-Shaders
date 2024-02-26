@@ -636,6 +636,10 @@ def rig_character(
         if "f_" in bone.name or "thumb" in bone.name:
             bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
 
+    # Fix hand bones being rotated 90 degrees sideways and arm deformation bones being wonky
+    if "Loli" in obj.name:
+        metarm.edit_bones["upper_arm.L"].tail.y += .003
+        metarm.edit_bones["upper_arm.R"].tail.y += .003
 
     ##########  DETACH PHYSICS BONES,  
 
@@ -964,21 +968,29 @@ def rig_character(
         bpy.ops.object.mode_set(mode='POSE')
 
     # Function to automatically move a bone (if it exists) to the specified bone layer. pass in num+1 than layer desired.        
-    def move_bone(bone_name,to_layer):
+    def move_bone(bone_name,to_layers):
         armature =  bpy.context.active_object
         armature_data = armature.data
         
         if bone_name in armature_data.bones:
             bone = armature_data.bones[bone_name]
             
-            # Set to true only where in bone layer we care about
-            bone.layers = [i == to_layer-1 for i in range(32)]  # Whatever BL is, -1.
+            for i in range(32):
+                bone.layers[i] = False
+            
+            to_layers = [to_layers] if isinstance(to_layers, int) else to_layers
+            
+            for layer in to_layers:
+                bone.layers[layer] = True
+                print("enabling layer: " + str(layer) + " for " + bone_name)
+            
+
 
     if not is_version_4:
         # Put away every other bone to the physics layer (22)
         for bone in bpy.context.active_object.data.bones:
             if bone.layers[0]:  # Check if the bone is on layer face
-                move_bone(bone.name, 26)  # Move the bone to layer 23
+                move_bone(bone.name, 25)  # Move the bone to layer 23
             
     # Let's append our root_shape custom bones
     path_to_file = file_path + "/Collection"
@@ -2751,7 +2763,7 @@ def rig_character(
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------
-    def bone_to_layer(bone, layer, collection):
+    def bone_to_layer(bone, layer, collection, second_coll="None"):
         arm = bpy.context.object
         if bone in arm.data.bones:
             if is_version_4:
@@ -2760,8 +2772,10 @@ def rig_character(
                 else:
                     bpy.context.object.data.collections[collection].assign(bpy.context.object.data.bones[bone])
                     bpy.context.object.data.collections["Other"].unassign(bpy.context.object.data.bones[bone])
+                    if second_coll != "None":
+                        bpy.context.object.data.collections[second_coll].assign(bpy.context.object.data.bones[bone])                                                                                                
             else:
-                move_bone(bone,layer+1)
+                move_bone(bone,layer)
                 
     # Since we've looped through ever 4.0 bone to place in 'other' above, we'll have to do so as well for 3.6
     if not is_version_4:
@@ -2938,18 +2952,12 @@ def rig_character(
         bone_to_layer("upper_arm_ik.L", 7, "Arm.L (IK)")
         bone_to_layer("upper_arm_ik.R", 10, "Arm.R (IK)")
     
-    bone_to_layer("upper_arm_parent.R", 25, "Other")
-    bone_to_layer("upper_arm_parent.L", 25, "Other")
-    
     if use_leg_ik_poles:
         bone_to_layer("thigh_ik.L", 25, "Other")
         bone_to_layer("thigh_ik.R", 25, "Other")
     else:
         bone_to_layer("thigh_ik.L", 13, "Leg.L (IK)")
         bone_to_layer("thigh_ik.R", 16, "Leg.R (IK)")
-        
-    bone_to_layer("thigh_parent.R", 25, "Other")
-    bone_to_layer("thigh_parent.L", 25, "Other")
         
     try:
         bone_to_layer("+EyeBone L A01.001", 25, "Other")
@@ -2966,7 +2974,7 @@ def rig_character(
         bone_to_layer("eyetrack_R",25,"Other")
            
     # New bones, post append 
-    list_to_send_other = ["MCH-thigh_ik_target_sub.L","MCH-thigh_ik_target_sub.R","MCH-foot_ik_pivot.L","MCH-foot_ik_pivot.R","MCH-hand_ik_pivot.L","MCH-hand_ik_pivot.R","MCH-hand_ik_wrist.L","MCH-hand_ik_wrist.R","MCH-torso_pivot.002",]
+    list_to_send_other = ["MCH-thigh_ik_target_sub.L","MCH-thigh_ik_target_sub.R","MCH-foot_ik_pivot.L","MCH-foot_ik_pivot.R","MCH-hand_ik_pivot.L","MCH-hand_ik_pivot.R","MCH-hand_ik_wrist.L","MCH-hand_ik_wrist.R","MCH-torso_pivot.002","shoulder_driver.R","shoulder_driver.L","MCH-shoulder_follow.R","MCH-shoulder_follow.L"]
     
     fast_bone_move(list_to_send_other,25,"Other")
     
@@ -2979,15 +2987,15 @@ def rig_character(
     
     bone_to_layer("hand_ik.L",7,"Arm.L (IK)")
     bone_to_layer("hand_ik_wrist.L",26,"Offsets")
-    bone_to_layer("upper_arm_parent.L",7,"Arm.L (IK)")
+    bone_to_layer("upper_arm_parent.L",[7,8],"Arm.L (IK)","Arm.L (FK)")
     bone_to_layer("upper_arm_ik_target.L",7,"Arm.L (IK)")
-    bone_to_layer("shoulder.L",7,"Arm.L (IK)")
+    bone_to_layer("shoulder.L",[7,8],"Arm.L (IK)","Arm.L (FK)")
     
     bone_to_layer("hand_ik.R",10,"Arm.R (IK)")
-    bone_to_layer("upper_arm_parent.R",10,"Arm.R (IK)")
+    bone_to_layer("upper_arm_parent.R",[10,11],"Arm.R (IK)","Arm.R (FK)")
     bone_to_layer("hand_ik_wrist.R",26,"Offsets")
     bone_to_layer("upper_arm_ik_target.R",10,"Arm.R (IK)")
-    bone_to_layer("shoulder.R",10,"Arm.R (IK)")
+    bone_to_layer("shoulder.R",[10,11],"Arm.R (IK)","Arm.R (FK)")
     
     bone_to_layer("upper_arm_fk.L",8,"Arm.L (FK)")
     bone_to_layer("forearm_fk.L",8,"Arm.L (FK)")
@@ -2998,7 +3006,7 @@ def rig_character(
     bone_to_layer("hand_fk.R",11,"Arm.R (FK)")
     
     bone_to_layer("foot_ik.L",13,"Leg.L (IK)")
-    bone_to_layer("thigh_parent.L",13,"Leg.L (IK)")
+    bone_to_layer("thigh_parent.L",[13,14],"Leg.L (IK)","Leg.L (FK)")
     bone_to_layer("thigh_ik_target.L",13,"Leg.L (IK)")
     bone_to_layer("foot_ik_sub.L",26,"Offsets")
     bone_to_layer("foot_spin_ik.L",13,"Leg.L (IK)")
@@ -3010,7 +3018,7 @@ def rig_character(
     bone_to_layer("toe_fk.L",14,"Leg.L (FK)")
     
     bone_to_layer("foot_ik.R",16,"Leg.R (IK)")
-    bone_to_layer("thigh_parent.R",16,"Leg.R (IK)")    
+    bone_to_layer("thigh_parent.R",[16,17],"Leg.R (IK)","Leg.R (FK)")    
     bone_to_layer("thigh_ik_target.R",16,"Leg.R (IK)")
     bone_to_layer("foot_ik_sub.R",26,"Offsets")
     bone_to_layer("foot_spin_ik.R",16,"Leg.R (IK)")
