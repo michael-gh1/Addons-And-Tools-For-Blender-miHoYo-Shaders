@@ -242,6 +242,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if 'Weapon' in mesh_body_part_name:
                     weapon_material = self.create_weapon_materials(mesh_body_part_name)
                     material_name = weapon_material.name
+                if 'Handbag' in mesh_body_part_name:
+                    handbag_material = self.create_weapon_materials(mesh_body_part_name)
+                    material_name = handbag_material.name
 
                 honkai_star_rail_material = bpy.data.materials.get(
                     f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
@@ -315,7 +318,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def create_weapon_materials(self, mesh_body_part_name):
         weapon_material_name = \
             f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}' if \
-            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' else \
+            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' or mesh_body_part_name == 'Handbag' else \
             f'{self.shader_material_names.WEAPON}'
         weapon_material = bpy.data.materials.get(weapon_material_name)
 
@@ -358,7 +361,7 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
     def create_weapon_materials(self, mesh_body_part_name):
         weapon_material_name = \
             f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}' if \
-            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' else \
+            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' or mesh_body_part_name == 'Handbag' else \
             f'{self.shader_material_names.WEAPON}'
         weapon_material = bpy.data.materials.get(weapon_material_name)
 

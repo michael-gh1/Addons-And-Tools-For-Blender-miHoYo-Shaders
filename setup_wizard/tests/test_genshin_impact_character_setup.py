@@ -86,6 +86,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('fix_transformations'),
             GenshinImpactTestOperatorExecutioner('setup_head_driver'),
             GenshinImpactTestOperatorExecutioner('set_color_management_to_standard'),
+            GenshinImpactTestOperatorExecutioner('rename_shader_materials'),
             GenshinImpactTestOperatorExecutioner('delete_specific_objects'),
             GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             GenshinImpactTestOperatorExecutioner('join_meshes_on_armature'),

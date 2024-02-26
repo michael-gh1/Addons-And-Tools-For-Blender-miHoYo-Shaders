@@ -127,6 +127,17 @@ class GameMaterialDataImporter(ABC):
         )
         return material_data_file_finder
 
+    def validate_UI_inputs_for_targeted_material_data_import(self):
+        if self.material and not self.outlines_material:
+            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Outlines Material" input')
+        elif not self.material and self.outlines_material:
+            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Target Material" input')
+
+    def validate_num_of_file_inputs_for_targeted_material_data_import(self, material_data_files):
+        num_of_files = len(material_data_files)
+        if self.material and self.outlines_material and num_of_files != 1:
+            raise UserInputException(f'\n\n>>> Select only 1 material data file to apply to the material. You selected {num_of_files} material data files to apply on 1 material.')
+
 
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
@@ -165,7 +176,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         self.material_names = material_names
 
     def import_material_data(self):
-        self.__validate_UI_inputs_for_targeted_material_data_import()
+        self.validate_UI_inputs_for_targeted_material_data_import()
         material_data_file_finder: MaterialDataFileFinder = self.get_material_data_files()
 
         caller_is_advanced_setup = self.blender_operator.setup_mode == 'ADVANCED'
@@ -182,7 +193,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             )
             return {'SKIP'}
 
-        self.__validate_num_of_file_inputs_for_targeted_material_data_import(material_data_file_finder.material_data_files)
+        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_file_finder.material_data_files)
 
         for file in material_data_file_finder.material_data_files:
             body_part = None
@@ -224,17 +235,6 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             self.apply_material_data(body_part, material_data_appliers)
         return {'FINISHED'}
 
-    def __validate_UI_inputs_for_targeted_material_data_import(self):
-        if self.material and not self.outlines_material:
-            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Outlines Material" input')
-        elif not self.material and self.outlines_material:
-            raise UserInputException(f'\n\n>>> Targeted Material Data Import: Missing "Target Material" input')
-
-    def __validate_num_of_file_inputs_for_targeted_material_data_import(self, material_data_files):
-        num_of_files = len(material_data_files)
-        if self.material and self.outlines_material and num_of_files != 1:
-            raise UserInputException(f'\n\n>>> Select only 1 material data file to apply to the material. You selected {num_of_files} material data files to apply on 1 material.')
-
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
     def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
@@ -250,10 +250,13 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         self.material_names = material_names
 
     def import_material_data(self):
+        self.validate_UI_inputs_for_targeted_material_data_import()
         material_data_file_finder: MaterialDataFileFinder = self.get_material_data_files()
 
-        if not material_data_file_finder.material_data_directory_exists and \
-            (not self.blender_operator.filepath or not self.blender_operator.files):
+        caller_is_advanced_setup = self.blender_operator.setup_mode == 'ADVANCED'
+        no_material_data_files = not material_data_file_finder.material_data_directory_exists and \
+            (not self.blender_operator.filepath or not self.blender_operator.files)
+        if caller_is_advanced_setup or no_material_data_files:
             bpy.ops.genshin.import_material_data(
                 'INVOKE_DEFAULT',
                 next_step_idx=self.blender_operator.next_step_idx, 
@@ -263,6 +266,8 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 game_type=self.blender_operator.game_type,
             )
             return {'SKIP'}
+
+        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_file_finder.material_data_files)
 
         for file in material_data_file_finder.material_data_files:
             is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'

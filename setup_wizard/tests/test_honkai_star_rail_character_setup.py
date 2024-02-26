@@ -84,8 +84,10 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             HonkaiStarRailTestOperatorExecutioner('set_color_management_to_standard'),
             HonkaiStarRailTestOperatorExecutioner('set_up_screen_space_reflections'),
             HonkaiStarRailTestOperatorExecutioner('vertex_paint_face_see_through_effect'),
+            HonkaiStarRailTestOperatorExecutioner('rename_shader_materials'),
             HonkaiStarRailTestOperatorExecutioner('delete_specific_objects'),
             HonkaiStarRailTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
+            HonkaiStarRailTestOperatorExecutioner('join_meshes_on_armature'),
         ]
 
         for operator in operators:

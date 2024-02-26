@@ -24,6 +24,7 @@ class ShaderMaterialNames:
     WEAPON = ''
     WEAPON01 = ''
     WEAPON02 = ''
+    HANDBAG = ''  # Sampo
     # HSR: StellarToon
     BASE = ''
     BASE_OUTLINES = ''
@@ -86,6 +87,7 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
     WEAPON01 = f'{MATERIAL_PREFIX}Weapon01'
     WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
+    HANDBAG = f'{MATERIAL_PREFIX}Handbag'
 
 
 class StellarToonShaderMaterialNames(ShaderMaterialNames):
@@ -115,6 +117,7 @@ class StellarToonShaderMaterialNames(ShaderMaterialNames):
     WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
     WEAPON01 = f'{MATERIAL_PREFIX}Weapon01'
     WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
+    HANDBAG = f'{MATERIAL_PREFIX}Handbag'
 
 
 class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):

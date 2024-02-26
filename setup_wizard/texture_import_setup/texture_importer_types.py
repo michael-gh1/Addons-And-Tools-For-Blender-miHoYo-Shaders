@@ -721,6 +721,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 weapon01_material = bpy.data.materials.get(self.material_names.WEAPON01)
                 weapon02_material = bpy.data.materials.get(self.material_names.WEAPON02)
                 weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material]
+                handbag_material = bpy.data.materials.get(self.material_names.HANDBAG)
 
                 # Implement the texture in the correct node
                 print(f'INFO: Importing texture {file} using {self.__class__.__name__}')
@@ -854,6 +855,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Weapon', 'Ramp'], file):
                     # Set Weapon Ramp, if none exists use Body Ramp
                     self.set_weapon_ramp_texture(img, override=True)
+
+                elif self.is_texture_identifiers_in_texture_name(['Handbag', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.WEAPON, handbag_material, img)
+                
+                elif self.is_texture_identifiers_in_texture_name(['Handbag', 'Lightmap'], file):
+                    self.set_lightmap_texture(TextureType.WEAPON, handbag_material, img)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')
