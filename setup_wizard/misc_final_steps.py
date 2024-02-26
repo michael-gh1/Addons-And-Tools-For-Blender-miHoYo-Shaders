@@ -13,6 +13,12 @@ class GI_OT_FinishSetup(Operator, BasicSetupUIOperator):
     bl_label = 'Genshin: Finish Setup (UI)'
 
 
+class HSR_OT_FinishSetup(Operator, BasicSetupUIOperator):
+    '''Finish Setup'''
+    bl_idname = 'honkai_star_rail.finish_setup'
+    bl_label = 'Honkai Star Rail: Finish Setup (UI)'
+
+
 class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
     '''Makes the Character Upright and Fixes Scale'''
     bl_idname = 'genshin.fix_transformations'

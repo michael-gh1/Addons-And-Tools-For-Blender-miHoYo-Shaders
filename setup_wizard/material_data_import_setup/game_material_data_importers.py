@@ -243,7 +243,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 high_level_step_name=self.blender_operator.high_level_step_name,
                 game_type=self.blender_operator.game_type,
             )
-            return {'FINISHED'}
+            return {'SKIP'}
 
         for file in self.blender_operator.files:
             is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'
@@ -274,6 +274,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 character_type
             )
             self.apply_material_data(body_part, material_data_appliers)
+        return {'FINISHED'}
 
 
 # Unused.

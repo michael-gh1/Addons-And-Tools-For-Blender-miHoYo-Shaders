@@ -82,6 +82,8 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             HonkaiStarRailTestOperatorExecutioner('fix_transformations'),
             HonkaiStarRailTestOperatorExecutioner('setup_head_driver'),
             HonkaiStarRailTestOperatorExecutioner('set_color_management_to_standard'),
+            HonkaiStarRailTestOperatorExecutioner('set_up_screen_space_reflections'),
+            HonkaiStarRailTestOperatorExecutioner('vertex_paint_face_see_through_effect'),
             HonkaiStarRailTestOperatorExecutioner('delete_specific_objects'),
             HonkaiStarRailTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
         ]

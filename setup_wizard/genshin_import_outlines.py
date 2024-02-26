@@ -21,6 +21,12 @@ class GI_OT_SetUpOutlines(Operator, BasicSetupUIOperator):
     bl_label = 'Genshin: Set Up Outlines (UI)'
 
 
+class HSR_OT_SetUpOutlines(Operator, BasicSetupUIOperator):
+    '''Sets Up Outlines'''
+    bl_idname = 'honkai_star_rail.set_up_outlines'
+    bl_label = 'Honkai Star Rail: Set Up Outlines (UI)'
+
+
 class GI_OT_GenshinImportOutlines(Operator, ImportHelper, CustomOperatorProperties):
     """Select the .blend file with the outlines node group to import"""
     bl_idname = "genshin.import_outlines"  # important since its how we chain file dialogs

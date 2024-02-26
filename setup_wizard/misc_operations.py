@@ -5,8 +5,8 @@ import bpy
 from bpy.types import Material, Operator
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_identifier_service import ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, ShaderMaterialNames
+from setup_wizard.domain.shader_identifier_service import HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, ShaderMaterialNames, StellarToonShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames
@@ -28,6 +28,98 @@ class GI_OT_SetColorManagementToStandard(Operator, CustomOperatorProperties):
                 game_type=self.game_type,
             )
         return {'FINISHED'}
+
+
+class HYV_OT_SetUpScreenSpaceReflections(Operator, CustomOperatorProperties):
+    '''Sets Up Screen Space Reflections'''
+    bl_idname = 'hoyoverse.set_up_screen_space_reflections'
+    bl_label = 'HoYoverse: Set Up Screen Space Reflections'
+
+    def execute(self, context):
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+        if shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+            bpy.context.scene.eevee.use_ssr = True
+            bpy.context.scene.eevee.use_ssr_refraction = True
+
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
+        return {'FINISHED'}
+
+
+class HYV_OT_VertexPaintFaceSeeThroughEffect(Operator, CustomOperatorProperties):
+    '''Vertex Paint Face'''
+    bl_idname = 'hoyoverse.vertex_paint_face_see_through_effect'
+    bl_label = 'HoYoverse: Vertex Paint Face for See Through Effect'
+
+    def execute(self, context):
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        self.shader_material_names = Nya222HonkaiStarRailShaderMaterialNames if \
+            shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER else \
+            StellarToonShaderMaterialNames
+
+        face_object = bpy.data.objects.get('Face')
+        face_mesh: bpy.types.Mesh = bpy.data.meshes.get('Face')
+
+        if shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER and face_mesh:
+            color_color_attribute = face_mesh.color_attributes.get('Color')
+            start_mode = bpy.context.object.mode
+
+            if not color_color_attribute:
+                color_color_attribute = face_mesh.color_attributes.new(
+                    name='Color',
+                    type='FLOAT_COLOR',
+                    domain='POINT'
+                )
+                for v_index in range(len(face_object.data.vertices)):
+                    color_color_attribute.data[v_index].color = [0, 0, 0, 1]
+            face_mesh.attributes.active_color = color_color_attribute
+
+            col_color_attribute = face_mesh.vertex_colors.get('Col')
+            col_color_attribute.active_render = True
+
+            bpy.context.view_layer.objects.active = face_object
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.select_mode(type='FACE')
+
+            # Try first slot as a best guess (Screwllum has Body1 material in Face mesh)
+            face_material_slot = face_object.material_slots.get(self.shader_material_names.FACE) or face_object.material_slots[0]
+            face_object.active_material_index = face_material_slot.slot_index
+
+            bpy.ops.mesh.select_all(action='DESELECT')
+            bpy.ops.object.material_slot_select()
+
+            bpy.ops.paint.vertex_paint_toggle()
+            face_mesh.use_paint_mask = True
+            bpy.data.brushes["Draw"].color = (1, 1, 1)
+            bpy.ops.paint.vertex_color_set()
+
+            bpy.ops.object.mode_set(mode=start_mode)
+            self.__replace_eyeshadow_material()
+
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
+        return {'FINISHED'}
+
+    def __replace_eyeshadow_material(self):
+        face_mesh = bpy.data.objects.get('Face')
+        face_mesh_material_slots = face_mesh.material_slots
+
+        for material_slot in face_mesh_material_slots:
+            if 'EyeShadow' in material_slot.material.name:
+                material_slot.material = bpy.data.materials.get(self.shader_material_names.FACE)
 
 
 class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):

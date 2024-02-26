@@ -20,7 +20,16 @@ class ShaderMaterialNames:
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    # HSR
     WEAPON = ''
+    WEAPON01 = ''
+    WEAPON02 = ''
+    # HSR: StellarToon
+    BASE = ''
+    BASE_OUTLINES = ''
+    HAIR_OUTLINES = ''
+    FACE_OUTLINES = ''
+    WEAPON_OUTLINES = ''
     # PGR
     ALPHA = ''
     EYE = ''
@@ -60,22 +69,52 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
+
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
-    BODY = 'HSR - Body'
-    BODY1 = 'HSR - Body1'
-    BODY2 = 'HSR - Body2'
-    BODY3 = 'HSR - Body3'
-    BODY_TRANS = 'HSR - Body_Trans'
-    BODY2_TRANS = 'HSR - Body2_Trans'
-    HAIR = 'HSR - Hair'
-    FACE = 'HSR - Face'
-    EYESHADOW = 'HSR - EyeShadow'
-    OUTLINES = 'HSR - Outlines'
-    WEAPON = 'HSR - Weapon'
+    BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
+    BODY3 = f'{MATERIAL_PREFIX}Body3'
+    BODY_TRANS = f'{MATERIAL_PREFIX}Body_Trans'
+    BODY2_TRANS = f'{MATERIAL_PREFIX}Body2_Trans'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    EYESHADOW = f'{MATERIAL_PREFIX}EyeShadow'
+    OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    WEAPON = f'{MATERIAL_PREFIX}Weapon'
     WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
-    WEAPON01 = 'HSR - Weapon01'
-    WEAPON02 = 'HSR - Weapon02'
+    WEAPON01 = f'{MATERIAL_PREFIX}Weapon01'
+    WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
+
+
+class StellarToonShaderMaterialNames(ShaderMaterialNames):
+    # Shader Materials
+    MATERIAL_PREFIX = 'StellarToon - '
+    BASE = f'{MATERIAL_PREFIX}Base'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    WEAPON = f'{MATERIAL_PREFIX}Weapon'
+    BASE_OUTLINES = f'{MATERIAL_PREFIX}Base Outlines'
+    OUTLINES = BASE_OUTLINES
+    HAIR_OUTLINES = f'{MATERIAL_PREFIX}Hair Outlines'
+    FACE_OUTLINES = f'{MATERIAL_PREFIX}Face Outlines'
+    WEAPON_OUTLINES = f'{MATERIAL_PREFIX}Weapon Outlines'
+
+    # Game Materials
+    BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
+    BODY3 = f'{MATERIAL_PREFIX}Body3'
+    BODY_TRANS = f'{MATERIAL_PREFIX}Body_Trans'
+    BODY2_TRANS = f'{MATERIAL_PREFIX}Body2_Trans'
+    HAIR = f'{MATERIAL_PREFIX}Hair'
+    FACE = f'{MATERIAL_PREFIX}Face'
+    EYESHADOW = f'{MATERIAL_PREFIX}EyeShadow'
+    WEAPON = f'{MATERIAL_PREFIX}Weapon'
+    WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
+    WEAPON01 = f'{MATERIAL_PREFIX}Weapon01'
+    WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
 
 
 class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):

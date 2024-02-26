@@ -6,12 +6,14 @@ class LightDirectionEmptyNames:
     HEAD_FORWARD = 'Head Forward'
     HEAD_UP = 'Head Up'
     LIGHT_DIRECTION = 'Light Direction'
+    MAIN_LIGHT_DIRECTION = 'Main Light Direction'
 
     LIGHT_DIRECTION_EMPTIES = [
         HEAD_ORIGIN,
         HEAD_FORWARD,
         HEAD_UP,
-        LIGHT_DIRECTION
+        LIGHT_DIRECTION,
+        MAIN_LIGHT_DIRECTION,
     ]
 
     LIGHT_DIRECTION_EMPTIES_FILE_IMPORT = [
@@ -19,4 +21,5 @@ class LightDirectionEmptyNames:
         {'name': HEAD_FORWARD},
         {'name': HEAD_UP},
         {'name': LIGHT_DIRECTION},
+        {'name': MAIN_LIGHT_DIRECTION},
     ]

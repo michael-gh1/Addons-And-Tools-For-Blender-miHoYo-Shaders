@@ -10,7 +10,7 @@ from bpy.types import Operator, PropertyGroup
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
 
 from setup_wizard.import_order import NextStepInvoker
-from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporterFactory
+from setup_wizard.material_data_import_setup.game_material_data_importers import GameMaterialDataImporter, GameMaterialDataImporterFactory
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 WEAPON_NAME_IDENTIFIER = 'Mat'
@@ -56,7 +56,7 @@ class GI_OT_GenshinImportMaterialData(Operator, ImportHelper, CustomOperatorProp
         try:
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(selected_material, outlines_material)
 
-            game_material_data_importer = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
+            game_material_data_importer: GameMaterialDataImporter = GameMaterialDataImporterFactory.create(self.game_type, self, context, outline_material_group)
             status = game_material_data_importer.import_material_data()
 
             self.report({'INFO'}, 'Imported material data')

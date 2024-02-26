@@ -25,7 +25,7 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
         run_entire_setup_column = sub_layout.column()
         OperatorFactory.create(
             run_entire_setup_column,
-            'genshin.setup_wizard_ui',
+            'honkai_star_rail.setup_wizard_ui',
             'Run Entire Setup',
             'PLAY',
             game_type=GameType.HONKAI_STAR_RAIL.name
@@ -57,7 +57,7 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         set_up_character_column = sub_layout.column()
         OperatorFactory.create(
             set_up_character_column,
-            'genshin.set_up_character',
+            'honkai_star_rail.set_up_character',
             'Set Up Character',
             icon='OUTLINER_OB_ARMATURE',
             game_type=GameType.HONKAI_STAR_RAIL.name,
@@ -66,7 +66,7 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
 
         OperatorFactory.create(
             sub_layout,
-            'genshin.set_up_materials',
+            'honkai_star_rail.set_up_materials',
             'Set Up Materials',
             icon='MATERIAL',
             game_type=GameType.HONKAI_STAR_RAIL.name,
@@ -74,7 +74,7 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         if bpy.app.version >= (3,3,0):
             OperatorFactory.create(
                 sub_layout,
-                'genshin.set_up_outlines',
+                'honkai_star_rail.set_up_outlines',
                 'Set Up Outlines',
                 icon='GEOMETRY_NODES',
                 game_type=GameType.HONKAI_STAR_RAIL.name,
@@ -83,7 +83,7 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             layout.label(text='(Outlines Disabled < v3.3.0)')
         OperatorFactory.create(
             sub_layout,
-            'genshin.finish_setup',
+            'honkai_star_rail.finish_setup',
             'Finish Setup',
             icon='CHECKMARK',
             game_type=GameType.HONKAI_STAR_RAIL.name,
@@ -236,6 +236,19 @@ class HSR_PT_UI_Finish_Setup_Menu(Panel):
             'genshin.set_color_management_to_standard',
             'Set Color Mgmt to Standard',
             'SCENE'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.set_up_screen_space_reflections',
+            'Enable SSR',
+            'SCENE'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.vertex_paint_face_see_through_effect',
+            'Vertex Paint Face',
+            'VPAINT_HLT',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
         )
         OperatorFactory.create(
             sub_layout,

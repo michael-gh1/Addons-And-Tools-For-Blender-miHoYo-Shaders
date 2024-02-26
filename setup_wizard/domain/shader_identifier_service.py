@@ -5,7 +5,7 @@ from abc import abstractmethod
 from enum import Enum, auto
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames
 
 
@@ -13,6 +13,10 @@ class GenshinImpactShaders(Enum):
     V1_GENSHIN_IMPACT_SHADER = auto()
     V2_GENSHIN_IMPACT_SHADER = auto()
     V3_GENSHIN_IMPACT_SHADER = auto()
+
+class HonkaiStarRailShaders(Enum):
+    NYA222_HONKAI_STAR_RAIL_SHADER = auto()
+    STELLARTOON_HONKAI_STAR_RAIL_SHADER = auto()
 
 
 class PunishingGrayRavenShaders(Enum):
@@ -116,8 +120,25 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     def __init__(self):
         super().__init__()
 
-# Unused.
+
 class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
+    NYA222_NAMES_OF_SHADER_MATERIALS = [
+        Nya222HonkaiStarRailShaderMaterialNames.BODY1,
+        Nya222HonkaiStarRailShaderMaterialNames.FACE,
+        Nya222HonkaiStarRailShaderMaterialNames.HAIR,
+        Nya222HonkaiStarRailShaderMaterialNames.OUTLINES,
+    ]
+    STELLARTOON_NAMES_OF_SHADER_MATERIALS = [
+        StellarToonShaderMaterialNames.BASE,
+        StellarToonShaderMaterialNames.HAIR,
+        StellarToonShaderMaterialNames.FACE,
+        StellarToonShaderMaterialNames.WEAPON,
+    ]
+    material_lists_to_search_through = {
+        HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER: NYA222_NAMES_OF_SHADER_MATERIALS,
+        HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER: STELLARTOON_NAMES_OF_SHADER_MATERIALS
+    }
+
     def __init__(self):
         super().__init__()
 
