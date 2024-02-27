@@ -28,11 +28,11 @@ class MaterialDataFile:
         self.name = filename
 
 
-class MaterialDataFileFinder:
-    def __init__(self, material_data_directory_exists, directory_file_path, material_data_files):
-        self.material_data_directory_exists = material_data_directory_exists
-        self.directory_file_path = directory_file_path
-        self.material_data_files = material_data_files
+class MaterialDataDirectory:
+    def __init__(self, exists, file_path, files):
+        self.exists = exists
+        self.file_path = file_path
+        self.files = files
 
 
 class GameMaterialDataImporter(ABC):
@@ -120,12 +120,12 @@ class GameMaterialDataImporter(ABC):
         is_targeted_material_data_import = self.material and self.outlines_material
         material_data_files = self.blender_operator.files or (material_data_files if not is_targeted_material_data_import else None)
 
-        material_data_file_finder = MaterialDataFileFinder(
-            material_data_directory_exists=material_data_directory_exists,
-            directory_file_path=directory_file_path,
-            material_data_files=material_data_files,
+        material_data_directory = MaterialDataDirectory(
+            exists=material_data_directory_exists,
+            file_path=directory_file_path,
+            files=material_data_files,
         )
-        return material_data_file_finder
+        return material_data_directory
 
     def validate_UI_inputs_for_targeted_material_data_import(self):
         if self.material and not self.outlines_material:
@@ -177,10 +177,10 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
-        material_data_file_finder: MaterialDataFileFinder = self.get_material_data_files()
+        material_data_directory: MaterialDataDirectory = self.get_material_data_files()
 
         caller_is_advanced_setup = self.blender_operator.setup_mode == 'ADVANCED'
-        no_material_data_files = not material_data_file_finder.material_data_directory_exists and \
+        no_material_data_files = not material_data_directory.exists and \
             (not self.blender_operator.filepath or not self.blender_operator.files)
         if caller_is_advanced_setup or no_material_data_files:
             bpy.ops.genshin.import_material_data(
@@ -193,9 +193,9 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             )
             return {'SKIP'}
 
-        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_file_finder.material_data_files)
+        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_directory.files)
 
-        for file in material_data_file_finder.material_data_files:
+        for file in material_data_directory.files:
             body_part = None
 
             if 'Monster' in file.name:
@@ -212,7 +212,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
-            json_material_data = self.open_and_load_json_data(material_data_file_finder.directory_file_path, file)
+            json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
             material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
@@ -251,10 +251,10 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
-        material_data_file_finder: MaterialDataFileFinder = self.get_material_data_files()
+        material_data_directory: MaterialDataDirectory = self.get_material_data_files()
 
         caller_is_advanced_setup = self.blender_operator.setup_mode == 'ADVANCED'
-        no_material_data_files = not material_data_file_finder.material_data_directory_exists and \
+        no_material_data_files = not material_data_directory.exists and \
             (not self.blender_operator.filepath or not self.blender_operator.files)
         if caller_is_advanced_setup or no_material_data_files:
             bpy.ops.genshin.import_material_data(
@@ -267,9 +267,9 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
             )
             return {'SKIP'}
 
-        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_file_finder.material_data_files)
+        self.validate_num_of_file_inputs_for_targeted_material_data_import(material_data_directory.files)
 
-        for file in material_data_file_finder.material_data_files:
+        for file in material_data_directory.files:
             is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'
 
             body_part = 'Body_Trans' if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
@@ -277,7 +277,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 else PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
 
-            json_material_data = self.open_and_load_json_data(material_data_file_finder.directory_file_path, file)
+            json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
             material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
