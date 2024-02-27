@@ -808,7 +808,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
                 # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
-                # TODO: Sampo Hangbag (unknown other uses, previously this was to handle Svarog, but was updated)
+                # TODO: Unknown uses, previously this was to handle Svarog, but was updated)
                 elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
 
