@@ -13,6 +13,8 @@ COMPONENT_NAME = 'component_name'
 ENABLED = 'enabled'
 CACHE_KEY = 'cache_key'
 UI_ORDER_CONFIG_KEY = 'ui_order'
+BLENDER_ADDON_CONFIG_FILENAME = f'character_{__package__}.json'
+BLENDER_ADDON_CONFIG_FILEPATH = os.path.join(bpy.utils.user_resource('CONFIG'), BLENDER_ADDON_CONFIG_FILENAME)
 
 # Cache Constants
 FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
@@ -109,50 +111,47 @@ def invoke_next_step_ui(
         game_type=game_type,
     )
 
+def read_from_blender_cache():
+    try:
+        with open(BLENDER_ADDON_CONFIG_FILEPATH, 'r') as json_file:
+            print(f'Reading from user Blender config: {BLENDER_ADDON_CONFIG_FILEPATH}')
+            config = json.load(json_file)
+            print(f'Retrieved user Blender config')
+            return config
+    except FileNotFoundError as err:
+        return {}
+
 
 def get_cache(cache_enabled=True):
     if not cache_enabled:
         return {}
-    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
+    return read_from_blender_cache()
 
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
-    if not os.path.exists(cache_file_path):
-        return {}
-    cache_file = open(cache_file_path)
-    cache = json.load(cache_file)
-    return cache
-
+def write_to_blender_cache(config):
+    with open(BLENDER_ADDON_CONFIG_FILEPATH, 'w') as json_file:
+        print(f'Writing to user Blender config: {BLENDER_ADDON_CONFIG_FILEPATH}')
+        json_string = json.dumps(config, indent=4)
+        json_file.write(json_string)
+        print(f'Successfully wrote to user Blender config')
 
 def cache_previous_step_file_path(cache, last_step, file_path_to_cache):
     if not file_path_to_cache:
         return
-    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
     step_cache_key = last_step.get(CACHE_KEY)
 
     print(f'Assigning `{step_cache_key}:{file_path_to_cache}` in cache')
     cache[step_cache_key] = file_path_to_cache
-    with open(cache_file_path, 'w', encoding='utf-8') as f:
-        json.dump(cache, f, ensure_ascii=False, indent=4)
-
+    write_to_blender_cache(cache)
 
 def cache_using_cache_key(cache, cache_key, file_path_for_cache):
     if not file_path_for_cache:
         return
-    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
-
     print(f'Assigning `{cache_key}:{file_path_for_cache}` in cache')
     cache[cache_key] = file_path_for_cache
-    with open(cache_file_path, 'w', encoding='utf-8') as f:
-        json.dump(cache, f, ensure_ascii=False, indent=4)
-
+    write_to_blender_cache(cache)
 
 def clear_cache():
-    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
-    with open(cache_file_path, 'w') as f:
-        json.dump({}, f)
+    write_to_blender_cache({})
 
 
 def clear_cache(game_type: str):
@@ -183,12 +182,7 @@ def clear_cache(game_type: str):
             cache[NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
     else:
         cache = {}
-
-    path_to_setup_wizard_folder = os.path.dirname(os.path.abspath(__file__))
-    cache_file_path = f'{path_to_setup_wizard_folder}/cache.json.tmp'
-    with open(cache_file_path, 'w') as f:
-        json_string = json.dumps(cache, indent=4)
-        f.write(json_string)
+    write_to_blender_cache(cache)
 
 
 '''
