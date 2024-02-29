@@ -8,7 +8,7 @@ from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
-from setup_wizard.import_order import FESTIVITY_OUTLINES_FILE_PATH, JAREDNYTS_PGR_OUTLINES_FILE_PATH, NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH, \
+from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH, HONKAI_STAR_RAIL_OUTLINES_FILE_PATH, \
     NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.domain.game_types import GameType
 
@@ -46,7 +46,7 @@ class GenshinImpactOutlineNodeGroupImporter(GameOutlineNodeGroupImporter):
     def __init__(self, blender_operator, context, outlines_node_group_name):
         self.blender_operator = blender_operator
         self.context = context
-        self.outlines_file_path = FESTIVITY_OUTLINES_FILE_PATH  # Keep same filepath for all Genshin Impact
+        self.outlines_file_path = GENSHIN_IMPACT_OUTLINES_FILE_PATH  # Keep same filepath for all Genshin Impact
         self.outlines_node_group_names = outlines_node_group_name
 
     def import_outline_node_group(self):
@@ -86,7 +86,7 @@ class HonkaiStarRailOutlineNodeGroupImporter(GameOutlineNodeGroupImporter):
     def __init__(self, blender_operator, context, outlines_node_group_names):
         self.blender_operator = blender_operator
         self.context = context
-        self.outlines_file_path = NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH  # Keep same filepath for all HSR
+        self.outlines_file_path = HONKAI_STAR_RAIL_OUTLINES_FILE_PATH  # Keep same filepath for all HSR
         self.outlines_node_group_names = outlines_node_group_names
 
     def import_outline_node_group(self):
@@ -128,7 +128,7 @@ class PunishingGrayRavenOutlineNodeGroupImporter(GameOutlineNodeGroupImporter):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context
-        self.outlines_file_path = JAREDNYTS_PGR_OUTLINES_FILE_PATH
+        self.outlines_file_path = PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH
         self.outlines_node_group_names = \
             OutlineNodeGroupNames.V2_JAREDNYTS_PGR_OUTLINES + OutlineNodeGroupNames.V3_JAREDNYTS_PGR_OUTLINES
 

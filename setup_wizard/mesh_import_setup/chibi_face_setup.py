@@ -11,7 +11,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames
 from setup_wizard.geometry_nodes_setup.geometry_nodes_setups import PunishingGrayRavenGeometryNodesSetup
 
-from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH, NextStepInvoker
+from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH, NextStepInvoker
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache
 from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames
 
@@ -59,7 +59,7 @@ class PGR_OT_SetUpChibiFace(Operator, ImportHelper, CustomOperatorProperties):
     def __import_chibi_face_mesh(self, cache_enabled):
         user_selected_shader_blend_file_path = self.filepath if \
             self.filepath and not os.path.isdir(self.filepath) else \
-            get_cache(cache_enabled).get(JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH)
+            get_cache(cache_enabled).get(PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH)
 
         if not [material for material in bpy.data.materials if self.material_names.CHIBIFACE in material.name]:
             if not user_selected_shader_blend_file_path:
@@ -95,7 +95,7 @@ class PGR_OT_SetUpChibiFace(Operator, ImportHelper, CustomOperatorProperties):
 
             if cache_enabled and (user_selected_shader_blend_file_path):
                 if user_selected_shader_blend_file_path:
-                    cache_using_cache_key(get_cache(cache_enabled), JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH, user_selected_shader_blend_file_path)
+                    cache_using_cache_key(get_cache(cache_enabled), PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH, user_selected_shader_blend_file_path)
 
     def __parent_mesh_to_armature(self, chibi_face_mesh, character_armature):
         bpy.context.view_layer.objects.active = character_armature

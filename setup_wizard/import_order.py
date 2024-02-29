@@ -17,19 +17,22 @@ BLENDER_ADDON_CONFIG_FILENAME = f'character_{__package__}.json'
 BLENDER_ADDON_CONFIG_FILEPATH = os.path.join(bpy.utils.user_resource('CONFIG'), BLENDER_ADDON_CONFIG_FILENAME)
 
 # Cache Constants
-FESTIVITY_ROOT_FOLDER_FILE_PATH = 'festivity_root_folder_file_path'
-FESTIVITY_SHADER_FILE_PATH = "festivity_shader_file_path"
-FESTIVITY_OUTLINES_FILE_PATH = 'festivity_outlines_file_path'
-FESTIVITY_GRAN_TURISMO_FILE_PATH = 'festivity_gran_turismo_file_path'
-GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH = 'genshin_rigify_bone_shapes_file_path'
 CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
-NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'nya222_honkai_star_rail_folder_file_path'
-NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'nya222_honkai_star_rail_shader_file_path'
-NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'nya222_honkai_star_rail_outlines_file_path'
-JAREDNYTS_PGR_ROOT_FOLDER_FILE_PATH = 'jarednyts_pgr_folder_file_path'
-JAREDNYTS_PGR_SHADER_FILE_PATH = 'jarednyts_pgr_shader_file_path'
-JAREDNYTS_PGR_OUTLINES_FILE_PATH = 'jarednyts_pgr_outlines_file_path'
-JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH = 'jarednyts_pgr_chibi_mesh_file_path'
+
+GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH = 'genshin_impact_root_folder_file_path'
+GENSHIN_IMPACT_SHADER_FILE_PATH = "genshin_impact_shader_file_path"
+GENSHIN_IMPACT_OUTLINES_FILE_PATH = 'genshin_impact_outlines_file_path'
+GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH = 'genshin_impact_gran_turismo_file_path'
+GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH = 'genshin_rigify_bone_shapes_file_path'
+
+HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'honkai_star_rail_folder_file_path'
+HONKAI_STAR_RAIL_SHADER_FILE_PATH = 'honkai_star_rail_shader_file_path'
+HONKAI_STAR_RAIL_OUTLINES_FILE_PATH = 'honkai_star_rail_outlines_file_path'
+
+PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH = 'punishing_gray_raven_folder_file_path'
+PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH = 'punishing_gray_raven_shader_file_path'
+PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH = 'punishing_gray_raven_outlines_file_path'
+PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH = 'punishing_gray_raven_chibi_mesh_file_path'
 
 
 class NextStepInvoker:
@@ -157,29 +160,29 @@ def clear_cache():
 def clear_cache(game_type: str):
     cache = get_cache()
     if game_type == GameType.HONKAI_STAR_RAIL.name:
-        cached_gi_root_folder_file_path = cache.get(FESTIVITY_ROOT_FOLDER_FILE_PATH)
-        cached_gi_shader_file_path = cache.get(FESTIVITY_SHADER_FILE_PATH)
-        cached_gi_outlines_file_path = cache.get(FESTIVITY_OUTLINES_FILE_PATH)
+        cached_gi_root_folder_file_path = cache.get(GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH)
+        cached_gi_shader_file_path = cache.get(GENSHIN_IMPACT_SHADER_FILE_PATH)
+        cached_gi_outlines_file_path = cache.get(GENSHIN_IMPACT_OUTLINES_FILE_PATH)
         cache = {}
 
         if cached_gi_root_folder_file_path:
-            cache[FESTIVITY_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
+            cache[GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
         if cached_gi_shader_file_path:
-            cache[FESTIVITY_SHADER_FILE_PATH] = cached_gi_shader_file_path
+            cache[GENSHIN_IMPACT_SHADER_FILE_PATH] = cached_gi_shader_file_path
         if cached_gi_shader_file_path:
-            cache[FESTIVITY_OUTLINES_FILE_PATH] = cached_gi_outlines_file_path
+            cache[GENSHIN_IMPACT_OUTLINES_FILE_PATH] = cached_gi_outlines_file_path
     elif game_type == GameType.GENSHIN_IMPACT.name:
-        cached_hsr_root_folder_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
-        cached_hsr_shader_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH)
-        cached_hsr_outlines_file_path = cache.get(NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)
+        cached_hsr_root_folder_file_path = cache.get(HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
+        cached_hsr_shader_file_path = cache.get(HONKAI_STAR_RAIL_SHADER_FILE_PATH)
+        cached_hsr_outlines_file_path = cache.get(HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)
         cache = {}
 
         if cached_hsr_root_folder_file_path:
-            cache[NYA222_HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
+            cache[HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
         if cached_hsr_shader_file_path:
-            cache[NYA222_HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
+            cache[HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
         if cached_hsr_outlines_file_path:
-            cache[NYA222_HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
+            cache[HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
     else:
         cache = {}
     write_to_blender_cache(cache)

@@ -6,7 +6,7 @@ import os
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-from setup_wizard.import_order import cache_using_cache_key, get_cache, FESTIVITY_GRAN_TURISMO_FILE_PATH
+from setup_wizard.import_order import cache_using_cache_key, get_cache, GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
@@ -50,7 +50,7 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled
-        gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(FESTIVITY_GRAN_TURISMO_FILE_PATH)
+        gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH)
 
         if not bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree:
             self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up GT Tonemapper\n'
@@ -96,7 +96,7 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         if cache_enabled and gran_turismo_blend_file_path:
             cache_using_cache_key(
                 get_cache(cache_enabled), 
-                FESTIVITY_GRAN_TURISMO_FILE_PATH, 
+                GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH, 
                 gran_turismo_blend_file_path
             )
 
