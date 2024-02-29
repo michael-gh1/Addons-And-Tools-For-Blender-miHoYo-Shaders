@@ -159,32 +159,37 @@ def clear_cache():
 
 def clear_cache(game_type: str):
     cache = get_cache()
-    if game_type == GameType.HONKAI_STAR_RAIL.name:
-        cached_gi_root_folder_file_path = cache.get(GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH)
-        cached_gi_shader_file_path = cache.get(GENSHIN_IMPACT_SHADER_FILE_PATH)
-        cached_gi_outlines_file_path = cache.get(GENSHIN_IMPACT_OUTLINES_FILE_PATH)
-        cache = {}
+    if game_type == GameType.GENSHIN_IMPACT.name:
+        keys_to_delete = [
+            CHARACTER_MODEL_FOLDER_FILE_PATH,
+            GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH,
+            GENSHIN_IMPACT_SHADER_FILE_PATH,
+            GENSHIN_IMPACT_OUTLINES_FILE_PATH,
+            GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH,
+            GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH,
+        ]
+        for key in keys_to_delete:
+            cache.pop(key, None)
+    elif game_type == GameType.HONKAI_STAR_RAIL.name:
+        keys_to_delete = [
+            CHARACTER_MODEL_FOLDER_FILE_PATH,
+            HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH,
+            HONKAI_STAR_RAIL_SHADER_FILE_PATH,
+            HONKAI_STAR_RAIL_OUTLINES_FILE_PATH,
+        ]
+        for key in keys_to_delete:
+            cache.pop(key, None)
 
-        if cached_gi_root_folder_file_path:
-            cache[GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH] = cached_gi_root_folder_file_path
-        if cached_gi_shader_file_path:
-            cache[GENSHIN_IMPACT_SHADER_FILE_PATH] = cached_gi_shader_file_path
-        if cached_gi_shader_file_path:
-            cache[GENSHIN_IMPACT_OUTLINES_FILE_PATH] = cached_gi_outlines_file_path
-    elif game_type == GameType.GENSHIN_IMPACT.name:
-        cached_hsr_root_folder_file_path = cache.get(HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH)
-        cached_hsr_shader_file_path = cache.get(HONKAI_STAR_RAIL_SHADER_FILE_PATH)
-        cached_hsr_outlines_file_path = cache.get(HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)
-        cache = {}
-
-        if cached_hsr_root_folder_file_path:
-            cache[HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH] = cached_hsr_root_folder_file_path
-        if cached_hsr_shader_file_path:
-            cache[HONKAI_STAR_RAIL_SHADER_FILE_PATH] = cached_hsr_shader_file_path
-        if cached_hsr_outlines_file_path:
-            cache[HONKAI_STAR_RAIL_OUTLINES_FILE_PATH] = cached_hsr_outlines_file_path
-    else:
-        cache = {}
+    elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
+        keys_to_delete = [
+            CHARACTER_MODEL_FOLDER_FILE_PATH,
+            PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH,
+            PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH,
+            PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH,
+            PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH,
+        ]
+        for key in keys_to_delete:
+            cache.pop(key, None)
     write_to_blender_cache(cache)
 
 
