@@ -159,6 +159,8 @@ def clear_cache():
 
 def clear_cache(game_type: str):
     cache = get_cache()
+    keys_to_delete = []
+
     if game_type == GameType.GENSHIN_IMPACT.name:
         keys_to_delete = [
             CHARACTER_MODEL_FOLDER_FILE_PATH,
@@ -168,8 +170,6 @@ def clear_cache(game_type: str):
             GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH,
             GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH,
         ]
-        for key in keys_to_delete:
-            cache.pop(key, None)
     elif game_type == GameType.HONKAI_STAR_RAIL.name:
         keys_to_delete = [
             CHARACTER_MODEL_FOLDER_FILE_PATH,
@@ -177,9 +177,6 @@ def clear_cache(game_type: str):
             HONKAI_STAR_RAIL_SHADER_FILE_PATH,
             HONKAI_STAR_RAIL_OUTLINES_FILE_PATH,
         ]
-        for key in keys_to_delete:
-            cache.pop(key, None)
-
     elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
         keys_to_delete = [
             CHARACTER_MODEL_FOLDER_FILE_PATH,
@@ -188,8 +185,9 @@ def clear_cache(game_type: str):
             PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH,
             PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH,
         ]
-        for key in keys_to_delete:
-            cache.pop(key, None)
+
+    for key in keys_to_delete:
+        cache.pop(key, None)
     write_to_blender_cache(cache)
 
 
