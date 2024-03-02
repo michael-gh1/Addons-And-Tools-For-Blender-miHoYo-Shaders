@@ -10,6 +10,9 @@ class ShaderNodeNames:
     USE_LIGHTMAP_AO = ''
     DEPTH_BASED_RIM = ''
 
+    # StellarToon
+    ENABLE_STOCKINGS = ''
+
     # PGR
     MAIN_SHADER = ''
     USE_LUT = ''
@@ -38,6 +41,7 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
 class StellarToonShaderNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.006'
     BODY_SHADER = 'Group.006'
+    ENABLE_STOCKINGS = 'Enable Stockings'
 
 class JaredNyts_PunishingGrayRavenNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.001'

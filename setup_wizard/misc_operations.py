@@ -202,6 +202,9 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
         is_shader_common_diffuse_node_name = texture_node_names.DIFFUSE  # Nya222/PGR
 
         # StellarToon before common shaders is important!!!
+        # We need to check StellarToon before the others otherwise it may attempt to provide the incorrect
+        # body_diffuse_uv0_node_name, this is because texture_node_names.DIFFUSE is common across StellarToon AND
+        # other common diffuse node names.
         body_diffuse_uv0_node_name = \
             is_genshin_impact_diffuse_node_name or \
             is_stellartoon_diffuse_node_name or \

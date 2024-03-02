@@ -683,7 +683,8 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
                 stockings_body1_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
             if body_stockings_node:  # Stellartoon
                 body_stockings_node.image = img
-                material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get('Enable Stockings').default_value = 1.0
+                material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(
+                    StellarToonShaderNodeNames.ENABLE_STOCKINGS).default_value = 1.0
         else:
             stockings_body2_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP)
             if stockings_body2_node_group:  # Nya222
@@ -808,7 +809,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                     self.set_cool_shadow_ramp_texture(TextureType.BODY, img)
 
                 # Not Hair, so ramp must be Body. Only one ramp texture exists (no specific Warm or Cool ramp)
-                # TODO: Sampo Hangbag (unknown other uses, previously this was to handle Svarog, but was updated)
+                # TODO: Unknown uses, previously this was to handle Svarog, but was updated)
                 elif self.is_texture_identifiers_in_texture_name(['Ramp'], file) and \
                     not self.is_texture_identifiers_in_texture_name(['Weapon'], file):
 
