@@ -4,9 +4,9 @@ import logging
 import os
 import sys
 from pathlib import PurePath
-from setup_wizard.import_order import JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH
-from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
-    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, RIG_CHARACTER
+from setup_wizard.import_order import PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH, \
+    PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH, PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH
+from setup_wizard.tests.constants import RIG_CHARACTER
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import PunishingGrayRavenTestOperatorExecutioner
 
@@ -72,12 +72,12 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             PunishingGrayRavenTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             PunishingGrayRavenTestOperatorExecutioner('delete_empties'),
             PunishingGrayRavenTestOperatorExecutioner('import_materials', 
-                file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
-                filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
+                file_directory=config.get(PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH) or '',
+                filepath=config.get(PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH) or '',
             ),
             PunishingGrayRavenTestOperatorExecutioner('replace_default_materials'),
             PunishingGrayRavenTestOperatorExecutioner('import_character_textures'),
-            PunishingGrayRavenTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
+            PunishingGrayRavenTestOperatorExecutioner('import_outlines', filepath=config.get(PUNISHING_GRAY_RAVEN_OUTLINES_FILE_PATH)),
             PunishingGrayRavenTestOperatorExecutioner('setup_geometry_nodes'),
             PunishingGrayRavenTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
             # PunishingGrayRavenTestOperatorExecutioner('import_material_data', 
@@ -91,7 +91,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             PunishingGrayRavenTestOperatorExecutioner('delete_specific_objects'),
             PunishingGrayRavenTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             PunishingGrayRavenTestOperatorExecutioner('join_meshes_on_armature'),
-            PunishingGrayRavenTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
+            # PunishingGrayRavenTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
             PunishingGrayRavenTestOperatorExecutioner('rig_character', config=config),
             PunishingGrayRavenTestOperatorExecutioner('paint_vertex_colors'),
         ]
@@ -107,7 +107,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             operator.execute()
 
         chibi_operators = [
-            PunishingGrayRavenTestOperatorExecutioner('set_up_chibi_face_mesh', filepath=config.get(JAREDNYTS_PGR_CHIBI_MESH_FILE_PATH)),
+            PunishingGrayRavenTestOperatorExecutioner('set_up_chibi_face_mesh', filepath=config.get(PUNISHING_GRAY_RAVEN_CHIBI_MESH_FILE_PATH)),
             PunishingGrayRavenTestOperatorExecutioner('import_chibi_face_texture', file_directory=character_folder_file_path),
         ]
         if [material for material in bpy.data.materials if 'XDefaultMaterial' in material.name]:

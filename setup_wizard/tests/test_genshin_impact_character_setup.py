@@ -4,8 +4,9 @@ import logging
 import os
 import sys
 from pathlib import PurePath
-from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
-    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, RIG_CHARACTER
+from setup_wizard.tests.constants import RIG_CHARACTER
+from setup_wizard.import_order import GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, \
+    GENSHIN_IMPACT_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
 
@@ -71,12 +72,12 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             GenshinImpactTestOperatorExecutioner('delete_empties'),
             GenshinImpactTestOperatorExecutioner('import_materials', 
-                file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
-                filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
+                file_directory=config.get(GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH) or '',
+                filepath=config.get(GENSHIN_IMPACT_SHADER_FILE_PATH) or '',
             ),
             GenshinImpactTestOperatorExecutioner('replace_default_materials'),
             GenshinImpactTestOperatorExecutioner('import_character_textures'),
-            GenshinImpactTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
+            GenshinImpactTestOperatorExecutioner('import_outlines', filepath=config.get(GENSHIN_IMPACT_OUTLINES_FILE_PATH)),
             GenshinImpactTestOperatorExecutioner('setup_geometry_nodes'),
             GenshinImpactTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
             GenshinImpactTestOperatorExecutioner('import_material_data', 

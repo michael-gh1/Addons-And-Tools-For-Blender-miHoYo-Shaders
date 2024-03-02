@@ -4,8 +4,8 @@ import logging
 import os
 import sys
 from pathlib import PurePath
-from setup_wizard.tests.constants import FESTIVITY_ROOT_FOLDER_FILE_PATH, \
-    FESTIVITY_SHADER_FILE_PATH, FESTIVITY_OUTLINES_FILE_PATH
+from setup_wizard.import_order import HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, HONKAI_STAR_RAIL_SHADER_FILE_PATH, \
+    HONKAI_STAR_RAIL_OUTLINES_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import HonkaiStarRailTestOperatorExecutioner
 
@@ -67,12 +67,12 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             HonkaiStarRailTestOperatorExecutioner('import_character_model', file_directory=character_folder_file_path),
             HonkaiStarRailTestOperatorExecutioner('delete_empties'),
             HonkaiStarRailTestOperatorExecutioner('import_materials', 
-                file_directory=config.get(FESTIVITY_ROOT_FOLDER_FILE_PATH) or '',
-                filepath=config.get(FESTIVITY_SHADER_FILE_PATH) or '',
+                file_directory=config.get(HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH) or '',
+                filepath=config.get(HONKAI_STAR_RAIL_SHADER_FILE_PATH) or '',
             ),
             HonkaiStarRailTestOperatorExecutioner('replace_default_materials'),
             HonkaiStarRailTestOperatorExecutioner('import_character_textures'),
-            HonkaiStarRailTestOperatorExecutioner('import_outlines', filepath=config.get(FESTIVITY_OUTLINES_FILE_PATH)),
+            HonkaiStarRailTestOperatorExecutioner('import_outlines', filepath=config.get(HONKAI_STAR_RAIL_OUTLINES_FILE_PATH)),
             HonkaiStarRailTestOperatorExecutioner('setup_geometry_nodes'),
             HonkaiStarRailTestOperatorExecutioner('import_outline_lightmaps', file_directory=character_folder_file_path),
             HonkaiStarRailTestOperatorExecutioner('import_material_data', 
