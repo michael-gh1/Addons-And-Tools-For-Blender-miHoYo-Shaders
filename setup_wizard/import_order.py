@@ -13,7 +13,7 @@ COMPONENT_NAME = 'component_name'
 ENABLED = 'enabled'
 CACHE_KEY = 'cache_key'
 UI_ORDER_CONFIG_KEY = 'ui_order'
-BLENDER_ADDON_CONFIG_FILENAME = f'character_{__package__}.json'
+BLENDER_ADDON_CONFIG_FILENAME = f'character_setup_wizard.json'
 BLENDER_ADDON_CONFIG_FILEPATH = os.path.join(bpy.utils.user_resource('CONFIG'), BLENDER_ADDON_CONFIG_FILENAME)
 
 # Cache Constants
