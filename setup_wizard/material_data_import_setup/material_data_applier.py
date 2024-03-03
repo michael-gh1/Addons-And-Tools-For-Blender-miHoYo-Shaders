@@ -523,7 +523,7 @@ class V2_HSR_MaterialDataApplier(V2_MaterialDataApplier):
 
 class StellarToon_MaterialDataApplier(V2_MaterialDataApplier):
     outline_mapping = {
-        '_OutlineColorIntensity': 'Outline Intensity',
+        # '_OutlineColorIntensity': 'Outline Intensity',
         '_OutlineColor0': 'Outline Color 1',
         '_OutlineColor1': 'Outline Color 2',
         '_OutlineColor2': 'Outline Color 3',
