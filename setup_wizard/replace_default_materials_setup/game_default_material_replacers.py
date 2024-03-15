@@ -131,6 +131,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name
+        elif mesh_body_part_name and ('Screw' in mesh_body_part_name or 'Hat' in mesh_body_part_name):  # Aranaras
+            new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
+            material_name = new_material.name
         return material_name
 
     def __get_npc_mesh_body_part_name(self, material_name):
@@ -142,7 +145,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             return 'Body'
         elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
             return 'Dress'
-        elif 'Item' in material_name:
+        elif 'Item' in material_name or 'Screw' in material_name or 'Hat' in material_name:
             return material_name
         else:
             return None
