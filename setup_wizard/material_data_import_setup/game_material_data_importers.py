@@ -279,7 +279,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         for file in material_data_directory.files:
             is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'
 
-            body_part = 'Body_Trans' if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
+            body_part = PurePosixPath(file.name).stem.split('_Mat_')[1] if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
                 else PurePosixPath(file.name).stem.split('_')[-2] if is_firefly \
                 else PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
