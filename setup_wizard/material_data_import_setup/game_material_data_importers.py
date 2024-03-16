@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import json
 import os
 from pathlib import PurePosixPath
-from typing import List
+from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
@@ -74,12 +74,12 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
-    def find_material_and_outline_material_for_body_part(self, body_part) -> (Material, Material):
+    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_materials = [material for material in bpy.data.materials.values() if f' {body_part}' in material.name and 'Outlines' not in material.name]
+        searched_materials = [material for material in bpy.data.materials.values() if body_part in material.name and 'Outlines' not in material.name]
         searched_material = searched_materials[0] if searched_materials else None
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
@@ -87,7 +87,7 @@ class GameMaterialDataImporter(ABC):
         # 1. Outline Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_outlines_materials = [material for material in bpy.data.materials.values() if f' {body_part} Outlines' in material.name]
+        searched_outlines_materials = [material for material in bpy.data.materials.values() if body_part in material.name and ' Outlines' in material.name]
         searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
         outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
 

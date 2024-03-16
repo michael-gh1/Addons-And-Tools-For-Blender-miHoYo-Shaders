@@ -58,6 +58,8 @@ meshes_to_create_geometry_nodes_on = [
     'Helmet',
     'Wriothesley_Gauntlet_L_Model',
     'Wriothesley_Gauntlet_R_Model',
+    'Screw',  # Aranara
+    'Hat',  # Aranara
     # HSR
     'Hair',
     'Weapon',
@@ -277,10 +279,12 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
         self.set_face_outlines_material_default_values(self.material_names)
-        character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
-        character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
+        # Originally was just checked the meshes list, then we checked character meshes, then we went back to the original way
+        # Keeping this here in case we run into bugs
+        # character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
+        # character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
 
-        for mesh_name in character_armature_mesh_names:  # It is important that this is created and placed before Outlines!!
+        for mesh_name in meshes_to_create_geometry_nodes_on:  # It is important that this is created and placed before Outlines!!
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
@@ -336,6 +340,30 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             if bpy.data.materials.get(material_name) and bpy.data.materials.get(outline_material_name):
                 modifier[material_input_accessor] = bpy.data.materials.get(material_name)
                 modifier[outline_material_input_accessor] = bpy.data.materials.get(outline_material_name)
+
+        is_npc = [material for material in bpy.data.materials if 'NPC' in material.name]
+        if is_npc:
+            npc_outline_to_material_mapping = {
+                'Hat': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+                'Screw': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+            }
+
+            for input_name, (material_input_accessor, outline_material_input_accessor) in npc_outline_to_material_mapping.items():
+                shader_materials = [
+                    material for material_name, material in bpy.data.materials.items() if \
+                        input_name in material_name and 
+                        self.material_names.MATERIAL_PREFIX in material_name and 
+                        not ' Outlines' in material_name]
+                outline_materials = [
+                    material for material_name, material in bpy.data.materials.items() if \
+                        input_name in material_name and 
+                        self.material_names.MATERIAL_PREFIX in material_name and 
+                        ' Outlines' in material_name
+                ]
+
+                if shader_materials and outline_materials:
+                    modifier[material_input_accessor] = shader_materials[0]
+                    modifier[outline_material_input_accessor] = outline_materials[0]
 
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
