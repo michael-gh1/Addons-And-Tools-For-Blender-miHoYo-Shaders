@@ -7,9 +7,9 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
-from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
@@ -149,16 +149,20 @@ class GameMaterialDataImporter(ABC):
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            material_names = Nya222HonkaiStarRailShaderMaterialNames
+            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+                material_names = Nya222HonkaiStarRailShaderMaterialNames
+            else:
+                material_names = StellarToonShaderMaterialNames
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
@@ -294,7 +298,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                     f'Continuing to apply other material data, but: \n'
                     f'* Type: {character_type}\n'
                     f'* Material Data JSON "{file.name}" was selected, but unable to determine material to apply this to.\n'
-                    f'* Expected Materials "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}" and "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines"')
+                    f'* Expected Materials "{self.material_names.MATERIAL_PREFIX}{body_part}" and "{self.material_names.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
             material_data_parser = self.get_material_data_json_parser(json_material_data)
