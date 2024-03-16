@@ -79,7 +79,11 @@ class GameMaterialDataImporter(ABC):
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_materials = [material for material in bpy.data.materials.values() if body_part in material.name and 'Outlines' not in material.name]
+        searched_materials = [material for material in bpy.data.materials.values() if 
+                              body_part in material.name and 
+                              self.material_names.MATERIAL_PREFIX in material.name and
+                              'Outlines' not in material.name
+        ]
         searched_material = searched_materials[0] if searched_materials else None
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
@@ -87,7 +91,10 @@ class GameMaterialDataImporter(ABC):
         # 1. Outline Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_outlines_materials = [material for material in bpy.data.materials.values() if body_part in material.name and ' Outlines' in material.name]
+        searched_outlines_materials = [material for material in bpy.data.materials.values() if 
+                                       body_part in material.name and 
+                                       self.material_names.MATERIAL_PREFIX in material.name and
+                                       ' Outlines' in material.name]
         searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
         outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
 
