@@ -5,6 +5,7 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
 
@@ -110,6 +111,7 @@ class GameGeometryNodesSetupFactory:
 class GameGeometryNodesSetup(ABC):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
     DEFAULT_OUTLINE_THICKNESS = 0.25
+    ENABLE_TRANSPARENCY = 'Enable Transparency'
 
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
@@ -133,6 +135,9 @@ class GameGeometryNodesSetup(ABC):
                     new_outline_material = outline_material.copy()
                     new_outline_material.name = new_outline_name
                     new_outline_material.use_fake_user = True
+                if '_Trans' in new_outline_name and type(self) is StellarToonGeometryNodesSetup:
+                    new_outline_material = bpy.data.materials.get(new_outline_name)
+                    new_outline_material.node_tree.nodes.get(StellarToonShaderNodeNames.OUTLINES_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
 
     def set_face_outlines_material_default_values(self, game_material_names: ShaderMaterialNames):
         face_outlines_material = bpy.data.materials.get(f'{game_material_names.FACE} Outlines')

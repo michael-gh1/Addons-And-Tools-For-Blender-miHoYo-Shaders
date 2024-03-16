@@ -4,6 +4,7 @@ import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
+from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
@@ -337,6 +338,8 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
         'Face_Mask'
     ]
 
+    ENABLE_TRANSPARENCY = 'Enable Transparency'
+
     def __init__(self, blender_operator, context, material_names: ShaderMaterialNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
@@ -359,6 +362,7 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
             body_material = bpy.data.materials.get(self.shader_material_names.BASE).copy()
             body_material.name = material_name
             body_material.use_fake_user = True
+        body_material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
         return body_material
 
     def create_weapon_materials(self, mesh_body_part_name):
