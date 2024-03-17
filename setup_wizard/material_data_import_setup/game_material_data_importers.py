@@ -3,13 +3,13 @@ from abc import ABC, abstractmethod
 import json
 import os
 from pathlib import PurePosixPath
-from typing import List
+from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
-from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 
@@ -74,12 +74,16 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
-    def find_material_and_outline_material_for_body_part(self, body_part) -> (Material, Material):
+    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_materials = [material for material in bpy.data.materials.values() if f' {body_part}' in material.name and 'Outlines' not in material.name]
+        searched_materials = [material for material in bpy.data.materials.values() if 
+                              body_part in material.name and 
+                              self.material_names.MATERIAL_PREFIX in material.name and
+                              'Outlines' not in material.name
+        ] if body_part else []
         searched_material = searched_materials[0] if searched_materials else None
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
@@ -87,7 +91,11 @@ class GameMaterialDataImporter(ABC):
         # 1. Outline Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
-        searched_outlines_materials = [material for material in bpy.data.materials.values() if f' {body_part} Outlines' in material.name]
+        searched_outlines_materials = [material for material in bpy.data.materials.values() if 
+                                       body_part in material.name and 
+                                       self.material_names.MATERIAL_PREFIX in material.name and
+                                       ' Outlines' in material.name
+        ] if body_part else []
         searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
         outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
 
@@ -142,16 +150,20 @@ class GameMaterialDataImporter(ABC):
 class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = V2_FestivityGenshinImpactMaterialNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            material_names = Nya222HonkaiStarRailShaderMaterialNames
+            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+                material_names = Nya222HonkaiStarRailShaderMaterialNames
+            else:
+                material_names = StellarToonShaderMaterialNames
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
@@ -272,7 +284,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         for file in material_data_directory.files:
             is_firefly = PurePosixPath(file.name).stem.split('_')[-1] == 'D' or PurePosixPath(file.name).stem.split('_')[-1] == 'S'
 
-            body_part = 'Body_Trans' if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
+            body_part = PurePosixPath(file.name).stem.split('_Mat_')[1] if PurePosixPath(file.name).stem.split('_')[-1] == 'Trans' \
                 else PurePosixPath(file.name).stem.split('_')[-2] if is_firefly \
                 else PurePosixPath(file.name).stem.split('_')[-1]
             character_type = CharacterType.HSR_AVATAR
@@ -287,7 +299,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                     f'Continuing to apply other material data, but: \n'
                     f'* Type: {character_type}\n'
                     f'* Material Data JSON "{file.name}" was selected, but unable to determine material to apply this to.\n'
-                    f'* Expected Materials "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part}" and "{Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX}{body_part} Outlines"')
+                    f'* Expected Materials "{self.material_names.MATERIAL_PREFIX}{body_part}" and "{self.material_names.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
             material_data_parser = self.get_material_data_json_parser(json_material_data)

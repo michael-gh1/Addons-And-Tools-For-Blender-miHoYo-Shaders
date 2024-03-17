@@ -396,6 +396,12 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_UseLightMapColorAO': 'Use Lightmap AO',
         '_UseVertexColorAO': 'Use Vertex Color AO',
         '_MainTexAlphaCutoff': 'Transparency Cutoff',
+        '_Color': 'Color',
+        '_Color2': 'Color 2',
+        '_Color3': 'Color 3',
+        '_Color4': 'Color 4',
+        '_Color5': 'Color 5',
+        '_EmissionScaler': 'Emission Strength',
     }
 
     body_shader_node_tree_node_name = 'Body Shader'

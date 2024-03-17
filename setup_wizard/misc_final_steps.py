@@ -56,6 +56,18 @@ class GI_OT_FixTransformations(Operator, CustomOperatorProperties):
         #     use_proportional_projected=False
         # )  # from @M4urlcl0
 
+        bpy.ops.object.select_all(action='DESELECT')
+        is_aranara = [material for material in bpy.data.materials if 'Aranara' in material.name]
+        if is_aranara:
+            hat_object: bpy.types.Object = bpy.data.objects.get('Hat')
+            hat_object.select_set(True)
+            bpy.ops.transform.rotate(
+                value=-1.5708, 
+                orient_axis='X', 
+                orient_type='GLOBAL', 
+            )  # Could not seem to rotate the Mesh using transform_apply()
+
+
         if self.next_step_idx:
             NextStepInvoker().invoke(
                 self.next_step_idx, 

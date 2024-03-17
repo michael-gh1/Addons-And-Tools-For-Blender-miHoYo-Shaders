@@ -292,12 +292,6 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
         OperatorFactory.create(
             sub_layout,
-            'genshin.set_up_armtwist_bone_constraints',
-            'Set Up ArmTwist Bone Constraints',
-            'CONSTRAINT_BONE'
-        )
-        OperatorFactory.create(
-            sub_layout,
             'hoyoverse.join_meshes_on_armature',
             'Join Meshes on Armature',
             'RNA',
