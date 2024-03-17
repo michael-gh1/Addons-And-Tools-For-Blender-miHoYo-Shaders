@@ -494,7 +494,6 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Diffuse'], file):
-                    # material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
                     # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
                     item_materials = [material for material in bpy.data.materials if 
                                       material.name.split('_Mat')[0].replace(self.shader_material_names.MATERIAL_PREFIX, '') in file]
@@ -502,7 +501,6 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                         item_material = item_materials[0]
                         self.set_diffuse_texture(TextureType.BODY, item_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Lightmap'], file):
-                    # material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
                     # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
                     item_materials = [material for material in bpy.data.materials if 
                                       material.name.split('_Mat')[0].replace(self.shader_material_names.MATERIAL_PREFIX, '') in file]
