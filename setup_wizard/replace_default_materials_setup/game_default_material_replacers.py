@@ -236,8 +236,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name == 'Body3':
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY3)
                     material_name = body_material.name
-                if mesh_body_part_name ==  'Body_Trans':
+                if mesh_body_part_name ==  'Body_Trans' or mesh_body_part_name == 'Mat_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY_TRANS) 
+                    mesh_body_part_name = 'Body_Trans'
                     material_name = body_material.name
                 if mesh_body_part_name ==  'Body2_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY2_TRANS) 
@@ -294,6 +295,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             'Body2',
             'Body3',
             'Body_Trans',
+            'Mat_Trans',
             'Face',
             'EyeShadow',
             'Body',  # Important this is last in the list because it could interfere with Body1 and Body2
