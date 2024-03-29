@@ -8,6 +8,7 @@ class TextureNodeNames:
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
+    STOCKINGS_NODE_GROUP = ''
     STOCKINGS = ''
     BODY_WARM_RAMP_NODE_GROUP = ''
     BODY_WARM_RAMP = ''

@@ -494,7 +494,6 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                     self.set_metalmap_texture(img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Diffuse'], file):
-                    # material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
                     # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
                     item_materials = [material for material in bpy.data.materials if 
                                       material.name.split('_Mat')[0].replace(self.shader_material_names.MATERIAL_PREFIX, '') in file]
@@ -502,7 +501,6 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                         item_material = item_materials[0]
                         self.set_diffuse_texture(TextureType.BODY, item_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Lightmap'], file):
-                    # material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
                     # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
                     item_materials = [material for material in bpy.data.materials if 
                                       material.name.split('_Mat')[0].replace(self.shader_material_names.MATERIAL_PREFIX, '') in file]
@@ -706,6 +704,7 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
         if (body_material and material is body_material) or (body1_material and material is body1_material):
             stockings_body1_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP)
             body_stockings_node = material.node_tree.nodes.get(self.texture_node_names.STOCKINGS)
+            body_stockings_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_NODE_GROUP)
 
             if stockings_body1_node_group:  # Nya222
                 stockings_body1_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
@@ -713,6 +712,8 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
                 body_stockings_node.image = img
                 material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(
                     StellarToonShaderNodeNames.ENABLE_STOCKINGS).default_value = 1.0
+            if body_stockings_node_group:  # StellarToon
+                body_stockings_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
         else:
             stockings_body2_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP)
             if stockings_body2_node_group:  # Nya222
