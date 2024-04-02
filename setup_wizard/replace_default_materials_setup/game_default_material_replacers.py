@@ -250,6 +250,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if 'Handbag' in mesh_body_part_name:
                     handbag_material = self.create_weapon_materials(mesh_body_part_name)
                     material_name = handbag_material.name
+                if 'Kendama' in mesh_body_part_name:
+                    handbag_material = self.create_weapon_materials(mesh_body_part_name)
+                    material_name = handbag_material.name
 
                 honkai_star_rail_material = bpy.data.materials.get(
                     f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
@@ -324,7 +327,11 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     def create_weapon_materials(self, mesh_body_part_name):
         weapon_material_name = \
             f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}' if \
-            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' or mesh_body_part_name == 'Handbag' else \
+            mesh_body_part_name == 'Weapon01' or \
+            mesh_body_part_name == 'Weapon02' or \
+            mesh_body_part_name == 'Weapon1' or \
+            mesh_body_part_name == 'Handbag' or \
+            mesh_body_part_name == 'Kendama' else \
             f'{self.shader_material_names.WEAPON}'
         weapon_material = bpy.data.materials.get(weapon_material_name)
 
@@ -366,19 +373,6 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
             body_material.use_fake_user = True
         body_material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
         return body_material
-
-    def create_weapon_materials(self, mesh_body_part_name):
-        weapon_material_name = \
-            f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}' if \
-            mesh_body_part_name == 'Weapon01' or mesh_body_part_name == 'Weapon02' or mesh_body_part_name == 'Weapon1' or mesh_body_part_name == 'Handbag' else \
-            f'{self.shader_material_names.WEAPON}'
-        weapon_material = bpy.data.materials.get(weapon_material_name)
-
-        if not weapon_material:
-            weapon_material = bpy.data.materials.get(f'{self.shader_material_names.WEAPON}').copy()
-            weapon_material.name = weapon_material_name
-            weapon_material.use_fake_user = True
-        return weapon_material
 
 
 class PunishingGrayRavenDefaultMaterialReplacer(GameDefaultMaterialReplacer):
