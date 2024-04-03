@@ -84,7 +84,8 @@
             "delete_specific_objects",
             "rename_shader_materials",
             "set_up_armtwist_bone_constraints",
-            "join_meshes_on_armature"
+            "join_meshes_on_armature",
+            "rig_character"
         ],
         "HONKAI_STAR_RAIL_OT_setup_wizard_ui_no_outlines": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_setup_wizard_ui",
@@ -101,7 +102,8 @@
             "delete_specific_objects",
             "rename_shader_materials",
             "set_up_armtwist_bone_constraints",
-            "join_meshes_on_armature"
+            "join_meshes_on_armature",
+            "rig_character"
         ],
         "HONKAI_STAR_RAIL_OT_set_up_character": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_set_up_character",
