@@ -286,12 +286,13 @@ def rig_character():
 
     obs = [bpy.data.objects[rigifyr.name], bpy.data.objects[newrig]]
     c={}
-    c["object"] = bpy.data.objects[rigifyr.name]
-    c["active_object"] = bpy.data.objects[rigifyr.name]
-    c["selected_objects"] = obs
-    c["selected_editable_objects"] = obs
+    c["object"] = c["active_object"] = bpy.data.objects[rigifyr.name]
+    c["selected_objects"] = c["selected_editable_objects"] = obs
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.join(c)
+    bpy.ops.object.select_all(action='DESELECT')
+
+    with bpy.context.temp_override(active_object=bpy.data.objects.get("rigify"), selected_editable_objects=obs):
+        bpy.ops.object.join()
 
 
     bpy.context.view_layer.objects.active = bpy.data.objects["rigify"]
