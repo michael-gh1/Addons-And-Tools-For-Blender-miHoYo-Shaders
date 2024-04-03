@@ -346,20 +346,19 @@ def rig_character():
         except:
             pass
 
-    # Separates physics-related bones into layers 22 and 23
-    clothes = ["ribbon", "sleeve", "strap", "skirt", "button", "belt", "cloth"]
-    hair = ["hair", "eardrop"]
+    # Separates physics-related bones into their own bone layer/collection
+    clothes_bone_name_subtsrings = ["ribbon", "sleeve", "strap", "skirt", "button", "belt", "cloth"]
+    hair_bone_name_substrings = ["hair", "eardrop"]
 
-    eb = obj.pose.bones
-    for bone in eb:
-        for name in clothes:
-            if name in bone.name.lower():
-                obj.pose.bones[bone.name].bone.layers[22] = True
-                obj.pose.bones[bone.name].bone.layers[0] = False
-        for name in hair:
-            if name in bone.name.lower():
-                obj.pose.bones[bone.name].bone.layers[23] = True
-                obj.pose.bones[bone.name].bone.layers[0] = False
+    for armature_bone in obj.pose.bones:
+        for bone_name_substring in clothes_bone_name_subtsrings:
+            if bone_name_substring in armature_bone.name.lower():
+                assign_bone_to_bone_collection(armature, obj, armature_bone, collection_name='Clothes', collection_idx=22)
+                break
+        for bone_name_substring in hair_bone_name_substrings:
+            if bone_name_substring in armature_bone.name.lower():
+                assign_bone_to_bone_collection(armature, obj, armature_bone, collection_name='Hair', collection_idx=23)
+                break
 
     # Change any physics bones attached to shoulder to be attached to spine instead bc it's a pain in the ass to animate
     bpy.ops.object.mode_set(mode='EDIT')
@@ -389,10 +388,8 @@ def rig_character():
     bpy.ops.pose.select_all(action='DESELECT')
     bone = rigifyr.pose.bones["root_2"].bone
     rigifyr.data.bones.active = bone
-    bpy.ops.pose.group_assign(type=6)
-    for x in range(0, 28):
-        bone.layers[x] = False
-    bone.layers[1] = True
+
+    assign_root_bone_to_bone_collection(armature, bone, collection_name='Root', collection_idx=1)
 
     ### Makes it able to scale only the fingertips by scaling the X axis on the finger scale controls
     rig = rigifyr
@@ -470,3 +467,30 @@ def rig_character():
         pass
     x = original_name.split("_")
     bpy.data.objects["rigify"].name = x[-2] + "Rig"
+
+
+def is_blender_version_4_0():
+    version_tuple = bpy.app.version
+    return version_tuple[0] == 4 and version_tuple[1] == 0
+
+
+def assign_bone_to_bone_collection(armature, armature_obj, bone, collection_name, collection_idx):
+    if is_blender_version_4_0():
+        clothes_bone_collection = armature.collections.get(collection_name) if \
+            armature.collections.get(collection_name) else armature.collections.new(collection_name)
+        clothes_bone_collection.assign(bone)
+    else:
+        armature_obj.pose.bones[bone.name].bone.layers[collection_idx] = True
+        armature_obj.pose.bones[bone.name].bone.layers[0] = False
+
+
+def assign_root_bone_to_bone_collection(armature, bone, collection_name, collection_idx):
+    if is_blender_version_4_0():
+        root_bone_collection = armature.collections.get(collection_name)
+        if root_bone_collection:
+            root_bone_collection.assign(bone)
+    else:
+        bpy.ops.pose.group_assign(type=6)
+        for x in range(0, 28):
+            bone.layers[x] = False
+        bone.layers[collection_idx] = True
