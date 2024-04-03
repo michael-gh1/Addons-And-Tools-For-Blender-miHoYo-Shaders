@@ -486,7 +486,8 @@ def assign_bone_to_bone_collection(armature, armature_obj, bone, collection_name
 
 def assign_root_bone_to_bone_collection(armature, bone, collection_name, collection_idx):
     if is_blender_version_4_0():
-        root_bone_collection = armature.collections.get(collection_name)
+        root_bone_collection = armature.collections.get(collection_name) if \
+            armature.collections.get(collection_name) else armature.collections.new(collection_name)
         if root_bone_collection:
             root_bone_collection.assign(bone)
     else:
