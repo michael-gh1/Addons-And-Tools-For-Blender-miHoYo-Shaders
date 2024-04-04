@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HoYoverse Setup Wizard",
     "author": "Mken, OctavoPE, Enthralpy",
-    "version": (2, 4, 2),
+    "version": (2, 4, 3),
     "blender": (3, 3, 0),
     "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail / Punishing Gray Raven",
     "description": "An addon to streamline the character model setup process when using Festivity, Nya222's or JaredNyts' Shaders",
