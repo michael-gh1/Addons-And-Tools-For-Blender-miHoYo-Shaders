@@ -13,6 +13,7 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 import os
 
+from setup_wizard.domain.game_types import GameType
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key
 from setup_wizard.import_order import get_cache, CHARACTER_MODEL_FOLDER_FILE_PATH
 from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator, CustomOperatorProperties
@@ -106,7 +107,9 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         character_model_file_path = character_model_file_path_or_directory if is_character_model_file else \
             self.__find_fbx_file(character_model_file_path_or_directory)
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
-        betterfbx_enabled = bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
+        # Honkai Star Rail requires BetterFBX. We should always use it for HSR Character Import
+        betterfbx_enabled = True if self.game_type == GameType.HONKAI_STAR_RAIL.name else \
+            bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
 
         if betterfbx_installed and betterfbx_enabled:
             bpy.ops.better_import.fbx(
