@@ -1,5 +1,8 @@
 # Blender Addons and Tools for HoYoverse Shaders
 
+![alt text](./assets/gi_hsr_pgr_banner.jpg)
+(PC: [BonnyAnimations](https://www.youtube.com/@BonnyAnimations), [Festivity](https://github.com/festivities), [JaredNyts](https://twitter.com/jared_nyts))
+
 This repo contains **Blender Addons and Tools** for working with
 * Festivity's Genshin Impact Shader, found here: https://github.com/festivize/Blender-miHoYo-Shaders
 * Festivity's Honkai: Star Rail Shader, found here: https://github.com/festivities/Blender-StellarToon

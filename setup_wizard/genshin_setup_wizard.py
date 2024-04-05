@@ -1,5 +1,6 @@
 # Author: michael-gh1
 
+import os
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
@@ -96,6 +97,23 @@ class GI_OT_GenshinSetupWizard(Operator):
 
 def register():
     bpy.utils.register_class(GI_OT_GenshinSetupWizard)
+    bpy.app.timers.register(on_register, first_interval=1)
+
+
+def on_register():
+    try:
+        # Enable Rigify, BetterFBX and ExpyKit. If they don't exist, install them from dependencies folder
+        addons_to_enable = {'rigify': '', 'better_fbx': 'b_f-5.4.8.zip', 'Expy-Kit-main': 'Expy-Kit-v052.zip'}
+        for addon, filename in addons_to_enable.items():
+            try:
+                bpy.ops.preferences.addon_enable(module=addon)
+            except Exception as err:
+                addon_path = os.path.join(os.path.dirname(__file__), 'dependencies', filename)
+                print(f'Installing addon: {addon_path}')
+                bpy.ops.preferences.addon_install(filepath=addon_path, overwrite=False)
+    except Exception as err:
+        print(f'Unexpected error when trying to enable/install addons: {err}')
+
 
 # Legacy import system before this became an Addon. Refactoring necessary.
 def setup_dependencies():
