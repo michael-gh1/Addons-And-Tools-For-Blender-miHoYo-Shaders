@@ -32,7 +32,17 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
         )
         OperatorFactory.create_betterfbx_required_ui(run_entire_setup_column)
 
-        row = layout.row()
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
+
+        if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
+            sub_layout.label(text='Rigging Disabled', icon='ERROR')
+
+        settings_box = layout.box()
+        settings_box.label(text='Global Settings', icon='WORLD')
+
+        row = settings_box.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -42,6 +52,8 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
 
+        # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
+        settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
 
 class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'

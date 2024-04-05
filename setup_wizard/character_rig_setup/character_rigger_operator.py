@@ -43,7 +43,9 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
 
     def execute(self, context):
         is_advanced_setup = self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui' and \
-            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui_no_outlines'
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui_no_outlines' and \
+            self.high_level_step_name != 'HONKAI_STAR_RAIL_OT_setup_wizard_ui' and \
+            self.high_level_step_name != 'HONKAI_STAR_RAIL_OT_setup_wizard_ui_no_outlines'
         rigging_enabled = bpy.context.window_manager.setup_wizard_full_run_rigging_enabled or is_advanced_setup
         betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
