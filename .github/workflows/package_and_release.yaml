@@ -76,8 +76,7 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: true
-          title: "Test"
+          draft: true
           files: |
             Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone/Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone.zip
             Character_Setup_Wizard_Addon_${{github.ref_name}}/Character_Setup_Wizard_Addon_${{github.ref_name}}.zip
