@@ -106,13 +106,27 @@ def on_register():
         addons_to_enable = {'rigify': '', 'better_fbx': 'b_f-5.4.8.zip', 'Expy-Kit-main': 'Expy-Kit-v052.zip'}
         for addon, filename in addons_to_enable.items():
             try:
-                bpy.ops.preferences.addon_enable(module=addon)
-            except Exception as err:
-                addon_path = os.path.join(os.path.dirname(__file__), 'dependencies', filename)
-                print(f'Installing addon: {addon_path}')
-                bpy.ops.preferences.addon_install(filepath=addon_path, overwrite=False)
+                print(f'Enabling addon: {addon}')
+                status = bpy.ops.preferences.addon_enable(module=addon)
+                if status == {'FINISHED'}:
+                    print(f'Enabled addon: {addon}')
+                    continue
+                install_addon(addon, filename)
+            except Exception as err:  # Blender 3.6
+                install_addon(addon, filename)
     except Exception as err:
         print(f'Unexpected error when trying to enable/install addons: {err}')
+
+
+def install_addon(addon, filename):
+    addon_path = os.path.join(os.path.dirname(__file__), 'dependencies', filename)
+    if os.path.exists(addon_path):
+        print(f'Installing addon: {addon_path}')
+        bpy.ops.preferences.addon_install(filepath=addon_path, overwrite=False)
+        bpy.ops.preferences.addon_enable(module=addon)
+        print(f'Enabled addon: {addon}')
+    else:  #  is not standalone version of Setup Wizard
+        print(f'Addon file does not exist at {addon_path}. Unable to install {addon}.')
 
 
 # Legacy import system before this became an Addon. Refactoring necessary.
