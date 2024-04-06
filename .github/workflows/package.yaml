@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build_standalone:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,7 +27,7 @@ jobs:
         with:
           name: "Character_Setup_Wizard_Addon_${{github.ref_name}}"
           path: dist/setup_wizard/
-  build:
+  build_regular:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
