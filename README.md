@@ -5,6 +5,7 @@
 
 This repo contains **Blender Addons and Tools** for working with
 * Festivity's Genshin Impact Shader, found here: https://github.com/festivize/Blender-miHoYo-Shaders
+* Festivity's Honkai: Star Rail Shader, found here: https://github.com/festivities/Blender-StellarToon
 * Nya222's Honkai: Star Rail Shader, found here: https://discord.com/channels/894925535870865498/1127604826885328926/1147845711254265866 (Omatsuri Discord Server)
 * JaredNyts' Punishing: Gray Raven shader, found here: https://discord.com/channels/894925535870865498/1186597049198727259 (Omatsuri Discord Server)
 
