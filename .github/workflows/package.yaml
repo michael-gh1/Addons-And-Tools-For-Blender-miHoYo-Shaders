@@ -2,28 +2,15 @@ name: Package Addons
 
 on:
   push:
+    branches:
+      - 'main'
     tags:
-      - "v*"
+      - '*'
     paths-ignore:
       - '**/.tmp'
       - '**/.gitignore'
       - '**/.gitattributes'
   workflow_dispatch:
-
-permissions:
-  actions: write
-  checks: read
-  contents: write
-  packages: write
-  deployments: write
-  id-token: write
-  issues: read
-  discussions: read
-  pages: read
-  pull-requests: read
-  repository-projects: read
-  security-events: read
-  statuses: read
 
 jobs:
   build_standalone:
@@ -36,7 +23,7 @@ jobs:
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
       - name: Upload Standalone Setup Wizard Package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: "Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone"
           path: dist/setup_wizard/
@@ -51,33 +38,7 @@ jobs:
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
       - name: Upload Setup Wizard Package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: "Character_Setup_Wizard_Addon_${{github.ref_name}}"
           path: dist/setup_wizard/
-  tagged-release:
-    name: Tagged Release
-    needs: [build_standalone, build_regular]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        name: Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone
-      - uses: actions/download-artifact@v4
-        name: Character_Setup_Wizard_Addon_${{github.ref_name}}
-      - name: Display structure of downloaded files
-        run: ls -R
-      - name: Zip folders
-        run: |
-            cd Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone
-            zip -r Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone.zip setup_wizard -x ".git*"
-            cd ../Character_Setup_Wizard_Addon_${{github.ref_name}}
-            zip -r Character_Setup_Wizard_Addon_${{github.ref_name}}.zip setup_wizard -x ".git*"
-            ls -R
-      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: true
-          title: "Test"
-          files: |
-            Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone/Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone.zip
-            Character_Setup_Wizard_Addon_${{github.ref_name}}/Character_Setup_Wizard_Addon_${{github.ref_name}}.zip
