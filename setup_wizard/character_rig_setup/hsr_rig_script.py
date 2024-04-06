@@ -95,8 +95,9 @@ def rig_character():
     for bone in bones_list:
         if bone.name in abadidea:
             bone.name = abadidea[bone.name]
-    armature.edit_bones["DEF-shoulder.L"].roll += 3.14
-    armature.edit_bones["DEF-shoulder.R"].roll -= 3.14
+
+    #armature.edit_bones["DEF-shoulder.R"].roll -= 3.14
+    #armature.edit_bones["DEF-shoulder.L"].roll += 3.14
 
     # For making it possible to symmetrically pose bones properly.
     for bone in bones_list:
@@ -108,10 +109,14 @@ def rig_character():
     def realign(bone):
         bone.head.x = 0
         bone.tail.x = 0
-        bone.tail.y = bone.tail.x
-        bone.tail.z += .1
+        bone.tail.y = bone.head.y
+        if bone.tail.z < bone.head.z:
+            bone.tail.z = bone.head.z + .1
+        else:
+            bone.tail.z += .1
+            
         bone.roll = 0
-    # realign(armature.edit_bones['DEF-spine.006'])
+    realign(armature.edit_bones['DEF-spine.006'])
 
     ## Attaches the feet to the toes and the upperarms to lowerarms
     def attachfeets(foot, toe):
@@ -128,6 +133,10 @@ def rig_character():
     attachfeets('DEF-thigh.R', 'DEF-shin.R')
     attachfeets('DEF-forearm.L', 'DEF-hand.L')
     attachfeets('DEF-forearm.R', 'DEF-hand.R')
+
+    attachfeets('DEF-shoulder.R', 'DEF-upper_arm.R')
+    attachfeets('DEF-shoulder.L', 'DEF-upper_arm.L')
+
     attachfeets('DEF-spine', 'DEF-spine.001')
     attachfeets('DEF-spine.001', 'DEF-spine.002')
     attachfeets('DEF-spine.002', 'DEF-spine.003')
@@ -144,7 +153,7 @@ def rig_character():
             
     bpy.ops.armature.select_all(action='DESELECT')
     try:
-        select_bone(armature.edit_bones["breast.L"])
+        select_bone(armature.edit_bones["breast.R"])
         bpy.ops.armature.symmetrize()
         bpy.ops.armature.select_all(action='DESELECT')
 
@@ -162,6 +171,17 @@ def rig_character():
     # DELETE MAIN BONE?? 
     #armature.edit_bones.remove(armature.edit_bones["Main"])
 
+    try:  # If tall woman, fix their pinky finger
+        if armature.edit_bones["DEF-breast.R"] and armature.edit_bones["DEF-spine.003"].tail.z > 1.3 and armature.edit_bones["DEF-spine.003"].tail.z < 1.4:
+            bpy.context.object.data.use_mirror_x = True
+            armature.edit_bones["DEF-f_pinky.01.L"].tail.x += 0.00164
+            armature.edit_bones["DEF-f_pinky.02.L"].tail.x += 0.00164
+            armature.edit_bones["DEF-f_pinky.02.L"].head.x += 0.00164
+            armature.edit_bones["DEF-f_pinky.03.L"].head.x += 0.00164
+            bpy.context.object.data.use_mirror_x = False
+
+    except:
+        pass
 
     bpy.ops.object.mode_set(mode='POSE')
     bpy.ops.object.expykit_extract_metarig(rig_preset='Rigify_Metarig.py', assign_metarig=True)
@@ -338,7 +358,7 @@ def rig_character():
 
     # This part puts all the main bones I use into the secoond bone layer
     bpy.ops.object.mode_set(mode='OBJECT')
-    listofbones = ["root", "foot_heel_ik.R", "foot_heel_ik.L", "toe_ik.R", "toe_ik.L", "foot_ik.R", "foot_ik.L", "thigh_ik_target.R", "thigh_ik_target.L", "hips", "torso", "chest", "neck", "head", "eyeRoot", "shoulder.L", "shoulder.R", "upper_arm_fk.L", "upper_arm_fk.R", "forearm_fk.L", "forearm_fk.R", "hand_fk.L", "hand_fk.R", "upper_arm_ik_target.L", "upper_arm_ik_target.R", "hand_ik.R", "hand_ik.L", "upper_arm_ik.R", "upper_arm_ik.L", "thigh_ik.L", "thigh_ik.R"]
+    listofbones = ["root", "foot_heel_ik.R", "foot_heel_ik.L", "toe_ik.R", "toe_ik.L", "foot_ik.R", "foot_ik.L", "thigh_ik_target.R", "thigh_ik_target.L", "hips", "torso", "chest", "neck", "head", "eyeRoot", "shoulder.L", "shoulder.R", "upper_arm_fk.L", "upper_arm_fk.R", "forearm_fk.L", "forearm_fk.R", "hand_fk.L", "hand_fk.R", "upper_arm_ik_target.L", "upper_arm_ik_target.R", "hand_ik.R", "hand_ik.L"]  # TODO: Blender 4.0 what Bone Collection to put these in?
 
     for bone in listofbones:
         try:
@@ -368,7 +388,7 @@ def rig_character():
             if bone.name not in pre_res and bone.parent.name in ["DEF-shoulder.L", "DEF-shoulder.R"]:
                 print(bone)
                 
-                bone.parent = rigifyr.data.edit_bones["DEF-spine.004"]
+                bone.parent = rigifyr.data.edit_bones["DEF-spine.003"]
 
     # makes a root #2 bone
     newroot = rigifyr.data.edit_bones.new("root_2")
@@ -388,8 +408,19 @@ def rig_character():
     bpy.ops.pose.select_all(action='DESELECT')
     bone = rigifyr.pose.bones["root_2"].bone
     rigifyr.data.bones.active = bone
-
     assign_root_bone_to_bone_collection(armature, bone, collection_name='Root', collection_idx=1)
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    bone = rigifyr.pose.bones["palm.L"].bone
+    rigifyr.data.bones.active = bone
+    assign_bone_to_bone_collection(armature, obj, bone, collection_name='Palms', collection_idx=21)
+    unassign_bone_from_bone_collection(armature, obj, bone, collection_name='Fingers', collection_idx_range=(0, 28))
+
+    bpy.ops.pose.select_all(action='DESELECT')
+    bone = rigifyr.pose.bones["palm.R"].bone
+    rigifyr.data.bones.active = bone
+    assign_bone_to_bone_collection(armature, obj, bone, collection_name='Palms', collection_idx=21)
+    unassign_bone_from_bone_collection(armature, obj, bone, collection_name='Fingers', collection_idx_range=(0, 28))
 
     ### Makes it able to scale only the fingertips by scaling the X axis on the finger scale controls
     rig = rigifyr
@@ -461,12 +492,28 @@ def rig_character():
     except:
         pass
     try:
-        bpy.context.view_layer.objects.active = bpy.data.objects["Head Driver"]
+        bpy.context.view_layer.objects.active = bpy.data.objects["Head Origin"]
         bpy.ops.constraint.childof_set_inverse(constraint="Child Of", owner='OBJECT')
     except:
         pass
     x = original_name.split("_")
+    bpy.data.objects["rigify"].users_collection[0].name = x[-2]
     bpy.data.objects["rigify"].name = x[-2] + "Rig"
+
+try:
+    bpy.context.scene.objects["Head Forward"].hide_viewport = True
+    bpy.context.scene.objects["Head Up"].hide_viewport = True
+except:
+    pass
+
+lis = ["Body", "Face", "Hair"]
+
+for obj in lis:
+    try:
+        mod = bpy.context.scene.objects[obj].modifiers[2]
+        mod.show_viewport = False 
+    except:
+        pass
 
 
 def is_blender_version_4_0():
@@ -482,6 +529,16 @@ def assign_bone_to_bone_collection(armature, armature_obj, bone, collection_name
     else:
         armature_obj.pose.bones[bone.name].bone.layers[collection_idx] = True
         armature_obj.pose.bones[bone.name].bone.layers[0] = False
+
+
+def unassign_bone_from_bone_collection(armature, armature_obj, bone, collection_name, collection_idx_range):
+    if is_blender_version_4_0():
+        clothes_bone_collection = armature.collections.get(collection_name) if \
+            armature.collections.get(collection_name) else armature.collections.new(collection_name)
+        clothes_bone_collection.unassign(bone)
+    else:
+        for i in range(collection_idx_range[0], collection_idx_range[1]):
+            armature_obj.pose.bones[bone.name].bone.layers[i] = False
 
 
 def assign_root_bone_to_bone_collection(armature, bone, collection_name, collection_idx):
