@@ -17,9 +17,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Set Up Standalone Addon Folder Structure
+        run: |
+          rm -r setup_wizard/tests
+          mkdir -p dist/setup_wizard/setup_wizard
+          mv setup_wizard dist/setup_wizard
+      - name: Upload Standalone Setup Wizard Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Character_Setup_Wizard_Addon_${{github.ref_name}}"
+          path: dist/setup_wizard/
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
       - name: Set Up Addon Folder Structure
         run: |
           rm -r setup_wizard/tests
+          rm -r setup_wizard/dependencies
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
       - name: Upload Setup Wizard Package
