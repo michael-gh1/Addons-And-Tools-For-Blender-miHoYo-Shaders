@@ -121,10 +121,18 @@ class HonkaiStarRailCharacterRigger(CharacterRigger):
     def __init__(self, blender_operator, context):
         self.blender_operator = blender_operator
         self.context = context
-        self.rigify_bone_shapes_file_path = 'PLACEHOLDER'
+        self.rigify_bone_shapes_file_path = GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
 
     def rig_character(self):
+        cache_enabled = self.context.window_manager.cache_enabled
+        filepath = get_cache(cache_enabled).get(self.rigify_bone_shapes_file_path) or self.blender_operator.filepath
+
+        if not filepath:
+            filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
+
         armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
+        character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
+        meshes_joined = not (bpy.data.objects.get('Body') and bpy.data.objects.get('Face'))
 
         # Important that the Armature is selected before performing rigging operations
         bpy.ops.object.select_all(action='DESELECT')
@@ -132,7 +140,16 @@ class HonkaiStarRailCharacterRigger(CharacterRigger):
         bpy.context.view_layer.objects.active = armature
         armature.select_set(True)
 
-        hsr_rig_character()
+        hsr_rig_character(
+            filepath,
+            not character_rigger_props.allow_arm_ik_stretch,
+            not character_rigger_props.allow_leg_ik_stretch,
+            character_rigger_props.use_arm_ik_poles,
+            character_rigger_props.use_leg_ik_poles,
+            character_rigger_props.add_children_of_constraints,
+            character_rigger_props.use_head_tracker,
+            meshes_joined=meshes_joined
+        )
 
 
 class PunishingGrayRavenCharacterRigger(CharacterRigger):
