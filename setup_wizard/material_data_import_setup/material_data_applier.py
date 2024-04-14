@@ -396,6 +396,9 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_UseLightMapColorAO': 'Use Lightmap AO',
         '_UseVertexColorAO': 'Use Vertex Color AO',
         '_MainTexAlphaCutoff': 'Transparency Cutoff',
+    }
+
+    v3_2_local_material_mapping = {
         '_Color': 'Color',
         '_Color2': 'Color 2',
         '_Color3': 'Color 3',
@@ -427,6 +430,16 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
                 self.local_material_mapping,
                 base_material_shader_node_tree_inputs,
             )
+
+            # Genshin Shader V3.2 material data applying. Ignore the error, even if the shader field does not exist.
+            # This is to keep backwards compatibility for those who may still be on an older version of the shader.
+            try:
+                super().apply_material_data(
+                    self.v3_2_local_material_mapping,
+                    base_material_shader_node_tree_inputs,
+                )
+            except AttributeError:
+                print(f'Ignoring missing shader field. Continuing to use {type(self).__name__}.')
         self.set_up_alpha_options_material_data(base_material_shader_node_tree_inputs)
         self.set_up_alpha_options_material_data(outline_material_shader_node_tree_inputs, outlines_alpha_only=True)
 
