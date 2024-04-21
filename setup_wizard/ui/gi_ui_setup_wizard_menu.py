@@ -337,11 +337,11 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
 
 
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
-    bl_label = "Gran Turismo Tonemapper"
-    bl_idname = "GI_PT_Gran_Turismo_Tonemapper_UI_Layout"
+    bl_label = "Compositing Setup Wizard"
+    bl_idname = "GI_PT_Custom_Compositing_Node_UI_Layout"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
-    bl_category = "Genshin - Setup Wizard"
+    bl_category = "GI - Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
@@ -367,8 +367,8 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
         )
         OperatorFactory.create(
             sub_layout,
-            'genshin.gran_turismo_tonemapper_setup',
-            'Set Up GT Tonemapper',
+            'hoyoverse.custom_composite_node_setup',
+            'Set Up Compositing Node',
             'PLAY'
         )
 

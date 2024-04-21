@@ -6,14 +6,15 @@ import os
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 from bpy.types import Operator
-from setup_wizard.import_order import cache_using_cache_key, get_cache, GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH
+from setup_wizard.import_order import cache_using_cache_key, get_cache, HOYOVERSE_COMPOSITING_NODE_FILE_PATH
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
 NAME_OF_DEFAULT_SCENE = 'Scene'
 
-NAME_OF_GRAN_TURISMO_NODE = 'Group'
+NAME_OF_COMPOSITE_NODE = 'Group'
 NAME_OF_GRAN_TURISMO_NODE_TREE = 'GranTurismoWrapper [APPEND]'
+NAME_OF_HOYOVERSE_POST_PROCESSING_NODE_TREE = 'HoYoverse - Post Processing'
 
 NAME_OF_COMPOSITOR_INPUT_NODE = 'Render Layers'
 NAME_OF_COMPOSITOR_OUTPUT_NODE = 'Composite'
@@ -22,13 +23,14 @@ NAME_OF_VIEWER_NODE = 'Viewer'
 NAME_OF_VIEWER_NODE_TYPE = 'CompositorNodeViewer'
 
 NAME_OF_IMAGE_IO = 'Image'
-NAME_OF_RESULT_IO = 'Result'
+NAME_OF_GT_COMPOSITE_NODE_OUTPUT = 'Result'
+NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT = 'Image'
 
 
 class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties):
-    """Select Festivity's Gran Turismo ToneMapper .blend File to import NodeTree"""
-    bl_idname = 'genshin.gran_turismo_tonemapper_setup'
-    bl_label = 'Genshin: Gran Turismo Tonemapper Setup - Select Gran Turismo .blend File'
+    """Select the Custom Compositing .blend File to import NodeTree"""
+    bl_idname = 'hoyoverse.custom_composite_node_setup'
+    bl_label = 'Hoyoverse: Custom Composite Node Setup - Select Custom Compositing .blend File'
 
     # ImportHelper mixin class uses this
     filename_ext = "*.*"
@@ -46,14 +48,22 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
-    logs = 'Gran Turismo Tonemapper Setup:\n'
+    logs = 'Custom Composite Node Setup:\n'
+    names_of_node_groups = [
+        NAME_OF_GRAN_TURISMO_NODE_TREE,
+        NAME_OF_HOYOVERSE_POST_PROCESSING_NODE_TREE,
+    ]
+    names_of_composite_node_outputs = [
+        NAME_OF_GT_COMPOSITE_NODE_OUTPUT,
+        NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT,
+    ]
 
     def execute(self, context):
         cache_enabled = context.window_manager.cache_enabled
-        gran_turismo_blend_file_path = self.filepath or get_cache(cache_enabled).get(GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH)
+        composite_blend_file_path = self.filepath or get_cache(cache_enabled).get(HOYOVERSE_COMPOSITING_NODE_FILE_PATH)
 
         if not bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree:
-            self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up GT Tonemapper\n'
+            self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up Custom Composite Node\n'
             self.report({'ERROR'}, f'{self.logs}')
             return {'FINISHED'}
 
@@ -63,9 +73,15 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         # TODO: This does not work unless INVOKE_DEFAULT with a modal or some window appears to update the Blender UI
         # self.switch_to_compositor()
 
-        if not bpy.data.node_groups.get(NAME_OF_GRAN_TURISMO_NODE_TREE):
-            if not gran_turismo_blend_file_path:
-                bpy.ops.genshin.gran_turismo_tonemapper_setup(
+        composite_node_group = None
+        for composite_node_group_name in self.names_of_node_groups:
+            composite_node_group = bpy.data.node_groups.get(composite_node_group_name)
+            if composite_node_group:
+                break
+
+        if not composite_node_group:
+            if not composite_blend_file_path:
+                bpy.ops.hoyoverse.custom_composite_node_setup(
                     'INVOKE_DEFAULT',
                     next_step_idx=self.next_step_idx, 
                     file_directory=self.file_directory,
@@ -73,16 +89,17 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
                     high_level_step_name=self.high_level_step_name
                 )
                 return {'FINISHED'}
-            self.append_gran_turismo_tonemapper(gran_turismo_blend_file_path)
+            name_of_composite_node_group = self.append_composite_node_group(composite_blend_file_path)
+            composite_node_group = bpy.data.node_groups.get(name_of_composite_node_group)
         else:
-            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} already appended, skipping.\n'
+            self.logs += f'{composite_node_group.name} already appended, skipping.\n'
 
-        gran_turismo_node = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
-        if not gran_turismo_node or \
-            (gran_turismo_node and gran_turismo_node.node_tree.name != NAME_OF_GRAN_TURISMO_NODE_TREE):
-            self.create_compositor_node_group(NAME_OF_GRAN_TURISMO_NODE_TREE)
+        composite_node = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree.nodes.get(NAME_OF_COMPOSITE_NODE)
+        if not composite_node or \
+            (composite_node and (composite_node.node_tree.name not in self.names_of_node_groups)):
+            self.create_compositor_node_group(composite_node_group.name)
         else:
-            self.logs += f'{NAME_OF_GRAN_TURISMO_NODE_TREE} node already created, skipping and not creating new node.\n'
+            self.logs += f'{composite_node_group.name} node already created, skipping and not creating new node.\n'
 
         viewer_node = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree.nodes.get(NAME_OF_VIEWER_NODE)
         if not viewer_node:
@@ -93,11 +110,11 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         self.connect_starting_nodes()
         self.set_node_locations()
 
-        if cache_enabled and gran_turismo_blend_file_path:
+        if cache_enabled and composite_blend_file_path:
             cache_using_cache_key(
                 get_cache(cache_enabled), 
-                GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH, 
-                gran_turismo_blend_file_path
+                HOYOVERSE_COMPOSITING_NODE_FILE_PATH, 
+                composite_blend_file_path
             )
 
         self.report({'INFO'}, f'{self.logs}')
@@ -118,16 +135,19 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         )
     '''
 
-    def append_gran_turismo_tonemapper(self, gran_turismo_blend_file_path):
+    def append_composite_node_group(self, composite_node_group_blend_file_path):
         inner_path = 'NodeTree'
 
-        bpy.ops.wm.append(
-            filepath=os.path.join(gran_turismo_blend_file_path, inner_path, NAME_OF_GRAN_TURISMO_NODE_TREE),
-            directory=os.path.join(gran_turismo_blend_file_path, inner_path),
-            filename=NAME_OF_GRAN_TURISMO_NODE_TREE
-        )
-
-        self.logs += f'Appended {NAME_OF_GRAN_TURISMO_NODE_TREE}\n'
+        for node_group_name in self.names_of_node_groups:
+            bpy.ops.wm.append(
+                filepath=os.path.join(composite_node_group_blend_file_path, inner_path, node_group_name),
+                directory=os.path.join(composite_node_group_blend_file_path, inner_path),
+                filename=node_group_name
+            )
+            
+            if bpy.data.node_groups.get(node_group_name):
+                self.logs += f'Appended {node_group_name}\n'
+                return node_group_name
 
     def create_compositor_node_group(self, node_name):
         bpy.ops.node.add_node(
@@ -152,9 +172,14 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         render_layers_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_INPUT_NODE)
         render_layers_output = render_layers_node.outputs.get(NAME_OF_IMAGE_IO)
 
-        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
-        gran_turismo_wrapper_node_input = gran_turismo_wrapper_node.inputs.get(NAME_OF_IMAGE_IO)
-        gran_turismo_wrapper_node_output = gran_turismo_wrapper_node.outputs.get(NAME_OF_RESULT_IO)
+        composite_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITE_NODE)
+        composite_wrapper_node_input = composite_wrapper_node.inputs.get(NAME_OF_IMAGE_IO)
+        composite_wrapper_node_output = None
+
+        for composite_node_output_name in self.names_of_composite_node_outputs:
+            composite_wrapper_node_output = composite_wrapper_node.outputs.get(composite_node_output_name)
+            if composite_wrapper_node_output:
+                break
 
         composite_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_OUTPUT_NODE)
         composite_node_input = composite_node.inputs.get(NAME_OF_IMAGE_IO)
@@ -162,9 +187,9 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         viewer_node = default_scene.node_tree.nodes.get(NAME_OF_VIEWER_NODE)
         viewer_node_input = viewer_node.inputs.get(NAME_OF_IMAGE_IO)
 
-        self.connect_nodes_in_scene(default_scene, render_layers_output, gran_turismo_wrapper_node_input)
-        self.connect_nodes_in_scene(default_scene, gran_turismo_wrapper_node_output, composite_node_input)
-        self.connect_nodes_in_scene(default_scene, gran_turismo_wrapper_node_output, viewer_node_input)
+        self.connect_nodes_in_scene(default_scene, render_layers_output, composite_wrapper_node_input)
+        self.connect_nodes_in_scene(default_scene, composite_wrapper_node_output, composite_node_input)
+        self.connect_nodes_in_scene(default_scene, composite_wrapper_node_output, viewer_node_input)
 
     def connect_nodes_in_scene(self, scene, input, output):
         # This is very important! The links are at the scene.node_tree level
@@ -185,12 +210,12 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
     def set_node_locations(self):
         default_scene = bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE)
         render_layers_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_INPUT_NODE)
-        gran_turismo_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_GRAN_TURISMO_NODE)
+        composite_wrapper_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITE_NODE)
         composite_node = default_scene.node_tree.nodes.get(NAME_OF_COMPOSITOR_OUTPUT_NODE)
         viewer_node = default_scene.node_tree.nodes.get(NAME_OF_VIEWER_NODE)
 
         render_layers_node.location = (-200, 400)
-        gran_turismo_wrapper_node.location = (250, 400)
+        composite_wrapper_node.location = (250, 400)
         composite_node.location = (500, 400)
         viewer_node.location = (500, 200)
         self.logs += f'Set default locations for nodes in Compositing\n'
