@@ -18,7 +18,7 @@
             "rename_shader_materials",
             "join_meshes_on_armature",
             "rig_character",
-            "gran_turismo_tonemapper_setup",
+            "compositing_node_setup",
             "post_processing_default_settings"
         ],
         "GENSHIN_OT_setup_wizard_ui_no_outlines": [
@@ -35,7 +35,7 @@
             "rename_shader_materials",
             "join_meshes_on_armature",
             "rig_character",
-            "gran_turismo_tonemapper_setup",
+            "compositing_node_setup",
             "post_processing_default_settings"
         ],
         "GENSHIN_OT_set_up_character": [
@@ -71,7 +71,7 @@
         ],
         "HOYOVERSE_OT_post_processing_compositing_setup": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_final_steps",
-            "gran_turismo_tonemapper_setup",
+            "compositing_node_setup",
             "post_processing_default_settings"
         ],
         "HONKAI_STAR_RAIL_OT_setup_wizard_ui": [

@@ -375,7 +375,7 @@ class GI_PT_UI_Post_Processing_Setup_Menu(Panel):
         )
 
 
-class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
+class GI_PT_UI_Compositing_Panel_Post_Processing_UI_Layout(Panel):
     bl_label = "Compositing Setup Wizard"
     bl_idname = "GI_PT_Custom_Compositing_Node_UI_Layout"
     bl_space_type = "NODE_EDITOR"

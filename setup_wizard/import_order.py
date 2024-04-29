@@ -285,7 +285,7 @@ class ComponentFunctionFactory:
             return bpy.ops.punishing_gray_raven.import_chibi_face_texture
         elif component_name == 'paint_vertex_colors':
             return bpy.ops.punishing_gray_raven.paint_vertex_colors
-        elif component_name == 'gran_turismo_tonemapper_setup':
+        elif component_name == 'compositing_node_setup':
             return bpy.ops.hoyoverse.custom_composite_node_setup
         elif component_name == 'post_processing_default_settings':
             return bpy.ops.hoyoverse.post_processing_default_settings

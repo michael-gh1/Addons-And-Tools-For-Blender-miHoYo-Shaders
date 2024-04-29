@@ -23,7 +23,7 @@ from setup_wizard.misc_final_steps import GI_OT_FinishSetup, HSR_OT_FinishSetup
 from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_RigCharacter
 from setup_wizard.character_rig_setup.character_rigger_props import CharacterRiggerPropertyGroup, \
     CharacterRiggerPropertyManager
-from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_PostProcessingCompositingSetup
+from setup_wizard.genshin_compositing_node_setup import GI_OT_PostProcessingCompositingSetup
 
 import setup_wizard.ui.gi_ui_setup_wizard_menu
 from setup_wizard.ui.gi_ui_setup_wizard_menu import \
@@ -37,7 +37,7 @@ from setup_wizard.ui.gi_ui_setup_wizard_menu import \
     GI_PT_UI_Finish_Setup_Menu, \
     GI_PT_UI_Character_Rig_Setup_Menu, \
     GI_PT_UI_Post_Processing_Setup_Menu, \
-    GI_PT_UI_Gran_Turismo_UI_Layout
+    GI_PT_UI_Compositing_Panel_Post_Processing_UI_Layout
 from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_Setup_Wizard_UI_Layout, \
     HSR_PT_Basic_Setup_Wizard_UI_Layout, \
@@ -47,7 +47,7 @@ from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_UI_Outlines_Menu, \
     HSR_PT_UI_Finish_Setup_Menu, \
     HSR_PT_UI_Character_Rig_Setup_Menu
-    # HSR_PT_UI_Gran_Turismo_UI_Layout
+    # HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout
 from setup_wizard.ui.pgr_ui_setup_wizard_menu import \
     PGR_PT_Setup_Wizard_UI_Layout, \
     PGR_PT_Basic_Setup_Wizard_UI_Layout, \
@@ -83,7 +83,7 @@ classes = [
     GI_PT_UI_Finish_Setup_Menu,
     GI_PT_UI_Character_Rig_Setup_Menu,
     GI_PT_UI_Post_Processing_Setup_Menu,
-    GI_PT_UI_Gran_Turismo_UI_Layout,
+    GI_PT_UI_Compositing_Panel_Post_Processing_UI_Layout,
     GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,
     GI_OT_SetUpMaterials,
@@ -99,7 +99,7 @@ classes = [
     HSR_PT_UI_Outlines_Menu,
     HSR_PT_UI_Finish_Setup_Menu,
     HSR_PT_UI_Character_Rig_Setup_Menu,
-    # HSR_PT_UI_Gran_Turismo_UI_Layout,
+    # HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout,
     HSR_OT_HonkaiStarRailSetupWizardUI,
     HSR_OT_SetUpCharacter,
     HSR_OT_SetUpMaterials,

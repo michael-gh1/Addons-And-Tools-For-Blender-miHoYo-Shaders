@@ -329,7 +329,7 @@ class HSR_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
-# class HSR_PT_UI_Gran_Turismo_UI_Layout(Panel):
+# class HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout(Panel):
 #     bl_label = "Compositing Setup Wizard"
 #     bl_idname = "HSR_PT_Custom_Compositing_Node_UI_Layout"
 #     bl_space_type = "NODE_EDITOR"

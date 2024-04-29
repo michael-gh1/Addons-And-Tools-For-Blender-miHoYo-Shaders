@@ -48,7 +48,7 @@ class PostProcessingFeatureFlag:
         return not post_processing_setup_enabled and not is_advanced_setup
 
 
-class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties, PostProcessingFeatureFlag):
+class GI_OT_CompositingNodeSetup(Operator, ImportHelper, CustomOperatorProperties, PostProcessingFeatureFlag):
     """Select the Custom Compositing .blend File to import NodeTree"""
     bl_idname = 'hoyoverse.custom_composite_node_setup'
     bl_label = 'Hoyoverse: Custom Composite Node Setup - Select Custom Compositing .blend File'
