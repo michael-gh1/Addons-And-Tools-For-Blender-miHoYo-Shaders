@@ -5,8 +5,11 @@ import os
 import sys
 from pathlib import PurePath
 from setup_wizard.tests.constants import RIG_CHARACTER
-from setup_wizard.import_order import GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, \
-    GENSHIN_IMPACT_OUTLINES_FILE_PATH, GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
+from setup_wizard.import_order import GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, \
+    GENSHIN_IMPACT_SHADER_FILE_PATH, \
+    GENSHIN_IMPACT_OUTLINES_FILE_PATH, \
+    GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, \
+    HOYOVERSE_COMPOSITING_NODE_FILE_PATH
 from setup_wizard.tests.logger import Logger
 from setup_wizard.tests.models.test_operator_executioner import GenshinImpactTestOperatorExecutioner
 
@@ -92,7 +95,9 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             GenshinImpactTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             GenshinImpactTestOperatorExecutioner('join_meshes_on_armature'),
             GenshinImpactTestOperatorExecutioner('rootshape_filepath_setter', filepath=config.get(GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH)),
-            GenshinImpactTestOperatorExecutioner('rig_character', config=config)
+            GenshinImpactTestOperatorExecutioner('rig_character', config=config),
+            GenshinImpactTestOperatorExecutioner('compositing_node_setup', filepath=config.get(HOYOVERSE_COMPOSITING_NODE_FILE_PATH)),
+            GenshinImpactTestOperatorExecutioner('post_processing_default_settings'),
         ]
 
         for operator in operators:
