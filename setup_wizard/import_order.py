@@ -287,5 +287,7 @@ class ComponentFunctionFactory:
             return bpy.ops.punishing_gray_raven.paint_vertex_colors
         elif component_name == 'gran_turismo_tonemapper_setup':
             return bpy.ops.hoyoverse.custom_composite_node_setup
+        elif component_name == 'post_processing_default_settings':
+            return bpy.ops.hoyoverse.post_processing_default_settings
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

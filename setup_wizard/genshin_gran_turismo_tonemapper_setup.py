@@ -9,6 +9,8 @@ from bpy.types import Operator
 from setup_wizard.import_order import cache_using_cache_key, get_cache, HOYOVERSE_COMPOSITING_NODE_FILE_PATH
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import NextStepInvoker
+from setup_wizard.setup_wizard_operator_base_classes import BasicSetupUIOperator
 
 NAME_OF_DEFAULT_SCENE = 'Scene'
 
@@ -27,7 +29,26 @@ NAME_OF_GT_COMPOSITE_NODE_OUTPUT = 'Result'
 NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT = 'Image'
 
 
-class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties):
+class GI_OT_PostProcessingCompositingSetup(Operator, BasicSetupUIOperator):
+    '''Sets Up Post Processing Compositing'''
+    bl_idname = 'hoyoverse.post_processing_compositing_setup'
+    bl_label = 'HoYoverse: Set Up Post Processing Compositing (UI)'
+
+
+class PostProcessingFeatureFlag:
+    # self is CustomOperatorProperties only for IDE syntax highlighting purposes
+    def feature_disabled(self: CustomOperatorProperties, context):
+        post_processing_setup_enabled = context.window_manager.post_processing_setup_enabled
+
+        is_advanced_setup = self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui' and \
+            self.high_level_step_name != 'GENSHIN_OT_setup_wizard_ui_no_outlines' and \
+            self.high_level_step_name != 'HONKAI_STAR_RAIL_OT_setup_wizard_ui' and \
+            self.high_level_step_name != 'HONKAI_STAR_RAIL_OT_setup_wizard_ui_no_outlines'
+        
+        return not post_processing_setup_enabled and not is_advanced_setup
+
+
+class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOperatorProperties, PostProcessingFeatureFlag):
     """Select the Custom Compositing .blend File to import NodeTree"""
     bl_idname = 'hoyoverse.custom_composite_node_setup'
     bl_label = 'Hoyoverse: Custom Composite Node Setup - Select Custom Compositing .blend File'
@@ -37,7 +58,7 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
 
     import_path: StringProperty(
         name="Path",
-        description="Festivity's Gran Turismo .blend File",
+        description="Custom Composite Node .blend File",
         default="",
         subtype='DIR_PATH'
     )
@@ -59,13 +80,21 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
     ]
 
     def execute(self, context):
+        if self.feature_disabled(context):
+            if self.next_step_idx:
+                NextStepInvoker().invoke(
+                    self.next_step_idx, 
+                    self.invoker_type, 
+                    high_level_step_name=self.high_level_step_name,
+                    game_type=self.game_type,
+                )
+            self.clear_custom_properties()
+            return {'FINISHED'}
+
         cache_enabled = context.window_manager.cache_enabled
         composite_blend_file_path = self.filepath or get_cache(cache_enabled).get(HOYOVERSE_COMPOSITING_NODE_FILE_PATH)
 
-        if not bpy.data.scenes.get(NAME_OF_DEFAULT_SCENE).node_tree:
-            self.logs += 'ERROR: Must enable "Use Nodes" in Compositor view before being able to set up Custom Composite Node\n'
-            self.report({'ERROR'}, f'{self.logs}')
-            return {'FINISHED'}
+        context.scene.use_nodes = True
 
         # Technically works if only running this Operator, but this cannot be chained because we need to be 
         # out of the script (or in another Operator) to update ctx before the import modal appears
@@ -118,7 +147,14 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
             )
 
         self.report({'INFO'}, f'{self.logs}')
-        super().clear_custom_properties()
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
+        self.clear_custom_properties()
         return {'FINISHED'}
 
     '''
@@ -149,20 +185,20 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
                 self.logs += f'Appended {node_group_name}\n'
                 return node_group_name
 
+    # Important to create using node_tree.nodes.new() instead of bpy.ops.node.add_node()
     def create_compositor_node_group(self, node_name):
-        bpy.ops.node.add_node(
-            type="CompositorNodeGroup", 
-            use_transform=True, 
-            settings=[
-                {"name":"node_tree", "value":f"bpy.data.node_groups['{node_name}']"}
-            ]
+        node_tree = bpy.context.scene.node_tree
+        node = node_tree.nodes.new(
+            type='CompositorNodeGroup'
         )
+        node.node_tree = bpy.data.node_groups.get(node_name)
         self.logs += f'Created {node_name} node tree\n'
 
+    # Important to create using node_tree.nodes.new() instead of bpy.ops.node.add_node()
     def create_compositor_node(self, node_type):
-        bpy.ops.node.add_node(
-            type=node_type, 
-            use_transform=True
+        node_tree = bpy.context.scene.node_tree
+        node_tree.nodes.new(
+            type=node_type
         )
         self.logs += f'Created {node_type} node tree\n'
 
@@ -219,3 +255,40 @@ class GI_OT_GenshinGranTurismoTonemapperSetup(Operator, ImportHelper, CustomOper
         composite_node.location = (500, 400)
         viewer_node.location = (500, 200)
         self.logs += f'Set default locations for nodes in Compositing\n'
+
+
+class HYV_OT_HoyoversePostProcessingDefaultSettings(Operator, ImportHelper, CustomOperatorProperties, PostProcessingFeatureFlag):
+    """Sets default settings when using Hoyoverse - Post Processing"""
+    bl_idname = 'hoyoverse.post_processing_default_settings'
+    bl_label = 'Hoyoverse: Post Processing - Default Settings'
+
+    # ImportHelper mixin class uses this
+    filename_ext = "*.*"
+
+    def execute(self, context):
+        if self.feature_disabled(context):
+            if self.next_step_idx:
+                NextStepInvoker().invoke(
+                    self.next_step_idx, 
+                    self.invoker_type, 
+                    high_level_step_name=self.high_level_step_name,
+                    game_type=self.game_type,
+                )
+            self.clear_custom_properties()
+            return {'FINISHED'}
+
+        bpy.context.scene.node_tree.use_opencl = False
+        bpy.context.scene.node_tree.use_two_pass = True
+        bpy.context.scene.eevee.use_bloom = False
+        bpy.context.scene.render.film_transparent = False
+
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
+        self.clear_custom_properties()
+
+        return {'FINISHED'}

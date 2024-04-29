@@ -29,6 +29,12 @@ class UI_Properties:
             default = True
         )
 
+        bpy.types.WindowManager.post_processing_setup_enabled = bpy.props.BoolProperty(
+            name = "Post-Processing Setup Enabled",
+            description = "Enables Post-Processing Compositing Setup",
+            default = False
+        )
+
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_label = "Genshin Impact Setup Wizard"
@@ -79,6 +85,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
 
         settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
+        settings_box.prop(window_manager, 'post_processing_setup_enabled')
 
 class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'
@@ -124,6 +131,13 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         )
 
         OperatorFactory.create_rig_character_ui(sub_layout)
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.post_processing_compositing_setup',
+            'Set Up Post-Processing',
+            icon='NODE_COMPOSITING',
+            game_type=GameType.GENSHIN_IMPACT.name,
+        )
 
 
 class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
@@ -336,12 +350,37 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
+class GI_PT_UI_Post_Processing_Setup_Menu(Panel):
+    bl_label = 'Post Processing Menu'
+    bl_idname = 'GI_PT_UI_Post_Processing_Setup_Menu'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_parent_id = 'GI_PT_UI_Advanced_Setup_Layout'
+
+    def draw(self, context):
+        layout = self.layout
+        sub_layout = layout.box()
+
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.custom_composite_node_setup',
+            'Set Up Compositing Nodes',
+            'NODE_COMPOSITING'
+        )
+        OperatorFactory.create(
+            sub_layout,
+            'hoyoverse.post_processing_default_settings',
+            'Set HYV-PP Defaults',
+            'FILE_REFRESH'
+        )
+
+
 class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
     bl_label = "Compositing Setup Wizard"
     bl_idname = "GI_PT_Custom_Compositing_Node_UI_Layout"
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
-    bl_category = "GI - Setup Wizard"
+    bl_category = "Genshin - Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
@@ -359,17 +398,15 @@ class GI_PT_UI_Gran_Turismo_UI_Layout(Panel):
         )
         OperatorFactory.create(
             sub_layout,
-            'genshin.change_bpy_context',
-            'Enable Use Nodes',
-            'CHECKMARK',
-            bpy_context_attr='scene.use_nodes',
-            bpy_context_value_bool=True
+            'hoyoverse.custom_composite_node_setup',
+            'Set Up Compositing Nodes',
+            'NODE_COMPOSITING'
         )
         OperatorFactory.create(
             sub_layout,
-            'hoyoverse.custom_composite_node_setup',
-            'Set Up Compositing Node',
-            'PLAY'
+            'hoyoverse.post_processing_default_settings',
+            'Set HYV-PP Defaults',
+            'FILE_REFRESH'
         )
 
 

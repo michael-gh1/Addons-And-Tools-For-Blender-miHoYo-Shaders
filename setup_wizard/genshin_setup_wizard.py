@@ -203,6 +203,7 @@ def setup_dependencies():
         setup_wizard.character_rig_setup.rootshape_filepath_setter_operator.GI_OT_RootShape_FilePath_Setter_Operator,
         setup_wizard.optimization.emissive_optimizer.GI_OT_Emissive_Optimizer,
         setup_wizard.genshin_gran_turismo_tonemapper_setup.GI_OT_GenshinGranTurismoTonemapperSetup,
+        setup_wizard.genshin_gran_turismo_tonemapper_setup.HYV_OT_HoyoversePostProcessingDefaultSettings,
         setup_wizard.change_bpy_context.GI_OT_Change_BPY_Context,
         setup_wizard.mesh_import_setup.chibi_face_setup.PGR_OT_SetUpChibiFace,
         setup_wizard.mesh_import_setup.chibi_face_setup.PGR_OT_ImportChibiFaceTexture,
@@ -234,7 +235,8 @@ def unregister():
     from setup_wizard.character_rig_setup.character_rigger_operator import GI_OT_CharacterRiggerOperator
     from setup_wizard.character_rig_setup.rootshape_filepath_setter_operator import GI_OT_RootShape_FilePath_Setter_Operator
     from setup_wizard.optimization.emissive_optimizer import GI_OT_Emissive_Optimizer
-    from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup
+    from setup_wizard.genshin_gran_turismo_tonemapper_setup import GI_OT_GenshinGranTurismoTonemapperSetup, \
+        HYV_OT_HoyoversePostProcessingDefaultSettings
     from setup_wizard.change_bpy_context import GI_OT_Change_BPY_Context
     from setup_wizard.mesh_import_setup.chibi_face_setup import PGR_OT_SetUpChibiFace, PGR_OT_ImportChibiFaceTexture
 
@@ -261,6 +263,7 @@ def unregister():
         GI_OT_RootShape_FilePath_Setter_Operator,
         GI_OT_Emissive_Optimizer,
         GI_OT_GenshinGranTurismoTonemapperSetup,
+        HYV_OT_HoyoversePostProcessingDefaultSettings,
         GI_OT_Change_BPY_Context,
         PGR_OT_SetUpChibiFace,
         PGR_OT_ImportChibiFaceTexture,
