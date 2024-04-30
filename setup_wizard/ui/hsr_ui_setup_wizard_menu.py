@@ -32,7 +32,17 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
         )
         OperatorFactory.create_betterfbx_required_ui(run_entire_setup_column)
 
-        row = layout.row()
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
+
+        if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
+            sub_layout.label(text='Rigging Disabled', icon='ERROR')
+
+        settings_box = layout.box()
+        settings_box.label(text='Global Settings', icon='WORLD')
+
+        row = settings_box.row()
         row.prop(window_manager, 'cache_enabled')
         OperatorFactory.create(
             row,
@@ -42,6 +52,8 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
 
+        # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
+        settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
 
 class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'
@@ -88,6 +100,8 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
             icon='CHECKMARK',
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
+
+        OperatorFactory.create_rig_character_ui(sub_layout)
 
 
 class HSR_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
@@ -278,6 +292,43 @@ class HSR_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
+class HSR_PT_UI_Character_Rig_Setup_Menu(Panel):
+    bl_label = 'Character Rig Menu'
+    bl_idname = 'HSR_PT_Rigify_Setup_Menu'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_parent_id = 'HSR_PT_UI_Advanced_Setup_Layout'
+
+    def draw(self, context):
+        layout = self.layout
+        sub_layout = layout.column()
+        box = sub_layout.box()
+
+        character_rigger_props = context.scene.character_rigger_props
+
+        OperatorFactory.create_rig_character_ui(box)
+
+        box = sub_layout.box()        
+        box.label(text='Settings')
+
+        col = box.column()
+        OperatorFactory.create(
+            col,
+            'hoyoverse.rootshape_filepath_setter',
+            'Override RootShape Filepath',
+            'FILE_FOLDER',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
+            operator_context='INVOKE_DEFAULT'
+        )
+        col = box.column()
+        col.prop(character_rigger_props, 'allow_arm_ik_stretch')
+        col.prop(character_rigger_props, 'allow_leg_ik_stretch')
+        col.prop(character_rigger_props, 'use_arm_ik_poles')
+        col.prop(character_rigger_props, 'use_leg_ik_poles')
+        col.prop(character_rigger_props, 'add_children_of_constraints')
+        col.prop(character_rigger_props, 'use_head_tracker')
+
+
 class HSR_PT_UI_Gran_Turismo_UI_Layout(Panel):
     bl_label = "Gran Turismo Tonemapper"
     bl_idname = "HSR_PT_Gran_Turismo_Tonemapper_UI_Layout"
@@ -348,3 +399,29 @@ class OperatorFactory:
             ui_object.column()
             ui_object.enabled = False
             ui_object.label(text='BetterFBX required', icon='ERROR')
+
+    @staticmethod
+    def create_rig_character_ui(
+        ui_object: UILayout,
+    ):
+        expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        rigify_installed = bpy.context.preferences.addons.get('rigify')
+
+        column = ui_object.column()
+        column.enabled = True if expy_kit_installed and betterfbx_installed and rigify_installed else False
+        OperatorFactory.create(
+            column,
+            'hoyoverse.set_up_character_rig',
+            'Rig Character',
+            'OUTLINER_OB_ARMATURE',
+            game_type=GameType.HONKAI_STAR_RAIL.name,
+        )
+        if not column.enabled:
+            column = ui_object.column()
+            if not betterfbx_installed:
+                column.label(text='BetterFBX required', icon='ERROR')
+            if not expy_kit_installed:
+                column.label(text='ExpyKit required', icon='ERROR')
+            if not rigify_installed:
+                column.label(text='Rigify required', icon='ERROR')
