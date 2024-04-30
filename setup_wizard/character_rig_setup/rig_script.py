@@ -1190,6 +1190,11 @@ def rig_character(
     armature.edit_bones['torso-outer'].inherit_scale="AVERAGE"
     armature.edit_bones['torso-inner'].inherit_scale="FULL"
     armature.edit_bones['torso'].inherit_scale="FULL"
+    # fix the bad rolls of the torso bone
+    armature.edit_bones['torso'].roll = 0
+    armature.edit_bones['torso-inner'].roll = 0
+    armature.edit_bones['torso-outer'].roll = 0
+    
     armature.edit_bones['forearm_tweak-pin.R'].inherit_scale="AVERAGE"
     armature.edit_bones['forearm_tweak-pin.L'].inherit_scale="AVERAGE"
     armature.edit_bones['shin_tweak-pin.L'].inherit_scale="AVERAGE"
@@ -1272,7 +1277,7 @@ def rig_character(
 
     
     # TORSO POS fixing
-    armature.edit_bones['torso'].roll = -1.5708
+    # armature.edit_bones['torso'].roll = -1.5708
     torso_head_pos = armature.edit_bones['torso'].head.copy()
     torso_tail_pos = armature.edit_bones['torso'].tail.copy()
     
