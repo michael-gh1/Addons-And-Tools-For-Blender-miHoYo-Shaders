@@ -88,6 +88,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             HonkaiStarRailTestOperatorExecutioner('delete_specific_objects'),
             HonkaiStarRailTestOperatorExecutioner('set_up_armtwist_bone_constraints'),
             HonkaiStarRailTestOperatorExecutioner('join_meshes_on_armature'),
+            HonkaiStarRailTestOperatorExecutioner('rig_character', config=config),
         ]
 
         for operator in operators:
