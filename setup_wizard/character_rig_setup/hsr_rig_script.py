@@ -501,7 +501,7 @@ def rig_character(
     except:
         pass
     try:
-        bpy.context.view_layer.objects.active = bpy.data.objects["Head Origin"]
+        bpy.context.view_layer.objects.active = bpy.data.objects.get("Head Origin") or bpy.data.objects.get("Head Driver")
         bpy.ops.constraint.childof_set_inverse(constraint="Child Of", owner='OBJECT')
     except:
         pass
