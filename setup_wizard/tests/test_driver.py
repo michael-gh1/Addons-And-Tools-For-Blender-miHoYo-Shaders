@@ -21,7 +21,7 @@ class TestDriver:
         self.config_service = ConfigService(relative_path_to_config_json)
 
         timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H%M%SZ')
-        self.logs_directory_path = f'setup_wizard/tests/logs/{timestamp}'
+        self.logs_directory_path = f'setup_wizard/tests/logs/{timestamp}-{relative_path_to_config_json[:-5]}'
         Path(self.logs_directory_path).mkdir(parents=True, exist_ok=True)
 
     def execute(self):
