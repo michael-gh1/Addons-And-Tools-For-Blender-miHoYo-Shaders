@@ -495,11 +495,11 @@ def rig_character(
         bpy.data.objects["Face_Mask"].hide_render = True
     except:
         pass
-    try:
-        bpy.data.objects["Weapon"].hide_viewport = True
-        bpy.data.objects["Weapon"].hide_render = True
-    except:
-        pass
+    # try:
+    #     bpy.data.objects["Weapon"].hide_viewport = True
+    #     bpy.data.objects["Weapon"].hide_render = True
+    # except:
+    #     pass
     try:
         bpy.context.view_layer.objects.active = bpy.data.objects.get("Head Origin") or bpy.data.objects.get("Head Driver")
         bpy.ops.constraint.childof_set_inverse(constraint="Child Of", owner='OBJECT')
