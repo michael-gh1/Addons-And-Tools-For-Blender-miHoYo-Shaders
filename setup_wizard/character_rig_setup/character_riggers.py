@@ -4,7 +4,8 @@ import bpy
 import os
 
 from setup_wizard.character_rig_setup.rig_script import rig_character
-from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc                                                                                 
+from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
+from setup_wizard.character_rig_setup.hsr_rig_script import rig_character as hsr_rig_character
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -123,7 +124,15 @@ class HonkaiStarRailCharacterRigger(CharacterRigger):
         self.rigify_bone_shapes_file_path = 'PLACEHOLDER'
 
     def rig_character(self):
-        return
+        armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
+
+        # Important that the Armature is selected before performing rigging operations
+        bpy.ops.object.select_all(action='DESELECT')
+        armature: Armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
+        bpy.context.view_layer.objects.active = armature
+        armature.select_set(True)
+
+        hsr_rig_character()
 
 
 class PunishingGrayRavenCharacterRigger(CharacterRigger):
