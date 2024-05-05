@@ -37,7 +37,7 @@ from setup_wizard.ui.gi_ui_setup_wizard_menu import \
     GI_PT_UI_Finish_Setup_Menu, \
     GI_PT_UI_Character_Rig_Setup_Menu, \
     GI_PT_UI_Post_Processing_Setup_Menu, \
-    GI_PT_UI_Compositing_Panel_Post_Processing_UI_Layout
+    GI_PT_UI_Post_Processing_Node_Editor_Setup_Menu
 from setup_wizard.ui.hsr_ui_setup_wizard_menu import \
     HSR_PT_Setup_Wizard_UI_Layout, \
     HSR_PT_Basic_Setup_Wizard_UI_Layout, \
@@ -83,7 +83,7 @@ classes = [
     GI_PT_UI_Finish_Setup_Menu,
     GI_PT_UI_Character_Rig_Setup_Menu,
     GI_PT_UI_Post_Processing_Setup_Menu,
-    GI_PT_UI_Compositing_Panel_Post_Processing_UI_Layout,
+    GI_PT_UI_Post_Processing_Node_Editor_Setup_Menu,
     GI_OT_GenshinSetupWizardUI,
     GI_OT_SetUpCharacter,
     GI_OT_SetUpMaterials,
