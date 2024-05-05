@@ -329,41 +329,41 @@ class HSR_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
-class HSR_PT_UI_Gran_Turismo_UI_Layout(Panel):
-    bl_label = "Gran Turismo Tonemapper"
-    bl_idname = "HSR_PT_Gran_Turismo_Tonemapper_UI_Layout"
-    bl_space_type = "NODE_EDITOR"
-    bl_region_type = "UI"
-    bl_category = "Honkai Star Rail - Setup Wizard"
+# class HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout(Panel):
+#     bl_label = "Compositing Setup Wizard"
+#     bl_idname = "HSR_PT_Custom_Compositing_Node_UI_Layout"
+#     bl_space_type = "NODE_EDITOR"
+#     bl_region_type = "UI"
+#     bl_category = "HSR - Setup Wizard"
 
-    def draw(self, context):
-        layout = self.layout
-        row = layout.row()
-        sub_layout = layout.box()
-        window_manager = context.window_manager
+#     def draw(self, context):
+#         layout = self.layout
+#         row = layout.row()
+#         sub_layout = layout.box()
+#         window_manager = context.window_manager
 
-        row.prop(window_manager, 'cache_enabled')
-        OperatorFactory.create(
-            row,
-            'genshin.clear_cache_operator',
-            'Clear Cache',
-            'TRASH',
-            game_type=GameType.HONKAI_STAR_RAIL.name,
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.change_bpy_context',
-            'Enable Use Nodes',
-            'CHECKMARK',
-            bpy_context_attr='scene.use_nodes',
-            bpy_context_value_bool=True
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'genshin.gran_turismo_tonemapper_setup',
-            'Set Up GT Tonemapper',
-            'PLAY'
-        )
+#         row.prop(window_manager, 'cache_enabled')
+#         OperatorFactory.create(
+#             row,
+#             'genshin.clear_cache_operator',
+#             'Clear Cache',
+#             'TRASH',
+#             game_type=GameType.HONKAI_STAR_RAIL.name,
+#         )
+#         OperatorFactory.create(
+#             sub_layout,
+#             'genshin.change_bpy_context',
+#             'Enable Use Nodes',
+#             'CHECKMARK',
+#             bpy_context_attr='scene.use_nodes',
+#             bpy_context_value_bool=True
+#         )
+#         OperatorFactory.create(
+#             sub_layout,
+#             'hoyoverse.custom_composite_node_setup',
+#             'Set Up Compositing Node',
+#             'PLAY'
+#         )
 
 
 '''

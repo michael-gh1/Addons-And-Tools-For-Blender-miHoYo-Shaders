@@ -22,7 +22,7 @@ CHARACTER_MODEL_FOLDER_FILE_PATH = 'character_model_folder_file_path'
 GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH = 'genshin_impact_root_folder_file_path'
 GENSHIN_IMPACT_SHADER_FILE_PATH = "genshin_impact_shader_file_path"
 GENSHIN_IMPACT_OUTLINES_FILE_PATH = 'genshin_impact_outlines_file_path'
-GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH = 'genshin_impact_gran_turismo_file_path'
+HOYOVERSE_COMPOSITING_NODE_FILE_PATH = 'hoyoverse_compositing_node_file_path'
 GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH = 'genshin_rigify_bone_shapes_file_path'
 
 HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH = 'honkai_star_rail_folder_file_path'
@@ -167,7 +167,7 @@ def clear_cache(game_type: str):
             GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH,
             GENSHIN_IMPACT_SHADER_FILE_PATH,
             GENSHIN_IMPACT_OUTLINES_FILE_PATH,
-            GENSHIN_IMPACT_GRAN_TURISMO_FILE_PATH,
+            HOYOVERSE_COMPOSITING_NODE_FILE_PATH,
             GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH,
         ]
     elif game_type == GameType.HONKAI_STAR_RAIL.name:
@@ -285,7 +285,9 @@ class ComponentFunctionFactory:
             return bpy.ops.punishing_gray_raven.import_chibi_face_texture
         elif component_name == 'paint_vertex_colors':
             return bpy.ops.punishing_gray_raven.paint_vertex_colors
-        elif component_name == 'gran_turismo_tonemapper_setup':
-            return bpy.ops.genshin.gran_turismo_tonemapper_setup
+        elif component_name == 'compositing_node_setup':
+            return bpy.ops.hoyoverse.custom_composite_node_setup
+        elif component_name == 'post_processing_default_settings':
+            return bpy.ops.hoyoverse.post_processing_default_settings
         else:
             raise Exception(f'Unknown component name passed into {__name__}: {component_name}')

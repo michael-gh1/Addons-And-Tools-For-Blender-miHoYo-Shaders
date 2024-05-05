@@ -56,6 +56,7 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
                 {'WARNING'},
                 'Rigging skipped. Rigging not enabled on Run Entire Setup.'
             )
+            self.invoke_next_step()
             return {'FINISHED'}
         if not betterfbx_installed or not expy_kit_installed or not rigify_installed:
             self.report(
@@ -65,24 +66,27 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
                 f'ExpyKit: {"Installed" if expy_kit_installed else "Missing"}\n'
                 f'Rigify: {"Installed" if rigify_installed else "Missing"}'
             )
+            self.invoke_next_step()
             return {'FINISHED'}
 
         try:
             rigify_character_service = RigifyCharacterService(self.game_type, self, context)
             rigify_character_service.rig_character()
 
-            if self.next_step_idx:
-                NextStepInvoker().invoke(
-                    self.next_step_idx, 
-                    self.invoker_type, 
-                    high_level_step_name=self.high_level_step_name,
-                    game_type=self.game_type,
-                )
+            self.invoke_next_step()
         except Exception as ex:
             raise ex
         finally:
             super().clear_custom_properties()
         return {'FINISHED'}
 
+    def invoke_next_step(self):
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
 
 register, unregister = bpy.utils.register_classes_factory(GI_OT_CharacterRiggerOperator)

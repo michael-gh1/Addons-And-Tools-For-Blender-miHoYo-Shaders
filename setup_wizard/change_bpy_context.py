@@ -7,6 +7,7 @@ from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
+from setup_wizard.setup_wizard_operator_base_classes import NextStepInvoker
 
 '''
 While this Operator technically works in changing bpy.context, the Blender UI
@@ -27,11 +28,27 @@ class GI_OT_Change_BPY_Context(Operator, CustomOperatorProperties):
     bpy_context_value_bool: BoolProperty()
 
     def execute(self, context):
-        self.rsetattr(  
-            bpy.context, 
-            self.bpy_context_attr, 
-            (self.bpy_context_value_str or self.bpy_context_value_bool)
-        )
+        try:
+            self.rsetattr(  
+                bpy.context, 
+                self.bpy_context_attr, 
+                (self.bpy_context_value_str or self.bpy_context_value_bool)
+            )
+            self.invoke_next_step()
+        except Exception as ex:
+            raise ex
+        finally:
+            super().clear_custom_properties()
+        return {'FINISHED'}
+
+    def invoke_next_step(self):
+        if self.next_step_idx:
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
         self.clear_custom_properties()
         return {'FINISHED'}
 
