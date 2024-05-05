@@ -10,12 +10,12 @@ class UI_Properties:
     @staticmethod
     def create_custom_ui_properties():
         bpy.types.WindowManager.setup_wizard_full_run_rigging_enabled = bpy.props.BoolProperty(
-            name = " Rigging Enabled",
+            name = "Rigging Enabled",
             default = True
         )
 
         bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
-            name = " Join Meshes Enabled",
+            name = "Join Meshes Enabled",
             default = True
         )
 
