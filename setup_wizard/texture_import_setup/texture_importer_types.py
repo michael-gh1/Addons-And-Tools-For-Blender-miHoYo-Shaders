@@ -750,7 +750,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 weapon1_material = bpy.data.materials.get(self.material_names.WEAPON1)
                 weapon01_material = bpy.data.materials.get(self.material_names.WEAPON01)
                 weapon02_material = bpy.data.materials.get(self.material_names.WEAPON02)
-                weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material]
+                weapon_trans_material = bpy.data.materials.get(self.material_names.WEAPON_TRANS)
+                weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material, weapon_trans_material]
                 handbag_material = bpy.data.materials.get(self.material_names.HANDBAG)
                 kendama_material = bpy.data.materials.get(self.material_names.KENDAMA)
 

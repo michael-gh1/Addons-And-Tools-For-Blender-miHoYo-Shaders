@@ -24,6 +24,7 @@ class ShaderMaterialNames:
     WEAPON = ''
     WEAPON01 = ''
     WEAPON02 = ''
+    WEAPON_TRANS = ''  # Serval
     HANDBAG = ''  # Sampo
     KENDAMA = ''  # Sparkle
     # HSR: StellarToon
@@ -119,6 +120,7 @@ class StellarToonShaderMaterialNames(ShaderMaterialNames):
     WEAPON1 = f'{MATERIAL_PREFIX}Weapon1'
     WEAPON01 = f'{MATERIAL_PREFIX}Weapon01'
     WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
+    WEAPON_TRANS = f'{MATERIAL_PREFIX}Weapon_Trans'
     HANDBAG = f'{MATERIAL_PREFIX}Handbag'
     KENDAMA = f'{MATERIAL_PREFIX}Kendama'  # Sparkle
 
