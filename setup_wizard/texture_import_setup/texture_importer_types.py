@@ -697,6 +697,7 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
     def set_stocking_texture(self, type: TextureType, material, img):
         body_material = bpy.data.materials.get(self.material_names.BODY)
         body1_material = bpy.data.materials.get(self.material_names.BODY1)
+        body2_material = bpy.data.materials.get(self.material_names.BODY2)
         img.colorspace_settings.name='Non-Color'
 
         # If Body material or Body1 material apply to Body1 Stockings
@@ -718,6 +719,15 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
             stockings_body2_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP)
             if stockings_body2_node_group:  # Nya222
                 stockings_body2_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
+
+            body_stockings_node = body2_material.node_tree.nodes.get(self.texture_node_names.STOCKINGS)
+            body_stockings_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_NODE_GROUP)
+            if body_stockings_node:  # Stellartoon
+                body_stockings_node.image = img
+                body2_material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(
+                    StellarToonShaderNodeNames.ENABLE_STOCKINGS).default_value = 1.0
+            if body_stockings_node_group:  # StellarToon
+                body_stockings_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
 
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
