@@ -413,7 +413,7 @@ class OperatorFactory:
         OperatorFactory.create(
             column,
             'hoyoverse.set_up_character_rig',
-            'Rig Character',
+            'Rig Character [Preview]',
             'OUTLINER_OB_ARMATURE',
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
