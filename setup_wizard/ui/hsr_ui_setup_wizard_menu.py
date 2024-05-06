@@ -53,7 +53,7 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
         )
 
         # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
-        settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
+        # settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')  # temp disabled, feature preview only
 
 class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
     bl_label = 'Basic Setup'
