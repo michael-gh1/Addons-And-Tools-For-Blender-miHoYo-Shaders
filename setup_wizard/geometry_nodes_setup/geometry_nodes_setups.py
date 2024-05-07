@@ -349,8 +349,11 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         is_npc = [material for material in bpy.data.materials if 'NPC' in material.name]
         if is_npc:
             npc_outline_to_material_mapping = {
+                'Item_01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
                 'Hat': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+                'Item_02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
                 'Screw': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+                'Item_03': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
             }
 
             for input_name, (material_input_accessor, outline_material_input_accessor) in npc_outline_to_material_mapping.items():
