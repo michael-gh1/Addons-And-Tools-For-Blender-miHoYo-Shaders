@@ -939,6 +939,8 @@ def rig_character(
     bpy.ops.wm.append(filename='append_Foot', directory=path_to_file)
     
     bpy.ops.wm.append(filename='append_Hand', directory=path_to_file)
+    
+    bpy.ops.wm.append(filename='append_Props', directory=path_to_file)
   
     this_obj = our_char
 
@@ -1056,6 +1058,11 @@ def rig_character(
     hand_l_rig_obj = bpy.data.objects.get("handrig-L")
     if hand_l_rig_obj:
         hand_l_rig_obj.select_set(True)
+        
+    # Select prop rig   
+    prop_rig_obj = bpy.data.objects.get("prop-rig")
+    if prop_rig_obj:
+        prop_rig_obj.select_set(True)
             
     # Select char armature
     if our_char:
@@ -1164,13 +1171,18 @@ def rig_character(
     armature.edit_bones['MCH-upper_arm_ik_target.L'].parent = armature.edit_bones['mch-hand-ik-wrist-L']    
     armature.edit_bones['MCH-upper_arm_ik_target.R'].parent = armature.edit_bones['mch-hand-ik-wrist-R']    
 
-    
-    armature.edit_bones['shoulder_driver.L'].parent = armature.edit_bones['ORG-spine.002']
-    armature.edit_bones['shoulder_driver.R'].parent = armature.edit_bones['ORG-spine.002']
-    armature.edit_bones['MCH-shoulder_follow.L'].parent = armature.edit_bones['ORG-spine.002']
-    armature.edit_bones['MCH-shoulder_follow.R'].parent = armature.edit_bones['ORG-spine.002']
+    # on NPC's only, org spine 003 is missing, so shoulders act weird. instead try parenting to def spine 002
+    armature.edit_bones['shoulder_driver.L'].parent = armature.edit_bones['DEF-spine.002']
+    armature.edit_bones['shoulder_driver.R'].parent = armature.edit_bones['DEF-spine.002']
+    armature.edit_bones['MCH-shoulder_follow.L'].parent = armature.edit_bones['DEF-spine.002']
+    armature.edit_bones['MCH-shoulder_follow.R'].parent = armature.edit_bones['DEF-spine.002']
     armature.edit_bones['shoulder.L'].parent = armature.edit_bones['MCH-shoulder_follow.L']
-    armature.edit_bones['shoulder.R'].parent = armature.edit_bones['MCH-shoulder_follow.R']                                                                                                                  
+    armature.edit_bones['shoulder.R'].parent = armature.edit_bones['MCH-shoulder_follow.R']
+    armature.edit_bones['ORG-shoulder.L'].parent = armature.edit_bones['DEF-spine.002']
+    armature.edit_bones['ORG-shoulder.R'].parent = armature.edit_bones['DEF-spine.002']
+
+     
+    
     # RENAME imported bones
     rename_bones_list = [("root", "root.002")]
     rename_bones_list.append(("root-inner", "root.001"))
@@ -1349,7 +1361,9 @@ def rig_character(
     armature.edit_bones['MCH-shoulder_follow.L'].tail = armature.edit_bones['shoulder.L'].tail.copy()
     
     armature.edit_bones['MCH-shoulder_follow.R'].head = armature.edit_bones['shoulder.R'].head.copy()
-    armature.edit_bones['MCH-shoulder_follow.R'].tail = armature.edit_bones['shoulder.R'].tail.copy()                                       
+    armature.edit_bones['MCH-shoulder_follow.R'].tail = armature.edit_bones['shoulder.R'].tail.copy()    
+
+
    
     try:
         armature.edit_bones["DEF-eye.L"].name = "+EyeBone L A01"
@@ -1471,6 +1485,11 @@ def rig_character(
     to_del_coll = bpy.data.collections.get("wgt.005")
     for obj in to_del_coll.objects:
         move_into_collection(obj.name,"wgt")
+        
+    # props
+    to_del_coll = bpy.data.collections.get("wgt.006")
+    for obj in to_del_coll.objects:
+        move_into_collection(obj.name,"wgt")
 
     # After moving into collection, delete the old empty ones.
     bpy.data.collections.remove(bpy.data.collections.get("append_Root"),do_unlink=True)
@@ -1479,6 +1498,7 @@ def rig_character(
     bpy.data.collections.remove(bpy.data.collections.get("append_Pelvis"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Foot"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Hand"),do_unlink=True)
+    bpy.data.collections.remove(bpy.data.collections.get("append_Props"),do_unlink=True)
 
     # Adding Shape Key Drivers
     ourRig = char_name
@@ -1790,6 +1810,7 @@ def rig_character(
     assign_bone_to_group("hand-ik-L", "Limbs L")
     assign_bone_to_group("upper_arm_parent.L", "Limbs L")
     assign_bone_to_group("forearm_tweak-pin.L", "Limbs L")
+    assign_bone_to_group("prop.L", "Limbs L")
     if not use_arm_ik_poles:
         assign_bone_to_group("upper_arm_ik.L", "Limbs L")                                                                                                                                                       
 
@@ -1801,6 +1822,7 @@ def rig_character(
     assign_bone_to_group("hand-ik-R", "Limbs R")
     assign_bone_to_group("upper_arm_parent.R", "Limbs R")
     assign_bone_to_group("forearm_tweak-pin.R", "Limbs R")
+    assign_bone_to_group("prop.R", "Limbs R")
     if not use_arm_ik_poles:
         assign_bone_to_group("upper_arm_ik.R", "Limbs R")                                                        
 
@@ -2013,9 +2035,33 @@ def rig_character(
         depsgraph.update()
         
         # Toggle the constraint off, we HAVE to reenable it later to work!!
-        new.enabled = False                                      
+        new.enabled = False    
+            # We have to nuke the existing driver in the torso. 
+    
+    def remake_spine_constraint(bone, target):       
+        const = this_obj.pose.bones[bone].constraints
+        to_del = [c for c in const]
+        for c in to_del:
+            const.remove(c)
+            
+        new = const.new('COPY_TRANSFORMS')
+        new.name = 'Copy Transforms'
+        # add target
+        #new.targets.new()
+        new.target = bpy.data.objects[char_name]
+        new.subtarget = target
+        
+        new.target_space = "LOCAL"
+        new.owner_space = "LOCAL"
+        
+        new.influence = 0.5
+        
+        # Toggle the constraint off, we HAVE to reenable it later to work!!
+        new.enabled = False  
         
     nuke_old_torso_const()
+    remake_spine_constraint("MCH-spine.002","chest")
+    remake_spine_constraint("MCH-pivot","spine_fk.001")
                              
     # Use this to swap a variable in a constraint
     def swap_const_follow_in_const(bone, constraint_type, new_var):
@@ -2050,6 +2096,7 @@ def rig_character(
         collections.new("Tweaks")
         collections.new("Pivots & Pins")
         collections.new("Offsets")
+        collections.new("Props")
         collections.new("Face")
         collections.new("Torso (IK)")
         collections.new("Torso (FK)")
@@ -2114,6 +2161,8 @@ def rig_character(
     this_obj.pose.bones["MCH-shin_tweak-pin.parent.L"].constraints[0].enabled = True
     this_obj.pose.bones["MCH-shin_tweak-pin.parent.R"].constraints[0].enabled = True
     this_obj.pose.bones["MCH-torso.parent"].constraints[0].enabled = True     
+    this_obj.pose.bones["MCH-spine.002"].constraints[0].enabled = True     
+    this_obj.pose.bones["MCH-pivot"].constraints[0].enabled = True     
     # Deselect everything, we're done.
     for bone in bpy.context.active_object.pose.bones:
         bone.bone.select = False
@@ -2125,7 +2174,7 @@ def rig_character(
     rig_text = rig_file.as_string()
     complete_rig_text = rig_text
     # My disclaimer, out of respect for modifying Rigify core's script
-    rig_text_disclaimer = "\n# This RigUI script has been modified by Llama for use with Genshin Impact characters using a custom made rig. Any issues arising as a result of these modifications are my own fault and are not indicitive of Rigify's original functionalities. \n# Rigify's writers bare no responsibility for issues/errors made here. Additionally, these modifications have been made for the sole reason of improving the custom made rigs for Genshin Impact characters, meaning that\n# attempting to use this script elsewhere for characters/models/skeletons it was NOT intended to be used with, could yield improper or erroneous results - of which neither Rigify's development team nor I, am responsible for. \n\n# Otherwise, if you are seeing this disclaimer with a Genshin Impact character made with the proper addons, run this as needed. (Such as after appending to build the rig layers)\n# Do NOT however, attempt to use this rig in another version of blender than what it was made in. (3.6.X rigs will NOT work adequately in 4.X or beyond; and 4.X rigs will not work in previous versions before 4.0)\n"
+    rig_text_disclaimer = "\n# This RigUI script has been modified by Llama for use with Genshin Impact characters using a custom made rig. Any issues arising as a result of these modifications are not indicitive of Rigify's original functionalities. \n# Rigify's writers bare no responsibility for issues/errors made here. Additionally, these modifications have been made to improve the custom made rigs for Genshin Impact characters, meaning that\n# attempting to use this script elsewhere for characters/models/skeletons it was NOT intended to be used with, could yield improper or erroneous results - of which neither Rigify's development team nor I, am responsible for. \n\n# Otherwise, if you are seeing this disclaimer with a Hoyoverse character made with the proper addons, run this as needed. (Such as after appending to build the rig layers)\n# Do NOT however, attempt to use this rig in another version of blender than what it was made in. (3.6.X rigs will NOT work adequately in 4.X or beyond; and 4.X rigs will not work in previous versions before 4.0)\n"
     
     # MODIFICATIONS to the text file are made here:
     # Get the ID of this char's rig ui script.
@@ -2141,7 +2190,7 @@ def rig_character(
             return string3
     
     def layers_to_generate(vers):
-        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)+"\n            row = col.row()\n            "+make_layer_str("Other", 25, vers)
+        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            "+make_layer_str("Props", 21, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)+"\n            row = col.row()\n            "+make_layer_str("Other", 25, vers)
                 
         return str
         
@@ -2244,6 +2293,7 @@ def rig_character(
         bpy.context.object.data.layers[14] = False
         bpy.context.object.data.layers[16] = True
         bpy.context.object.data.layers[17] = False
+        bpy.context.object.data.layers[21] = True
         bpy.context.object.data.layers[28] = True
         bpy.context.object.data.layers[26] = True
     else:            
@@ -2309,7 +2359,7 @@ def rig_character(
     if use_head_tracker:
         bone_to_layer("head-controller", 0, "Face")  
     else:
-        bone_to_layer("head-controller", 25, "Other")  
+        bone_to_layer("head-controller", 25, "Other") 
     bone_to_layer("eyetrack_L", 0, "Face")        
     bone_to_layer("eyetrack_R", 0, "Face") 
     
@@ -2449,8 +2499,8 @@ def rig_character(
     fast_bone_move(send_to_pivots, 19, "Pivots & Pins")
     
     bone_to_layer("root.002", 28, "Root")
-    bone_to_layer("root.001", 28, "Root")
-    bone_to_layer("root", 28, "Root")
+    bone_to_layer("root.001", 26, "Offsets")
+    bone_to_layer("root", 26, "Offsets")
     
     bone_to_layer("hand_ik.L",7,"Arm.L (IK)")
     bone_to_layer("hand_ik_wrist.L",26,"Offsets")
@@ -2499,6 +2549,9 @@ def rig_character(
     #npc, move invis bones away
     bone_to_layer("WinkA-Invis", 25, "Other")  
     bone_to_layer("WinkB-Invis", 25, "Other")
+    
+    bone_to_layer("prop.L", 21, "Props")
+    bone_to_layer("prop.R", 21, "Props")
 
     # MOVING OF BONES END -------------------------------    
 def setup_neck_and_head_follow(neck_follow_value, head_follow_value):
