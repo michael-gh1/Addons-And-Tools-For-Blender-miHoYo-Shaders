@@ -27,8 +27,8 @@ def get_npc_mesh_body_part_name(material_name):
     elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
         return 'Dress'
     elif 'Item' in material_name:
-        item_material_name = material_name.replace('NPC_', '').replace('_Mat', '')
-        return item_material_name
+        item_name = material_name.replace('NPC_', '').replace('_Mat', '')
+        return item_name
     elif 'Screw' in material_name:
         return 'Screw'
     elif 'Hat' in material_name:
