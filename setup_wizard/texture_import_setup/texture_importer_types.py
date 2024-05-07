@@ -697,28 +697,37 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
     def set_stocking_texture(self, type: TextureType, material, img):
         body_material = bpy.data.materials.get(self.material_names.BODY)
         body1_material = bpy.data.materials.get(self.material_names.BODY1)
+        body2_material = bpy.data.materials.get(self.material_names.BODY2)
         img.colorspace_settings.name='Non-Color'
 
         # If Body material or Body1 material apply to Body1 Stockings
         # Else Body2 material or Body Stockings texture with Body1/Body2 materials apply to Body2 Stockings
         if (body_material and material is body_material) or (body1_material and material is body1_material):
             stockings_body1_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY1_NODE_GROUP)
-            body_stockings_node = material.node_tree.nodes.get(self.texture_node_names.STOCKINGS)
-            body_stockings_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_NODE_GROUP)
 
             if stockings_body1_node_group:  # Nya222
                 stockings_body1_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
-            if body_stockings_node:  # Stellartoon
-                body_stockings_node.image = img
-                material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(
-                    StellarToonShaderNodeNames.ENABLE_STOCKINGS).default_value = 1.0
-            if body_stockings_node_group:  # StellarToon
-                body_stockings_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
+
+            # StellarToon Shader
+            self.set_up_stellartoon_stocking_texture(material, img)  # Body or Body1 material
         else:
             stockings_body2_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_BODY2_NODE_GROUP)
             if stockings_body2_node_group:  # Nya222
                 stockings_body2_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
 
+            # StellarToon Shader
+            self.set_up_stellartoon_stocking_texture(body2_material, img)
+
+    def set_up_stellartoon_stocking_texture(self, material, img):
+        body_stockings_node = material.node_tree.nodes.get(self.texture_node_names.STOCKINGS)
+        body_stockings_node_group = bpy.data.node_groups.get(self.texture_node_names.STOCKINGS_NODE_GROUP)
+
+        if body_stockings_node:
+            body_stockings_node.image = img
+            material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(
+                StellarToonShaderNodeNames.ENABLE_STOCKINGS).default_value = 1.0
+        if body_stockings_node_group:
+            body_stockings_node_group.nodes[self.texture_node_names.STOCKINGS].image = img
 
 class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
     def __init__(self, material_names: ShaderMaterialNames, texture_node_names: TextureNodeNames):
@@ -750,7 +759,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 weapon1_material = bpy.data.materials.get(self.material_names.WEAPON1)
                 weapon01_material = bpy.data.materials.get(self.material_names.WEAPON01)
                 weapon02_material = bpy.data.materials.get(self.material_names.WEAPON02)
-                weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material]
+                weapon_trans_material = bpy.data.materials.get(self.material_names.WEAPON_TRANS)
+                weapon_materials = [weapon_material, weapon1_material, weapon01_material, weapon02_material, weapon_trans_material]
                 handbag_material = bpy.data.materials.get(self.material_names.HANDBAG)
                 kendama_material = bpy.data.materials.get(self.material_names.KENDAMA)
 

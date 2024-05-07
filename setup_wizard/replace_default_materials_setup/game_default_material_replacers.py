@@ -301,6 +301,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             'Mat_Trans',
             'Face',
             'EyeShadow',
+            'Weapon_Trans',
             'Body',  # Important this is last in the list because it could interfere with Body1 and Body2
         ]
 
@@ -330,6 +331,7 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             mesh_body_part_name == 'Weapon01' or \
             mesh_body_part_name == 'Weapon02' or \
             mesh_body_part_name == 'Weapon1' or \
+            mesh_body_part_name == 'Weapon_Trans' or \
             mesh_body_part_name == 'Handbag' or \
             mesh_body_part_name == 'Kendama' else \
             f'{self.shader_material_names.WEAPON}'
@@ -373,6 +375,11 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
             body_material.use_fake_user = True
         body_material.node_tree.nodes.get(StellarToonShaderNodeNames.BODY_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
         return body_material
+
+    def create_weapon_materials(self, mesh_body_part_name):
+        weapon_material = super().create_weapon_materials(mesh_body_part_name)
+        weapon_material.node_tree.nodes.get(StellarToonShaderNodeNames.MAIN_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
+        return weapon_material
 
 
 class PunishingGrayRavenDefaultMaterialReplacer(GameDefaultMaterialReplacer):
