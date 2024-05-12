@@ -6,6 +6,7 @@ import os
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
 from setup_wizard.character_rig_setup.hsr_rig_script import rig_character as hsr_rig_character
+from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -37,6 +38,26 @@ class CharacterRigger(ABC):
     def rig_character(self):
         raise NotImplementedError
 
+    # Genshin Shader >=v3.3
+    def set_up_lighting_panel(self, light_vectors_modifier):
+        if LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier:
+            if not bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL):
+                self.import_lighting_panel()
+
+            for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
+                light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
+
+    def import_lighting_panel(self):
+        lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
+        inner_path = 'Collection'
+        bpy.ops.wm.append(
+            filepath=os.path.join(lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
+            directory=os.path.join(lighting_panel_filepath, inner_path),
+            files=[
+                {'name': LightingPanelNames.Collections.LIGHTING_PANEL},
+            ],
+        )
+
 
 class GenshinImpactCharacterRigger(CharacterRigger):
     def __init__(self, blender_operator, context):
@@ -50,6 +71,12 @@ class GenshinImpactCharacterRigger(CharacterRigger):
 
         if not filepath:
             filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
+
+        light_vectors_modifiers = [modifier for obj in bpy.data.objects.values() if 
+                                   obj.type == 'MESH' for modifier in obj.modifiers if 
+                                   'Light Vectors' in modifier.name]
+        for modifier in light_vectors_modifiers:
+            self.set_up_lighting_panel(modifier)
 
         armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
