@@ -4,6 +4,7 @@ import bpy
 from bpy.types import Operator
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
 
@@ -23,7 +24,7 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
         if join_meshes_enabled:
             character_model = None
             for object in bpy.context.scene.objects:
-                if object.type == 'ARMATURE':
+                if object.type == 'ARMATURE' and object.name != LightingPanelNames.Objects.LIGHTING_PANEL:
                     character_model = object
                     continue
 
