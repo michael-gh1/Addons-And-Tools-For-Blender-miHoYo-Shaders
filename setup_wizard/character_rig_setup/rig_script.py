@@ -1099,7 +1099,12 @@ def rig_character(
     face_rig_obj = bpy.data.objects.get("facerig")
     if face_rig_obj:
         face_rig_obj.select_set(True)
-        
+
+    # Select lighting panel armature
+    lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
+    if lighting_panel_rig_obj:
+        lighting_panel_rig_obj.select_set(True)
+
     # Select eye rig    
     eye_rig_obj = bpy.data.objects.get("eyerig")
     if eye_rig_obj:
@@ -1179,6 +1184,7 @@ def rig_character(
     bpy.ops.object.mode_set(mode='EDIT')
     armature.edit_bones['plate-border'].parent = armature.edit_bones['head']
     armature.edit_bones['plate-settings'].parent = armature.edit_bones['head']
+    armature.edit_bones[LightingPanelNames.Bones.LIGHTING_PANEL].parent = armature.edit_bones['head']
     
     armature.edit_bones['plate-border'].head = armature.edit_bones['neck'].head.copy()
     armature.edit_bones['plate-border'].tail = armature.edit_bones['neck'].tail.copy()

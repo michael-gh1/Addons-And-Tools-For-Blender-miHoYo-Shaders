@@ -1,4 +1,8 @@
 class LightingPanelNames:
+    class Bones:
+        LIGHTING_PANEL = 'Lighting Panel'
+
+
     class Collections:
         LIGHTING_PANEL = 'Lighting Panel'
         WTC = 'wtc'
