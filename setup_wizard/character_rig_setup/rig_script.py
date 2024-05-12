@@ -2587,6 +2587,7 @@ def rig_character(
         collections.new("Root")
         collections.new("Physics")
         collections.new("Cage")
+        collections.new("Lighting")
         collections.new("Other")
         
         for bone in armature.bones:
@@ -2765,6 +2766,7 @@ def rig_character(
                 
         # Disable/Enable Rig UI layers we care about
         bpy.context.object.data.layers[0] = True
+        bpy.context.object.data.layers[1] = True  # Lighting
         bpy.context.object.data.layers[3] = True
         bpy.context.object.data.layers[4] = False
         bpy.context.object.data.layers[5] = True
@@ -2960,7 +2962,17 @@ def rig_character(
     bone_to_layer("f_pinky.03.R", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.L.001", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.R.001", 6, "Fingers (Detail)") 
-    
+
+    bone_to_layer("Lighting Panel", 1, "Lighting")
+    bone_to_layer("Fresnel", 1, "Lighting")
+    bone_to_layer("Ambient", 1, "Lighting")
+    bone_to_layer("SoftLit", 1, "Lighting")
+    bone_to_layer("Lit", 1, "Lighting")  # Sharp Lit
+    bone_to_layer("SoftShadow", 1, "Lighting")
+    bone_to_layer("Shadow", 1, "Lighting")  # Sharp Shadow
+    bone_to_layer("RimShadow", 1, "Lighting")
+    bone_to_layer("Rim Lit", 1, "Lighting")
+
     # Pass in a list, all of those bones will be moved accordingly.
     def fast_bone_move(bone_list, layer, collection):
         for bone in bone_list:
