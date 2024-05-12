@@ -6,6 +6,8 @@ import os
 from mathutils import Color, Vector
 from math import pi
 
+from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
+
 def rig_character(
         file_path, 
         disallow_arm_ik_stretch, 
@@ -827,6 +829,18 @@ def rig_character(
 
     move_into_collection("metarig","wgt")
 
+    # Genshin Shader >=v3.3
+    lighting_panel_coll = bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL)
+    if lighting_panel_coll:
+        default_collection = bpy.data.collections.get("Collection")
+        move_collection_into_collection(
+            source=default_collection, 
+            destination=char_coll, 
+            collection=lighting_panel_coll
+        )
+        disable_collection(LightingPanelNames.Collections.WTC)
+        disable_collection(LightingPanelNames.Collections.PICKER)
+
     # Unlink all inner objects from the old WGT collection. We want them inside the new one.
     for obj in bpy.data.objects:
         if obj.name.startswith("WGT"):
@@ -872,17 +886,8 @@ def rig_character(
     if camera_coll:
         bpy.data.collections.remove(camera_coll,do_unlink=True)
 
-    # Let's 'exclude' that wgt collection: https://blenderartists.org/t/disable-exlude-from-view-layer-in-collection/1324744
-    def recurLayerCollection(layerColl):
-        found = None
-        if (layerColl.name == "wgt"):
-            return layerColl
-        for layer in layerColl.children:
-            found = recurLayerCollection(layer)
-            if found:
-                return found
     layer_collection = bpy.context.view_layer.layer_collection
-    layerColl = recurLayerCollection(layer_collection)
+    layerColl = searchForLayerCollection(layer_collection, "wgt")
     bpy.context.view_layer.active_layer_collection = layerColl
 
     layerColl.exclude = True
@@ -1023,7 +1028,12 @@ def rig_character(
     face_rig_obj = bpy.data.objects.get("npc_facerig")
     if face_rig_obj:
         face_rig_obj.select_set(True)
-        
+
+    # Select lighting panel armature
+    lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
+    if lighting_panel_rig_obj:
+        lighting_panel_rig_obj.select_set(True)
+
     # Select eye rig    
     eye_rig_obj = bpy.data.objects.get("eyerig")
     if eye_rig_obj:
@@ -1097,8 +1107,9 @@ def rig_character(
     # In edit mode, select platebone and head controller and set their parent bones.
     bpy.ops.object.mode_set(mode='EDIT')
     armature.edit_bones['plate-border'].parent = armature.edit_bones['head']                 
-    armature.edit_bones['plate-settings'].parent = armature.edit_bones['head']                                                                            
-    
+    armature.edit_bones['plate-settings'].parent = armature.edit_bones['head']
+    armature.edit_bones[LightingPanelNames.Bones.LIGHTING_PANEL].parent = armature.edit_bones['head']
+
     armature.edit_bones['plate-border'].head = armature.edit_bones['neck'].head.copy()
     armature.edit_bones['plate-border'].tail = armature.edit_bones['neck'].tail.copy()
     armature.edit_bones['plate-border'].head.x = 0.33
@@ -2586,3 +2597,29 @@ def setup_finger_scale_controls_on_x_axis_to_curl_just_the_fingertips(rigified_r
     for side in [".L", ".R"]:
         for bone in fingerlist:
             rigified_rig.pose.bones[bone + side].lock_scale[0] = False
+
+
+# Let's 'exclude' that wgt collection: https://blenderartists.org/t/disable-exlude-from-view-layer-in-collection/1324744
+def searchForLayerCollection(layerColl, coll_name):
+    found = None
+    if (layerColl.name == coll_name):
+        return layerColl
+    for layer in layerColl.children:
+        found = searchForLayerCollection(layer, coll_name)
+        if found:
+            return found
+
+
+def disable_collection(collection_name):
+    view_layer_collection = bpy.context.view_layer.layer_collection
+
+    layer_collection_to_disable = searchForLayerCollection(view_layer_collection, collection_name)
+    if layer_collection_to_disable:
+        layer_collection_to_disable.exclude = True
+        return True
+    return False
+
+
+def move_collection_into_collection(source, destination, collection):  
+    destination.children.link(collection)
+    source.children.unlink(collection)
