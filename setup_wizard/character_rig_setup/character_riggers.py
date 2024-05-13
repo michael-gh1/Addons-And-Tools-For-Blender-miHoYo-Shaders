@@ -3,10 +3,10 @@
 import bpy
 import os
 
+from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
 from setup_wizard.character_rig_setup.hsr_rig_script import rig_character as hsr_rig_character
-from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -38,101 +38,6 @@ class CharacterRigger(ABC):
     def rig_character(self):
         raise NotImplementedError
 
-    # Genshin Shader >=v3.3
-    def set_up_lighting_panel(self, light_vectors_modifier):
-        if LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier:
-            if not bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL):
-                self.import_lighting_panel()
-
-            self.connect_lighting_panel_nodes_to_global_material_properties()
-
-            for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
-                light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
-
-    def import_lighting_panel(self):
-        lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
-        inner_path = 'Collection'
-        bpy.ops.wm.append(
-            filepath=os.path.join(lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
-            directory=os.path.join(lighting_panel_filepath, inner_path),
-            files=[
-                {'name': LightingPanelNames.Collections.LIGHTING_PANEL},
-            ],
-        )
-
-    def connect_lighting_panel_nodes_to_global_material_properties(self):
-        EXTERNAL_GLOBAL_PROPERTIES_NODE_NAME = 'Global Properties'  # At shader level
-        INTERNAL_GLOBAL_PROPERTIES_NODE_NAME = 'Global Properties'  # Inside node group
-        materials_with_global_properties = [material for material in bpy.data.materials.values() if 
-                                            material.node_tree and material.node_tree.nodes and 
-                                            material.node_tree.nodes.get(EXTERNAL_GLOBAL_PROPERTIES_NODE_NAME)]
-        if materials_with_global_properties:
-            COMBINE_COLOR = 'Combine Color'
-            SEPARATE_COLOR = 'Separate Color'
-            ATTR_AMBIENT_COLOUR = 'Attribute.001'
-            ATTR_SHARP_LIT_COLOUR = 'Attribute.002'
-            ATTR_SOFT_LIFT_COLOUR = 'Attribute.003'
-            ATTR_SHARP_SHADOW_COLOUR = 'Attribute.004'
-            ATTR_SOFT_SHADOW_COLOUR = 'Attribute.005'
-            MULTIPLY_RIMLIT = 'Mix'
-            MULTIPLY_RIM_SHADOW = 'Mix.001'
-
-            FRESNEL_COLOR = 'Fresnel Color'
-            FRESNEL_SCALER = 'Fresnel Scaler'
-            AMBIENT_COLOUR = 'Ambient Colour'
-            SHARP_LIT_COLOUR = 'Sharp Lit Colour'
-            SOFT_LIT_COLOUR = 'Soft Lit Colour'
-            SHARP_SHADOW_COLOUR = 'Sharp Shadow Colour'
-            SOFT_SHADOW_COLOUR = 'Soft Shadow Colour'
-            RIM_LIT = 'Rim Lit'
-            RIM_SHADOW = 'Rim Shadow'
-
-            NODES_TO_GLOBAL_PROPERTIES = {
-                COMBINE_COLOR: {
-                    'input': FRESNEL_COLOR,
-                    'output': 'Color',
-                },
-                SEPARATE_COLOR: {
-                    'input': FRESNEL_SCALER,
-                    'output': 'Blue',  # 'Value'
-                },
-                ATTR_AMBIENT_COLOUR: {
-                    'input': AMBIENT_COLOUR,
-                    'output': 'Color',
-                },
-                ATTR_SHARP_LIT_COLOUR: {
-                    'input': SHARP_LIT_COLOUR,
-                    'output': 'Color',
-                },
-                ATTR_SOFT_LIFT_COLOUR: {
-                    'input': SOFT_LIT_COLOUR,
-                    'output': 'Color',
-                },
-                ATTR_SHARP_SHADOW_COLOUR: {
-                    'input': SHARP_SHADOW_COLOUR,
-                    'output': 'Color',
-                },
-                ATTR_SOFT_SHADOW_COLOUR: {
-                    'input': SOFT_SHADOW_COLOUR,
-                    'output': 'Color',
-                },
-                MULTIPLY_RIMLIT: {
-                    'input': RIM_LIT,
-                    'output': 'Result',
-                },
-                MULTIPLY_RIM_SHADOW: {
-                    'input': RIM_SHADOW,
-                    'output': 'Result',
-                },
-            }
-            global_properties_external_node = materials_with_global_properties[0].node_tree.nodes.get(EXTERNAL_GLOBAL_PROPERTIES_NODE_NAME)
-            global_properties_internal_nodes = global_properties_external_node.node_tree.nodes
-
-            for node_name, output_to_input in NODES_TO_GLOBAL_PROPERTIES.items():
-                output = global_properties_internal_nodes[node_name].outputs.get(output_to_input['output'])
-                input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(output_to_input['input'])
-                global_properties_external_node.node_tree.links.new(output, input)
-
 
 class GenshinImpactCharacterRigger(CharacterRigger):
     def __init__(self, blender_operator, context):
@@ -151,7 +56,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                                    obj.type == 'MESH' for modifier in obj.modifiers if 
                                    'Light Vectors' in modifier.name]
         for modifier in light_vectors_modifiers:
-            self.set_up_lighting_panel(modifier)
+            LightingPanel().set_up_lighting_panel(modifier)  # Genshin Shader >= v3.4
 
         armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
