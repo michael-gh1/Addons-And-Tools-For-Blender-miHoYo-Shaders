@@ -47,62 +47,62 @@ class LightingPanel:
 
 class GlobalPropertiesNames:
     class LightingPanelNodeNames:
-        COMBINE_COLOR = 'Combine Color'
-        SEPARATE_COLOR = 'Separate Color'
-        ATTR_AMBIENT_COLOUR = 'Attribute.001'
-        ATTR_SHARP_LIT_COLOUR = 'Attribute.002'
-        ATTR_SOFT_LIFT_COLOUR = 'Attribute.003'
-        ATTR_SHARP_SHADOW_COLOUR = 'Attribute.004'
-        ATTR_SOFT_SHADOW_COLOUR = 'Attribute.005'
-        MULTIPLY_RIMLIT = 'Mix'
-        MULTIPLY_RIM_SHADOW = 'Mix.001'
+        FRESNEL_COLOR_NODE = 'Fresnel Color'
+        FRESNEL_SCALER_NODE = 'Value = Fresnel Scaler'
+        AMBIENT_COLOUR_NODE = 'Ambient'
+        SHARP_LIT_COLOUR_NODE = 'SharpLit'
+        SOFT_LIFT_COLOUR_NODE = 'SoftLit'
+        SHARP_SHADOW_COLOUR_NODE = 'SharpShadow'
+        SOFT_SHADOW_COLOUR_NODE = 'SoftShadow'
+        RIM_LIT_NODE = 'RimLitMult'
+        RIM_SHADOW_NODE = 'RimShadowMult'
 
-
-    FRESNEL_COLOR = 'Fresnel Color'
-    FRESNEL_SCALER = 'Fresnel Scaler'
-    AMBIENT_COLOUR = 'Ambient Colour'
-    SHARP_LIT_COLOUR = 'Sharp Lit Colour'
-    SOFT_LIT_COLOUR = 'Soft Lit Colour'
-    SHARP_SHADOW_COLOUR = 'Sharp Shadow Colour'
-    SOFT_SHADOW_COLOUR = 'Soft Shadow Colour'
-    RIM_LIT = 'Rim Lit'
-    RIM_SHADOW = 'Rim Shadow'
+    class Inputs:
+        FRESNEL_COLOR = 'Fresnel Color'
+        FRESNEL_SCALER = 'Fresnel Scaler'
+        AMBIENT_COLOUR = 'Ambient Colour'
+        SHARP_LIT_COLOUR = 'Sharp Lit Colour'
+        SOFT_LIT_COLOUR = 'Soft Lit Colour'
+        SHARP_SHADOW_COLOUR = 'Sharp Shadow Colour'
+        SOFT_SHADOW_COLOUR = 'Soft Shadow Colour'
+        RIM_LIT = 'Rim Lit'
+        RIM_SHADOW = 'Rim Shadow'
 
     NODES_TO_GLOBAL_PROPERTIES = {
-        LightingPanelNodeNames.COMBINE_COLOR: {
-            'input': FRESNEL_COLOR,
+        LightingPanelNodeNames.FRESNEL_COLOR_NODE: {
+            'input': Inputs.FRESNEL_COLOR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.SEPARATE_COLOR: {
-            'input': FRESNEL_SCALER,
+        LightingPanelNodeNames.FRESNEL_SCALER_NODE: {
+            'input': Inputs.FRESNEL_SCALER,
             'output': 'Blue',  # 'Value'
         },
-        LightingPanelNodeNames.ATTR_AMBIENT_COLOUR: {
-            'input': AMBIENT_COLOUR,
+        LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
+            'input': Inputs.AMBIENT_COLOUR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.ATTR_SHARP_LIT_COLOUR: {
-            'input': SHARP_LIT_COLOUR,
+        LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
+            'input': Inputs.SHARP_LIT_COLOUR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.ATTR_SOFT_LIFT_COLOUR: {
-            'input': SOFT_LIT_COLOUR,
+        LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
+            'input': Inputs.SOFT_LIT_COLOUR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.ATTR_SHARP_SHADOW_COLOUR: {
-            'input': SHARP_SHADOW_COLOUR,
+        LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
+            'input': Inputs.SHARP_SHADOW_COLOUR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.ATTR_SOFT_SHADOW_COLOUR: {
-            'input': SOFT_SHADOW_COLOUR,
+        LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
+            'input': Inputs.SOFT_SHADOW_COLOUR,
             'output': 'Color',
         },
-        LightingPanelNodeNames.MULTIPLY_RIMLIT: {
-            'input': RIM_LIT,
+        LightingPanelNodeNames.RIM_LIT_NODE: {
+            'input': Inputs.RIM_LIT,
             'output': 'Result',
         },
-        LightingPanelNodeNames.MULTIPLY_RIM_SHADOW: {
-            'input': RIM_SHADOW,
+        LightingPanelNodeNames.RIM_SHADOW_NODE: {
+            'input': Inputs.RIM_SHADOW,
             'output': 'Result',
         },
     }
