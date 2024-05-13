@@ -2,13 +2,11 @@ class LightingPanelNames:
     class Bones:
         LIGHTING_PANEL = 'Lighting Panel'
 
-
     class Collections:
         LIGHTING_PANEL = 'Lighting Panel'
         WTC = 'wtc'
         WHEEL = 'Wheel'
         PICKER = 'Picker'
-
 
     class Objects:
         LIGHTING_PANEL = 'Lighting Panel'
@@ -29,7 +27,6 @@ class LightingPanelNames:
         SOFTLIT_COLOR_WHEEL = 'ColorWheel-SoftLit'
         SOFTSHADOW_COLOR_WHEEL = 'ColorWheel-SoftShadow'
 
-
     class GeometryNodeInputs:
         AMBIENT_COLOR_WHEEL = 'Socket_0'
         AMBIENT_COLOR_PICKER = 'Socket_1'
@@ -47,7 +44,6 @@ class LightingPanelNames:
         SOFT_SHADOW_COLOR_PICKER = 'Socket_22'
         RIM_SHADOW_COLOR_WHEEL = 'Socket_8'
         RIM_SHADOW_COLOR_PICKER = 'Socket_9'
-
 
     FILENAME = 'LightingPanel.blend'
     LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME = [
