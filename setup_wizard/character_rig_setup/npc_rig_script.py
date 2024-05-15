@@ -832,9 +832,10 @@ def rig_character(
     # Genshin Shader >=v3.3
     lighting_panel_coll = bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL)
     if lighting_panel_coll:
-        default_collection = bpy.data.collections.get("Collection")
+        view_layer_root_collection = bpy.context.view_layer.layer_collection
+        parent_collection = searchForParentLayerCollection(view_layer_root_collection, LightingPanelNames.Collections.LIGHTING_PANEL).collection
         move_collection_into_collection(
-            source=default_collection, 
+            source=parent_collection, 
             destination=char_coll, 
             collection=lighting_panel_coll
         )
@@ -1108,7 +1109,8 @@ def rig_character(
     bpy.ops.object.mode_set(mode='EDIT')
     armature.edit_bones['plate-border'].parent = armature.edit_bones['head']                 
     armature.edit_bones['plate-settings'].parent = armature.edit_bones['head']
-    armature.edit_bones[LightingPanelNames.Bones.LIGHTING_PANEL].parent = armature.edit_bones['head']
+    if armature.edit_bones.get(LightingPanelNames.Bones.LIGHTING_PANEL):
+        armature.edit_bones[LightingPanelNames.Bones.LIGHTING_PANEL].parent = armature.edit_bones['head']
 
     armature.edit_bones['plate-border'].head = armature.edit_bones['neck'].head.copy()
     armature.edit_bones['plate-border'].tail = armature.edit_bones['neck'].tail.copy()
@@ -2293,7 +2295,7 @@ def rig_character(
                 
         # Disable/Enable Rig UI layers we care about
         bpy.context.object.data.layers[0] = True
-        bpy.context.object.data.layers[1] = True
+        bpy.context.object.data.layers[1] = True if lighting_panel_rig_obj else False  # Lighting
         bpy.context.object.data.layers[3] = True
         bpy.context.object.data.layers[4] = False
         bpy.context.object.data.layers[5] = True
@@ -2459,15 +2461,16 @@ def rig_character(
     bone_to_layer("f_pinky.01.L.001", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.R.001", 6, "Fingers (Detail)") 
 
-    bone_to_layer("Lighting Panel", 1, "Lighting")
-    bone_to_layer("Fresnel", 1, "Lighting")
-    bone_to_layer("Ambient", 1, "Lighting")
-    bone_to_layer("SoftLit", 1, "Lighting")
-    bone_to_layer("Lit", 1, "Lighting")  # Sharp Lit
-    bone_to_layer("SoftShadow", 1, "Lighting")
-    bone_to_layer("Shadow", 1, "Lighting")  # Sharp Shadow
-    bone_to_layer("RimShadow", 1, "Lighting")
-    bone_to_layer("Rim Lit", 1, "Lighting")
+    if lighting_panel_rig_obj:
+        bone_to_layer("Lighting Panel", 1, "Lighting")
+        bone_to_layer("Fresnel", 1, "Lighting")
+        bone_to_layer("Ambient", 1, "Lighting")
+        bone_to_layer("SoftLit", 1, "Lighting")
+        bone_to_layer("Lit", 1, "Lighting")  # Sharp Lit
+        bone_to_layer("SoftShadow", 1, "Lighting")
+        bone_to_layer("Shadow", 1, "Lighting")  # Sharp Shadow
+        bone_to_layer("RimShadow", 1, "Lighting")
+        bone_to_layer("Rim Lit", 1, "Lighting")
 
     # Pass in a list, all of those bones will be moved accordingly.
     def fast_bone_move(bone_list, layer, collection):
@@ -2606,6 +2609,16 @@ def searchForLayerCollection(layerColl, coll_name):
         return layerColl
     for layer in layerColl.children:
         found = searchForLayerCollection(layer, coll_name)
+        if found:
+            return found
+
+
+def searchForParentLayerCollection(layerColl, coll_name):
+    found = None
+    for layer in layerColl.children:
+        if (layer.name == coll_name):
+            return layerColl
+        found = searchForParentLayerCollection(layer, coll_name)
         if found:
             return found
 
