@@ -899,9 +899,10 @@ def rig_character(
     # Genshin Shader >=v3.3
     lighting_panel_coll = bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL)
     if lighting_panel_coll:
-        default_collection = bpy.data.collections.get("Collection")
+        view_layer_root_collection = bpy.context.view_layer.layer_collection
+        parent_collection = searchForParentLayerCollection(view_layer_root_collection, LightingPanelNames.Collections.LIGHTING_PANEL).collection
         move_collection_into_collection(
-            source=default_collection, 
+            source=parent_collection, 
             destination=char_coll, 
             collection=lighting_panel_coll
         )
@@ -3141,6 +3142,16 @@ def searchForLayerCollection(layerColl, coll_name):
         return layerColl
     for layer in layerColl.children:
         found = searchForLayerCollection(layer, coll_name)
+        if found:
+            return found
+
+
+def searchForParentLayerCollection(layerColl, coll_name):
+    found = None
+    for layer in layerColl.children:
+        if (layer.name == coll_name):
+            return layerColl
+        found = searchForParentLayerCollection(layer, coll_name)
         if found:
             return found
 
