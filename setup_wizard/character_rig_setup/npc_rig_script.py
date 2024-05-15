@@ -829,7 +829,7 @@ def rig_character(
 
     move_into_collection("metarig","wgt")
 
-    # Genshin Shader >=v3.3
+    # Genshin Shader >=v3.4
     lighting_panel_coll = bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL)
     if lighting_panel_coll:
         view_layer_root_collection = bpy.context.view_layer.layer_collection
