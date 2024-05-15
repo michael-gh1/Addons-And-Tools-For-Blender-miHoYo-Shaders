@@ -2589,7 +2589,8 @@ def rig_character(
         collections.new("Root")
         collections.new("Physics")
         collections.new("Cage")
-        collections.new("Lighting")
+        if lighting_panel_rig_obj:
+            collections.new("Lighting")
         collections.new("Other")
         
         for bone in armature.bones:
