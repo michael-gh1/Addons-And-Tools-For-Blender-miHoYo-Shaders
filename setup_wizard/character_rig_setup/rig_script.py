@@ -906,8 +906,11 @@ def rig_character(
             destination=char_coll, 
             collection=lighting_panel_coll
         )
-        disable_collection(LightingPanelNames.Collections.WTC)
-        disable_collection(LightingPanelNames.Collections.PICKER)
+        
+        lighting_panel_widget_collection = bpy.data.collections.get(LightingPanelNames.Collections.WIDGET_COLLECTION)
+        lighting_panel_picker_collection = bpy.data.collections.get(LightingPanelNames.Collections.PICKER)
+        move_collection_into_collection(lighting_panel_coll, wgt_coll, lighting_panel_widget_collection)
+        move_collection_into_collection(lighting_panel_coll, lighting_panel_widget_collection, lighting_panel_picker_collection)
 
     # Unlink all inner objects from the old WGT collection. We want them inside the new one.
     for obj in bpy.data.objects:

@@ -4,7 +4,7 @@ class LightingPanelNames:
 
     class Collections:
         LIGHTING_PANEL = 'Lighting Panel'
-        WTC = 'wtc'
+        WIDGET_COLLECTION = 'lighting panel wgt'
         WHEEL = 'Wheel'
         PICKER = 'Picker'
 
