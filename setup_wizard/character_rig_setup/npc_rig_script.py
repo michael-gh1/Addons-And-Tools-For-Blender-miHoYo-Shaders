@@ -829,21 +829,6 @@ def rig_character(
 
     move_into_collection("metarig","wgt")
 
-    # Genshin Shader >=v3.4
-    lighting_panel_coll = bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL)
-    if lighting_panel_coll:
-        view_layer_root_collection = bpy.context.view_layer.layer_collection
-        parent_collection = searchForParentLayerCollection(view_layer_root_collection, LightingPanelNames.Collections.LIGHTING_PANEL).collection
-        move_collection_into_collection(
-            source=parent_collection, 
-            destination=char_coll, 
-            collection=lighting_panel_coll
-        )
-
-        lighting_panel_widget_collection = bpy.data.collections.get(LightingPanelNames.Collections.WIDGET_COLLECTION)
-        lighting_panel_picker_collection = bpy.data.collections.get(LightingPanelNames.Collections.PICKER)
-        move_collection_into_collection(lighting_panel_coll, wgt_coll, lighting_panel_widget_collection)
-        move_collection_into_collection(lighting_panel_coll, lighting_panel_widget_collection, lighting_panel_picker_collection)
 
     # Unlink all inner objects from the old WGT collection. We want them inside the new one.
     for obj in bpy.data.objects:
@@ -1506,6 +1491,18 @@ def rig_character(
     to_del_coll = bpy.data.collections.get("wgt.006")
     for obj in to_del_coll.objects:
         move_into_collection(obj.name,"wgt")
+        
+    # remove lighting colls - also move the RGB wheels into the rig obj
+    if lighting_panel_rig_obj:
+        to_del_coll = bpy.data.collections.get("lighting panel wgt")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+        to_del_coll = bpy.data.collections.get("Picker")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+        to_del_coll = bpy.data.collections.get("Wheel")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,char_name)
 
     # After moving into collection, delete the old empty ones.
     bpy.data.collections.remove(bpy.data.collections.get("append_Root"),do_unlink=True)
@@ -1515,7 +1512,9 @@ def rig_character(
     bpy.data.collections.remove(bpy.data.collections.get("append_Foot"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Hand"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Props"),do_unlink=True)
-
+    if lighting_panel_rig_obj:
+        bpy.data.collections.remove(bpy.data.collections.get("Lighting Panel"),do_unlink=True)
+    
     # Adding Shape Key Drivers
     ourRig = char_name
 
@@ -2192,7 +2191,14 @@ def rig_character(
     rig_text = rig_file.as_string()
     complete_rig_text = rig_text
     # My disclaimer, out of respect for modifying Rigify core's script
-    rig_text_disclaimer = "\n# This RigUI script has been modified by Llama for use with Genshin Impact characters using a custom made rig. Any issues arising as a result of these modifications are not indicitive of Rigify's original functionalities. \n# Rigify's writers bare no responsibility for issues/errors made here. Additionally, these modifications have been made to improve the custom made rigs for Genshin Impact characters, meaning that\n# attempting to use this script elsewhere for characters/models/skeletons it was NOT intended to be used with, could yield improper or erroneous results - of which neither Rigify's development team nor I, am responsible for. \n\n# Otherwise, if you are seeing this disclaimer with a Hoyoverse character made with the proper addons, run this as needed. (Such as after appending to build the rig layers)\n# Do NOT however, attempt to use this rig in another version of blender than what it was made in. (3.6.X rigs will NOT work adequately in 4.X or beyond; and 4.X rigs will not work in previous versions before 4.0)\n"
+    rig_text_disclaimer = """
+# This RigUI script has been modified by Llama for use with Genshin Impact characters using a custom-made rig. Any issues arising as a result of these modifications are not indicative of Rigify's original functionalities.
+# Rigify's authors bear no responsibility for issues/errors resulting from these modifications. Additionally, these modifications have been made to improve the custom-made rigs for Genshin Impact characters.
+# Attempting to use this script with characters/models/skeletons it was not intended for could yield improper or erroneous results, for which neither Rigify's development team nor I are responsible.
+
+# If you are seeing this disclaimer on a Hoyoverse character made with the proper addons, run this as needed (e.g., after appending to build the rig layers).
+# Do NOT, however, attempt to use this rig in a version of Blender other than the one it was made in. (3.6.X rigs will NOT work adequately in 4.X or beyond, and 4.X rigs will not work in versions before 4.0).
+"""
     
     # MODIFICATIONS to the text file are made here:
     # Get the ID of this char's rig ui script.
@@ -2208,14 +2214,18 @@ def rig_character(
             return string3
     
     def layers_to_generate(vers):
-        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            "+make_layer_str("Props", 21, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)+"\n            row = col.row()\n            "+make_layer_str("Other", 25, vers)
-                
+        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            "+make_layer_str("Props", 21, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)
+        if lighting_panel_rig_obj:
+            str+="\n            row = col.row()\n            "+make_layer_str("Lighting", 1, vers)
+
+        str+="\n            row = col.row()\n            "+make_layer_str("Other", 25, vers)
+        
         return str
         
     # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
     def generate_rig_layers():
         # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        v_str = \""+bpy.app.version_string+"\"\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            row.label(text=v_str+\" rig for "+char_name.split("Costume")[0]+"\")\n            "+layers_to_generate(3)+"\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            row.label(text=v_str+\" rig for "+char_name.split("Costume")[0]+"\")\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        v_str = \""+bpy.app.version_string+"\"\n        row.label(text=v_str+\" rig for "+char_name.split("Costume")[0]+"\")\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
@@ -2290,7 +2300,32 @@ def rig_character(
         bpy.ops.text.run_script()
     
     # DONE MODIFYING ui.py FILE --------------------------------------------
-    
+
+    # if using lighting panel, tie the visiblity of the RGB circle meshes to the visibility of the lighting layer.
+    if lighting_panel_rig_obj:
+        def drive_visibility_with_prop(obj, path):
+            driver_obj = bpy.context.scene.objects[obj]
+            driver = driver_obj.driver_add("hide_viewport").driver
+            
+            driver.type = 'SCRIPTED'
+            driver.expression = 'not is_visible'
+            
+            var = driver.variables.new()
+            var.name = "is_visible"
+            var.type = "SINGLE_PROP"
+            var.targets[0].id_type = "ARMATURE"
+            var.targets[0].id = armature
+            var.targets[0].data_path = path
+            
+        drive_visibility_with_prop("ColorWheel-Ambient","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-Fresnel","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-Lit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-RimLit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-RimShadow","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-Shadow","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-SoftLit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorWheel-SoftShadow","collections[\"Lighting\"].is_visible")    
+       
     # Post modification, Adjustment of bone layers/collections.
     if not is_version_4:
         for x in range(29):
