@@ -941,17 +941,17 @@ def rig_character(
     # remove lighting colls - also move the RGB wheels into the rig obj
     lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
     if lighting_panel_rig_obj:
-        to_del_coll = bpy.data.collections.get("lighting panel wgt")
+        to_del_coll = bpy.data.collections.get(LightingPanelNames.Collections.WIDGET_COLLECTION)
         for obj in to_del_coll.objects:
-            move_into_collection(obj.name,"wgt")
-        to_del_coll = bpy.data.collections.get("Picker")
+            move_into_collection(obj.name, "wgt")
+        to_del_coll = bpy.data.collections.get(LightingPanelNames.Collections.PICKER)
         for obj in to_del_coll.objects:
-            move_into_collection(obj.name,"wgt")
-        to_del_coll = bpy.data.collections.get("Wheel")
+            move_into_collection(obj.name, "wgt")
+        to_del_coll = bpy.data.collections.get(LightingPanelNames.Collections.WHEEL)
         for obj in to_del_coll.objects:
-            move_into_collection(obj.name,char_name)
-        move_into_collection(LightingPanelNames.Objects.LIGHTING_PANEL,char_name)
-        bpy.data.collections.remove(bpy.data.collections.get("Lighting Panel"),do_unlink=True)
+            move_into_collection(obj.name, char_name)
+        move_into_collection(LightingPanelNames.Objects.LIGHTING_PANEL, char_name)
+        bpy.data.collections.remove(bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL), do_unlink=True)
 
     # If it exists, gets rid of the default collection.
     camera_coll = bpy.data.collections.get("Collection")
