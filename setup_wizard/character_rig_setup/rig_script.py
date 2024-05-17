@@ -937,6 +937,22 @@ def rig_character(
     head_up_obj.hide_viewport = True
     head_up_obj.hide_render = True
 
+    # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
+    # remove lighting colls - also move the RGB wheels into the rig obj
+    lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
+    if lighting_panel_rig_obj:
+        to_del_coll = bpy.data.collections.get("lighting panel wgt")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+        to_del_coll = bpy.data.collections.get("Picker")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+        to_del_coll = bpy.data.collections.get("Wheel")
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,char_name)
+        move_into_collection(LightingPanelNames.Objects.LIGHTING_PANEL,char_name)
+        bpy.data.collections.remove(bpy.data.collections.get("Lighting Panel"),do_unlink=True)
+
     # If it exists, gets rid of the default collection.
     camera_coll = bpy.data.collections.get("Collection")
     if camera_coll:
@@ -1656,18 +1672,6 @@ def rig_character(
     to_del_coll = bpy.data.collections.get("wgt.006")
     for obj in to_del_coll.objects:
         move_into_collection(obj.name,"wgt")
-        
-    # remove lighting colls - also move the RGB wheels into the rig obj
-    if lighting_panel_rig_obj:
-        to_del_coll = bpy.data.collections.get("lighting panel wgt")
-        for obj in to_del_coll.objects:
-            move_into_collection(obj.name,"wgt")
-        to_del_coll = bpy.data.collections.get("Picker")
-        for obj in to_del_coll.objects:
-            move_into_collection(obj.name,"wgt")
-        to_del_coll = bpy.data.collections.get("Wheel")
-        for obj in to_del_coll.objects:
-            move_into_collection(obj.name,char_name)
 
     # After moving into collection, delete the old empty ones.
     bpy.data.collections.remove(bpy.data.collections.get("append_Root"),do_unlink=True)
@@ -1677,8 +1681,6 @@ def rig_character(
     bpy.data.collections.remove(bpy.data.collections.get("append_Foot"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Hand"),do_unlink=True)
     bpy.data.collections.remove(bpy.data.collections.get("append_Props"),do_unlink=True)
-    if lighting_panel_rig_obj:
-        bpy.data.collections.remove(bpy.data.collections.get("Lighting Panel"),do_unlink=True)
 
     # Adding Shape Key Drivers
     ourRig = char_name+"Rig"
