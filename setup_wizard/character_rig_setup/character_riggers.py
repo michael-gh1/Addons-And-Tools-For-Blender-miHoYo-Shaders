@@ -65,8 +65,10 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
 
         # Lighting Panel is an Armature, so it's important this goes after the armature variable initialization above
-        for modifier in light_vectors_modifiers:
-            LightingPanel().set_up_lighting_panel(modifier)  # Genshin Shader >= v3.4
+        # Genshin Shader >= v3.4
+        if character_rigger_props.set_up_lighting_panel:
+            for modifier in light_vectors_modifiers:
+                LightingPanel().set_up_lighting_panel(modifier)
 
         # Important that the Armature is selected before performing rigging operations
         bpy.ops.object.select_all(action='DESELECT')
