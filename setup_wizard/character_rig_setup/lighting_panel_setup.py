@@ -10,7 +10,8 @@ class LightingPanel:
         pass
 
     def set_up_lighting_panel(self, light_vectors_modifier):
-        if LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier:
+        lighting_panel_attributes_exist = LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier
+        if lighting_panel_attributes_exist:
             if not bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL):
                 self.import_lighting_panel()
             self.connect_lighting_panel_nodes_to_global_material_properties()
@@ -56,6 +57,7 @@ class GlobalPropertiesNames:
         SOFT_SHADOW_COLOUR_NODE = 'SoftShadow'
         RIM_LIT_NODE = 'RimLitMult'
         RIM_SHADOW_NODE = 'RimShadowMult'
+        RIM_SCALE_NODE = 'Rim Scale'
 
     class Inputs:
         FRESNEL_COLOR = 'Fresnel Color'
@@ -67,6 +69,7 @@ class GlobalPropertiesNames:
         SOFT_SHADOW_COLOUR = 'Soft Shadow Colour'
         RIM_LIT = 'Rim Lit'
         RIM_SHADOW = 'Rim Shadow'
+        RIM_SCALE = 'Rim Scale'
 
     NODES_TO_GLOBAL_PROPERTIES = {
         LightingPanelNodeNames.FRESNEL_COLOR_NODE: {
@@ -104,5 +107,9 @@ class GlobalPropertiesNames:
         LightingPanelNodeNames.RIM_SHADOW_NODE: {
             'input': Inputs.RIM_SHADOW,
             'output': 'Result',
+        },
+        LightingPanelNodeNames.RIM_SCALE_NODE: {
+            'input': Inputs.RIM_SCALE,
+            'output': 'Vector',
         },
     }

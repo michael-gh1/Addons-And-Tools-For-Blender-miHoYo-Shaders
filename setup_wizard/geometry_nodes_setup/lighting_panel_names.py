@@ -26,6 +26,10 @@ class LightingPanelNames:
         SHADOW_COLOR_WHEEL = 'ColorWheel-Shadow'
         SOFTLIT_COLOR_WHEEL = 'ColorWheel-SoftLit'
         SOFTSHADOW_COLOR_WHEEL = 'ColorWheel-SoftShadow'
+        RIM_X_SIZE_ORIGIN = 'Origin-RimX'
+        RIM_X_SIZE_SLIDER = 'Slider-RimX'
+        RIM_Y_SIZE_ORIGIN = 'Origin-RimY'
+        RIM_Y_SIZE_SLIDER = 'Slider-RimY'
 
     class GeometryNodeInputs:
         AMBIENT_COLOR_WHEEL = 'Socket_0'
@@ -44,6 +48,10 @@ class LightingPanelNames:
         SOFT_SHADOW_COLOR_PICKER = 'Socket_22'
         RIM_SHADOW_COLOR_WHEEL = 'Socket_8'
         RIM_SHADOW_COLOR_PICKER = 'Socket_9'
+        RIM_X_SIZE_ORIGIN = 'Socket_26'
+        RIM_X_SIZE_SLIDER = 'Socket_27'
+        RIM_Y_SIZE_ORIGIN = 'Socket_28'
+        RIM_Y_SIZE_SLIDER = 'Socket_29'
 
     FILENAME = 'LightingPanel.blend'
     LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME = [
@@ -62,5 +70,9 @@ class LightingPanelNames:
         (GeometryNodeInputs.SOFT_SHADOW_COLOR_WHEEL, Objects.SOFTSHADOW_COLOR_WHEEL),
         (GeometryNodeInputs.SOFT_SHADOW_COLOR_PICKER, Objects.SOFTSHADOW_COLOR_PICKER),
         (GeometryNodeInputs.RIM_SHADOW_COLOR_WHEEL, Objects.RIMSHADOW_COLOR_WHEEL),
-        (GeometryNodeInputs.RIM_SHADOW_COLOR_PICKER, Objects.RIMSHADOW_COLOR_PICKER)
+        (GeometryNodeInputs.RIM_SHADOW_COLOR_PICKER, Objects.RIMSHADOW_COLOR_PICKER),
+        (GeometryNodeInputs.RIM_X_SIZE_ORIGIN, Objects.RIM_X_SIZE_ORIGIN),
+        (GeometryNodeInputs.RIM_X_SIZE_SLIDER, Objects.RIM_X_SIZE_SLIDER),
+        (GeometryNodeInputs.RIM_Y_SIZE_ORIGIN, Objects.RIM_Y_SIZE_ORIGIN),
+        (GeometryNodeInputs.RIM_Y_SIZE_SLIDER, Objects.RIM_Y_SIZE_SLIDER),
     ]
