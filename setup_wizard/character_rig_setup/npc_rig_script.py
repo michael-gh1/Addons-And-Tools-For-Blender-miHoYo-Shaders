@@ -788,7 +788,7 @@ def rig_character(
     bpy.data.objects["metarig"].hide_render = True
 
     # Moves specified param and it's children into the collection
-    def move_into_collection(object,collection):
+    def move_into_collection(object,collection,include_children=True):
         
         # Get object
         this_obj = bpy.context.scene.objects.get(object)
@@ -807,12 +807,13 @@ def rig_character(
             # Move it to our specified collection (This only does the parent obj)
             this_coll.objects.link(this_obj)
             
-            # Now we move the children of this object
-            for child_obj in this_obj.children:
-                # Same thing, unlink previous collections
-                for coll in child_obj.users_collection:
-                    coll.objects.unlink(child_obj)
-                this_coll.objects.link(child_obj)
+            if include_children:
+                # Now we move the children of this object
+                for child_obj in this_obj.children:
+                    # Same thing, unlink previous collections
+                    for coll in child_obj.users_collection:
+                        coll.objects.unlink(child_obj)
+                    this_coll.objects.link(child_obj)
                 
     # Move the rig into the char name's collection                        
     move_into_collection(char_name,char_name)
@@ -883,7 +884,8 @@ def rig_character(
         to_del_coll = bpy.data.collections.get(LightingPanelNames.Collections.WHEEL)
         for obj in to_del_coll.objects:
             move_into_collection(obj.name, char_name)
-        move_into_collection(LightingPanelNames.Objects.LIGHTING_PANEL, char_name)
+        # DO NOT INCLUDE CHILDREN. This will cause ColorPickers to be moved into the rig object.
+        move_into_collection(LightingPanelNames.Objects.LIGHTING_PANEL, char_name, include_children=False)
         bpy.data.collections.remove(bpy.data.collections.get(LightingPanelNames.Collections.LIGHTING_PANEL), do_unlink=True)
 
     # If it exists, gets rid of the default collection.
