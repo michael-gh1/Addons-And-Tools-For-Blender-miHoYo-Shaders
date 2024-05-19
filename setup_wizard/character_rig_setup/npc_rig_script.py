@@ -2318,7 +2318,15 @@ def rig_character(
             var.targets[0].id_type = "ARMATURE"
             var.targets[0].id = armature
             var.targets[0].data_path = path
-            
+        
+        drive_visibility_with_prop("ColorPicker-Ambient","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-Fresnel","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-Lit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-RimLit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-RimShadow","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-Shadow","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-SoftLit","collections[\"Lighting\"].is_visible")
+        drive_visibility_with_prop("ColorPicker-SoftShadow","collections[\"Lighting\"].is_visible")    
         drive_visibility_with_prop("ColorWheel-Ambient","collections[\"Lighting\"].is_visible")
         drive_visibility_with_prop("ColorWheel-Fresnel","collections[\"Lighting\"].is_visible")
         drive_visibility_with_prop("ColorWheel-Lit","collections[\"Lighting\"].is_visible")
