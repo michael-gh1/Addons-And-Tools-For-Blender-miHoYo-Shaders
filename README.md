@@ -44,17 +44,17 @@ And lastly all the wonderful people who I've collaborated, it's an been an absol
 <br>
 * [@Festivity](https://github.com/festivities) 
 — [YouTube](https://www.youtube.com/channel/UCXCTHNBA8TVs0s5aQuNtWwg)
-— [Twitter](https://x.com/festivizing) 
+| [Twitter](https://x.com/festivizing) 
 * TheyCallMeSpy
 * Sultana
 * M4urlcl0
 * Modder4869 
 * [@BonnyAnimations](https://github.com/BonnyAnimations) 
 — [YouTube](https://www.youtube.com/@BonnyAnimations) 
-— [Twitter](https://x.com/BonnyTweetsOFF)
+| [Twitter](https://x.com/BonnyTweetsOFF)
 * Enthralpy 
 — [YouTube](https://www.youtube.com/@Enthralpy)
-— [Twitter](https://x.com/Enthralpy)
+| [Twitter](https://x.com/Enthralpy)
 * [@OctavoPE](https://github.com/OctavoPE) 
 — [Twitter](https://x.com/Llama3D)
 * JaredNyts 
@@ -64,6 +64,6 @@ And lastly all the wonderful people who I've collaborated, it's an been an absol
 | [Twitter](https://twitter.com/SubutaiEdits)
 * Aiko 
 — [YouTube](https://www.youtube.com/@AikoDesu)
-— [Twitter](https://x.com/Aiko__ya)
+| [Twitter](https://x.com/Aiko__ya)
 
 Cheers and Happy Blending!
