@@ -3,9 +3,11 @@
 import bpy
 import os
 
+from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
 from setup_wizard.character_rig_setup.hsr_rig_script import rig_character as hsr_rig_character
+from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -51,16 +53,25 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         if not filepath:
             filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
 
-        armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
+        light_vectors_modifiers = [modifier for obj in bpy.data.objects.values() if 
+                                   obj.type == 'MESH' for modifier in obj.modifiers if 
+                                   'Light Vectors' in modifier.name]
+
+        armature: Armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
         number_of_hand_bone_children = max([len(hand_bone.children) for hand_bone in hand_bones])
         is_player_hand = number_of_hand_bone_children >= 5
 
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
 
+        # Lighting Panel is an Armature, so it's important this goes after the armature variable initialization above
+        # Genshin Shader >= v3.4
+        if character_rigger_props.set_up_lighting_panel:
+            for modifier in light_vectors_modifiers:
+                LightingPanel().set_up_lighting_panel(modifier)
+
         # Important that the Armature is selected before performing rigging operations
         bpy.ops.object.select_all(action='DESELECT')
-        armature: Armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
         bpy.context.view_layer.objects.active = armature
         armature.select_set(True)
 

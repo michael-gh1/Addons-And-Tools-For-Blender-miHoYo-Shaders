@@ -269,19 +269,32 @@ This Setup Wizard should work on all playable characters, but if you do find any
 
 Thanks to all those who helped answer the questions I had while building out this tool and learning about Blender on Festivity's Discord server.
 <br>
-Shoutout to those in the #help channel assisting others, hats off to you for your hard work and dedication to helping others.
+**Shoutout to those in the #help channel assisting others**, hats off to you for your hard work and dedication to helping others.
 <br>
 And lastly all the wonderful people who I've collaborated, it's an been an absolutely tremendous and wonderful journey and experience.
 <br>
-* [@Festivity](https://github.com/festivities)
-* @TheyCallMeSpy
-* @Sultana
-* @M4urlcl0
-* @Modder4869 
-* [@Bonny](https://www.youtube.com/@BonnyAnimations)
-* [@Enthralpy](https://www.youtube.com/@Enthralpy)
-* [@OctavoPE](https://github.com/OctavoPE)
-* [@JaredNyts](https://twitter.com/jared_nyts)
-* @SubutaiProduction [[Twitter](https://twitter.com/SubutaiEdits)] / [[Youtube](https://www.youtube.com/@SubutaiProduction)]
+* [@Festivity](https://github.com/festivities) 
+— [YouTube](https://www.youtube.com/channel/UCXCTHNBA8TVs0s5aQuNtWwg)
+| [Twitter](https://x.com/festivizing) 
+* TheyCallMeSpy
+* Sultana
+* M4urlcl0
+* Modder4869 
+* [@BonnyAnimations](https://github.com/BonnyAnimations) 
+— [YouTube](https://www.youtube.com/@BonnyAnimations) 
+| [Twitter](https://x.com/BonnyTweetsOFF)
+* Enthralpy 
+— [YouTube](https://www.youtube.com/@Enthralpy)
+| [Twitter](https://x.com/Enthralpy)
+* [@OctavoPE](https://github.com/OctavoPE) 
+— [Twitter](https://x.com/Llama3D)
+* JaredNyts 
+— [Twitter](https://twitter.com/jared_nyts)
+* SubutaiProduction 
+— [YouTube](https://www.youtube.com/@SubutaiProduction) 
+| [Twitter](https://twitter.com/SubutaiEdits)
+* Aiko 
+— [YouTube](https://www.youtube.com/@AikoDesu)
+| [Twitter](https://x.com/Aiko__ya)
 
 Cheers and Happy Blending

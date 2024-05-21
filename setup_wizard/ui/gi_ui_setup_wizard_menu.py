@@ -342,6 +342,7 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
             operator_context='INVOKE_DEFAULT'
         )
         col = box.column()
+        col.prop(character_rigger_props, 'set_up_lighting_panel')
         col.prop(character_rigger_props, 'allow_arm_ik_stretch')
         col.prop(character_rigger_props, 'allow_leg_ik_stretch')
         col.prop(character_rigger_props, 'use_arm_ik_poles')
