@@ -3022,6 +3022,16 @@ def rig_character(
         bone_to_layer("Shadow", 1, "Lighting")  # Sharp Shadow
         bone_to_layer("RimShadow", 1, "Lighting")
         bone_to_layer("Rim Lit", 1, "Lighting")
+        bone_to_layer("RimX", 1, "Lighting")
+        bone_to_layer("RimY", 1, "Lighting")
+        bone_to_layer("RimLitPin", 1, "Lighting")
+        bone_to_layer("ShadowPin", 1, "Lighting")
+        bone_to_layer("LitPin", 1, "Lighting")
+        bone_to_layer("AmbientPin", 1, "Lighting")
+        bone_to_layer("RimShadowPin", 1, "Lighting")
+        bone_to_layer("SoftShadowPin", 1, "Lighting")
+        bone_to_layer("SoftLitPin", 1, "Lighting")
+        bone_to_layer("FresnelPin", 1, "Lighting")
 
     # Pass in a list, all of those bones will be moved accordingly.
     def fast_bone_move(bone_list, layer, collection):
