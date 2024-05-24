@@ -2795,7 +2795,10 @@ def rig_character(
             var.type = "SINGLE_PROP"
             var.targets[0].id_type = "ARMATURE"
             var.targets[0].id = armature
-            var.targets[0].data_path = path
+            if is_version_4:
+                var.targets[0].data_path = path
+            else:
+                var.targets[0].data_path = "layers[1]"
             
         drive_visibility_with_prop("ColorWheel-Ambient","collections[\"Lighting\"].is_visible")
         drive_visibility_with_prop("ColorWheel-Fresnel","collections[\"Lighting\"].is_visible")
