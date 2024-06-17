@@ -7,6 +7,7 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
+from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
@@ -84,7 +85,8 @@ class GameMaterialDataImporter(ABC):
                               self.material_names.MATERIAL_PREFIX in material.name and
                               'Outlines' not in material.name
         ] if body_part else []
-        searched_material = searched_materials[0] if searched_materials else None
+        is_not_outlines_material = lambda material: not ShaderMaterial(material).is_outlines_material()
+        searched_material = next((material for material in searched_materials if is_not_outlines_material(material)), None)
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
         # Order of Selection
@@ -96,8 +98,21 @@ class GameMaterialDataImporter(ABC):
                                        self.material_names.MATERIAL_PREFIX in material.name and
                                        ' Outlines' in material.name
         ] if body_part else []
-        searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
-        outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
+
+        # If outlines could not be found, the material name may be too long.
+        # Try searching for the outlines material by specific settings in it.
+        is_outlines_material = lambda material: ShaderMaterial(material).is_outlines_material()
+        if not searched_outlines_materials:
+            searched_outlines_materials = [next(
+                (material for material in searched_materials if is_outlines_material(material)), None)
+            ]
+        searched_outlines_material = next(
+            (material for material in searched_outlines_materials if is_outlines_material(material)), None
+        )
+
+        outlines_material: Material = self.outlines_material or \
+            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or \
+            searched_outlines_material
 
         return (material, outlines_material)
 

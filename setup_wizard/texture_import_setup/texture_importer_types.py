@@ -535,6 +535,20 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                         screw_material = screw_materials[0]
                         self.set_lightmap_texture(TextureType.BODY, screw_material, img)
 
+                elif self.is_texture_identifiers_in_texture_name(['Others', 'Diffuse'], file):
+                    others_materials = [material for material in bpy.data.materials if 'Others' in material.name and 
+                                     self.shader_material_names.MATERIAL_PREFIX in material.name]
+                    if others_materials:
+                        others_material = others_materials[0]
+                        self.set_diffuse_texture(TextureType.BODY, others_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Others', 'Lightmap'], file):
+                    others_materials = [material for material in bpy.data.materials if 'Others' in material.name and 
+                                     self.shader_material_names.MATERIAL_PREFIX in material.name]
+                    if others_materials:
+                        others_material = others_materials[0]
+                        self.set_lightmap_texture(TextureType.BODY, others_material, img)
+
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

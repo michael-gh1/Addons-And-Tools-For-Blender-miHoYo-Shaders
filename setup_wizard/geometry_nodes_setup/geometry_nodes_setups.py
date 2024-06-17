@@ -5,6 +5,7 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
@@ -352,8 +353,10 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                 'Item_01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
                 'Hat': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
                 'Item_02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+                'Crown': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
                 'Screw': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
                 'Item_03': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+                'Others': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
             }
 
             for input_name, (material_input_accessor, outline_material_input_accessor) in npc_outline_to_material_mapping.items():
@@ -361,13 +364,23 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                     material for material_name, material in bpy.data.materials.items() if \
                         input_name in material_name and 
                         self.material_names.MATERIAL_PREFIX in material_name and 
-                        not ' Outlines' in material_name]
+                        not ' Outlines' in material_name
+                ]
                 outline_materials = [
                     material for material_name, material in bpy.data.materials.items() if \
                         input_name in material_name and 
                         self.material_names.MATERIAL_PREFIX in material_name and 
                         ' Outlines' in material_name
                 ]
+                # If outlines could not be found, the material name may be too long.
+                # Try searching for the outlines material by specific settings in it.
+                if not outline_materials:
+                    outline_materials = [
+                        material for material_name, material in bpy.data.materials.items() if \
+                            input_name in material_name and 
+                            self.material_names.MATERIAL_PREFIX in material_name and 
+                            ShaderMaterial(material).is_outlines_material()
+                    ]
 
                 if shader_materials and outline_materials:
                     modifier[material_input_accessor] = shader_materials[0]

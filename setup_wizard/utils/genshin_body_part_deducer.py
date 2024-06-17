@@ -33,5 +33,7 @@ def get_npc_mesh_body_part_name(material_name):
         return 'Screw'
     elif 'Hat' in material_name:
         return 'Hat'
+    elif 'Others' in material_name:
+        return 'Others'
     else:
         return None

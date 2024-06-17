@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
 
+from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
@@ -29,7 +30,7 @@ class OutlineTextureImporter(ABC):
     def assign_lightmap_texture(self, character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name):
         v1_lightmap_node_name = 'Image Texture'
         v2_lightmap_node_name = 'Outline_Lightmap'
-        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
         lightmap_filenames = []
@@ -51,7 +52,8 @@ class OutlineTextureImporter(ABC):
 
     def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
         difuse_node_name = 'Outline_Diffuse'
-        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines')
+        outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
+        
         diffuse_node = outline_material.node_tree.nodes.get(difuse_node_name) \
             or None  # None for backwards compatibility in v1 where it did not exist
 
@@ -77,6 +79,11 @@ class OutlineTextureImporter(ABC):
         texture_img.alpha_mode = 'CHANNEL_PACKED'
         node.image = texture_img
 
+    def get_outline_material_fallback(self, body_part_material_name):
+        # If outlines could not be found, the material name may be too long.
+        # Try searching for the outlines material by specific settings in it.
+        shader_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name}')
+        return ShaderMaterial(shader_material).get_outlines_material()
 
 class OutlineTextureImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
@@ -126,7 +133,11 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
         for name, folder, files in os.walk(character_model_folder_file_path):
             diffuse_files = [file for file in files if 'Diffuse'.lower() in file.lower()]
             lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower() or 'Ligntmap'.lower() in file.lower()]  # Important typo check for: Wrioth
-            outline_materials = [material for material in bpy.data.materials.values() if 'Outlines' in material.name and material.name != self.material_names.OUTLINES]
+            outline_materials = [material for material in bpy.data.materials.values() if 
+                                 material.name != self.material_names.OUTLINES and 
+                                 ('Outlines' in material.name or 
+                                 ShaderMaterial(material).is_outlines_material())
+            ]
 
             for outline_material in outline_materials:
                 body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'

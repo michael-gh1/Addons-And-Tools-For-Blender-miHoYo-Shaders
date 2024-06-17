@@ -9,6 +9,7 @@ class ShaderNodeNames:
     USE_SHADOW_RAMP = ''
     USE_LIGHTMAP_AO = ''
     DEPTH_BASED_RIM = ''
+    OUTLINES = 'Outlines'  # Outlines material node OUTPUT
 
     # StellarToon
     ENABLE_STOCKINGS = ''
