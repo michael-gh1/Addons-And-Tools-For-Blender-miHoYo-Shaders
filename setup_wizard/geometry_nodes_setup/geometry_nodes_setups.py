@@ -132,7 +132,7 @@ class GameGeometryNodesSetup(ABC):
                 outline_material = bpy.data.materials.get(game_material_names.OUTLINES)
                 new_outline_name = f'{material.name} Outlines'
 
-                if not bpy.data.materials.get(new_outline_name):
+                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material).get_outlines_material():
                     new_outline_material = outline_material.copy()
                     new_outline_material.name = new_outline_name
                     new_outline_material.use_fake_user = True
