@@ -57,7 +57,7 @@ class ShaderIdentifierService:
         for shader, material_list in self.material_lists_to_search_through.items():
             found_all = True
             for material in material_list:
-                if material not in materials:
+                if not [scene_material for scene_material in materials.values() if material in scene_material.name]:
                     found_all = False
                     break
             if found_all:
@@ -107,16 +107,10 @@ class ShaderIdentifierService:
 
 class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     V2_NAMES_OF_GENSHIN_MATERIALS = [
-        V2_FestivityGenshinImpactMaterialNames.BODY,
-        V2_FestivityGenshinImpactMaterialNames.FACE,
-        V2_FestivityGenshinImpactMaterialNames.HAIR,
-        V2_FestivityGenshinImpactMaterialNames.OUTLINES
+        V2_FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     V3_NAMES_OF_GENSHIN_MATERIALS = [
-        V3_BonnyFestivityGenshinImpactMaterialNames.BODY,
-        V3_BonnyFestivityGenshinImpactMaterialNames.FACE,
-        V3_BonnyFestivityGenshinImpactMaterialNames.HAIR,
-        V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES
+        V3_BonnyFestivityGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     material_lists_to_search_through = {
         GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER: V3_NAMES_OF_GENSHIN_MATERIALS,
@@ -133,16 +127,10 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
 
 class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
     NYA222_NAMES_OF_SHADER_MATERIALS = [
-        Nya222HonkaiStarRailShaderMaterialNames.BODY1,
-        Nya222HonkaiStarRailShaderMaterialNames.FACE,
-        Nya222HonkaiStarRailShaderMaterialNames.HAIR,
-        Nya222HonkaiStarRailShaderMaterialNames.OUTLINES,
+        Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     STELLARTOON_NAMES_OF_SHADER_MATERIALS = [
-        StellarToonShaderMaterialNames.BASE,
-        StellarToonShaderMaterialNames.HAIR,
-        StellarToonShaderMaterialNames.FACE,
-        StellarToonShaderMaterialNames.WEAPON,
+        StellarToonShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     material_lists_to_search_through = {
         HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER: NYA222_NAMES_OF_SHADER_MATERIALS,
@@ -156,12 +144,7 @@ class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
 # Unused.
 class PunishingGrayRavenShaderIdentifierService(ShaderIdentifierService):
     V1_NAMES_OF_PGR_MATERIALS = [
-        JaredNytsPunishingGrayRavenShaderMaterialNames.ALPHA,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.FACE,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.OUTLINES,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     material_lists_to_search_through = {
         PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER: V1_NAMES_OF_PGR_MATERIALS

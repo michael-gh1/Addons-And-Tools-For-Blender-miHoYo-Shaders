@@ -4,6 +4,7 @@
 class ShaderMaterialNames:
     EMISSIVE_TEMPLATE_MATERIAL_NAME = 'HoYoverse - HELPER Template'
     MATERIAL_PREFIX = ''
+    MATERIAL_PREFIX_AFTER_RENAME = ''
     BODY = ''
     BODY1 = ''
     BODY2 = ''
@@ -46,6 +47,7 @@ class ShaderMaterialNames:
 
 class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'miHoYo - '
     BODY = f'{MATERIAL_PREFIX}Body'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
@@ -60,6 +62,7 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
     BODY = f'{MATERIAL_PREFIX}Body'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
@@ -75,6 +78,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HSR - '
     BODY = f'{MATERIAL_PREFIX}Body'
     BODY1 = f'{MATERIAL_PREFIX}Body1'
     BODY2 = f'{MATERIAL_PREFIX}Body2'
@@ -96,6 +100,7 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
 class StellarToonShaderMaterialNames(ShaderMaterialNames):
     # Shader Materials
     MATERIAL_PREFIX = 'StellarToon - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'StellarToon - '
     BASE = f'{MATERIAL_PREFIX}Base'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     FACE = f'{MATERIAL_PREFIX}Face'
@@ -127,6 +132,7 @@ class StellarToonShaderMaterialNames(ShaderMaterialNames):
 
 class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'PGR - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'PGR - '
     ALPHA = f'{MATERIAL_PREFIX}Alpha'
     EYE = f'{MATERIAL_PREFIX}Eye'
     FACE = f'{MATERIAL_PREFIX}Face'
