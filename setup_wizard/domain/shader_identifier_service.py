@@ -66,10 +66,10 @@ class ShaderIdentifierService:
     def get_shader_material_names(self, game_type, materials, node_groups):
         if game_type == GameType.GENSHIN_IMPACT.name:
             game_shader = self.identify_shader(materials, node_groups)
-            if game_shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                return V3_BonnyFestivityGenshinImpactMaterialNames
-            else:
+            if game_shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
                 return V2_FestivityGenshinImpactMaterialNames
+            else:
+                return V3_BonnyFestivityGenshinImpactMaterialNames
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return Nya222HonkaiStarRailShaderMaterialNames
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
