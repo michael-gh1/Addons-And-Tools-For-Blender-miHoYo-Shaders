@@ -21,6 +21,7 @@ class ShaderMaterial:
         if self.material.node_tree and self.material.node_tree.nodes:
             outlines_nodes = [node for node in self.material.node_tree.nodes.values() if 
                             type(node) is ShaderNodeGroup and 
+                            len(node.outputs) == 1 and
                             node.outputs.get(ShaderNodeNames.OUTLINES)
             ]
             if outlines_nodes:
