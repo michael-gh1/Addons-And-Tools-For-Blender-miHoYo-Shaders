@@ -144,8 +144,14 @@ class GameGeometryNodesSetup(ABC):
         face_outlines_material = bpy.data.materials.get(f'{game_material_names.FACE} Outlines')
         if face_outlines_material:
             node_name = 'Outlines'
-            input_name = 'Use Face Shader'
-            face_outlines_material.node_tree.nodes.get(node_name).inputs.get(input_name).default_value = 1.0
+            input_names = [
+                'Use Face Shader',
+                'Use Face Outlines'  # >= v3.5 Genshin Shader
+            ]
+            for input_name in input_names:
+                face_outlines_node_input = face_outlines_material.node_tree.nodes.get(node_name).inputs.get(input_name)
+                if  face_outlines_node_input:
+                    face_outlines_node_input.default_value = 1.0
 
     def set_up_modifier_default_values(self, modifier, mesh):
         if modifier[f'{NAME_OF_VERTEX_COLORS_INPUT}_use_attribute'] == 0:
