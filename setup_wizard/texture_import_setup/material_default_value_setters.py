@@ -69,6 +69,10 @@ class MaterialDefaultValueSetter:
             if shader_use_lightmap_ao_input:
                 shader_use_lightmap_ao_input.default_value = default_value
 
+    def set_up_hair_material(self, material):
+        material.name = self.material_names.HAIR
+        material.use_fake_user = True
+        material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER).inputs[self.shader_node_names.BODY_HAIR_RAMP_SWITCH].default_value = 1
 
 class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
     def __init__(self, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames) -> None:

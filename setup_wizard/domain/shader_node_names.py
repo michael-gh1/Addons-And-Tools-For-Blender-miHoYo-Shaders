@@ -9,6 +9,7 @@ class ShaderNodeNames:
     USE_SHADOW_RAMP = ''
     USE_LIGHTMAP_AO = ''
     DEPTH_BASED_RIM = ''
+    BODY_HAIR_RAMP_SWITCH = ''
     OUTLINES = 'Outlines'  # Outlines material node OUTPUT
 
     # StellarToon
@@ -37,6 +38,8 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
     FACE_MATERIAL_ID = 'Face Material ID'
     USE_SHADOW_RAMP = 'Use Shadow Ramp'
     USE_LIGHTMAP_AO = 'Use Lightmap AO'
+
+    BODY_HAIR_RAMP_SWITCH = 'Body / Hair'
 
 
 class StellarToonShaderNodeNames(ShaderNodeNames):
