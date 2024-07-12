@@ -11,6 +11,8 @@ class ShaderNodeNames:
     DEPTH_BASED_RIM = ''
     BODY_HAIR_RAMP_SWITCH = ''
     OUTLINES = 'Outlines'  # Outlines material node OUTPUT
+    EXTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
+    INTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
 
     # StellarToon
     ENABLE_STOCKINGS = ''

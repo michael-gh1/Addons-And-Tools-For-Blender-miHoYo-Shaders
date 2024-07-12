@@ -40,8 +40,14 @@ class MaterialDefaultValueSetter:
         raise NotImplementedError()
 
     def set_up_shadow_ramp_default_value(self, body_part, material, default_missing=0, default_exists=1):
-        shadow_ramp_node_group = bpy.data.node_groups.get(f'{body_part} Shadow Ramp')
-        shadow_ramp_node = shadow_ramp_node_group.nodes.get(f'{body_part}_Shadow_Ramp')
+        possible_shadow_ramp_node_group_names = [
+            f'{body_part} Shadow Ramp',
+            'Shadow Ramp',
+        ]
+        for shadow_ramp_node_name in possible_shadow_ramp_node_group_names:
+            shadow_ramp_node_group = bpy.data.node_groups.get(shadow_ramp_node_name)
+            if shadow_ramp_node_group:
+                shadow_ramp_node = shadow_ramp_node_group.nodes.get(f'{body_part}_Shadow_Ramp')
 
         if not shadow_ramp_node_group or not shadow_ramp_node:
             return
@@ -57,11 +63,15 @@ class MaterialDefaultValueSetter:
     def set_up_lightmap_ao_default_value(self, body_part, material, default_missing=0, default_exists=1):
         lightmap_uv0 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV0')
         lightmap_uv1 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV1')
+        lightmap_all = material.node_tree.nodes.get('Body_Lightmap')  # >= v3.5 Body/Hair use same node name
 
-        if not lightmap_uv0 or not lightmap_uv1:
+        if (not lightmap_uv0 or not lightmap_uv1) and not lightmap_all:
             return
 
-        default_value = default_missing if not lightmap_uv0.image or not lightmap_uv1.image else default_exists
+        if lightmap_uv0 and lightmap_uv1:
+            default_value = default_missing if not lightmap_uv0.image or not lightmap_uv1.image else default_exists
+        else:
+            default_value = default_missing if not lightmap_all.image else default_exists
 
         body_shader_node = material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
         if body_shader_node:
