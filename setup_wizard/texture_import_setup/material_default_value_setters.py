@@ -63,7 +63,7 @@ class MaterialDefaultValueSetter:
     def set_up_lightmap_ao_default_value(self, body_part, material, default_missing=0, default_exists=1):
         lightmap_uv0 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV0')
         lightmap_uv1 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV1')
-        lightmap_all = material.node_tree.nodes.get('Body_Lightmap')  # >= v3.5 Body/Hair use same node name
+        lightmap_all = material.node_tree.nodes.get('Main_Lightmap')  # >= v3.5 Body/Hair use same node name
 
         if (not lightmap_uv0 or not lightmap_uv1) and not lightmap_all:
             return

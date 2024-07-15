@@ -134,49 +134,49 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
-            f'Body_Diffuse',  # >= v3.5 Body/Hair use same node name
+            f'Main_Diffuse',  # >= v3.5 Body/Hair use same node name
         ]
         
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
                 material.node_tree.nodes[texture_node_name].image = img
 
-        if self.game_type == GameType.GENSHIN_IMPACT:
-            if not self.does_dress_texture_exist_in_directory_files() or \
-                type(self) is GenshinMonsterTextureImporter or \
-                type(self) is GenshinNPCTextureImporter:
-                self.setup_dress_textures(f'{texture_type.value}_Diffuse', img, self.character_type)
+                if self.game_type == GameType.GENSHIN_IMPACT:
+                    if not self.does_dress_texture_exist_in_directory_files() or \
+                        type(self) is GenshinMonsterTextureImporter or \
+                        type(self) is GenshinNPCTextureImporter:
+                        self.setup_dress_textures(texture_node_name, img, self.character_type)
 
     def set_lightmap_texture(self, texture_type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
         possible_texture_node_names = [
             f'{texture_type.value}_Lightmap_UV0',
             f'{texture_type.value}_Lightmap_UV1',
-            f'Body_Lightmap',  # >= v3.5 Body/Hair use same node name
+            f'Main_Lightmap',  # >= v3.5 Body/Hair use same node name
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
                 material.node_tree.nodes[texture_node_name].image = img
         
-        if self.game_type == GameType.GENSHIN_IMPACT:
-            if not self.does_dress_texture_exist_in_directory_files() or \
-                type(self) is GenshinMonsterTextureImporter or \
-                type(self) is GenshinNPCTextureImporter:
-                self.setup_dress_textures(f'{texture_type.value}_Lightmap', img, self.character_type)
+                if self.game_type == GameType.GENSHIN_IMPACT:
+                    if not self.does_dress_texture_exist_in_directory_files() or \
+                        type(self) is GenshinMonsterTextureImporter or \
+                        type(self) is GenshinNPCTextureImporter:
+                        self.setup_dress_textures(texture_node_name, img, self.character_type)
 
     def set_normalmap_texture(self, type: TextureType, material, img):
         img.colorspace_settings.name='Non-Color'
         possible_texture_node_names = [
             f'{type.value}_Normalmap_UV0',
             f'{type.value}_Normalmap_UV1',
-            f'Body_Normalmap',  # >= v3.5 Body/Hair use same node name
+            f'Main_Normalmap',  # >= v3.5 Body/Hair use same node name
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
                 material.node_tree.nodes[texture_node_name].image = img
         
-        if self.game_type == GameType.GENSHIN_IMPACT:
-            self.setup_dress_textures(f'{type.value}_Normalmap', img, self.character_type)
+            if self.game_type == GameType.GENSHIN_IMPACT:
+                self.setup_dress_textures(texture_node_name, img, self.character_type)
 
         # Deprecated. Tries only if it exists. Only for V1 Shader
         self.plug_normal_map(f'miHoYo - Genshin {type.value}', 'MUTE IF ONLY 1 UV MAP EXISTS')
@@ -251,11 +251,6 @@ class GenshinTextureImporter:
                                   'Genshin Dress' in material.name and 'Outlines' not in material.name]
         shader_cloak_materials = [material for material in bpy.data.materials
                                   if 'Genshin Arm' in material.name or 'Genshin Cloak' in material.name]
-        possible_texture_node_names = [
-            f'{texture_name}_UV0',
-            f'{texture_name}_UV1',
-            f'{texture_name}'.replace('Hair', 'Body')  # >= v3.5 Body/Hair use same node name
-        ]
 
         # TODO: Refactor this for sure!
         # Specific case for Xiao (the only character with an Arm material)
@@ -266,11 +261,10 @@ class GenshinTextureImporter:
                 shader_cloak_materials[0].name.split(' ')[-1]
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
             actual_cloak_material = get_actual_material_name_for_dress(original_cloak_material.name, character_type.name)
-            if actual_cloak_material in texture_name:
+            if actual_cloak_material in texture_img:
                 material_shader_nodes = bpy.data.materials.get(shader_cloak_materials[0].name).node_tree.nodes
-                for texture_node_name in possible_texture_node_names:
-                    if material_shader_nodes.get(texture_node_name):
-                        material_shader_nodes.get(texture_node_name).image = texture_img
+                if material_shader_nodes.get(texture_name):
+                    material_shader_nodes.get(texture_name).image = texture_img
 
         for shader_dress_material in shader_dress_materials:
             original_dress_material = [material for material in bpy.data.materials if material.name.endswith(
@@ -278,12 +272,11 @@ class GenshinTextureImporter:
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
 
             actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
-            if actual_material in texture_name:
+            if actual_material in texture_img.name:
                 print(f'Importing texture "{texture_name}" onto material "{shader_dress_material.name}"')
                 material_shader_nodes = bpy.data.materials.get(shader_dress_material.name).node_tree.nodes
-                for texture_node_name in possible_texture_node_names:
-                    if material_shader_nodes.get(texture_node_name):
-                        material_shader_nodes.get(texture_node_name).image = texture_img
+                if material_shader_nodes.get(texture_name):
+                    material_shader_nodes.get(texture_name).image = texture_img
                 return
 
     def does_dress_texture_exist_in_directory_files(self):
