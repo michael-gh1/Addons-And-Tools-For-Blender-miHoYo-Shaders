@@ -22,6 +22,7 @@ class MaterialDataAppliersFactory:
                 ]
             else:
                 return [
+                    V3_5_MaterialDataApplier(material_data_parser, outline_material_group),
                     V3_MaterialDataApplier(material_data_parser, outline_material_group),
                     V2_MaterialDataApplier(material_data_parser, outline_material_group), 
                     V1_MaterialDataApplier(material_data_parser, outline_material_group),
@@ -64,29 +65,32 @@ class MaterialDataApplier(ABC):
 
     def apply_material_data(self, material_mapping, node_inputs):
         for material_json_name, material_node_name in material_mapping.items():
-            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_json_name)
+            material_node_names = material_node_name if type(material_node_name) is list else [material_node_name]
 
-            if material_json_value is None:  # explicitly check for None
-                self.__handle_material_value_not_found(material_json_name)
-                continue
+            for material_node_name in material_node_names:
+                material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_json_name)
 
-            # StellarToon: handle two "Stockings Color" inputs in same shader node
-            if material_node_name == 'Stockings Color':
-                stockings_color_inputs = [node_input for node_input in node_inputs if node_input.name == 'Stockings Color']
-                if len(stockings_color_inputs) > 1:
-                    node_input = stockings_color_inputs[1]
-            else:
-                node_input = node_inputs.get(material_node_name)
-            try:
-                # Convert to sRGB to Hex to RGB for Nya222 Shader 
-                # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
-                if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
-                    material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
-                node_input.default_value = material_json_value
-            except AttributeError as ex:
-                print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
-                    Falling back to next MaterialDataApplier version')
-                raise ex
+                if material_json_value is None:  # explicitly check for None
+                    self.__handle_material_value_not_found(material_json_name)
+                    continue
+
+                # StellarToon: handle two "Stockings Color" inputs in same shader node
+                if material_node_name == 'Stockings Color':
+                    stockings_color_inputs = [node_input for node_input in node_inputs if node_input.name == 'Stockings Color']
+                    if len(stockings_color_inputs) > 1:
+                        node_input = stockings_color_inputs[1]
+                else:
+                    node_input = node_inputs.get(material_node_name)
+                try:
+                    # Convert to sRGB to Hex to RGB for Nya222 Shader 
+                    # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
+                    if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
+                        material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
+                    node_input.default_value = material_json_value
+                except AttributeError as ex:
+                    print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
+                        Falling back to next MaterialDataApplier version')
+                    raise ex
 
     def get_value_in_json_parser(self, parser, key):
         try:
@@ -398,7 +402,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_MainTexAlphaCutoff': 'Transparency Cutoff',
     }
 
-    v3_2_local_material_mapping = {
+    additional_local_material_mapping = {
         '_Color': 'Color',
         '_Color2': 'Color 2',
         '_Color3': 'Color 3',
@@ -435,7 +439,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
             # This is to keep backwards compatibility for those who may still be on an older version of the shader.
             try:
                 super().apply_material_data(
-                    self.v3_2_local_material_mapping,
+                    self.additional_local_material_mapping,
                     base_material_shader_node_tree_inputs,
                 )
             except AttributeError:
@@ -447,6 +451,176 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
             self.outline_mapping,
             outline_material_shader_node_tree_inputs
         )
+
+
+class V3_5_MaterialDataApplier(V3_MaterialDataApplier):
+    outline_mapping = {
+        "_UseMaterial2": 'Use Material 2',
+        "_UseMaterial3": 'Use Material 3',
+        "_UseMaterial4": 'Use Material 4',
+        "_UseMaterial5": 'Use Material 5',
+        '_OutlineColor': 'Outline Color 1',
+        '_OutlineColor2': 'Outline Color 2',
+        '_OutlineColor3': 'Outline Color 3',
+        '_OutlineColor4': 'Outline Color 4',
+        '_OutlineColor5': 'Outline Color 5',
+        '_UseLightMapColorAO': 'Use Lightmap AO',
+        '_UseVertexColorAO': 'Use Vertex Color AO',
+    }
+
+    local_material_mapping = {
+        "_UseMaterial2": 'Use Material 2',
+        "_UseMaterial3": 'Use Material 3',
+        "_UseMaterial4": 'Use Material 4',
+        "_UseMaterial5": 'Use Material 5',
+        '_UseBumpMap': 'Use Normal Map',
+        '_ShadowRampWidth': 'Shadow Ramp Width',
+        "_ShadowTransitionRange": 'Shadow Transition Range',
+        "_ShadowTransitionRange2": 'Shadow Transition Range 2',
+        "_ShadowTransitionRange3": 'Shadow Transition Range 3',
+        "_ShadowTransitionRange4": 'Shadow Transition Range 4',
+        "_ShadowTransitionRange5": 'Shadow Transition Range 5',
+        "_ShadowTransitionSoftness": 'Shadow Transition Softness',
+        "_ShadowTransitionSoftness2": 'Shadow Transition Softness 2',
+        "_ShadowTransitionSoftness3": 'Shadow Transition Softness 3',
+        "_ShadowTransitionSoftness4": 'Shadow Transition Softness 4',
+        "_ShadowTransitionSoftness5": 'Shadow Transition Softness 5',
+        '_MetalMaterial': 'Enable Metallics?',
+        '_Shininess': 'Shininess',
+        '_Shininess2': 'Shininess 2',
+        '_Shininess3': 'Shininess 3',
+        '_Shininess4': 'Shininess 4',
+        '_Shininess5': 'Shininess 5',
+        '_SpecMulti': 'Specular Multiplier',
+        '_SpecMulti2': 'Specular Multiplier 2',
+        '_SpecMulti3': 'Specular Multiplier 3',
+        '_SpecMulti4': 'Specular Multiplier 4',
+        '_SpecMulti5': 'Specular Multiplier 5',
+        '_MTUseSpecularRamp': 'Use Specular Ramp',
+        '_CoolShadowMultColor': 'Nighttime Shadow Color',
+        '_CoolShadowMultColor2': 'Nighttime Shadow Color 2',
+        '_CoolShadowMultColor3': 'Nighttime Shadow Color 3',
+        '_CoolShadowMultColor4': 'Nighttime Shadow Color 4',
+        '_CoolShadowMultColor5': 'Nighttime Shadow Color 5',
+        '_FirstShadowMultColor': 'Daytime Shadow Color',
+        '_FirstShadowMultColor2': 'Daytime Shadow Color 2',
+        '_FirstShadowMultColor3': 'Daytime Shadow Color 3',
+        '_FirstShadowMultColor4': 'Daytime Shadow Color 4',
+        '_FirstShadowMultColor5': 'Daytime Shadow Color 5',
+        '_UseShadowRamp': 'Use Shadow Ramp',
+        '_UseLightMapColorAO': 'Use Lightmap AO',
+        '_UseVertexColorAO': 'Use Vertex Color AO',
+        '_MainTexAlphaCutoff': 'Transparency Cutoff',
+        '_Color': 'Color',
+        '_Color2': 'Color 2',
+        '_Color3': 'Color 3',
+        '_Color4': 'Color 4',
+        '_Color5': 'Color 5',
+        # GI Shader v3.5 and below
+        '_EmissionColor_MHY': 'Emit Tint',
+        '_EmissionColor_MHY': 'Emit Tint 2',
+        '_EmissionColor_MHY': 'Emit Tint 3',
+        '_EmissionColor_MHY': 'Emit Tint 4',
+        '_EmissionColor_MHY': 'Emit Tint 5',
+        '_EmissionScaler': 'Local Emit Scaler',
+        '_EmissionScaler1': 'Emit Scaler',
+        '_EmissionScaler2': 'Emit Scaler 2',
+        '_EmissionScaler3': 'Emit Scaler 3',
+        '_EmissionScaler4': 'Emit Scaler 4',
+        '_EmissionScaler5': 'Emit Scaler 5',
+        # Metallic Options (moved from pre-v3.5) and Specularity & Metallics Extras
+        '_SpecularColor': [
+            'Specular Color',
+            'Specular Color 2',
+            'Specular Color 3',
+            'Specular Color 4',
+            'Specular Color 5',
+        ],
+        '_MTMapBrightness': [
+            'Metallic Matcap Brightness',
+            'Metallic Matcap Brightness 2',
+            'Metallic Matcap Brightness 3',
+            'Metallic Matcap Brightness 4',
+            'Metallic Matcap Brightness 5',
+        ],
+        '_MTMapTileScale': [
+            'Metallic Matcap Tile Scale',
+            'Metallic Matcap Tile Scale 2',
+            'Metallic Matcap Tile Scale 3',
+            'Metallic Matcap Tile Scale 4',
+            'Metallic Matcap Tile Scale 5',
+        ],
+        '_MTMapDarkColor': [
+            'Metallic Matcap Dark Color',
+            'Metallic Matcap Dark Color 2',
+            'Metallic Matcap Dark Color 3',
+            'Metallic Matcap Dark Color 4',
+            'Metallic Matcap Dark Color 5',
+        ],
+        '_MTMapLightColor': [
+            'Metallic Matcap Light Color',
+            'Metallic Matcap Light Color 2',
+            'Metallic Matcap Light Color 3',
+            'Metallic Matcap Light Color 4',
+            'Metallic Matcap Light Color 5',
+        ],
+        '_MTShadowMultiColor': [
+            'Metallic Matcap Shadow Multiply Color',
+            'Metallic Matcap Shadow Multiply Color 2',
+            'Metallic Matcap Shadow Multiply Color 3',
+            'Metallic Matcap Shadow Multiply Color 4',
+            'Metallic Matcap Shadow Multiply Color 5',
+        ],
+        '_MTSpecularColor': [
+            'MT Specular Color',
+            'MT Specular Color 2',
+            'MT Specular Color 3',
+            'MT Specular Color 4',
+            'MT Specular Color 5',
+        ],
+        '_MTSharpLayerColor': [
+            'MT Sharp Layer Color',
+            'MT Sharp Layer Color 2',
+            'MT Sharp Layer Color 3',
+            'MT Sharp Layer Color 4',
+            'MT Sharp Layer Color 5',
+        ],
+        '_MTShininess': [
+            'Metallic Specular Shininess',
+            'Metallic Specular Shininess 2',
+            'Metallic Specular Shininess 3',
+            'Metallic Specular Shininess 4',
+            'Metallic Specular Shininess 5',
+        ],
+        '_MTSpecularScale': [
+            'Metallic Specular Scale',
+            'Metallic Specular Scale 2',
+            'Metallic Specular Scale 3',
+            'Metallic Specular Scale 4',
+            'Metallic Specular Scale 5',
+        ],
+        '_MTSpecularAttenInShadow': [
+            'Metallic Specular Attenuation',
+            'Metallic Specular Attenuation 2',
+            'Metallic Specular Attenuation 3',
+            'Metallic Specular Attenuation 4',
+            'Metallic Specular Attenuation 5',
+        ],
+        '_MTSharpLayerOffset': [
+            'Metallic Specular Sharp Layer Offset',
+            'Metallic Specular Sharp Layer Offset 2',
+            'Metallic Specular Sharp Layer Offset 3',
+            'Metallic Specular Sharp Layer Offset 4',
+            'Metallic Specular Sharp Layer Offset 5',
+        ],
+    }
+
+    # Override as we put this mapping in local_material_mapping
+    # If we have new mappings, we can add them here
+    additional_local_material_mapping = {}
+
+    def set_up_mesh_material_data(self):
+        super().set_up_mesh_material_data()
 
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
