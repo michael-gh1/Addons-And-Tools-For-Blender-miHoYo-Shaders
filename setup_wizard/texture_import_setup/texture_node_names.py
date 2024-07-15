@@ -4,6 +4,7 @@
 class TextureNodeNames:
     DIFFUSE = ''
     BODY_DIFFUSE_UV0 = ''
+    MAIN_DIFFUSE = ''
     LIGHTMAP = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
@@ -47,6 +48,7 @@ class TextureNodeNames:
 
 class GenshinImpactTextureNodeNames(TextureNodeNames):
     BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'
+    MAIN_DIFFUSE = 'Main_Diffuse'
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     DIFFUSE = '画像テクスチャ'

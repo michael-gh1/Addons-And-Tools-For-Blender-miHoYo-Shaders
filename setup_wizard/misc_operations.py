@@ -177,10 +177,10 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
             bpy.data.materials.get(shader_material_names.BODY1) or bpy.data.materials.get(shader_material_names.BASE)
         texture_node_names: TextureNodeNames = shader_identifier_service.get_shader_texture_node_names(shader)
 
-        body_diffuse_uv0_node_name = self.__get_body_diffuse_uv0_node_name(texture_node_names)
+        body_diffuse_node_name = self.__get_body_diffuse_node_name(body_material, texture_node_names)
 
         if body_material:
-            body_diffuse_texture = body_material.node_tree.nodes.get(body_diffuse_uv0_node_name).image
+            body_diffuse_texture = body_material.node_tree.nodes.get(body_diffuse_node_name).image
             if body_diffuse_texture:
                 materials_to_check = [material for material in bpy.data.materials if \
                                     material.name.startswith(shader_material_names.MATERIAL_PREFIX)]
@@ -196,20 +196,23 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
             )
         return {'FINISHED'}
 
-    def __get_body_diffuse_uv0_node_name(self, texture_node_names: TextureNodeNames):
-        is_genshin_impact_diffuse_node_name = texture_node_names.BODY_DIFFUSE_UV0
-        is_stellartoon_diffuse_node_name = f'Body{texture_node_names.DIFFUSE_UV0_SUFFIX}' if texture_node_names.DIFFUSE_UV0_SUFFIX else None
-        is_shader_common_diffuse_node_name = texture_node_names.DIFFUSE  # Nya222/PGR
+    # TODO: Oof, this should be refactored, but it's a little tricky with Genshin Shader v3.5
+    # We could create a shared variable across all TextureNodeNames, but we need to be able to differentiate v3 from v3.5
+    def __get_body_diffuse_node_name(self, material, texture_node_names: TextureNodeNames):
+        body_diffuse_node_names = [
+            texture_node_names.BODY_DIFFUSE_UV0,  # Genshin
+            texture_node_names.MAIN_DIFFUSE,  # Genshin >= v3.5
+            # StellarToon before common shaders is important!!!
+            # We need to check StellarToon before the others otherwise it may attempt to provide the incorrect
+            # body_diffuse_uv0_node_name, this is because texture_node_names.DIFFUSE is common across StellarToon AND
+            # other common diffuse node names.
+            f'Body{texture_node_names.DIFFUSE_UV0_SUFFIX}' if texture_node_names.DIFFUSE_UV0_SUFFIX else None,  # StellarToon
+            texture_node_names.DIFFUSE,  # Nya222/PGR -- # Keep on bottom as last check, catch-all common shader diffuse name
+        ]
 
-        # StellarToon before common shaders is important!!!
-        # We need to check StellarToon before the others otherwise it may attempt to provide the incorrect
-        # body_diffuse_uv0_node_name, this is because texture_node_names.DIFFUSE is common across StellarToon AND
-        # other common diffuse node names.
-        body_diffuse_uv0_node_name = \
-            is_genshin_impact_diffuse_node_name or \
-            is_stellartoon_diffuse_node_name or \
-            is_shader_common_diffuse_node_name  # Keep on bottom as last check
-        return body_diffuse_uv0_node_name
+        for node_name in body_diffuse_node_names:
+            if material.node_tree.nodes.get(node_name):
+                return node_name
 
     def __set_material_names(self, game_type: GameType, material: Material, shader_material_names: ShaderMaterialNames, body_diffuse_filename):
         if game_type == GameType.HONKAI_STAR_RAIL.name:
