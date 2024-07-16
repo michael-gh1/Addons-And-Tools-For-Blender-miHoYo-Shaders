@@ -7,6 +7,7 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
@@ -21,7 +22,8 @@ from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, get_cach
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import MaterialDataJsonParser, HoyoStudioMaterialDataJsonParser, \
     UABEMaterialDataJsonParser, UnknownHoyoStudioMaterialDataJsonParser
-from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name
+from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name, \
+    get_body_part
 
 
 class MaterialDataFile:
@@ -67,7 +69,9 @@ class GameMaterialDataImporter(ABC):
                 if index == len(self.parsers) - 1:
                     raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
-    def open_and_load_json_data(self, directory_file_path, file):
+    # TOOD: Refactor into own class?
+    @staticmethod
+    def open_and_load_json_data(directory_file_path, file):
         with open(f'{directory_file_path}/{file.name}') as fp:
             try:
                 json_material_data = json.load(fp)
@@ -169,9 +173,11 @@ class GameMaterialDataImporterFactory:
         if game_type == GameType.GENSHIN_IMPACT.name:
             if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+                shader_node_names = V3_GenshinShaderNodeNames
             else:
                 material_names = V2_FestivityGenshinImpactMaterialNames
-            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+                shader_node_names = V2_GenshinShaderNodeNames
+            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 material_names = Nya222HonkaiStarRailShaderMaterialNames
@@ -188,7 +194,7 @@ class GameMaterialDataImporterFactory:
 class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
     WEAPON_NAME_IDENTIFIER = 'Mat'
 
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -199,6 +205,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names: ShaderNodeNames = shader_node_names
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
@@ -250,6 +257,9 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                     f'* Expected Materials "{self.material_names.MATERIAL_PREFIX}{body_part}" and "{self.material_names.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
+            shadow_ramp_type_setter = ShadowRampTypeSetter(file, material_data_directory, self.shader_node_names)
+            shadow_ramp_type_setter.set_shadow_ramp_type(material)
+
             material_data_parser = self.get_material_data_json_parser(json_material_data)
             material_data_appliers = MaterialDataAppliersFactory.create(
                 self.blender_operator.game_type,
@@ -260,6 +270,49 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             self.apply_material_data(body_part, material_data_appliers)
         return {'FINISHED'}
 
+class ShadowRampTypeSetter:
+    def __init__(self, target_file, material_data_directory: MaterialDataDirectory, shader_node_names: ShaderNodeNames):
+        self.target_file = target_file
+        self.material_data_directory = material_data_directory
+        self.shader_node_names = shader_node_names
+
+    def set_shadow_ramp_type(self, shader_material):
+        shadow_ramp_type = self.__get_shadow_ramp_type_by_PackedShadowRampTex()
+        self.__set_shadow_ramp_type_on_shader_material(shader_material, shadow_ramp_type)
+
+    def __get_shadow_ramp_type_by_PackedShadowRampTex(self):
+        material_data_files = [mat_file for mat_file in self.material_data_directory.files if mat_file.name.lower() != self.target_file.name.lower()]
+
+        target_file_json = GenshinImpactMaterialDataImporter.open_and_load_json_data(
+            self.material_data_directory.file_path, 
+            self.target_file
+        )
+        target_file_shadow_ramp_pathID = self.__get_shadow_ramp_pathID(target_file_json)
+
+        for material_data_file in material_data_files:
+            material_data_json = GenshinImpactMaterialDataImporter.open_and_load_json_data(
+                self.material_data_directory.file_path, 
+                material_data_file
+            )
+            shadow_ramp_pathID = self.__get_shadow_ramp_pathID(material_data_json)
+
+            if shadow_ramp_pathID == target_file_shadow_ramp_pathID:
+                return get_body_part(material_data_file)
+
+    def __get_shadow_ramp_pathID(self, material_data_json):
+        return material_data_json.get('m_SavedProperties').get('m_TexEnvs').get('_PackedShadowRampTex').get('m_Texture').get('m_PathID')
+
+    def __set_shadow_ramp_type_on_shader_material(self, shader_material, shadow_ramp_type):
+        body_shader_node = shader_material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
+        body_hair_ramp_switch_input = body_shader_node.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH) if body_shader_node else None
+
+        if body_hair_ramp_switch_input:
+            if shadow_ramp_type == 'Hair':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+                body_hair_ramp_switch_input.default_value = 1
+            elif shadow_ramp_type == 'Body':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+                body_hair_ramp_switch_input.default_value = 0
+            else:
+                pass  # Intentionally do nothing.
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
     def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
