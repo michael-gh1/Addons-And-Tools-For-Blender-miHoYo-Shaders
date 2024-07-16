@@ -174,7 +174,8 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         if status == {'FINISHED'}:
             return status
 
-        if not bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v3.5
+        if bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.BODY) and \
+            not bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v3.5
             self.create_hair_material()
 
         cache_enabled = self.context.window_manager.cache_enabled
