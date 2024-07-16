@@ -168,24 +168,15 @@ class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        material_names = shader_identifier_service.get_shader_material_names(game_type, bpy.data.materials, bpy.data.node_groups)
+        shader_node_names = shader_identifier_service.get_shader_node_names(shader)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
-                shader_node_names = V3_GenshinShaderNodeNames
-            else:
-                material_names = V2_FestivityGenshinImpactMaterialNames
-                shader_node_names = V2_GenshinShaderNodeNames
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
-                material_names = Nya222HonkaiStarRailShaderMaterialNames
-            else:
-                material_names = StellarToonShaderMaterialNames
             return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
-            material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
             return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
