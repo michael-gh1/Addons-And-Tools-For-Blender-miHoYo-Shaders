@@ -206,7 +206,7 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
             # We need to check StellarToon before the others otherwise it may attempt to provide the incorrect
             # body_diffuse_uv0_node_name, this is because texture_node_names.DIFFUSE is common across StellarToon AND
             # other common diffuse node names.
-            f'Body{texture_node_names.DIFFUSE_UV0_SUFFIX}' if texture_node_names.DIFFUSE_UV0_SUFFIX else None,  # StellarToon
+            f'Body{texture_node_names.DIFFUSE_UV0_SUFFIX}' if texture_node_names.DIFFUSE_UV0_SUFFIX else '',  # StellarToon
             texture_node_names.DIFFUSE,  # Nya222/PGR -- # Keep on bottom as last check, catch-all common shader diffuse name
         ]
 
