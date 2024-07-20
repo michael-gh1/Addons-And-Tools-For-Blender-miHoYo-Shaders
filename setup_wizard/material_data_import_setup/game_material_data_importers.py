@@ -48,13 +48,14 @@ class GameMaterialDataImporter(ABC):
             try:
                 material_data_applier.set_up_mesh_material_data()
                 material_data_applier.set_up_outline_colors()
+                print(f'INFO: Successfully applied material data on {material_data_applier.__class__}')
                 break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
             except AttributeError as err:
-                print(err)
+                print(f'WARNING: {err} on {material_data_applier.__class__}')
                 print('WARNING: Falling back and trying next version')
                 continue # fallback and try next version
             except KeyError as err:
-                print(err)
+                print(f'WARNING: {err} on {material_data_applier.__class__}')
                 print('WARNING: Falling back and trying next version')
                 continue # fallback and try next version
 
@@ -287,7 +288,7 @@ class ShadowRampTypeSetter:
             )
             shadow_ramp_pathID = self.__get_shadow_ramp_pathID(material_data_json)
 
-            if shadow_ramp_pathID == target_file_shadow_ramp_pathID:
+            if shadow_ramp_pathID and target_file_shadow_ramp_pathID and shadow_ramp_pathID == target_file_shadow_ramp_pathID:
                 return get_body_part(material_data_file)
 
     def __get_shadow_ramp_pathID(self, material_data_json):
