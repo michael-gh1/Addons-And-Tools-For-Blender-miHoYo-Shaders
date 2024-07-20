@@ -291,7 +291,10 @@ class ShadowRampTypeSetter:
                 return get_body_part(material_data_file)
 
     def __get_shadow_ramp_pathID(self, material_data_json):
-        return material_data_json.get('m_SavedProperties').get('m_TexEnvs').get('_PackedShadowRampTex').get('m_Texture').get('m_PathID')
+        try:
+            return material_data_json.get('m_SavedProperties').get('m_TexEnvs').get('_PackedShadowRampTex').get('m_Texture').get('m_PathID')
+        except AttributeError:
+            return None
 
     def __set_shadow_ramp_type_on_shader_material(self, shader_material, shadow_ramp_type):
         body_shader_node = shader_material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
