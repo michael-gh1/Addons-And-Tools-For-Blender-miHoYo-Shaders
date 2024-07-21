@@ -7,7 +7,7 @@ from bpy.types import Operator, Context
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
-    JaredNytsPunishingGrayRavenShaderMaterialNames
+    JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
     GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
@@ -175,7 +175,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
             return status
 
         if bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.BODY) and \
-            not bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v3.5
+            not bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v4.0
             self.create_hair_material()
 
         cache_enabled = self.context.window_manager.cache_enabled
@@ -192,7 +192,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
     
     def create_hair_material(self):
-        body_material = bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.BODY)
+        body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
         hair_material = body_material.copy()
         MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type).set_up_hair_material(hair_material)
 

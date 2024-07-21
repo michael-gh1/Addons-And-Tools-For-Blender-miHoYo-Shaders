@@ -10,7 +10,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterFactory, TextureImporterType, TextureType
@@ -28,8 +28,9 @@ class OutlineTextureImporter(ABC):
         raise NotImplementedError()
 
     def assign_lightmap_texture(self, character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name):
-        v1_lightmap_node_name = 'Image Texture'
-        v2_lightmap_node_name = 'Outline_Lightmap'
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.blender_operator.game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        lightmap_node_name = shader_identifier_service.get_shader_texture_node_names(shader).LIGHTMAP
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
@@ -45,16 +46,17 @@ class OutlineTextureImporter(ABC):
         else:
             lightmap_filename = lightmap_filenames[0]
 
-        lightmap_node = outline_material.node_tree.nodes.get(v2_lightmap_node_name) \
-            or outline_material.node_tree.nodes.get(v1_lightmap_node_name)
+        lightmap_node = outline_material.node_tree.nodes.get(lightmap_node_name)
         self.assign_texture_to_node(lightmap_node, character_model_folder_file_path, lightmap_filename)
         self.blender_operator.report({'INFO'}, f'Imported "{actual_material_part_name}" lightmap onto material "{outline_material.name}"')
 
     def assign_diffuse_texture(self, character_model_folder_file_path, diffuse_files, body_part_material_name, actual_material_part_name):
-        difuse_node_name = 'Outline_Diffuse'
+        shader_identifier_service = ShaderIdentifierServiceFactory.create(self.blender_operator.game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        diffuse_node_name = shader_identifier_service.get_shader_texture_node_names(shader).DIFFUSE
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
         
-        diffuse_node = outline_material.node_tree.nodes.get(difuse_node_name) \
+        diffuse_node = outline_material.node_tree.nodes.get(diffuse_node_name) \
             or None  # None for backwards compatibility in v1 where it did not exist
 
         diffuse_filenames = []
@@ -92,10 +94,12 @@ class OutlineTextureImporterFactory:
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V2_FestivityGenshinImpactMaterialNames
+                material_names = V4_PrimoToonGenshinImpactMaterialNames
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:

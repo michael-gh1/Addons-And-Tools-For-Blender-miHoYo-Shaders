@@ -5,6 +5,8 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
+from setup_wizard.domain.shader_node_names import V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
@@ -21,12 +23,20 @@ class MaterialDataAppliersFactory:
                     V1_MaterialDataApplier(material_data_parser, outline_material_group),
                 ]
             else:
-                return [
-                    V3_MaterialDataApplier(material_data_parser, outline_material_group),
-                    V2_MaterialDataApplier(material_data_parser, outline_material_group), 
-                    V1_MaterialDataApplier(material_data_parser, outline_material_group),
-                    V3_5_MaterialDataApplier(material_data_parser, outline_material_group),  # Keep last, checks tooltips so no error thrown
-                ]
+                shader_identifier_service = ShaderIdentifierServiceFactory.create(game_type)
+                shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+                if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or \
+                    shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
+                    shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                    return [
+                        V3_MaterialDataApplier(material_data_parser, outline_material_group),
+                        V2_MaterialDataApplier(material_data_parser, outline_material_group), 
+                        V1_MaterialDataApplier(material_data_parser, outline_material_group),
+                    ]
+                else:
+                    return [
+                        V4_MaterialDataApplier(material_data_parser, outline_material_group),
+                    ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
                 StellarToon_MaterialDataApplier(material_data_parser, outline_material_group),
@@ -279,9 +289,9 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         )
 
     # We should consider abstracting this logic if we need to add additional logic for other material data values
-    def set_up_alpha_options_material_data(self, node_inputs, outlines_alpha_only=False):
+    def set_up_alpha_options_material_data(self, node_inputs, outlines_alpha_only=False, _MainTexAlphaUse_mapping=None):
         _MainTexAlphaUse_name = '_MainTexAlphaUse'
-        _MainTexAlphaUse_mapping = {
+        _MainTexAlphaUse_mapping = _MainTexAlphaUse_mapping if _MainTexAlphaUse_mapping else {
             0: {
                 "Use Alpha": 0,
                 "0 = Emission, 1 = Transparency": 0
@@ -453,16 +463,30 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         )
 
 
-class V3_5_MaterialDataApplier(V3_MaterialDataApplier):
-    outline_mapping = {
-        '_OutlineColor': 'Outline Color 1',
-        '_OutlineColor2': 'Outline Color 2',
-        '_OutlineColor3': 'Outline Color 3',
-        '_OutlineColor4': 'Outline Color 4',
-        '_OutlineColor5': 'Outline Color 5',
-    }  # TODO: Once shader is updated we can remove these values
+class V4_MaterialDataApplier(V3_MaterialDataApplier):
+    outline_mapping = {}
     local_material_mapping = {}
     additional_local_material_mapping = {}
+
+    body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
+    face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
+    outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
+
+    _MainTexAlphaUse_mapping = {
+        0: {
+            "Toggle Alpha": 0,
+            "Emit / Transparency": 0
+        },
+        1: {
+            "Toggle Alpha": 1,
+            "Emit / Transparency": 1
+        },
+        2: {
+            "Toggle Alpha": 1,
+            "Emit / Transparency": 0
+        },
+        3: {},
+    }
 
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
@@ -480,7 +504,11 @@ class V3_5_MaterialDataApplier(V3_MaterialDataApplier):
             if material_json_value is not None:  # Explicit None check in case value is falsy
                 try:
                     if material_data_key == '_MainTexAlphaUse':
-                        self.set_up_alpha_options_material_data(shader_node.inputs, outlines_alpha_only=is_outlines)
+                        self.set_up_alpha_options_material_data(
+                            shader_node.inputs, 
+                            outlines_alpha_only=is_outlines,
+                            _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
+                        )
                     else:
                         shader_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:

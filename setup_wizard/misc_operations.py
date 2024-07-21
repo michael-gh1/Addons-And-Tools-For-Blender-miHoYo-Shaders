@@ -196,12 +196,12 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
             )
         return {'FINISHED'}
 
-    # TODO: Oof, this should be refactored, but it's a little tricky with Genshin Shader v3.5
-    # We could create a shared variable across all TextureNodeNames, but we need to be able to differentiate v3 from v3.5
+    # TODO: Oof, this should be refactored, but it's a little tricky with Genshin Shader v4.0
+    # We could create a shared variable across all TextureNodeNames, but we need to be able to differentiate v3 from v4.0
     def __get_body_diffuse_node_name(self, material, texture_node_names: TextureNodeNames):
         body_diffuse_node_names = [
             texture_node_names.BODY_DIFFUSE_UV0,  # Genshin
-            texture_node_names.MAIN_DIFFUSE,  # Genshin >= v3.5
+            texture_node_names.MAIN_DIFFUSE,  # Genshin >= v4.0
             # StellarToon before common shaders is important!!!
             # We need to check StellarToon before the others otherwise it may attempt to provide the incorrect
             # body_diffuse_uv0_node_name, this is because texture_node_names.DIFFUSE is common across StellarToon AND

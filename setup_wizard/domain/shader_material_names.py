@@ -75,6 +75,8 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
 
 
+class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
+    pass
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '

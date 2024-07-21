@@ -8,11 +8,11 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
-from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, ShaderNodeNames, StellarToonShaderNodeNames
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
-from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames, V4_GenshinImpactTextureNodeNames
 
 
 class TextureImporterType(Enum):
@@ -38,10 +38,14 @@ class TextureImporterFactory:
         if game_type is GameType.GENSHIN_IMPACT:
             shader: GenshinImpactShaders = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                # Not sure why IDE says code is unreachable, it is used
+                material_names = V2_FestivityGenshinImpactMaterialNames  # V1/V2 have the same material names
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                # Not sure why IDE says code is unreachable, it is used
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V2_FestivityGenshinImpactMaterialNames  # V1/V2 have the same material names
+                material_names = V4_PrimoToonGenshinImpactMaterialNames  
 
             if texture_importer_type == TextureImporterType.AVATAR:
                 return GenshinAvatarTextureImporter(material_names)
@@ -79,7 +83,8 @@ class GenshinTextureImporter:
     def __init__(self, game_type: GameType, character_type: TextureImporterType):
         self.game_type = game_type
         self.character_type = character_type
-        self.genshin_shader_version = None  # purely for syntax highlighting purposes
+        self.shader_identifier_service: ShaderIdentifierService
+        self.genshin_shader_version: GenshinImpactShaders
 
     def import_textures(self, directory):
         raise NotImplementedError()
@@ -134,7 +139,7 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
-            f'Main_Diffuse',  # >= v3.5 Body/Hair use same node name
+            V4_GenshinImpactTextureNodeNames.DIFFUSE,
         ]
         
         for texture_node_name in possible_texture_node_names:
@@ -152,7 +157,7 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{texture_type.value}_Lightmap_UV0',
             f'{texture_type.value}_Lightmap_UV1',
-            f'Main_Lightmap',  # >= v3.5 Body/Hair use same node name
+            V4_GenshinImpactTextureNodeNames.LIGHTMAP,
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
@@ -169,7 +174,7 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{type.value}_Normalmap_UV0',
             f'{type.value}_Normalmap_UV1',
-            f'Main_Normalmap',  # >= v3.5 Body/Hair use same node name
+            V4_GenshinImpactTextureNodeNames.NORMALMAP,
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
@@ -187,7 +192,7 @@ class GenshinTextureImporter:
     def set_shadow_ramp_texture(self, type: TextureType, img):
         possible_shadow_ramp_node_group_names = [
             f'{type.value} Shadow Ramp',
-            'Shadow Ramp',
+            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
         ]
         for shadow_ramp_node_name in possible_shadow_ramp_node_group_names:
             shadow_ramp_node_group = bpy.data.node_groups.get(shadow_ramp_node_name)
@@ -234,11 +239,13 @@ class GenshinTextureImporter:
             face_material.node_tree.nodes['Face_Shadow'].image = img        
 
     def set_face_lightmap_texture(self, img):
-        face_lightmap_node_exist = bpy.data.node_groups.get('Face Lightmap')
+        # Genshin Impact Shader V2/V4
+        texture_node_names = self.shader_identifier_service.get_shader_texture_node_names(self.genshin_shader_version)
+        face_lightmap_node = bpy.data.node_groups.get(texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
 
-        if face_lightmap_node_exist:
+        if face_lightmap_node:
             img.colorspace_settings.name='Non-Color'
-            bpy.data.node_groups['Face Lightmap'].nodes['Face_Lightmap'].image = img
+            face_lightmap_node.nodes[texture_node_names.FACE_LIGHTMAP].image = img
 
     def set_metalmap_texture(self, img):
         metallic_matcap_node_exists = bpy.data.node_groups.get('Metallic Matcap')
@@ -303,14 +310,13 @@ class GenshinTextureImporter:
             'Yelan': 3,
         }
 
-        shader_node_names = V2_GenshinShaderNodeNames if \
-            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
         shader_has_face_material_id = self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
         # No longer a field in V3 shader
         if shader_has_face_material_id:
             for character_name in character_to_face_material_id_map.keys():
                 if character_name in image.name:
+                    shader_node_names = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
                     if face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
                         face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
                         face_shader_node.inputs[shader_node_names.FACE_MATERIAL_ID].default_value = \
@@ -321,12 +327,11 @@ class GenshinTextureImporter:
             'Funingna',  # Furina
         ]
 
-        shader_node_names = V2_GenshinShaderNodeNames if \
-            self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER else V3_GenshinShaderNodeNames
         shader_has_body_hair_output = self.genshin_shader_version is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER
 
         if shader_has_body_hair_output:
             for character_name in characters_needing_hair_output:
+                shader_node_names = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
                 if character_name in image.name and face_material.node_tree.nodes.get(shader_node_names.FACE_SHADER):
                     face_shader_node = face_material.node_tree.nodes[shader_node_names.FACE_SHADER]
                     face_shader_node_hair_output = face_shader_node.outputs.get('Hair')
@@ -376,8 +381,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.AVATAR)
         self.material_names = material_names
 
-        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
-        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        self.shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = self.shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -590,8 +595,8 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
         super().__init__(GameType.GENSHIN_IMPACT, TextureImporterType.MONSTER)
         self.material_names = material_names
 
-        shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
-        self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        self.shader_identifier_service = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.genshin_shader_version = self.shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
@@ -723,8 +728,8 @@ class HonkaiStarRailTextureImporter(GenshinTextureImporter):
 
     def set_facemap_texture(self, img):
         img.colorspace_settings.name='Non-Color'
-        bpy.data.node_groups[self.texture_node_names.FACE_MAP_NODE_GROUP].nodes[
-            self.texture_node_names.FACE_MAP].image = img
+        bpy.data.node_groups[self.texture_node_names.FACE_LIGHTMAP_NODE_GROUP].nodes[
+            self.texture_node_names.FACE_LIGHTMAP].image = img
 
     def set_face_expression_texture(self, face_material, img):
         img.colorspace_settings.name='Non-Color'

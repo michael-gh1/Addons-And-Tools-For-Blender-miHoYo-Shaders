@@ -6,9 +6,9 @@ from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
 from setup_wizard.domain.shader_material import ShaderMaterial
-from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
@@ -81,10 +81,12 @@ class GameGeometryNodesSetupFactory:
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                return GenshinImpactGeometryNodesSetup(blender_operator, context)
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
             else:
-                return GenshinImpactGeometryNodesSetup(blender_operator, context)
+                return V4_GenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 return HonkaiStarRailGeometryNodesSetup(
@@ -140,16 +142,15 @@ class GameGeometryNodesSetup(ABC):
                     new_outline_material = bpy.data.materials.get(new_outline_name)
                     new_outline_material.node_tree.nodes.get(StellarToonShaderNodeNames.OUTLINES_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
 
-    def set_face_outlines_material_default_values(self, game_material_names: ShaderMaterialNames):
+    def set_face_outlines_material_default_values(self, game_material_names: ShaderMaterialNames, outlines_shader_node_name: str):
         face_outlines_material = bpy.data.materials.get(f'{game_material_names.FACE} Outlines')
         if face_outlines_material:
-            node_name = 'Outlines'
             input_names = [
                 'Use Face Shader',
-                'Use Face Outlines'  # >= v3.5 Genshin Shader
+                'Use Face Outlines'  # >= v4.0 Genshin Shader
             ]
             for input_name in input_names:
-                face_outlines_node_input = face_outlines_material.node_tree.nodes.get(node_name).inputs.get(input_name)
+                face_outlines_node_input = face_outlines_material.node_tree.nodes.get(outlines_shader_node_name).inputs.get(input_name)
                 if  face_outlines_node_input:
                     face_outlines_node_input.default_value = 1.0
 
@@ -287,10 +288,11 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
+        self.outlines_shader_node_name = V3_GenshinShaderNodeNames.OUTLINES_SHADER
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
-        self.set_face_outlines_material_default_values(self.material_names)
+        self.set_face_outlines_material_default_values(self.material_names, self.outlines_shader_node_name)
         # Originally was just checked the meshes list, then we checked character meshes, then we went back to the original way
         # Keeping this here in case we run into bugs
         # character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
@@ -391,6 +393,20 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                 if shader_materials and outline_materials:
                     modifier[material_input_accessor] = shader_materials[0]
                     modifier[outline_material_input_accessor] = outline_materials[0]
+
+
+class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
+    GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
+    BASE_GEOMETRY_INPUT = 'Input_12'
+    USE_VERTEX_COLORS_INPUT = 'Input_13'
+    OUTLINE_THICKNESS_INPUT = 'Input_7'
+
+    def __init__(self, blender_operator, context):
+        super().__init__(blender_operator, context)
+        self.material_names = V4_PrimoToonGenshinImpactMaterialNames
+        self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+        self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
+        self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
 
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):

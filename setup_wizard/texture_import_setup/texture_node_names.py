@@ -6,6 +6,7 @@ class TextureNodeNames:
     BODY_DIFFUSE_UV0 = ''
     MAIN_DIFFUSE = ''
     LIGHTMAP = ''
+    SHADER_TEXTURES_NODE_GROUP = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
@@ -19,8 +20,8 @@ class TextureNodeNames:
     BODY_COOL_RAMP = ''
     HAIR_COOL_RAMP_NODE_GROUP = ''
     HAIR_COOL_RAMP = ''
-    FACE_MAP_NODE_GROUP = ''
-    FACE_MAP = ''
+    FACE_LIGHTMAP_NODE_GROUP = ''  # GI/HSR
+    FACE_LIGHTMAP = ''  # GI/HSR
     FACE_EXPRESSION_NODE_GROUP = ''
     FACE_EXPRESSION_MAP = ''
     WEAPON_RAMP_NODE_GROUP = ''
@@ -47,11 +48,31 @@ class TextureNodeNames:
     METALLIC_MATCAP = ''
 
 class GenshinImpactTextureNodeNames(TextureNodeNames):
-    BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'
-    MAIN_DIFFUSE = 'Main_Diffuse'
+    BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'  # For getting body shader name when renaming shader material names
+
+class V1_GenshinImpactTextureNodeNames(GenshinImpactTextureNodeNames):
+    LIGHTMAP = 'Image Texture'
+
+class V2_GenshinImpactTextureNodeNames(V1_GenshinImpactTextureNodeNames):
+    DIFFUSE = 'Outline_Diffuse'
+    LIGHTMAP = 'Outline_Lightmap'
+    FACE_LIGHTMAP = 'Face_Lightmap'
+    FACE_LIGHTMAP_NODE_GROUP = 'Face Lightmap'
+
+class V3_GenshinImpactTextureNodeNames(V2_GenshinImpactTextureNodeNames):
+    FACE_LIGHTMAP_NODE_GROUP = ''
+
+class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
+    SHADER_TEXTURES_NODE_GROUP = 'Shader Textures'
+    DIFFUSE = 'Main_Diffuse'
+    MAIN_DIFFUSE = DIFFUSE  # For getting body shader name when renaming shader material names
+    LIGHTMAP = 'Main_Lightmap'
+    FACE_LIGHTMAP_NODE_GROUP = SHADER_TEXTURES_NODE_GROUP
+    NORMALMAP = 'Main_Normalmap'
+
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
-    DIFFUSE = '画像テクスチャ'
+    DIFFUSE = '画像テクスチャ'  # For getting body shader name when renaming shader material names
     LIGHTMAP = '画像テクスチャ.001'
     STOCKINGS_BODY1_NODE_GROUP = '_Stockings Body1'  # From bpy.data.node_groups, not the node name in material
     STOCKINGS_BODY2_NODE_GROUP = '_Stockings Body2'  # From bpy.data.node_groups, not the node name in material
@@ -60,8 +81,8 @@ class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
     BODY_WARM_RAMP = 'Image Texture.002'
     HAIR_WARM_RAMP_NODE_GROUP = 'Hair_Ramp'
     HAIR_WARM_RAMP = 'Image Texture.002'
-    FACE_MAP_NODE_GROUP = '_FaceMap'  # From bpy.data.node_groups, not the node name in material
-    FACE_MAP = 'Face_Lightmap'
+    FACE_LIGHTMAP_NODE_GROUP = '_FaceMap'  # From bpy.data.node_groups, not the node name in material
+    FACE_LIGHTMAP = 'Face_Lightmap'
     FACE_EXPRESSION_NODE_GROUP = '_Expression'  # From bpy.data.node_groups, not the node name in material
     FACE_EXPRESSION_MAP = '画像テクスチャ.001'
     WEAPON_RAMP_NODE_GROUP = 'Weapon_Ramp'  # From bpy.data.node_groups, not the node name in material
@@ -73,7 +94,7 @@ All "NODE_GROUP"s below are from bpy.data.node_groups and not the node name in m
 class StellarToonTextureNodeNames(TextureNodeNames):
     DIFFUSE = 'Image Texture.001'
     LIGHTMAP = 'Image Texture.002'
-    DIFFUSE_UV0_SUFFIX = '_Color_UV0'
+    DIFFUSE_UV0_SUFFIX = '_Color_UV0'  # For getting body shader name when renaming shader material names
     DIFFUSE_UV1_SUFFIX = '_Color_UV1'
     LIGHTMAP_UV0_SUFFIX = '_Lightmap_UV0'
     LIGHTMAP_UV1_SUFFIX = '_Lightmap_UV1'
@@ -82,8 +103,8 @@ class StellarToonTextureNodeNames(TextureNodeNames):
     FACE_COLOR_SUFFIX = '_Color'
     FACE_EXPRESSION_MAP = 'ExpressionMap'
 
-    FACE_MAP_NODE_GROUP = 'Face Lightmap'
-    FACE_MAP = 'FaceMap'
+    FACE_LIGHTMAP_NODE_GROUP = 'Face Lightmap'
+    FACE_LIGHTMAP = 'FaceMap'
 
     BODY_WARM_RAMP_NODE_GROUP = 'Body Warm Shadow Ramp'
     BODY_WARM_RAMP = 'Body_Warm_Ramp'

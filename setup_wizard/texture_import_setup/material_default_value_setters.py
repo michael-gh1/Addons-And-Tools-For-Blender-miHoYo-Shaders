@@ -4,13 +4,14 @@ import bpy
 
 from abc import abstractmethod
 
-from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
+from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    V3_BonnyFestivityGenshinImpactMaterialNames
+    V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_node_names import ShaderNodeNames
 
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.texture_import_setup.texture_node_names import V4_GenshinImpactTextureNodeNames
 
 
 class MaterialDefaultValueSetterFactory:
@@ -18,10 +19,13 @@ class MaterialDefaultValueSetterFactory:
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                return GenshinImpactMaterialDefaultValueSetter(V2_FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return GenshinImpactMaterialDefaultValueSetter(V3_BonnyFestivityGenshinImpactMaterialNames, V3_GenshinShaderNodeNames)
             else:
-                return GenshinImpactMaterialDefaultValueSetter(V2_FestivityGenshinImpactMaterialNames, V2_GenshinShaderNodeNames)
+                return GenshinImpactMaterialDefaultValueSetter(V4_PrimoToonGenshinImpactMaterialNames, V4_PrimoToonShaderNodeNames)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDefaultValueSetter()
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
@@ -63,7 +67,7 @@ class MaterialDefaultValueSetter:
     def set_up_lightmap_ao_default_value(self, body_part, material, default_missing=0, default_exists=1):
         lightmap_uv0 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV0')
         lightmap_uv1 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV1')
-        lightmap_all = material.node_tree.nodes.get('Main_Lightmap')  # >= v3.5 Body/Hair use same node name
+        lightmap_all = material.node_tree.nodes.get(V4_GenshinImpactTextureNodeNames.LIGHTMAP)  # >= v4.0 Body/Hair use same node name
 
         if (not lightmap_uv0 or not lightmap_uv1) and not lightmap_all:
             return
