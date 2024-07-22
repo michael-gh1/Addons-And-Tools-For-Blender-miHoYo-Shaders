@@ -211,7 +211,7 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
         ]
 
         for node_name in body_diffuse_node_names:
-            if material.node_tree.nodes.get(node_name):
+            if material and material.node_tree.nodes.get(node_name):
                 return node_name
 
     def __set_material_names(self, game_type: GameType, material: Material, shader_material_names: ShaderMaterialNames, body_diffuse_filename):
