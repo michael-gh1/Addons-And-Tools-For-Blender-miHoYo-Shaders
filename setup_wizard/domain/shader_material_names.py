@@ -144,5 +144,6 @@ class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
 
     # Custom
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body01'
     XDEFAULTMATERIAL = f'{MATERIAL_PREFIX}XDefaultMaterial'  # Chibi Body
     CHIBIFACE = 'ChibiFace'  # Chibi Face
