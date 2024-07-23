@@ -82,23 +82,23 @@ class GlobalPropertiesNames:
         },
         LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
             'input': Inputs.AMBIENT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
         },
         LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
             'input': Inputs.SHARP_LIT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
         },
         LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
             'input': Inputs.SOFT_LIT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
         },
         LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
             'input': Inputs.SHARP_SHADOW_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
         },
         LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
             'input': Inputs.SOFT_SHADOW_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
         },
         LightingPanelNodeNames.RIM_LIT_NODE: {
             'input': Inputs.RIM_LIT,
