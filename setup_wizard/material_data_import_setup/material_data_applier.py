@@ -1,11 +1,12 @@
 # Author: michael-gh1
 
+from enum import auto
 import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
-from setup_wizard.domain.shader_node_names import V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
@@ -464,6 +465,10 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
 
 
 class V4_MaterialDataApplier(V3_MaterialDataApplier):
+    class ShaderNodeType:
+        INPUT = auto()
+        OUTPUT = auto()
+
     outline_mapping = {}
     local_material_mapping = {}
     additional_local_material_mapping = {}
@@ -491,12 +496,15 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
         outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
+        global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
+        global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
 
-        self.set_up_mesh_material_data_with_tooltips(shader_node)
-        self.set_up_mesh_material_data_with_tooltips(outline_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(shader_node, shader_node)
+        self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
 
-    def set_up_mesh_material_data_with_tooltips(self, shader_node, is_outlines=False):
-        shader_node_interface_input_items = shader_node.node_tree.interface.items_tree.values()
+    def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):
+        shader_node_interface_input_items = interface_node.node_tree.interface.items_tree.values()
         for node_interface_input in shader_node_interface_input_items:
             material_data_key = node_interface_input.description.strip()  # Tooltip
 
@@ -505,12 +513,12 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                 try:
                     if material_data_key == '_MainTexAlphaUse':
                         self.set_up_alpha_options_material_data(
-                            shader_node.inputs, 
+                            inputs_node.inputs, 
                             outlines_alpha_only=is_outlines,
                             _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
                         )
                     else:
-                        shader_node.inputs.get(node_interface_input.name).default_value = material_json_value
+                        inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
                         Falling back to next MaterialDataApplier version')
