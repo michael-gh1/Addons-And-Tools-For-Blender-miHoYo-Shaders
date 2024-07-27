@@ -27,10 +27,12 @@ class PunishingGrayRavenShaders(Enum):
 
 
 class ShaderIdentifier:
-    def __init__(self, material_name, shader_node_name, shader_label_name):
+    def __init__(self, material_name, shader_node_name, shader_label_name, material_prefix_after_rename, material_endswith_after_rename):
         self.material_name = material_name
         self.shader_node_name = shader_node_name
         self.shader_label_name = shader_label_name
+        self.material_prefix_after_rename = material_prefix_after_rename
+        self.material_endswith_after_rename = material_endswith_after_rename
 
 
 class ShaderIdentifierServiceFactory:
@@ -58,6 +60,10 @@ class ShaderIdentifierService:
         shader_identifier: ShaderIdentifier
         for shader, shader_identifier in self.shader_labels_to_search_through.items():
             shader_material = materials.get(shader_identifier.material_name)
+            renamed_shader_material = [material for material in materials if 
+                                       material.name.startswith(shader_identifier.material_prefix_after_rename) and material.name.endswith(shader_identifier.material_endswith_after_rename)]
+
+            shader_material = shader_material or renamed_shader_material[0] if renamed_shader_material else None
             if shader_material:
                 shader_node = shader_material.node_tree.nodes.get(shader_identifier.shader_node_name)
                 if shader_node and shader_node.label == shader_identifier.shader_label_name:
@@ -175,9 +181,11 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
 
     shader_labels_to_search_through = {
         GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER: ShaderIdentifier(
-            V4_PrimoToonGenshinImpactMaterialNames.BODY,
-            V4_PrimoToonShaderNodeNames.BODY_SHADER,
-            V4_PrimoToonShaderNodeNames.BODY_SHADER_LABEL
+            material_name=V4_PrimoToonGenshinImpactMaterialNames.BODY,
+            shader_node_name=V4_PrimoToonShaderNodeNames.BODY_SHADER,
+            shader_label_name=V4_PrimoToonShaderNodeNames.BODY_SHADER_LABEL,
+            material_prefix_after_rename=V4_PrimoToonGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
+            material_endswith_after_rename='Body'
         ),
     }
 
