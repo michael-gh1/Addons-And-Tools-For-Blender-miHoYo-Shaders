@@ -130,7 +130,9 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
     def execute(self, context):
         scene = bpy.context.scene
         objects_to_delete = [
-            'EffectMesh'
+            'HairVat',  # Mavuika
+            'HairEffect_Vat',  # Mavuika
+            'EffectMesh',  # Also, Mavuika: HairEffectMesh
         ]  # be extremely careful, we will be deleting anything that contains these object names
         delete_objects_that_start_with = [
             'AO_',  # Furina (Default)
@@ -140,6 +142,7 @@ class GI_OT_DeleteSpecificObjects(Operator, CustomOperatorProperties):
             for object_to_delete in objects_to_delete:
                 if object_to_delete in object.name and object.type == 'MESH':
                     bpy.data.objects.remove(object)
+                    break
 
         # lazy separate for-loop because object may already be deleted when reaching second for-loop
         for object in scene.objects:
