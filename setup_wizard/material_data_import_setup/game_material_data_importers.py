@@ -232,6 +232,12 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             elif 'Equip' in file.name:
                 body_part = 'Body'
                 character_type = CharacterType.GI_EQUIPMENT
+            elif file.name.endswith('Glass_Mat.json'):
+                body_part = 'Glass'
+                character_type = CharacterType.UNKNOWN
+            elif file.name.endswith('Glass_Eff_Mat.json'):
+                body_part = 'Glass_Eff'
+                character_type = CharacterType.UNKNOWN
             else:
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior

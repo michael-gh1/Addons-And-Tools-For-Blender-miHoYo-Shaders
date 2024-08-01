@@ -6,12 +6,13 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
+from setup_wizard.domain.shader_node_inputs import V4_PrimoToonShaderNodeInputNames
 from setup_wizard.domain.shader_node_names import ShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -104,12 +105,11 @@ class MaterialDataApplier(ABC):
                     raise ex
 
     def get_value_in_json_parser(self, parser, key):
-        try:
-            return getattr(parser.m_floats, key)
-        except AttributeError:
-            return getattr(parser.m_colors, key, None)
-        except Exception:
-            return None
+        m_floats = getattr(parser.m_floats, key, None)
+        m_colors = getattr(parser.m_colors, key, None)
+        m_texEnvs = getattr(parser.m_texEnvs, key, None)
+
+        return m_floats or m_colors or m_texEnvs
 
     def __handle_material_value_not_found(self, material_json_name):
         print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
@@ -463,6 +463,10 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
             outline_material_shader_node_tree_inputs
         )
 
+class mTexEnvsKeys:
+    def __init__(self, key, m_TexEnvs_key):
+        self.key = key
+        self.m_TexEnvs_key = m_TexEnvs_key
 
 class V4_MaterialDataApplier(V3_MaterialDataApplier):
     class ShaderNodeType:
@@ -476,6 +480,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
     face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
     outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
+    shader_node_input_names = V4_PrimoToonShaderNodeInputNames
 
     _MainTexAlphaUse_mapping = {
         0: {
@@ -508,8 +513,19 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         for node_interface_input in shader_node_interface_input_items:
             material_data_key = node_interface_input.description.strip()  # Tooltip
 
-            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
-            if material_json_value is not None:  # Explicit None check in case value is falsy
+            if self.is_tooltip_TexEnv(material_data_key):
+                m_TexEnvs_keys: mTexEnvsKeys = self.get_TexEnv_Keys(material_data_key)
+                m_TexEnv_values = self.get_value_in_json_parser(self.material_data_parser, m_TexEnvs_keys.m_TexEnvs_key)
+                if m_TexEnv_values:
+                    material_json_value = m_TexEnv_values.get(m_TexEnvs_keys.key)
+                    material_json_value = (
+                        material_json_value.get('X') or 0.0, 
+                        material_json_value.get('Y') or 0.0, 
+                        material_json_value.get('Z') or 0.0
+                    )
+            else:
+                material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
+            if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
                 try:
                     if material_data_key == '_MainTexAlphaUse':
                         self.set_up_alpha_options_material_data(
@@ -524,6 +540,33 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                         Falling back to next MaterialDataApplier version')
                     raise ex
 
+        # Transparency for Glasses
+        if is_outlines and self.outline_material.name == f'{V4_PrimoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
+            toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
+            transparency_clip_node = inputs_node.inputs.get(self.shader_node_input_names.TRANSPARENCY_CLIP_THRESHOLD)
+
+            toggle_alpha_node.default_value = 1.0
+            transparency_clip_node.default_value = 1.0
+
+    def is_tooltip_TexEnv(self, tooltip):
+        tooltip_keys = tooltip.split(' ')
+        if len(tooltip_keys) == 1:
+            return False
+
+        m_TexEnvs_key = tooltip_keys[1]
+        if m_TexEnvs_key.startswith('(') and m_TexEnvs_key.endswith(')'):
+            return True
+        return False
+
+    def get_TexEnv_Keys(self, tooltip):
+        tooltip_keys = tooltip.split(' ')
+        if len(tooltip_keys) == 1:
+            return False
+
+        key = tooltip_keys[0]
+        m_TexEnvs_key = tooltip_keys[1].replace('(', '').replace(')', '')
+        
+        return mTexEnvsKeys(key, m_TexEnvs_key)
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
     def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):

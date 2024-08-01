@@ -21,18 +21,23 @@ NAME_OF_VERTEX_COLORS_INPUT = 'Input_3'
 OUTLINE_THICKNESS_INPUT = 'Input_7'
 BODY_PART_SUFFIX = ''
 
-NAME_OF_OUTLINE_1_MASK_INPUT = 'Input_10'
-NAME_OF_OUTLINE_1_MATERIAL_INPUT = 'Input_5'
-NAME_OF_OUTLINE_2_MASK_INPUT = 'Input_11'
-NAME_OF_OUTLINE_2_MATERIAL_INPUT = 'Input_9'
-NAME_OF_OUTLINE_3_MASK_INPUT = 'Input_14'
-NAME_OF_OUTLINE_3_MATERIAL_INPUT = 'Input_15'
-NAME_OF_OUTLINE_4_MASK_INPUT = 'Input_18'
-NAME_OF_OUTLINE_4_MATERIAL_INPUT = 'Input_19'
-NAME_OF_DRESS2_MASK_INPUT = 'Input_24'
-NAME_OF_DRESS2_MATERIAL_INPUT = 'Input_25'
+NAME_OF_OUTLINE_1_MASK_INPUT = 'Input_10'  # Hair
+NAME_OF_OUTLINE_2_MASK_INPUT = 'Input_11'  # Body
+NAME_OF_OUTLINE_3_MASK_INPUT = 'Input_14'  # Face
+NAME_OF_OUTLINE_4_MASK_INPUT = 'Input_18'  # Dress
+NAME_OF_DRESS2_MASK_INPUT = 'Input_24'  # Dress 2
+NAME_OF_LEATHER_MASK_INPUT = 'Socket_0'
 NAME_OF_OUTLINE_OTHER_MASK_INPUT = 'Input_26'
+NAME_OF_VFX_MASK_INPUT = 'Socket_1'
+
+NAME_OF_OUTLINE_1_MATERIAL_INPUT = 'Input_5'  # Hair
+NAME_OF_OUTLINE_2_MATERIAL_INPUT = 'Input_9'  # Body
+NAME_OF_OUTLINE_3_MATERIAL_INPUT = 'Input_15'  # Face
+NAME_OF_OUTLINE_4_MATERIAL_INPUT = 'Input_19'  # Dress
+NAME_OF_DRESS2_MATERIAL_INPUT = 'Input_25'  # Dress 2
+NAME_OF_LEATHER_MATERIAL_INPUT = 'Socket_2'
 NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT = 'Input_27'
+NAME_OF_VFX_MATERIAL_INPUT = 'Socket_3'
 
 LIGHT_VECTORS_LIGHT_DIRECTION = 'Input_3'
 LIGHT_VECTORS_HEAD_ORIGIN = 'Input_4'
@@ -58,6 +63,7 @@ meshes_to_create_geometry_nodes_on = [
     'Handcuffs',
     'Hat',
     'Helmet',
+    'SkillObj_Mavuika_Glass_Model',
     'Wriothesley_Gauntlet_L_Model',
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
@@ -283,6 +289,31 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
     USE_VERTEX_COLORS_INPUT = 'Input_13'
     OUTLINE_THICKNESS_INPUT = 'Input_7'
 
+    outline_to_material_mapping = {
+        'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+        'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
+        'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
+        'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Dress2': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+        'Arm': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Effect': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'EffectHair': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Gauntlet': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+    }
+
+    npc_outline_to_material_mapping = {
+        'Item_01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Hat': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+        'Item_02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+        'Crown': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+        'Screw': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Item_03': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Others': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+    }
+
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
         self.material_names = V3_BonnyFestivityGenshinImpactMaterialNames
@@ -332,22 +363,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         modifier[self.USE_VERTEX_COLORS_INPUT] = True
         modifier[self.OUTLINE_THICKNESS_INPUT] = 0.25
 
-        outline_to_material_mapping = {
-            'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
-            'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
-            'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
-            'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
-            'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
-            'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
-            'Dress2': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
-            'Arm': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-            'Effect': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-            'EffectHair': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-            'Gauntlet': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-            'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-        }
-
-        for input_name, (material_input_accessor, outline_material_input_accessor) in outline_to_material_mapping.items():
+        for input_name, (material_input_accessor, outline_material_input_accessor) in self.outline_to_material_mapping.items():
             material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name}'
             outline_material_name = f'{self.material_names.MATERIAL_PREFIX}{input_name} Outlines'
 
@@ -357,17 +373,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
         is_npc = [material for material in bpy.data.materials if 'NPC' in material.name]
         if is_npc:
-            npc_outline_to_material_mapping = {
-                'Item_01': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
-                'Hat': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
-                'Item_02': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
-                'Crown': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
-                'Screw': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-                'Item_03': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-                'Others': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
-            }
-
-            for input_name, (material_input_accessor, outline_material_input_accessor) in npc_outline_to_material_mapping.items():
+            for input_name, (material_input_accessor, outline_material_input_accessor) in self.npc_outline_to_material_mapping.items():
                 shader_materials = [
                     material for material_name, material in bpy.data.materials.items() if \
                         input_name in material_name and 
@@ -401,6 +407,24 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     USE_VERTEX_COLORS_INPUT = 'Input_13'
     OUTLINE_THICKNESS_INPUT = 'Input_7'
 
+    outline_to_material_mapping = {
+        'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
+        'Body': (NAME_OF_OUTLINE_2_MASK_INPUT, NAME_OF_OUTLINE_2_MATERIAL_INPUT),
+        'Face': (NAME_OF_OUTLINE_3_MASK_INPUT, NAME_OF_OUTLINE_3_MATERIAL_INPUT),
+        'Dress': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Dress1': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Helmet': (NAME_OF_OUTLINE_4_MASK_INPUT, NAME_OF_OUTLINE_4_MATERIAL_INPUT),
+        'Dress2': (NAME_OF_DRESS2_MASK_INPUT, NAME_OF_DRESS2_MATERIAL_INPUT),
+        'Leather': (NAME_OF_LEATHER_MASK_INPUT, NAME_OF_LEATHER_MATERIAL_INPUT),
+        'Arm': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Effect': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'EffectHair': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Gauntlet': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Glass': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
+        'Glass_Eff': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
+    }
+
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
         self.material_names = V4_PrimoToonGenshinImpactMaterialNames
@@ -408,6 +432,8 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
         self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
 
+    def set_up_modifier_default_values(self, modifier, mesh):
+        super().set_up_modifier_default_values(modifier, mesh)
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []

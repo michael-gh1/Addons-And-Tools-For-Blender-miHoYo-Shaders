@@ -253,6 +253,11 @@ class GenshinTextureImporter:
         if metallic_matcap_node_exists:
             bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
+    def set_glass_diffuse_texture(self, material, img):
+        diffuse_node = material.node_tree.nodes.get('Main_Diffuse') or material.node_tree.nodes.get('Glass_Diffuse')
+        if material and diffuse_node:
+            diffuse_node.image = img
+
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
         shader_dress_materials = [material for material in bpy.data.materials if 
                                   'Genshin Dress' in material.name and 'Outlines' not in material.name]
@@ -400,8 +405,11 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
-                gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
                 dress2_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Dress2')
+                gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
+                glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
+                glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
+                leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -429,10 +437,13 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
+                    self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
+                    self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
                 elif "Body_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
+                    self.set_normalmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
                 elif "Body_Shadow_Ramp" in file:
                     self.set_shadow_ramp_texture(TextureType.BODY, img)
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
@@ -445,6 +456,12 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_lightmap_texture(img)
                 elif "MetalMap" in file:
                     self.set_metalmap_texture(img)
+                elif self.is_texture_identifiers_in_texture_name(['Glass', 'Diffuse'], file):
+                    self.set_glass_diffuse_texture(glass_material, img)
+                    self.set_glass_diffuse_texture(glass_eff_material, img)
+                elif self.is_texture_identifiers_in_texture_name(['Glass', 'Lightmap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, glass_material, img)
+                    self.set_lightmap_texture(TextureType.BODY, glass_eff_material, img)
                 elif "Gauntlet_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Ligntmap" in file:

@@ -139,6 +139,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
             lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower() or 'Ligntmap'.lower() in file.lower()]  # Important typo check for: Wrioth
             outline_materials = [material for material in bpy.data.materials.values() if 
                                  material.name != self.material_names.OUTLINES and 
+                                 self.material_names.VFX not in material.name and
                                  ('Outlines' in material.name or 
                                  ShaderMaterial(material).is_outlines_material())
             ]
@@ -160,7 +161,10 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                     # original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and 'Body' in material.name][0]
                     character_type = TextureImporterType.MONSTER
                 else:
-                    original_mesh_material = [material for material in bpy.data.materials if material.name.endswith(f'Mat_{body_part_material_name}')][0]
+                    original_mesh_material = [material for material in bpy.data.materials if 
+                                              material.name.endswith(f'Mat_{body_part_material_name}') or \
+                                                material.name.endswith(f'{body_part_material_name}_Eff_Mat') or \
+                                                    material.name.endswith(f'{body_part_material_name}_Mat')][0]
                     character_type = TextureImporterType.AVATAR
 
                 if character_type == TextureImporterType.MONSTER:

@@ -155,7 +155,8 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.BODY},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
-        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES}
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES},
+        {'name': V4_PrimoToonGenshinImpactMaterialNames.VFX},
     ]
 
     def __init__(self, blender_operator, context):

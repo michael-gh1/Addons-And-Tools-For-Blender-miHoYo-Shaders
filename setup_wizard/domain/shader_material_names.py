@@ -15,12 +15,16 @@ class ShaderMaterialNames:
     EFFECT = ''
     EFFECT_HAIR = ''
     GAUNTLET = ''
+    GLASS = ''
+    GLASS_EFF = ''
     HELMET = ''
     HELMET_EMO = ''
+    LEATHER = ''
     HAIR = ''
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    VFX = ''
     # HSR
     WEAPON = ''
     WEAPON01 = ''
@@ -76,7 +80,12 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
 
 
 class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
-    pass
+    MATERIAL_PREFIX = 'HoYoverse - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
+    GLASS = f'{MATERIAL_PREFIX}Glass'
+    GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
+    LEATHER = f'{MATERIAL_PREFIX}Leather'
+    VFX = f'{MATERIAL_PREFIX}VFX'
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '

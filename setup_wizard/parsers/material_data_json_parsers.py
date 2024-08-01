@@ -26,6 +26,7 @@ class HoyoStudioMaterialDataJsonParser(MaterialDataJsonParser):
 
         self.m_floats = MaterialData(self.json_material_data.get('m_SavedProperties').get('m_Floats'))
         self.m_colors = MaterialData(m_colors_dict)
+        self.m_texEnvs = MaterialData(self.json_material_data.get('m_SavedProperties').get('m_TexEnvs'))
 
     def get_rgba_colors(self, material_json_value):
         # check lowercase for backwards compatibility
