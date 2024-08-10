@@ -57,8 +57,16 @@ class UnknownHoyoStudioMaterialDataJsonParser(HoyoStudioMaterialDataJsonParser):
             value = m_floats_value_dict['Value']
             m_floats_dict[key] = value
 
+        m_texEnvs = self.json_material_data.get('m_SavedProperties').get('m_TexEnvs')
+        m_texEnvs_dict = {}
+        for m_texEnvs_value_dict in m_texEnvs:
+            key = m_texEnvs_value_dict['Key']
+            value = m_texEnvs_value_dict['Value']
+            m_texEnvs_dict[key] = value
+
         self.m_floats = MaterialData(m_floats_dict)
         self.m_colors = MaterialData(m_colors_dict)
+        self.m_texEnvs = MaterialData(m_texEnvs_dict)
 
 
 class UABEMaterialDataJsonParser(MaterialDataJsonParser):
