@@ -109,7 +109,9 @@ class MaterialDataApplier(ABC):
         m_colors = getattr(parser.m_colors, key, None)
         m_texEnvs = getattr(parser.m_texEnvs, key, None)
 
-        return m_floats or m_colors or m_texEnvs
+        return m_floats if m_floats is not None else \
+            m_colors if m_colors is not None else \
+                m_texEnvs if m_texEnvs is not None else None
 
     def __handle_material_value_not_found(self, material_json_name):
         print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
