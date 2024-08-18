@@ -476,7 +476,6 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.SKILLOBJ, 'Lightmap'], file):
                     expected_skillobj_identifier = file.split('_')[2]
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
-                    skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ}')
                     self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
                     self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
