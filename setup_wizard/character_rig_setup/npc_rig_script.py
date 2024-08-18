@@ -2109,8 +2109,10 @@ def rig_character(
     if is_version_4:
         armature = bpy.context.object.data
         collections = armature.collections
-        for coll in collections:
-            collections.remove(coll)
+
+        del_collections = bpy.context.active_object.data.collections
+        while del_collections:
+            del_collections.remove(del_collections[0])
         
         collections.new("Tweaks")
         collections.new("Pivots & Pins")
