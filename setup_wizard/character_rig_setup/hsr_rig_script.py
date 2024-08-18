@@ -169,9 +169,15 @@ def rig_character(
     except Exception:
         pass
 
-    # DElete joint_skin_GRP and replace joint_face parent with DEF-spine.006
-    armature.edit_bones.remove(armature.edit_bones["joint_skin_GRP"])
-    armature.edit_bones["joint_face"].parent = armature.edit_bones["DEF-spine.006"]
+    # Delete joint_skin_GRP if it exists (may not exist on models without face, like Sam)
+    joint_skin_grp_bone = armature.edit_bones.get("joint_skin_GRP")
+    if joint_skin_grp_bone is not None:
+        armature.edit_bones.remove(joint_skin_grp_bone)
+
+    # Replace joint_face parent with DEF-spine.006 if joint_face exists
+    joint_face_bone = armature.edit_bones.get("joint_face")
+    if joint_face_bone is not None:
+      armature.edit_bones["joint_face"].parent = armature.edit_bones["DEF-spine.006"]
 
     #armature.edit_bones["joint_skin_GRP"].head.z = armature.edit_bones["joint_skin_GRP"].tail.z
     #armature.edit_bones["joint_skin_GRP"].tail.z += 0.1
