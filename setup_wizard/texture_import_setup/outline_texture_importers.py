@@ -11,6 +11,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterFactory, TextureImporterType, TextureType
@@ -145,7 +146,12 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
             ]
 
             for outline_material in outline_materials:
-                body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
+                is_skill_obj = False
+                if ShaderMaterialNameKeywords.SKILLOBJ in outline_material.name:
+                    body_part_material_name = ' '.join(outline_material.name.split(' ')[-3:-1])  # ex. 'HoYoverse - Genshin SkillObj Fugu Outlines'
+                    is_skill_obj = True
+                else:
+                    body_part_material_name = outline_material.name.split(' ')[-2]  # ex. 'miHoYo - Genshin Hair Outlines'
                 character_type = None
 
                 if [material for material in bpy.data.materials if material.name.startswith('NPC')]:
@@ -164,7 +170,9 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                     original_mesh_material = [material for material in bpy.data.materials if 
                                               material.name.endswith(f'Mat_{body_part_material_name}') or \
                                                 material.name.endswith(f'{body_part_material_name}_Eff_Mat') or \
-                                                    material.name.endswith(f'{body_part_material_name}_Mat')][0]
+                                                    material.name.endswith(f'{body_part_material_name}_Mat') or \
+                                                        (material.name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material.name.endswith('_Mat'))
+                                                        ][0]
                     character_type = TextureImporterType.AVATAR
 
                 if character_type == TextureImporterType.MONSTER:
@@ -172,7 +180,10 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                 elif character_type == TextureImporterType.NPC:
                     actual_material_part_name = get_npc_mesh_body_part_name(original_mesh_material.name)
                 else:
-                    actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type.name)
+                    if is_skill_obj:
+                        actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type.name, is_skill_obj)
+                    else:
+                        actual_material_part_name = get_actual_material_name_for_dress(original_mesh_material.name, character_type.name)
 
                 if 'Face' not in actual_material_part_name and 'Face' not in body_part_material_name:
                     self.assign_lightmap_texture(character_model_folder_file_path, lightmap_files, body_part_material_name, actual_material_part_name)

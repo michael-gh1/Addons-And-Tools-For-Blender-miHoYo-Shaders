@@ -14,6 +14,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 
 class GameDefaultMaterialReplacer(ABC):
@@ -75,10 +76,13 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
 
-                if material_name.startswith('SkillObj') and material_name.endswith('Glass_Mat'):
+                if material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material_name.endswith('Glass_Mat'):
                     mesh_body_part_name = 'Glass'
-                elif material_name.startswith('SkillObj') and material_name.endswith('Glass_Eff_Mat'):
+                elif material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material_name.endswith('Glass_Eff_Mat'):
                     mesh_body_part_name = 'Glass_Eff'
+                elif material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+                    skillobj_identifier = material_name.split('_')[2]
+                    mesh_body_part_name = f'{ShaderMaterialNameKeywords.SKILLOBJ} {skillobj_identifier}'
 
                 # If material_name is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
                 material_name = self.create_shader_material_if_unique_mesh(mesh, mesh_body_part_name, material_name)
@@ -147,6 +151,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             glass_material.shadow_method = 'NONE'
             glass_material.show_transparent_back = False
             material_name = glass_material.name
+        elif mesh_body_part_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+            skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
+            skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
+            material_name = skillobj_material.name
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name

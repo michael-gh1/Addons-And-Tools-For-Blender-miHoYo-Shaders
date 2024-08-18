@@ -24,6 +24,7 @@ class ShaderMaterialNames:
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    SKILLOBJ = ''
     VFX = ''
     # HSR
     WEAPON = ''
@@ -85,6 +86,7 @@ class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMater
     GLASS = f'{MATERIAL_PREFIX}Glass'
     GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
     LEATHER = f'{MATERIAL_PREFIX}Leather'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
     VFX = f'{MATERIAL_PREFIX}VFX'
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):

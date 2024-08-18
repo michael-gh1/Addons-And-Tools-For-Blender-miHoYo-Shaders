@@ -1,0 +1,2 @@
+class ShaderMaterialNameKeywords:
+    SKILLOBJ = 'SkillObj'

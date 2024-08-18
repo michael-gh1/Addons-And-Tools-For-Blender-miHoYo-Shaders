@@ -5,6 +5,7 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
@@ -21,6 +22,7 @@ NAME_OF_VERTEX_COLORS_INPUT = 'Input_3'
 OUTLINE_THICKNESS_INPUT = 'Input_7'
 BODY_PART_SUFFIX = ''
 
+# These are actually the Materials
 NAME_OF_OUTLINE_1_MASK_INPUT = 'Input_10'  # Hair
 NAME_OF_OUTLINE_2_MASK_INPUT = 'Input_11'  # Body
 NAME_OF_OUTLINE_3_MASK_INPUT = 'Input_14'  # Face
@@ -30,6 +32,7 @@ NAME_OF_LEATHER_MASK_INPUT = 'Socket_0'
 NAME_OF_OUTLINE_OTHER_MASK_INPUT = 'Input_26'
 NAME_OF_VFX_MASK_INPUT = 'Socket_1'
 
+# These are actually the Outlines
 NAME_OF_OUTLINE_1_MATERIAL_INPUT = 'Input_5'  # Hair
 NAME_OF_OUTLINE_2_MATERIAL_INPUT = 'Input_9'  # Body
 NAME_OF_OUTLINE_3_MATERIAL_INPUT = 'Input_15'  # Face
@@ -51,6 +54,17 @@ outline_mask_to_material_mapping = {
     NAME_OF_OUTLINE_3_MASK_INPUT: NAME_OF_OUTLINE_3_MATERIAL_INPUT,
     NAME_OF_OUTLINE_4_MASK_INPUT: NAME_OF_OUTLINE_4_MATERIAL_INPUT
 }
+
+available_outline_mask_to_material_mapping = {
+    NAME_OF_OUTLINE_1_MASK_INPUT: NAME_OF_OUTLINE_1_MATERIAL_INPUT,
+    NAME_OF_OUTLINE_2_MASK_INPUT: NAME_OF_OUTLINE_2_MATERIAL_INPUT,
+    NAME_OF_OUTLINE_3_MASK_INPUT: NAME_OF_OUTLINE_3_MATERIAL_INPUT,
+    NAME_OF_OUTLINE_4_MASK_INPUT: NAME_OF_OUTLINE_4_MATERIAL_INPUT,
+    NAME_OF_DRESS2_MASK_INPUT: NAME_OF_DRESS2_MATERIAL_INPUT,
+    NAME_OF_LEATHER_MASK_INPUT: NAME_OF_LEATHER_MATERIAL_INPUT,
+    NAME_OF_OUTLINE_OTHER_MASK_INPUT: NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT,
+    NAME_OF_VFX_MASK_INPUT: NAME_OF_VFX_MATERIAL_INPUT
+}  # For smart assignment
 
 meshes_to_create_geometry_nodes_on = [
     'Body',
@@ -78,6 +92,10 @@ meshes_to_create_geometry_nodes_on = [
     'Upper',
     'Cloth',
     'Clothes',
+]
+
+mesh_keywords_to_create_geometry_nodes_on = [
+    ShaderMaterialNameKeywords.SKILLOBJ,
 ]
 
 
@@ -331,11 +349,17 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
         for mesh_name in meshes_to_create_geometry_nodes_on:  # It is important that this is created and placed before Outlines!!
             for object_name, object_data in bpy.context.scene.objects.items():
-                if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name) or (
+                    [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
+                )
+                if object_data.type == 'MESH' and object_name_matches:
                     self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
         for mesh_name in meshes_to_create_geometry_nodes_on:
             for object_name, object_data in bpy.context.scene.objects.items():
-                if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
+                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name) or (
+                    [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
+                )
+                if object_data.type == 'MESH' and object_name_matches:
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
@@ -434,6 +458,24 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
 
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
+        self.assign_materials_to_empty_modifier_slots(mesh, modifier)
+
+    def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
+        for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
+            if mesh_keyword in mesh.name:
+                for material_slot in mesh.material_slots:
+                    material = material_slot.material
+                    already_assigned = False
+                    for _, (mask_input, material_input) in self.outline_to_material_mapping.items():
+                        if modifier[mask_input] == material:
+                            already_assigned = True
+                    if not already_assigned:
+                        for available_mask_input, available_material_input in available_outline_mask_to_material_mapping.items():
+                            if not modifier[available_mask_input] and not modifier[available_material_input]:
+                                modifier[available_mask_input] = bpy.data.materials.get(material.name)
+                                modifier[available_material_input] = bpy.data.materials.get(material.name + ' Outlines')
+                                break
+
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []

@@ -14,6 +14,7 @@ from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, 
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
@@ -237,6 +238,10 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 character_type = CharacterType.UNKNOWN
             elif file.name.endswith('Glass_Eff_Mat.json'):
                 body_part = 'Glass_Eff'
+                character_type = CharacterType.UNKNOWN
+            elif file.name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+                skillobj_identifier = file.name.split('_')[2]  # WARNING: This is a brittle way to get the identifier
+                body_part = f'{ShaderMaterialNameKeywords.SKILLOBJ} {skillobj_identifier}'
                 character_type = CharacterType.UNKNOWN
             else:
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
