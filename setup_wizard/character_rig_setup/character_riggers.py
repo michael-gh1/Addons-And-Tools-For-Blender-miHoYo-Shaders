@@ -1,8 +1,11 @@
 # Author: michael-gh1
 
+import re
 import bpy
 import os
 
+from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
@@ -17,12 +20,27 @@ from setup_wizard.import_order import GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, Next
     get_cache
 
 from setup_wizard.character_rig_setup.character_rigger_props import CharacterRiggerPropertyGroup
+from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames, V1_GenshinImpactTextureNodeNames, V2_GenshinImpactTextureNodeNames, V3_GenshinImpactTextureNodeNames, V4_GenshinImpactTextureNodeNames
 
 
 class CharacterRiggerFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            return GenshinImpactCharacterRigger(blender_operator, context)
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+                texture_node_names = V1_GenshinImpactTextureNodeNames
+            elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+                texture_node_names = V2_GenshinImpactTextureNodeNames
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+                texture_node_names = V3_GenshinImpactTextureNodeNames
+            else:
+                material_names = V4_PrimoToonGenshinImpactMaterialNames
+                texture_node_names = V4_GenshinImpactTextureNodeNames
+            return GenshinImpactCharacterRigger(blender_operator, context, material_names, texture_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailCharacterRigger(blender_operator, context)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
@@ -41,10 +59,12 @@ class CharacterRigger(ABC):
 
 
 class GenshinImpactCharacterRigger(CharacterRigger):
-    def __init__(self, blender_operator, context):
+    def __init__(self, blender_operator, context, material_names, texture_node_names):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.rigify_bone_shapes_file_path = GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
+        self.material_names: ShaderMaterialNames = material_names
+        self.texture_node_names: TextureNodeNames = texture_node_names
 
     def rig_character(self):
         cache_enabled = self.context.window_manager.cache_enabled
@@ -61,6 +81,8 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
         number_of_hand_bone_children = max([len(hand_bone.children) for hand_bone in hand_bones])
         is_player_hand = number_of_hand_bone_children >= 5
+        avatar_in_texture_name = self.__get_body_diffuse_texture_name().startswith('Avatar')
+        is_playable_character = avatar_in_texture_name or is_player_hand
 
         character_rigger_props: CharacterRiggerPropertyGroup = self.context.scene.character_rigger_props
 
@@ -86,7 +108,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
                 character_rigger_props.add_children_of_constraints,
                 character_rigger_props.use_head_tracker,
             )
-        elif not is_player_hand:
+        elif not is_playable_character:
             rig_npc(
                 filepath,
                 not character_rigger_props.allow_arm_ik_stretch,
@@ -120,6 +142,35 @@ class GenshinImpactCharacterRigger(CharacterRigger):
             high_level_step_name=self.blender_operator.high_level_step_name,
             game_type=GameType.GENSHIN_IMPACT.name
         )
+
+    def __get_body_diffuse_texture_name(self):
+        body_material = self.__get_body_material()
+        if not body_material:
+            return ''
+
+        body_diffuse_node = self.__get_body_diffuse_node(body_material, self.texture_node_names)
+        body_diffuse_texture = self.__get_body_diffuse_texture(body_material, body_diffuse_node)
+        return body_diffuse_texture.name if body_diffuse_texture else ''
+
+    def __get_body_material(self):
+        pattern = fr"^{self.material_names.MATERIAL_PREFIX_AFTER_RENAME}.*Body$"
+        for material in bpy.data.materials.values():
+            if re.match(pattern, material.name):
+                return material
+
+    def __get_body_diffuse_node(self, material, texture_node_names):
+        body_diffuse_node_names = [
+            texture_node_names.BODY_DIFFUSE_UV0,  # Genshin
+            texture_node_names.MAIN_DIFFUSE,  # Genshin >= v4.0
+        ]
+
+        for node_name in body_diffuse_node_names:
+            if material and material.node_tree.nodes.get(node_name):
+                return material.node_tree.nodes.get(node_name)
+
+    def __get_body_diffuse_texture(self, body_material, body_diffuse_node):
+        return body_material.node_tree.nodes.get(body_diffuse_node.name).image
+
 
     # @staticmethod
     # def __set_head_tracker_constraint_influence(influence_value):
