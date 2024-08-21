@@ -243,6 +243,9 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name ==  'Body2_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY2_TRANS) 
                     material_name = body_material.name
+                if 'Coat' in mesh_body_part_name:
+                    body_material = self.create_body_material(mesh, self.shader_material_names.COAT)
+                    material_name = body_material.name
 
                 if 'Weapon' in mesh_body_part_name:
                     weapon_material = self.create_weapon_materials(mesh_body_part_name)
@@ -285,6 +288,8 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
     Expected Format Search: Search for body part name at expected location, at the end of the material name (ex. 'Body')
     '''
     def __expected_format_body_part_name_search(self, material_name):
+        if material_name.endswith('_S') or material_name.endswith('_D'):
+            return material_name.split('_')[-2]
         return material_name.split('_')[-1]
 
     '''
