@@ -46,7 +46,7 @@ outline_mask_to_material_mapping = {
     NAME_OF_OUTLINE_4_MASK_INPUT: NAME_OF_OUTLINE_4_MATERIAL_INPUT
 }
 
-meshes_to_create_geometry_nodes_on = [
+gi_meshes_to_create_outlines_on = [
     'Body',
     'Face',
     'Face_Eye',
@@ -61,18 +61,30 @@ meshes_to_create_geometry_nodes_on = [
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
-    # HSR
+]
+
+hsr_meshes_to_create_outlines_on = [
     'Hair',
     'Weapon',
     'Weapon01',
     'Weapon02',
-    # PGR
+]
+
+pgr_meshes_to_create_outlines_on = [
     'Down',
     'Upper',
     'Cloth',
     'Clothes',
 ]
 
+meshes_to_create_outlines_on = \
+    gi_meshes_to_create_outlines_on + \
+    hsr_meshes_to_create_outlines_on + \
+    pgr_meshes_to_create_outlines_on
+
+meshes_to_create_light_vectors_on = meshes_to_create_outlines_on + [
+    'Brow'
+]
 
 class GameGeometryNodesSetupFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
@@ -243,7 +255,7 @@ class GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
-        for mesh_name in meshes_to_create_geometry_nodes_on:
+        for mesh_name in meshes_to_create_outlines_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
@@ -289,11 +301,11 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         # character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
         # character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
 
-        for mesh_name in meshes_to_create_geometry_nodes_on:  # It is important that this is created and placed before Outlines!!
+        for mesh_name in meshes_to_create_light_vectors_on:  # It is important that this is created and placed before Outlines!!
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
-        for mesh_name in meshes_to_create_geometry_nodes_on:
+        for mesh_name in meshes_to_create_outlines_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
@@ -384,7 +396,7 @@ class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
-        for mesh_name in meshes_to_create_geometry_nodes_on:
+        for mesh_name in meshes_to_create_outlines_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
@@ -433,7 +445,7 @@ class StellarToonGeometryNodesSetup(HonkaiStarRailGeometryNodesSetup):
                     if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                         light_vectors_modifier = self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                         self.__set_light_vectors_default_output_attributes(light_vectors_modifier)
-        for mesh_name in meshes_to_create_geometry_nodes_on:
+        for mesh_name in meshes_to_create_outlines_on:
             for object_name, object_data in bpy.context.scene.objects.items():
                 if object_data.type == 'MESH' and (mesh_name == object_name or f'_{mesh_name}' in object_name):
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')

@@ -27,6 +27,7 @@ class ShaderMaterialNames:
     WEAPON_TRANS = ''  # Serval
     HANDBAG = ''  # Sampo
     KENDAMA = ''  # Sparkle
+    COAT = ''  # Feixiao
     # HSR: StellarToon
     BASE = ''
     BASE_OUTLINES = ''
@@ -91,6 +92,7 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     WEAPON02 = f'{MATERIAL_PREFIX}Weapon02'
     HANDBAG = f'{MATERIAL_PREFIX}Handbag'
     KENDAMA = f'{MATERIAL_PREFIX}Kendama'  # Sparkle
+    COAT = f'{MATERIAL_PREFIX}Coat'  # Feixiao
 
 
 class StellarToonShaderMaterialNames(ShaderMaterialNames):
@@ -123,6 +125,7 @@ class StellarToonShaderMaterialNames(ShaderMaterialNames):
     WEAPON_TRANS = f'{MATERIAL_PREFIX}Weapon_Trans'
     HANDBAG = f'{MATERIAL_PREFIX}Handbag'
     KENDAMA = f'{MATERIAL_PREFIX}Kendama'  # Sparkle
+    COAT = f'{MATERIAL_PREFIX}Coat'  # Feixiao
 
 
 class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):

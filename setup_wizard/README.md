@@ -6,6 +6,7 @@ The goal of this tool is to streamline the character setup process. Whether it's
 
 **Important**: This tool is intended to be used with:
 * Festivity's Genshin Impact Shader, found here: https://github.com/festivize/Blender-miHoYo-Shaders
+* Festivity's Honkai: Star Rail Shader, found here: https://github.com/festivities/Blender-StellarToon
 * Nya222's Honkai: Star Rail Shader, found here: https://discord.com/channels/894925535870865498/1127604826885328926 (Omatsuri Discord Server)
 * JaredNyts' Punishing: Gray Raven Shader, found here: https://discord.com/channels/894925535870865498/1186597049198727259 (Omatsuri Discord Server)
 
@@ -26,21 +27,15 @@ The goal of this tool is to streamline the character setup process. Whether it's
 ## Tutorials/Screenshots
 ### Screenshot of the Tool
 
-![alt text](https://cdn.discordapp.com/attachments/890116796034711595/1014970456572436530/unknown.png)
+![alt text](/assets/genshin_tab.png)
+![alt text](/assets/star_rail_tab.png)
+![alt text](/assets/pgr_tab.png)
 
 ### Tutorials
 
-Download Tutorials:
-- Installation and "One Click" Simplified Setup (First Time Setup, No Cached Data) 
-  - https://cdn.discordapp.com/attachments/1015585109639974922/1015585432026763284/SetupWizardUI_v1-0_Installation_and_Simplified_Setup.mp4
-- 4 Step Menu: Basic Setup (First Time Setup, No Cached Data)
-  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587153058746499/SetupWizardUI_v1-0_Basic_Setup_-_No_Cache.mp4
-- 4 Step Menu: Basic Setup (Post-First Time Setup, with Cached Data)
-  - https://cdn.discordapp.com/attachments/1015585109639974922/1015746432482943057/SetupWizardUI_v1-0_Basic_Setup_with_Cache.mp4
-- Advanced Setup (Post-First Time Setup, with Cached Data)
-  - https://cdn.discordapp.com/attachments/1015585109639974922/1015587532362223698/SetupWizardUI_v1-0_Advanced_Setup_with_Cache.mp4
-
-
+A few kind souls have created some video tutorials (for educational purposes, not officially endorsed)
+* (Micchi — Genshin Impact-focused) https://youtu.be/S7mFQveRNcc
+* (fnoji — Honkia Star Rail-focused) https://www.youtube.com/watch?v=QY37vbfrLh4
 
 
 

@@ -755,6 +755,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 body3_material = bpy.data.materials.get(self.material_names.BODY3)
                 body_trans_material = bpy.data.materials.get(self.material_names.BODY_TRANS)
                 body2_trans_material = bpy.data.materials.get(self.material_names.BODY2_TRANS)
+                coat_material = bpy.data.materials.get(self.material_names.COAT)
                 weapon_material = bpy.data.materials.get(self.material_names.WEAPON)
                 weapon1_material = bpy.data.materials.get(self.material_names.WEAPON1)
                 weapon01_material = bpy.data.materials.get(self.material_names.WEAPON01)
@@ -865,6 +866,11 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                         self.set_stocking_texture(TextureType.BODY, body2_material, img)
                     elif self.is_texture_identifiers_in_texture_name(['Body'], file):  # Must be AFTER Body1/Body2
                         self.set_stocking_texture(TextureType.BODY, body_material, img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Coat', 'Color'], file):
+                    self.set_diffuse_texture(TextureType.BODY, coat_material, img)
+                elif self.is_texture_identifiers_in_texture_name(['Coat', 'LightMap'], file):
+                    self.set_lightmap_texture(TextureType.BODY, coat_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Color'], file):
                     self.set_diffuse_texture(TextureType.FACE, face_material, img)
