@@ -348,6 +348,10 @@ def rig_character(
     print("New Run\n\n")
     ## Rename all bones in selected armature to ORG
     original_name = obj.name
+
+    kachina = False  # maybe change to 'mittens' if more mitten-wielding chars are created lol
+    if "kachina" in obj.name.lower():
+        kachina = True
     abadidea = {
         'Bip001 Pelvis': 'spine',
         'Bip001 L Thigh': 'thigh.L',
@@ -411,13 +415,28 @@ def rig_character(
         '+EyeBone L A01': 'eye.L', 
         '+Breast L A01': 'breast.L',
         '+Breast R A01': 'breast.R', 
-        }
+        '+ThumbS L A01': 'thumb.01.L',  # Kachina
+        '+ThumbS L A02': 'thumb.02.L',
+        '+ThumbS R A01': 'thumb.01.R',
+        '+ThumbS R A02': 'thumb.02.R',
+        '+GlovesS L A01': 'f_middle.01.L',
+        '+GlovesS L A02': 'f_middle.02.L',
+        '+GlovesS R A01': 'f_middle.01.R',
+        '+GlovesS R A02': 'f_middle.02.R',    
+    }
+
     if not toe_bones_exist:
         del abadidea['Bip001 L Toe0']
         del abadidea['Bip001 R Toe0']
 
     bpy.ops.object.mode_set(mode='EDIT')
     armature = bpy.context.selected_objects[0].data
+
+    if kachina:
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 L Finger2"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 L Finger0"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 R Finger2"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 R Finger0"])
 
     bpy.ops.armature.select_all(action='DESELECT')
     def select_bone(bone):
@@ -451,22 +470,23 @@ def rig_character(
             bone.name = abadidea[bone.name]
     
     # Fix finger rolls - Thanks Poke!
-    how_not = ['f_index.01.L', 'f_index.02.L', 'f_index.03.L']
-    hahaha = ['f_middle.01.L', 'f_middle.02.L', 'f_middle.03.L']
-    to_name = ['f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L']
-    things_efficiently = ['f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L']
+    if not kachina:
+        how_not = ['f_index.01.L', 'f_index.02.L', 'f_index.03.L']
+        hahaha = ['f_middle.01.L', 'f_middle.02.L', 'f_middle.03.L']
+        to_name = ['f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L']
+        things_efficiently = ['f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L']
 
-    for bone in how_not:
-        armature.edit_bones[bone].roll -= .1197
-        
-    for bone in hahaha:
-        armature.edit_bones[bone].roll -= .04
-        
-    for bone in to_name:
-        armature.edit_bones[bone].roll += .1297
-        
-    for bone in things_efficiently:
-        armature.edit_bones[bone].roll += .338
+        for bone in how_not:
+            armature.edit_bones[bone].roll -= .1197
+            
+        for bone in hahaha:
+            armature.edit_bones[bone].roll -= .04
+            
+        for bone in to_name:
+            armature.edit_bones[bone].roll += .1297
+            
+        for bone in things_efficiently:
+            armature.edit_bones[bone].roll += .338
     
     #Aw shit here we go again.  This second loop is for making it possible to symmetrize pose bones properly.
     for bone in bones_list:
@@ -483,12 +503,13 @@ def rig_character(
     
     
     # Fixes the thumb scale rotating inward on x instead of z
-    armature.edit_bones["thumb.01.L"].roll += 3.14 / 4
-    armature.edit_bones["thumb.02.L"].roll += 3.14 / 4
-    armature.edit_bones["thumb.03.L"].roll += 3.14 / 4     
-    armature.edit_bones["thumb.01.R"].roll -= 3.14 / 4
-    armature.edit_bones["thumb.02.R"].roll -= 3.14 / 4
-    armature.edit_bones["thumb.03.R"].roll -= 3.14 / 4 
+    if not kachina:
+        armature.edit_bones["thumb.01.L"].roll += 3.14 / 4
+        armature.edit_bones["thumb.02.L"].roll += 3.14 / 4
+        armature.edit_bones["thumb.03.L"].roll += 3.14 / 4     
+        armature.edit_bones["thumb.01.R"].roll -= 3.14 / 4
+        armature.edit_bones["thumb.02.R"].roll -= 3.14 / 4
+        armature.edit_bones["thumb.03.R"].roll -= 3.14 / 4 
 
                                     
                                                                                                                                 
@@ -613,12 +634,20 @@ def rig_character(
     # Fixes the finger rolls
     bpy.ops.object.mode_set(mode='OBJECT')
     metapose = bpy.data.objects['metarig'].pose
-    for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
-        metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
-        metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
-                                                                               
-    metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
-    metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = '-Z'                                                                               
+    if kachina:
+        for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
+            metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = '-Z'
+            metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = 'Z'
+
+        metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'X'
+        metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = 'X'
+    else:
+        for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
+            metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
+            metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
+
+        metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
+        metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
                                           
 
     ## This part corrects metarm finger rolls
@@ -636,7 +665,10 @@ def rig_character(
     bpy.ops.object.mode_set(mode='EDIT')
     for bone in metarm.edit_bones:
         if "f_" in bone.name or "thumb" in bone.name:
-            bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
+            try:
+                bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
+            except:
+                pass
 
     # Fix hand bones being rotated 90 degrees sideways and arm deformation bones being wonky
     if "Loli" in obj.name:
@@ -823,20 +855,55 @@ def rig_character(
     except:
         pass
     
-    # Fix scaling for finger tips.
-    rig = bpy.context.object
+    bpy.ops.object.mode_set(mode='EDIT') 
 
-    for oDrv in rig.animation_data.drivers:
-        for variable in oDrv.driver.variables:
-            for target in variable.targets:
-                if ".03" in oDrv.data_path and target.data_path[-7:] == "scale.y":
-                    target.data_path = target.data_path[:-1] + "x"
+    rig = bpy.context.object
+    if kachina:
+        # Deletes the extra useless finger bones
+        eatthis = ['f_index.03.L', 'f_index.01.L.001', 'thumb.03.L', 'thumb.01.L.001', 'f_middle.03.L', 'f_middle.01.L.001', 'f_ring.01_master.L', 'f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L', 'f_ring.01.L.001', 'f_pinky.01_master.L', 'f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L', 'f_pinky.01.L.001', 'f_index.03.R', 'f_index.01.R.001', 'thumb.03.R', 'thumb.01.R.001', 'f_middle.03.R', 'f_middle.01.R.001', 'f_ring.01_master.R', 'f_ring.01.R', 'f_ring.02.R', 'f_ring.03.R', 'f_ring.01.R.001', 'f_pinky.01_master.R', 'f_pinky.01.R', 'f_pinky.02.R', 'f_pinky.03.R', 'f_pinky.01.R.001', 'ORG-palm.01.L', 'ORG-f_index.01.L', 'ORG-f_index.02.L', 'ORG-f_index.03.L', 'ORG-thumb.03.L', 'DEF-f_index.01.L', 'DEF-f_index.02.L', 'DEF-f_index.03.L', 'DEF-thumb.03.L', 'DEF-palm.01.L', 'MCH-f_index.01_drv.L', 'MCH-f_index.02_drv.L', 'MCH-f_index.03_drv.L', 'MCH-f_index.03.L', 'MCH-f_index.02.L', 'MCH-f_index.01.L', 'MCH-thumb.03_drv.L', 'MCH-thumb.03.L', 'ORG-f_middle.03.L', 'DEF-f_middle.03.L', 'MCH-f_middle.03_drv.L', 'MCH-f_middle.03.L', 'ORG-palm.03.L', 'DEF-palm.03.L', 'ORG-palm.04.L', 'DEF-palm.04.L', 'ORG-palm.01.R', 'ORG-f_index.01.R', 'ORG-f_index.02.R', 'ORG-f_index.03.R', 'ORG-thumb.03.R', 'DEF-f_index.01.R', 'DEF-f_index.02.R', 'DEF-f_index.03.R', 'DEF-thumb.03.R', 'DEF-palm.01.R', 'MCH-f_index.01_drv.R', 'MCH-f_index.02_drv.R', 'MCH-f_index.03_drv.R', 'MCH-f_index.03.R', 'MCH-f_index.02.R', 'MCH-f_index.01.R', 'MCH-thumb.03_drv.R', 'MCH-thumb.03.R', 'ORG-f_middle.03.R', 'DEF-f_middle.03.R', 'MCH-f_middle.03_drv.R', 'MCH-f_middle.03.R', 'ORG-palm.03.R', 'DEF-palm.03.R', 'ORG-palm.04.R', 'DEF-palm.04.R']
+        for this in eatthis:
+            ugh = rigifyr.data.edit_bones[this]
+            rigifyr.data.edit_bones.remove(ugh)
+            
+        # This workaround is for an issue so stupid i dont even want to explain this lmao
+        bpy.ops.object.mode_set(mode='POSE') 
+        wtf = [ 'MCH-thumb.02.L', 'MCH-f_middle.02.L', 'MCH-thumb.02.R', 'MCH-f_middle.02.R']
+        for this in wtf:
+            rigifyr.pose.bones[this].constraints[0].enabled = False
+            
+            
+        bpy.ops.object.mode_set(mode='EDIT') 
+        # The scale controls for the fingers are big as hell lmao what.
+        sizethis = ['thumb.01_master.L', 'f_index.01_master.L', 'f_middle.01_master.L', 'thumb.01_master.R', 'f_index.01_master.R', 'f_middle.01_master.R']
+        for this in sizethis:
+            rigifyr.data.edit_bones[this].length *= .08
+
+        # This corrects the drivers on the superscale control. Without this fix, the scales operate opposite to how they should.
+        bpy.ops.object.mode_set(mode='POSE')
+        for oDrv in rigifyr.animation_data.drivers:
+            for variable in oDrv.driver.variables:
+                for target in variable.targets:
+                    if "MCH-f_middle.02_drv" in oDrv.data_path or "MCH-f_index.02_drv" in oDrv.data_path:
+                        oDrv.driver.expression += "* -1"
+
+
+        
+    else:
+        # Fix scaling for finger tips.
+        for oDrv in rig.animation_data.drivers:
+            for variable in oDrv.driver.variables:
+                for target in variable.targets:
+                    if ".03" in oDrv.data_path and target.data_path[-7:] == "scale.y":
+                        target.data_path = target.data_path[:-1] + "x"
 
     fingerlist = ["thumb.01_master", "f_index.01_master", "f_middle.01_master", "f_ring.01_master", "f_pinky.01_master"]
 
     for side in [".L", ".R"]:
         for bone in fingerlist:
-            rig.pose.bones[bone + side].lock_scale[0] = False
+            try:
+                rig.pose.bones[bone + side].lock_scale[0] = False
+            except:
+                pass
 
     # Fix face shading being offset 90 degrees
     bpy.ops.object.mode_set(mode='OBJECT')
