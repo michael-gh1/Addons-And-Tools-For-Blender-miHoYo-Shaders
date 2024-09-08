@@ -860,21 +860,20 @@ def rig_character(
     rig = bpy.context.object
     if kachina:
         # Deletes the extra useless finger bones
-        eatthis = ['f_index.03.L', 'f_index.01.L.001', 'thumb.03.L', 'thumb.01.L.001', 'f_middle.03.L', 'f_middle.01.L.001', 'f_ring.01_master.L', 'f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L', 'f_ring.01.L.001', 'f_pinky.01_master.L', 'f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L', 'f_pinky.01.L.001', 'f_index.03.R', 'f_index.01.R.001', 'thumb.03.R', 'thumb.01.R.001', 'f_middle.03.R', 'f_middle.01.R.001', 'f_ring.01_master.R', 'f_ring.01.R', 'f_ring.02.R', 'f_ring.03.R', 'f_ring.01.R.001', 'f_pinky.01_master.R', 'f_pinky.01.R', 'f_pinky.02.R', 'f_pinky.03.R', 'f_pinky.01.R.001', 'ORG-palm.01.L', 'ORG-f_index.01.L', 'ORG-f_index.02.L', 'ORG-f_index.03.L', 'ORG-thumb.03.L', 'DEF-f_index.01.L', 'DEF-f_index.02.L', 'DEF-f_index.03.L', 'DEF-thumb.03.L', 'DEF-palm.01.L', 'MCH-f_index.01_drv.L', 'MCH-f_index.02_drv.L', 'MCH-f_index.03_drv.L', 'MCH-f_index.03.L', 'MCH-f_index.02.L', 'MCH-f_index.01.L', 'MCH-thumb.03_drv.L', 'MCH-thumb.03.L', 'ORG-f_middle.03.L', 'DEF-f_middle.03.L', 'MCH-f_middle.03_drv.L', 'MCH-f_middle.03.L', 'ORG-palm.03.L', 'DEF-palm.03.L', 'ORG-palm.04.L', 'DEF-palm.04.L', 'ORG-palm.01.R', 'ORG-f_index.01.R', 'ORG-f_index.02.R', 'ORG-f_index.03.R', 'ORG-thumb.03.R', 'DEF-f_index.01.R', 'DEF-f_index.02.R', 'DEF-f_index.03.R', 'DEF-thumb.03.R', 'DEF-palm.01.R', 'MCH-f_index.01_drv.R', 'MCH-f_index.02_drv.R', 'MCH-f_index.03_drv.R', 'MCH-f_index.03.R', 'MCH-f_index.02.R', 'MCH-f_index.01.R', 'MCH-thumb.03_drv.R', 'MCH-thumb.03.R', 'ORG-f_middle.03.R', 'DEF-f_middle.03.R', 'MCH-f_middle.03_drv.R', 'MCH-f_middle.03.R', 'ORG-palm.03.R', 'DEF-palm.03.R', 'ORG-palm.04.R', 'DEF-palm.04.R']
+        eatthis = ['f_index.03.L', 'f_index.01.L.001', 'f_index.01_master.L', 'thumb.03.L', 'thumb.01.L.001', 'f_middle.03.L', 'f_middle.01.L.001', 'f_ring.01_master.L', 'f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L', 'f_ring.01.L.001', 'f_pinky.01_master.L', 'f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L', 'f_pinky.01.L.001', 'f_index.03.R', 'f_index.01.R.001', 'f_index.01_master.R', 'thumb.03.R', 'thumb.01.R.001', 'f_middle.03.R', 'f_middle.01.R.001', 'f_ring.01_master.R', 'f_ring.01.R', 'f_ring.02.R', 'f_ring.03.R', 'f_ring.01.R.001', 'f_pinky.01_master.R', 'f_pinky.01.R', 'f_pinky.02.R', 'f_pinky.03.R', 'f_pinky.01.R.001', 'ORG-palm.01.L', 'ORG-f_index.01.L', 'ORG-f_index.02.L', 'ORG-f_index.03.L', 'ORG-thumb.03.L', 'DEF-f_index.01.L', 'DEF-f_index.02.L', 'DEF-f_index.03.L', 'DEF-thumb.03.L', 'DEF-palm.01.L', 'MCH-f_index.01_drv.L', 'MCH-f_index.02_drv.L', 'MCH-f_index.03_drv.L', 'MCH-f_index.03.L', 'MCH-f_index.02.L', 'MCH-f_index.01.L', 'MCH-thumb.03_drv.L', 'MCH-thumb.03.L', 'ORG-f_middle.03.L', 'DEF-f_middle.03.L', 'MCH-f_middle.03_drv.L', 'MCH-f_middle.03.L', 'ORG-palm.03.L', 'DEF-palm.03.L', 'ORG-palm.04.L', 'DEF-palm.04.L', 'ORG-palm.01.R', 'ORG-f_index.01.R', 'ORG-f_index.02.R', 'ORG-f_index.03.R', 'ORG-thumb.03.R', 'DEF-f_index.01.R', 'DEF-f_index.02.R', 'DEF-f_index.03.R', 'DEF-thumb.03.R', 'DEF-palm.01.R', 'MCH-f_index.01_drv.R', 'MCH-f_index.02_drv.R', 'MCH-f_index.03_drv.R', 'MCH-f_index.03.R', 'MCH-f_index.02.R', 'MCH-f_index.01.R', 'MCH-thumb.03_drv.R', 'MCH-thumb.03.R', 'ORG-f_middle.03.R', 'DEF-f_middle.03.R', 'MCH-f_middle.03_drv.R', 'MCH-f_middle.03.R', 'ORG-palm.03.R', 'DEF-palm.03.R', 'ORG-palm.04.R', 'DEF-palm.04.R']
         for this in eatthis:
             ugh = rigifyr.data.edit_bones[this]
             rigifyr.data.edit_bones.remove(ugh)
-            
+
         # This workaround is for an issue so stupid i dont even want to explain this lmao
         bpy.ops.object.mode_set(mode='POSE') 
         wtf = [ 'MCH-thumb.02.L', 'MCH-f_middle.02.L', 'MCH-thumb.02.R', 'MCH-f_middle.02.R']
         for this in wtf:
             rigifyr.pose.bones[this].constraints[0].enabled = False
-            
-            
+
         bpy.ops.object.mode_set(mode='EDIT') 
         # The scale controls for the fingers are big as hell lmao what.
-        sizethis = ['thumb.01_master.L', 'f_index.01_master.L', 'f_middle.01_master.L', 'thumb.01_master.R', 'f_index.01_master.R', 'f_middle.01_master.R']
+        sizethis = ['thumb.01_master.L', 'f_middle.01_master.L', 'thumb.01_master.R', 'f_middle.01_master.R']
         for this in sizethis:
             rigifyr.data.edit_bones[this].length *= .08
 
@@ -885,9 +884,6 @@ def rig_character(
                 for target in variable.targets:
                     if "MCH-f_middle.02_drv" in oDrv.data_path or "MCH-f_index.02_drv" in oDrv.data_path:
                         oDrv.driver.expression += "* -1"
-
-
-        
     else:
         # Fix scaling for finger tips.
         for oDrv in rig.animation_data.drivers:
