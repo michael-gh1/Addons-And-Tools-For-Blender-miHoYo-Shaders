@@ -140,6 +140,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
             lightmap_files = [file for file in files if 'Lightmap'.lower() in file.lower() or 'Ligntmap'.lower() in file.lower()]  # Important typo check for: Wrioth
             outline_materials = [material for material in bpy.data.materials.values() if 
                                  material.name != self.material_names.OUTLINES and 
+                                 material.name != self.material_names.NIGHT_SOUL_OUTLINES and
                                  self.material_names.VFX not in material.name and
                                  ('Outlines' in material.name or 
                                  ShaderMaterial(material).is_outlines_material())
