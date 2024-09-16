@@ -24,6 +24,7 @@ class ShaderMaterialNames:
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    NIGHT_SOUL_OUTLINES = ''
     SKILLOBJ = ''
     VFX = ''
     # HSR
@@ -89,6 +90,7 @@ class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMater
     LEATHER = f'{MATERIAL_PREFIX}Leather'
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
     VFX = f'{MATERIAL_PREFIX}VFX'
+    NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX_AFTER_RENAME}Night Soul Outlines'
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '

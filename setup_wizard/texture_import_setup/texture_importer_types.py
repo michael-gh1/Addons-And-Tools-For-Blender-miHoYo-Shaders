@@ -270,6 +270,25 @@ class GenshinTextureImporter:
                 if nyx_color_ramp_node:
                     nyx_color_ramp_node.image = img
 
+    def set_up_night_soul_outlines_material(self):
+        night_soul_outline_material = self.create_night_soul_outlines()
+        shader_node_names: ShaderNodeNames = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
+
+        body_shader = night_soul_outline_material.node_tree.nodes[shader_node_names.BODY_SHADER]
+        body_shader.inputs.get(shader_node_names.NORMAL_NIGHT_SOUL_INPUT_NAME).default_value = 1.0
+
+        night_soul_outline_material.use_screen_refraction = True
+
+    def create_night_soul_outlines(self):
+        shader_material_names: ShaderMaterialNames = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
+        outline_material = bpy.data.materials.get(shader_material_names.OUTLINES)
+        night_soul_outlines_material = bpy.data.materials.get(shader_material_names.NIGHT_SOUL_OUTLINES)
+        if not night_soul_outlines_material:
+            night_soul_outlines_material = outline_material.copy()
+            night_soul_outlines_material.name = shader_material_names.NIGHT_SOUL_OUTLINES
+            night_soul_outlines_material.use_fake_user = True
+        return night_soul_outlines_material
+
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
         shader_dress_materials = [material for material in bpy.data.materials if 
                                   'Genshin Dress' in material.name and 'Outlines' not in material.name]
@@ -495,6 +514,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
                 elif "Nyx" in file and "Ramp" in file:
                     self.set_nyx_color_ramp_texture(img)
+                    self.set_up_night_soul_outlines_material()
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

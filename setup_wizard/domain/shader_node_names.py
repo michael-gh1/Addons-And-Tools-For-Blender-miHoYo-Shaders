@@ -15,6 +15,7 @@ class ShaderNodeNames:
     OUTLINES = 'Outlines'  # Outlines material node OUTPUT
     EXTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
     INTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
+    NORMAL_NIGHT_SOUL_INPUT_NAME = ''
 
     # StellarToon
     ENABLE_STOCKINGS = ''
@@ -53,6 +54,7 @@ class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
+    NORMAL_NIGHT_SOUL_INPUT_NAME = 'Normal / Night Soul'
 
 class StellarToonShaderNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.006'
