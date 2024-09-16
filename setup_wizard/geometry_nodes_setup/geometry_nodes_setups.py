@@ -442,6 +442,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     BASE_GEOMETRY_INPUT = 'Input_12'
     USE_VERTEX_COLORS_INPUT = 'Input_13'
     OUTLINE_THICKNESS_INPUT = 'Input_7'
+    NIGHT_SOUL_OUTLINE_SOCKET = 'Socket_10'
 
     outline_to_material_mapping = {
         'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
@@ -471,6 +472,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
+        self.assign_night_soul_outlines_material(modifier)
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
         for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
@@ -488,6 +490,10 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                                 modifier[available_material_input] = bpy.data.materials.get(material.name + ' Outlines')
                                 break
 
+    def assign_night_soul_outlines_material(self, modifier):
+        night_soul_outlines_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+        if night_soul_outlines_material:
+            modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
