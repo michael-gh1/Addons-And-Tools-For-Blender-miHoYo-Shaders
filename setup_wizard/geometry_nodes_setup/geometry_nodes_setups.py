@@ -14,6 +14,7 @@ from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRave
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
+from setup_wizard.texture_import_setup.texture_node_names import V4_GenshinImpactTextureNodeNames
 
 
 # Constants
@@ -443,6 +444,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     USE_VERTEX_COLORS_INPUT = 'Input_13'
     OUTLINE_THICKNESS_INPUT = 'Input_7'
     NIGHT_SOUL_OUTLINE_SOCKET = 'Socket_10'
+    FACE_LIGHTMAP_SOCKET = 'Socket_31'
 
     outline_to_material_mapping = {
         'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
@@ -468,11 +470,13 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
         self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
+        self.texture_node_names = V4_GenshinImpactTextureNodeNames
 
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
         self.assign_night_soul_outlines_material(modifier)
+        self.assign_face_lightmap_texture(modifier)
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
         for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
@@ -494,6 +498,11 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         night_soul_outlines_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
         if night_soul_outlines_material:
             modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+
+    def assign_face_lightmap_texture(self, modifier):
+        face_lightmap_node_group = bpy.data.node_groups.get(self.texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
+        if face_lightmap_node_group:
+            modifier[self.FACE_LIGHTMAP_SOCKET] = face_lightmap_node_group.nodes[self.texture_node_names.FACE_LIGHTMAP].image
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
