@@ -512,7 +512,11 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
                     self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
-                elif "Nyx" in file and "Ramp" in file:
+                elif self.is_one_texture_identifier_in_texture_name([  # Nyx Color Ramp
+                    "NyxState_Ramp",
+                    "Nyx_Ramp",
+                    "Tex_Ramp"
+                ], file):
                     self.set_nyx_color_ramp_texture(img)
                     self.set_up_night_soul_outlines_material()
                 else:
