@@ -259,6 +259,17 @@ class GenshinTextureImporter:
         if material and diffuse_node:
             diffuse_node.image = img
 
+    def set_nyx_color_ramp_texture(self, img):
+        possible_nyx_color_ramp_node_group_names = [
+            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
+        ]
+        for nyx_color_ramp_node_group_name in possible_nyx_color_ramp_node_group_names:
+            nyx_color_ramp_node_group = bpy.data.node_groups.get(nyx_color_ramp_node_group_name)
+            if nyx_color_ramp_node_group:
+                nyx_color_ramp_node = nyx_color_ramp_node_group.nodes.get(V4_GenshinImpactTextureNodeNames.NYX_COLOR_RAMP)
+                if nyx_color_ramp_node:
+                    nyx_color_ramp_node.image = img
+
     def setup_dress_textures(self, texture_name, texture_img, character_type: TextureImporterType):
         shader_dress_materials = [material for material in bpy.data.materials if 
                                   'Genshin Dress' in material.name and 'Outlines' not in material.name]
@@ -482,6 +493,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
                     self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
+                elif "Nyx" in file and "Ramp" in file:
+                    self.set_nyx_color_ramp_texture(img)
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

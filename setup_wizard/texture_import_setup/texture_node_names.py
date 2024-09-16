@@ -7,6 +7,7 @@ class TextureNodeNames:
     MAIN_DIFFUSE = ''
     LIGHTMAP = ''
     SHADER_TEXTURES_NODE_GROUP = ''
+    NYX_COLOR_RAMP = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
@@ -69,6 +70,7 @@ class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     LIGHTMAP = 'Main_Lightmap'
     FACE_LIGHTMAP_NODE_GROUP = SHADER_TEXTURES_NODE_GROUP
     NORMALMAP = 'Main_Normalmap'
+    NYX_COLOR_RAMP = 'NYX_Color_Ramp'
 
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
