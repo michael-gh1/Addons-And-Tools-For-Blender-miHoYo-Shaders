@@ -529,6 +529,8 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                 material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
             if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
                 try:
+                    if material_data_key == '_NyxStateOutlineColorOnBodyMultiplier':
+                        material_json_value = material_json_value[0]  # Red (rgba)
                     if material_data_key == '_MainTexAlphaUse':
                         self.set_up_alpha_options_material_data(
                             inputs_node.inputs, 
@@ -536,6 +538,8 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                             _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
                         )
                     else:
+                        print(node_interface_input.name)
+                        print(material_json_value)
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
