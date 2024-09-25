@@ -371,6 +371,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
             for object_name, object_data in bpy.context.scene.objects.items():
                 object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name) or (
                     [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
+                    # TODO: Refactor, will return for each mesh in 'meshes_to_create_outlines_on' if there is an object with 'SkillObj' (5.0 chars)
                 )
                 if object_data.type == 'MESH' and object_name_matches:
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
