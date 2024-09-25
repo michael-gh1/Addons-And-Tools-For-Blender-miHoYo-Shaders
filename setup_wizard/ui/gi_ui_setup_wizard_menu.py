@@ -35,6 +35,12 @@ class UI_Properties:
             default = False
         )
 
+        bpy.types.WindowManager.enable_viewport_outlines = bpy.props.BoolProperty(
+            name = "Enable Viewport Outlines",
+            description = "Enables Viewport Outlines on Setup",
+            default = False
+        )
+
 
 class GI_PT_Setup_Wizard_UI_Layout(Panel):
     bl_label = "Genshin Impact Setup Wizard"
@@ -83,6 +89,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             row2 = settings_box.row()
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
+        settings_box.prop(window_manager, 'enable_viewport_outlines')
         settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
         settings_box.prop(window_manager, 'post_processing_setup_enabled')

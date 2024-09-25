@@ -477,6 +477,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
         self.assign_night_soul_outlines_material(modifier)
         self.assign_face_lightmap_texture(modifier)
+        modifier.show_viewport = bpy.context.window_manager.enable_viewport_outlines
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
         for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
