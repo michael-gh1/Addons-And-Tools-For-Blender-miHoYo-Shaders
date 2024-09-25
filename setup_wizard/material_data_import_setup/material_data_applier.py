@@ -529,8 +529,8 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                 material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
             if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
                 try:
-                    if material_data_key == '_NyxStateOutlineColorOnBodyMultiplier':
-                        material_json_value = material_json_value[0]  # Red (rgba)
+                    material_json_value = self.__manipulate_material_data_to_shader_value(material_data_key, material_json_value)
+
                     if material_data_key == '_MainTexAlphaUse':
                         self.set_up_alpha_options_material_data(
                             inputs_node.inputs, 
@@ -538,8 +538,6 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                             _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
                         )
                     else:
-                        print(node_interface_input.name)
-                        print(material_json_value)
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
@@ -573,6 +571,14 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         m_TexEnvs_key = tooltip_keys[1].replace('(', '').replace(')', '')
         
         return mTexEnvsKeys(key, m_TexEnvs_key)
+
+    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value):
+        if material_data_key == '_NyxStateOutlineColorOnBodyMultiplier':
+            # Same value for all 5.0 characters — (1.0, 1.0, 1.0, 1.0) (white)
+            # "just the intensity of the nyx state"
+            # "it probably is just to make it more intense and what not"
+            material_json_value = material_json_value[0]  # Red (rgba)
+        return material_json_value
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
     def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
