@@ -458,7 +458,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_lightmap_texture(TextureType.HAIR, effect_hair_material, img)
                 elif 'Helmet_Tex_Lightmap' in file:
                     self.set_lightmap_texture(TextureType.HAIR, helmet_material, img)
-                elif "Hair_Normalmap" in file:
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.HAIR, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
                     self.set_shadow_ramp_texture(TextureType.HAIR, img)
@@ -472,7 +472,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
-                elif "Body_Normalmap" in file:
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.BODY, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
                     self.set_normalmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
                 elif "Body_Shadow_Ramp" in file:
