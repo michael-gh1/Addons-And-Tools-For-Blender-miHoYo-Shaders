@@ -529,7 +529,12 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                 material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
             if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
                 try:
-                    material_json_value = self.__manipulate_material_data_to_shader_value(material_data_key, material_json_value)
+                    material_json_value = self.__manipulate_material_data_to_shader_value(
+                        material_data_key, 
+                        material_json_value,
+                        inputs_node,
+                        node_interface_input
+                    )
 
                     if material_data_key == '_MainTexAlphaUse':
                         self.set_up_alpha_options_material_data(
@@ -538,8 +543,6 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                             _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
                         )
                     else:
-                        if self.is_number_of_values_mismatch(inputs_node.inputs.get(node_interface_input.name), material_json_value):
-                            material_json_value = material_json_value[:3]
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
@@ -576,19 +579,19 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         
         return mTexEnvsKeys(key, m_TexEnvs_key)
 
-    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value):
-        if material_data_key == '_NyxStateOutlineColorOnBodyMultiplier':
-            # Same value for all 5.0 characters — (1.0, 1.0, 1.0, 1.0) (white)
-            # "just the intensity of the nyx state"
-            # "it probably is just to make it more intense and what not"
-            material_json_value = material_json_value[0]  # Red (rgba)
+    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value, inputs_node, node_interface_input):
+        if type(inputs_node.inputs.get(node_interface_input.name)) is bpy.types.NodeSocketBool and type(material_json_value) is float:
+            material_json_value = bool(material_json_value)
+        elif self.is_number_of_values_mismatch(inputs_node.inputs.get(node_interface_input.name), material_json_value):
+            material_json_value = material_json_value[:3]
         return material_json_value
 
     '''
     Specifically for handling `NS Anim` and `NS Scale`, which both have only 3 inputs, but material data has 4 (rgba)
+    This was done on the shader because NodeSocketVectors can handle negative values while colors cannot
     '''
     def is_number_of_values_mismatch(self, input, material_json_value):
-        return type(input.default_value) is bpy.types.bpy_prop_array and \
+        return type(input) is bpy.types.NodeSocketVector and \
             len(input.default_value) == 3 and \
             len(material_json_value) == 4
 
