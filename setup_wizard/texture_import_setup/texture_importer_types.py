@@ -275,8 +275,9 @@ class GenshinTextureImporter:
         shader_node_names: ShaderNodeNames = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
 
         body_shader = night_soul_outline_material.node_tree.nodes[shader_node_names.BODY_SHADER]
-        body_shader.inputs.get(shader_node_names.NORMAL_NIGHT_SOUL_INPUT_NAME).default_value = 1.0
-
+        output = body_shader.outputs.get(shader_node_names.NIGHT_SOUL_OUTPUT)
+        input = night_soul_outline_material.node_tree.nodes.get(shader_node_names.MATERIAL_OUTPUT_NODE).inputs.get(shader_node_names.MATERIAL_OUTPUT_SHADER_INPUT)
+        night_soul_outline_material.node_tree.links.new(output, input)
         night_soul_outline_material.use_screen_refraction = True
 
     def create_night_soul_outlines(self):

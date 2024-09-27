@@ -538,11 +538,15 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                             _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
                         )
                     else:
+                        if self.is_number_of_values_mismatch(inputs_node.inputs.get(node_interface_input.name), material_json_value):
+                            material_json_value = material_json_value[:3]
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
                         Falling back to next MaterialDataApplier version')
                     raise ex
+                except TypeError as ex:
+                    print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
 
         # Transparency for Glasses
         if is_outlines and self.outline_material.name == f'{V4_PrimoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
@@ -579,6 +583,15 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
             # "it probably is just to make it more intense and what not"
             material_json_value = material_json_value[0]  # Red (rgba)
         return material_json_value
+
+    '''
+    Specifically for handling `NS Anim` and `NS Scale`, which both have only 3 inputs, but material data has 4 (rgba)
+    '''
+    def is_number_of_values_mismatch(self, input, material_json_value):
+        return type(input.default_value) is bpy.types.bpy_prop_array and \
+            len(input.default_value) == 3 and \
+            len(material_json_value) == 4
+
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):
     def __init__(self, material_data_parser, outline_material_group: OutlineMaterialGroup):
