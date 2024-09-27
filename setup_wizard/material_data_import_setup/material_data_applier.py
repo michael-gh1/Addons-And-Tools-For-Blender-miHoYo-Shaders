@@ -67,6 +67,9 @@ class MaterialDataApplier(ABC):
     def set_up_mesh_material_data(self):
         raise NotImplementedError()
 
+    def set_up_outline_material_data(self):
+        return
+
     def set_up_outline_colors(self):
         outlines_shader_node_inputs = self.outline_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
 
@@ -532,8 +535,8 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                     material_json_value = self.__manipulate_material_data_to_shader_value(
                         material_data_key, 
                         material_json_value,
-                        inputs_node,
-                        node_interface_input
+                        node_interface_input,
+                        inputs_node
                     )
 
                     if material_data_key == '_MainTexAlphaUse':
@@ -579,19 +582,61 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         
         return mTexEnvsKeys(key, m_TexEnvs_key)
 
-    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value, inputs_node, node_interface_input):
-        if type(inputs_node.inputs.get(node_interface_input.name)) is bpy.types.NodeSocketBool and type(material_json_value) is float:
+    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value, node_interface_input, inputs_node=None):
+        input_object = inputs_node.inputs.get(node_interface_input.name) if inputs_node else node_interface_input
+
+        if (type(input_object) is bpy.types.NodeSocketBool or type(input_object) is bpy.types.NodeTreeInterfaceSocketBool) and \
+            type(material_json_value) is float:
             material_json_value = bool(material_json_value)
-        elif self.is_number_of_values_mismatch(inputs_node.inputs.get(node_interface_input.name), material_json_value):
+        elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
+
+    def set_up_outline_material_data(self, body_part, file):
+        self.set_up_outline_material_data_with_tooltips(body_part, file)
+
+    def set_up_outline_material_data_with_tooltips(self, body_part, file):
+        for scene_object in bpy.context.scene.objects.values():
+            for modifier in scene_object.modifiers:
+                if f'Outlines {body_part}' in modifier.name or f'Outlines {file.name.rsplit("_", 1)[0]}' in modifier.name:
+                    print(f"INFO: Modifying '{modifier.name}' using '{file.name}'")
+                    sockets = [item for item in modifier.node_group.interface.items_tree if item.item_type == 'SOCKET']
+                    for socket in sockets:
+                        material_data_key = socket.description  # Tooltip
+
+                        if self.is_tooltip_TexEnv(material_data_key):
+                            m_TexEnvs_keys: mTexEnvsKeys = self.get_TexEnv_Keys(material_data_key)
+                            m_TexEnv_values = self.get_value_in_json_parser(self.material_data_parser, m_TexEnvs_keys.m_TexEnvs_key)
+                            if m_TexEnv_values:
+                                material_json_value = m_TexEnv_values.get(m_TexEnvs_keys.key)
+                                material_json_value = (
+                                    material_json_value.get('X') or 0.0, 
+                                    material_json_value.get('Y') or 0.0, 
+                                    material_json_value.get('Z') or 0.0
+                                )
+                        else:
+                            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
+                        if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
+                            try:
+                                material_json_value = self.__manipulate_material_data_to_shader_value(
+                                    material_data_key, 
+                                    material_json_value,
+                                    socket
+                                )
+                                modifier[socket.identifier] = material_json_value
+                            except AttributeError as ex:
+                                print(f'Did not find {socket.name} in {self.material.name}/{self.outline_material.name} material using {self} \
+                                    Falling back to next MaterialDataApplier version')
+                                raise ex
+                            except TypeError as ex:
+                                print(f'ERROR: {ex} on {socket.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
 
     '''
     Specifically for handling `NS Anim` and `NS Scale`, which both have only 3 inputs, but material data has 4 (rgba)
     This was done on the shader because NodeSocketVectors can handle negative values while colors cannot
     '''
     def is_number_of_values_mismatch(self, input, material_json_value):
-        return type(input) is bpy.types.NodeSocketVector and \
+        return (type(input) is bpy.types.NodeSocketVector or type(input) is bpy.types.NodeTreeInterfaceSocketVector) and \
             len(input.default_value) == 3 and \
             len(material_json_value) == 4
 

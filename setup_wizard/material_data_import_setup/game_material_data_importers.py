@@ -44,10 +44,11 @@ class GameMaterialDataImporter(ABC):
     def import_material_data(self):
         raise NotImplementedError
 
-    def apply_material_data(self, body_part: str, material_data_appliers: List[MaterialDataApplier]):
+    def apply_material_data(self, body_part: str, material_data_appliers: List[MaterialDataApplier], file):
         for material_data_applier in material_data_appliers:
             try:
                 material_data_applier.set_up_mesh_material_data()
+                material_data_applier.set_up_outline_material_data(body_part, file)
                 material_data_applier.set_up_outline_colors()
                 print(f'INFO: Successfully applied material data on {material_data_applier.__class__}')
                 break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
@@ -270,7 +271,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 outline_material_group,
                 character_type
             )
-            self.apply_material_data(body_part, material_data_appliers)
+            self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
 
 class ShadowRampTypeSetter:
@@ -381,7 +382,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 outline_material_group,
                 character_type
             )
-            self.apply_material_data(body_part, material_data_appliers)
+            self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
 
 
