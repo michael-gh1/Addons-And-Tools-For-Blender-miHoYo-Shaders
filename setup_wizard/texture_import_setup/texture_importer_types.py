@@ -270,6 +270,15 @@ class GenshinTextureImporter:
                 if nyx_color_ramp_node:
                     nyx_color_ramp_node.image = img
 
+    def set_up_night_soul_mask_texture(self, material, img):
+        if material and material.node_tree and material.node_tree.nodes:
+            texture_node_names = self.shader_identifier_service.get_shader_texture_node_names(self.genshin_shader_version)
+            night_soul_mask_texture_node = material.node_tree.nodes.get(texture_node_names.NIGHT_SOUL_MASK) or \
+                material.node_tree.nodes.get(texture_node_names.FACE_NIGHT_SOUL_MASK)
+
+            if night_soul_mask_texture_node:
+                night_soul_mask_texture_node.image = img
+
     def set_up_night_soul_outlines_material(self):
         night_soul_outline_material = self.create_night_soul_outlines()
         shader_node_names: ShaderNodeNames = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
@@ -520,6 +529,9 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 ], file):
                     self.set_nyx_color_ramp_texture(img)
                     self.set_up_night_soul_outlines_material()
+                elif self.is_texture_identifiers_in_texture_name(ShaderMaterialNameKeywords.NIGHT_SOUL_MASK_IDENTIFIERS, file):
+                    for material in bpy.data.materials.values():
+                        self.set_up_night_soul_mask_texture(material, img)
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

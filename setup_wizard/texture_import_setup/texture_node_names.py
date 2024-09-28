@@ -71,6 +71,8 @@ class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     FACE_LIGHTMAP_NODE_GROUP = SHADER_TEXTURES_NODE_GROUP
     NORMALMAP = 'Main_Normalmap'
     NYX_COLOR_RAMP = 'NYX_Color_Ramp'
+    NIGHT_SOUL_MASK = 'Main_NYXmask'
+    FACE_NIGHT_SOUL_MASK = 'Face_NYXmask'
 
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
