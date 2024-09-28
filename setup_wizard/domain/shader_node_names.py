@@ -56,6 +56,7 @@ class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
+    TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
     NIGHT_SOUL_OUTPUT = 'PrimoToon (Night Soul)'
     MATERIAL_OUTPUT_NODE = 'Material Output'
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'

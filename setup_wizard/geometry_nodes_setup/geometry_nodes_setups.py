@@ -470,8 +470,16 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.material_names = V4_PrimoToonGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
+        self.shader_node_names = V4_PrimoToonShaderNodeNames
         self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
         self.texture_node_names = V4_GenshinImpactTextureNodeNames
+
+    def setup_geometry_nodes(self):
+        super().setup_geometry_nodes()
+        for material in bpy.data.materials:
+            if 'Face Outlines' in material.name:
+                outline_shader_node = material.node_tree.nodes.get(self.outlines_shader_node_name)
+                outline_shader_node.inputs.get(self.shader_node_names.TOGGLE_FACE_OUTLINES).default_value = True
 
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
