@@ -5,6 +5,7 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
@@ -69,12 +70,16 @@ available_outline_mask_to_material_mapping = {
 
 gi_meshes_to_create_outlines_on = [
     'Body',
+    'Dress',
+    'Dress1',
+    'Dress2',
     'Face',
     'Face_Eye',
     'EffectHair',
     'Mask',
     'Cap',
     'Clothes',
+    'Hair',
     'Handcuffs',
     'Hat',
     'Helmet',
@@ -263,6 +268,7 @@ class GameGeometryNodesSetup(ABC):
                 light_vectors_modifier = mesh.modifiers.new(f'{light_vectors_node_group_name} {mesh_name}', 'NODES')
                 light_vectors_modifier.node_group = light_vectors_node_group
                 self.set_up_light_vectors_modifier(light_vectors_modifier)
+        print(f'Light Vector Setup Completed for {mesh_name}')
         return light_vectors_modifier
 
     '''
@@ -360,20 +366,29 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         # character_armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]  # Expecting 1 armature in scene
         # character_armature_mesh_names = [obj.name for obj in character_armature.children if obj.type == 'MESH']
 
+        # Set up Light Vectors for meshes that match the expected mesh name list
         for mesh_name in meshes_to_create_light_vectors_on:  # It is important that this is created and placed before Outlines!!
             for object_name, object_data in bpy.context.scene.objects.items():
-                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name) or (
-                    [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
-                )
+                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name)
                 if object_data.type == 'MESH' and object_name_matches:
                     self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+        # Set up Light Vectors for meshes that have keywords in their names (Ex. SkillObj)
+        for object_name, object_data in bpy.context.scene.objects.items():
+            object_name_matches = [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
+            if object_data.type == 'MESH' and object_name_matches:
+                self.create_light_vectors_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+
+        # Set up Outlines for meshes that match the expected mesh name list
         for mesh_name in meshes_to_create_outlines_on:
             for object_name, object_data in bpy.context.scene.objects.items():
-                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name) or (
-                    [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
-                    # TODO: Refactor, will return for each mesh in 'meshes_to_create_outlines_on' if there is an object with 'SkillObj' (5.0 chars)
-                )
+                object_name_matches = (mesh_name == object_name or f'_{mesh_name}' in object_name)
                 if object_data.type == 'MESH' and object_name_matches:
+                    self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
+                    self.fix_meshes_by_setting_genshin_materials(object_name)
+        # Set up Outlines for meshes that have keywords in their names (Ex. SkillObj)
+        for object_name, object_data in bpy.context.scene.objects.items():
+            object_name_matches = [object_name for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on if mesh_keyword in object_name]
+            if object_data.type == 'MESH' and object_name_matches:
                     self.create_geometry_nodes_modifier(f'{object_name}{BODY_PART_SUFFIX}')
                     self.fix_meshes_by_setting_genshin_materials(object_name)
 
@@ -475,6 +490,8 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.texture_node_names = V4_GenshinImpactTextureNodeNames
 
     def setup_geometry_nodes(self):
+        for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
+            self.__separate_materials_into_unique_meshes(mesh)
         super().setup_geometry_nodes()
         for material in bpy.data.materials:
             if 'Face Outlines' in material.name:
@@ -487,6 +504,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.assign_night_soul_outlines_material(modifier)
         self.assign_face_lightmap_texture(modifier)
         modifier.show_viewport = bpy.context.window_manager.enable_viewport_outlines
+        print(f'Geometry Node Default Values Set for {modifier.name}: {mesh.name}')
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
         for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
@@ -513,6 +531,40 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         face_lightmap_node_group = bpy.data.node_groups.get(self.texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
         if face_lightmap_node_group:
             modifier[self.FACE_LIGHTMAP_SOCKET] = face_lightmap_node_group.nodes[self.texture_node_names.FACE_LIGHTMAP].image
+
+    def __separate_materials_into_unique_meshes(self, mesh):
+        if mesh.name in MeshNames.get_mesh_names() and len(mesh.material_slots) > 1:
+            for material_slot in mesh.material_slots:
+                bpy.context.view_layer.objects.active = mesh
+                expected_mesh_name = material_slot.material.name.rsplit(' ')[-1]
+                expected_mesh = bpy.data.objects.get(expected_mesh_name)
+                if not expected_mesh:
+                    new_separated_mesh = self.__separate_material_from_mesh(mesh, material_slot, expected_mesh_name)
+                    self.__remove_material_slots(new_separated_mesh, material_slot.material)
+            mesh_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh.name}')
+            self.__remove_material_slots(mesh, mesh_material)
+
+    def __separate_material_from_mesh(self, mesh, material_slot, new_mesh_name):
+        print(f'Separating material for: {material_slot.material.name}')
+        bpy.ops.object.mode_set(mode='EDIT')
+        mesh.active_material_index = mesh.material_slots.get(material_slot.material.name).slot_index
+        bpy.ops.object.material_slot_select()
+        bpy.ops.mesh.separate(type='SELECTED')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        
+        new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001')
+        new_separated_mesh.name = new_mesh_name
+        return new_separated_mesh
+
+    def __remove_material_slots(self, mesh, material):
+        bpy.ops.object.mode_set(mode='OBJECT')
+        # Reversing is IMPORTANT in order to avoid index errors while removing during runtime
+        for material_slot_material in reversed(mesh.material_slots):
+            if material_slot_material.name != material.name:
+                mesh.active_material_index = mesh.material_slots.get(material_slot_material.material.name).slot_index
+                print(f'Removing material: {material_slot_material.material.name} from {mesh.name}')
+                bpy.context.view_layer.objects.active = mesh
+                bpy.ops.object.material_slot_remove()
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
