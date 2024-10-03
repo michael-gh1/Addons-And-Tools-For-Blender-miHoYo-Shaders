@@ -533,7 +533,8 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             modifier[self.FACE_LIGHTMAP_SOCKET] = face_lightmap_node_group.nodes[self.texture_node_names.FACE_LIGHTMAP].image
 
     def __separate_materials_into_unique_meshes(self, mesh):
-        if mesh.name in MeshNames.get_mesh_names() and len(mesh.material_slots) > 1:
+        if len(mesh.material_slots) > 1:
+            separated_materials = []
             for material_slot in mesh.material_slots:
                 bpy.context.view_layer.objects.active = mesh
                 expected_mesh_name = material_slot.material.name.rsplit(' ')[-1]
@@ -541,11 +542,18 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 if not expected_mesh:
                     new_separated_mesh = self.__separate_material_from_mesh(mesh, material_slot, expected_mesh_name)
                     self.__remove_material_slots(new_separated_mesh, material_slot.material)
-            mesh_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh.name}')
-            self.__remove_material_slots(mesh, mesh_material)
+                    separated_materials += [material_slot.material]
+
+            # If we've separated all of the materials from the mesh, delete the original mesh
+            if len(separated_materials) == len(mesh.material_slots):
+                bpy.data.objects.remove(mesh)
+            else:
+                mesh_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh.name}') or \
+                    mesh.material_slots[0].material
+                self.__remove_material_slots(mesh, mesh_material)
 
     def __separate_material_from_mesh(self, mesh, material_slot, new_mesh_name):
-        print(f'Separating material for: {material_slot.material.name}')
+        print(f'Separating material for: {material_slot.material.name} from {mesh.name}')
         bpy.ops.object.mode_set(mode='EDIT')
         mesh.active_material_index = mesh.material_slots.get(material_slot.material.name).slot_index
         bpy.ops.object.material_slot_select()

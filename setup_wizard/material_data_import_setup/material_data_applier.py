@@ -559,7 +559,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
             toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
             transparency_clip_node = inputs_node.inputs.get(self.shader_node_input_names.TRANSPARENCY_CLIP_THRESHOLD)
 
-            toggle_alpha_node.default_value = 1.0
+            toggle_alpha_node.default_value = True
             transparency_clip_node.default_value = 1.0
 
     def is_tooltip_TexEnv(self, tooltip):
