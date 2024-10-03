@@ -539,9 +539,8 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 bpy.context.view_layer.objects.active = mesh
                 expected_mesh_name = material_slot.material.name.rsplit(' ')[-1]
                 expected_mesh = bpy.data.objects.get(expected_mesh_name)
-                if not expected_mesh:
-                    new_separated_mesh = self.__separate_material_from_mesh(mesh, material_slot, expected_mesh_name)
-                    self.__remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
+                if not expected_mesh or expected_mesh != mesh:
+                    self.__separate_material_from_mesh(mesh, material_slot, expected_mesh_name)
                     separated_materials += [material_slot.material]
 
             # If we've separated all of the materials from the mesh, delete the original mesh
@@ -559,8 +558,23 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         bpy.ops.object.mode_set(mode='OBJECT')
         
         new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001')
-        new_separated_mesh.name = new_mesh_name
-        return new_separated_mesh
+        new_mesh_name_mesh = bpy.data.objects.get(new_mesh_name)
+
+        # Clean the separated mesh of any other materials
+        self.__remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
+
+        if not new_mesh_name_mesh:
+            print(f'Renaming {new_separated_mesh.name} to {new_mesh_name}')
+            new_separated_mesh.name = new_mesh_name
+            return new_separated_mesh
+        else:
+            # Join meshes
+            bpy.ops.object.select_all(action='DESELECT')
+            new_separated_mesh.select_set(True)
+            new_mesh_name_mesh.select_set(True)
+            bpy.context.view_layer.objects.active = new_mesh_name_mesh
+            bpy.ops.object.join()
+            print(f'Joined {new_separated_mesh} to {new_mesh_name_mesh}')
 
     def __remove_material_slots(self, mesh, materials, exclude=False):
         bpy.ops.object.mode_set(mode='OBJECT')
