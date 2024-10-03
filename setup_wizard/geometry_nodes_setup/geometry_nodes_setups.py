@@ -541,7 +541,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 expected_mesh = bpy.data.objects.get(expected_mesh_name)
                 if not expected_mesh:
                     new_separated_mesh = self.__separate_material_from_mesh(mesh, material_slot, expected_mesh_name)
-                    self.__remove_material_slots(new_separated_mesh, material_slot.material)
+                    self.__remove_material_slots_except_for_excluded_materials(new_separated_mesh, [material_slot.material])
                     separated_materials += [material_slot.material]
 
             # If we've separated all of the materials from the mesh, delete the original mesh
@@ -550,7 +550,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             else:
                 mesh_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh.name}') or \
                     mesh.material_slots[0].material
-                self.__remove_material_slots(mesh, mesh_material)
+                self.__remove_material_slots_except_for_excluded_materials(mesh, [mesh_material])
 
     def __separate_material_from_mesh(self, mesh, material_slot, new_mesh_name):
         print(f'Separating material for: {material_slot.material.name} from {mesh.name}')
@@ -564,11 +564,11 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         new_separated_mesh.name = new_mesh_name
         return new_separated_mesh
 
-    def __remove_material_slots(self, mesh, material):
+    def __remove_material_slots_except_for_excluded_materials(self, mesh, excluded_materials):
         bpy.ops.object.mode_set(mode='OBJECT')
         # Reversing is IMPORTANT in order to avoid index errors while removing during runtime
         for material_slot_material in reversed(mesh.material_slots):
-            if material_slot_material.name != material.name:
+            if material_slot_material not in excluded_materials:
                 mesh.active_material_index = mesh.material_slots.get(material_slot_material.material.name).slot_index
                 print(f'Removing material: {material_slot_material.material.name} from {mesh.name}')
                 bpy.context.view_layer.objects.active = mesh
