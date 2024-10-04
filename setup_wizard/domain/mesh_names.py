@@ -3,6 +3,9 @@ Standardize and document mesh names that come with in each character armature.
 '''
 class MeshNames:
     BODY = 'Body'
+    Brow = 'Brow'
+    FACE = 'Face'
+    FACE_EYE = 'Face_Eye'
     # HAIR = 'Hair'
     # DRESS = 'Dress'
     # DRESS1 = 'Dress1'
