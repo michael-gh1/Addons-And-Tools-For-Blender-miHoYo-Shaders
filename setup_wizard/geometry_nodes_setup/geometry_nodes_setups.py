@@ -578,7 +578,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             renamed_mesh_name = new_mesh_name_mesh.material_slots[0].material.name.split(' ')[-1]
             print(f'Renaming {new_mesh_name_mesh.name} to {renamed_mesh_name}')
             new_mesh_name_mesh.name = renamed_mesh_name
-            
+
 
     def __remove_material_slots(self, mesh, materials, exclude=False):
         bpy.ops.object.mode_set(mode='OBJECT')
