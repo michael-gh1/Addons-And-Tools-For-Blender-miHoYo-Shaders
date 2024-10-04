@@ -117,6 +117,11 @@ meshes_to_create_light_vectors_on = meshes_to_create_outlines_on + [
     'Brow'
 ]
 
+material_keywords_to_not_create_outlines_on = [
+    'Eff',
+]
+
+
 class GameGeometryNodesSetupFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
@@ -493,6 +498,23 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
             self.__separate_materials_into_unique_meshes(mesh)
         super().setup_geometry_nodes()
+
+        for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
+            create_light_vectors = [
+                material_slot.material for material_slot in mesh.material_slots if 
+                material_slot.material.name.startswith(self.material_names.MATERIAL_PREFIX_AFTER_RENAME)
+            ]  # Only create Light Vectors on meshes with Shader materials
+            if create_light_vectors:
+                self.create_light_vectors_modifier(mesh.name)
+
+            create_outlines = [
+                material_slot.material for material_slot in mesh.material_slots if 
+                material_slot.material.name.startswith(self.material_names.MATERIAL_PREFIX_AFTER_RENAME) and
+                [keyword for keyword in material_keywords_to_not_create_outlines_on if keyword not in material_slot.material.name]
+            ]  # Only create Outlines on meshes with Shader materials and not in the ignore list (e.g. 'Eff' materials)
+            if create_outlines:
+                self.create_geometry_nodes_modifier(mesh.name)
+
         for material in bpy.data.materials:
             if 'Face Outlines' in material.name:
                 outline_shader_node = material.node_tree.nodes.get(self.outlines_shader_node_name)
