@@ -562,8 +562,20 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                                 break
 
     def assign_night_soul_outlines_material(self, mesh, modifier):
-        night_soul_outlines_material = [material for material in bpy.data.materials.values() if 
-                                        f'{mesh.name} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}' in material.name]
+        night_soul_outlines_material_using_mesh_name = [
+            material for material in bpy.data.materials.values() if 
+            f'{mesh.name} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}' in material.name
+        ]
+        night_soul_outlines_material_using_mesh_material_name = [
+            material for material in bpy.data.materials.values() if [
+                material_slot.material for material_slot in mesh.material_slots if 
+                material_slot.material.name.split(' ')[-1] in material.name and 
+                material.name.endswith(self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX)
+            ]
+        ]  # If, in the mesh, the last word in the material name is in a Night Soul Outlines material
+        night_soul_outlines_material = night_soul_outlines_material_using_mesh_name or \
+            night_soul_outlines_material_using_mesh_material_name
+
         if night_soul_outlines_material:
             modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = night_soul_outlines_material[0]
 
