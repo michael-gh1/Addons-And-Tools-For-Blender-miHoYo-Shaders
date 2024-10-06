@@ -8,7 +8,7 @@ from bpy.types import Operator, Context
 from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
-from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 
@@ -167,6 +167,7 @@ class GameGeometryNodesSetup(ABC):
         self.blender_operator = blender_operator
         self.context = context
         self.light_vectors_node_group_names = []
+        self.shader_node_names = ShaderNodeNames
 
     @abstractmethod
     def setup_geometry_nodes(self):
@@ -181,7 +182,7 @@ class GameGeometryNodesSetup(ABC):
                 outline_material = bpy.data.materials.get(game_material_names.OUTLINES)
                 new_outline_name = f'{material.name} Outlines'
 
-                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material).get_outlines_material():
+                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_outlines_material():
                     new_outline_material = outline_material.copy()
                     new_outline_material.name = new_outline_name
                     new_outline_material.use_fake_user = True
@@ -362,6 +363,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
         self.outlines_shader_node_name = V3_GenshinShaderNodeNames.OUTLINES_SHADER
+        self.shader_node_names = V3_GenshinShaderNodeNames
 
     def setup_geometry_nodes(self):
         self.clone_outlines(self.material_names)
@@ -451,7 +453,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                         material for material_name, material in bpy.data.materials.items() if \
                             input_name in material_name and 
                             self.material_names.MATERIAL_PREFIX in material_name and 
-                            ShaderMaterial(material).is_outlines_material()
+                            ShaderMaterial(material, self.shader_node_names).is_outlines_material()
                     ]
 
                 if shader_materials and outline_materials:

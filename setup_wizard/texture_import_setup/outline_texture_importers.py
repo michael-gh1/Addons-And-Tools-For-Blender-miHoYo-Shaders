@@ -5,6 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
 
+from setup_wizard.domain.shader_node_names import ShaderNodeNames
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
@@ -19,10 +20,11 @@ from setup_wizard.utils.genshin_body_part_deducer import get_npc_mesh_body_part_
 
 
 class OutlineTextureImporter(ABC):
-    def __init__(self, blender_operator: Operator, context: Context, material_names: ShaderMaterialNames):
+    def __init__(self, blender_operator: Operator, context: Context, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     @abstractmethod
     def import_textures(self):
@@ -33,6 +35,9 @@ class OutlineTextureImporter(ABC):
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
         lightmap_node_name = shader_identifier_service.get_shader_texture_node_names(shader).LIGHTMAP
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
+
+        if not outline_material:
+            return
 
         # Note: Unable to determine between character/equipment textures for Monsters w/ equipment in same folder
         lightmap_filenames = []
@@ -56,7 +61,10 @@ class OutlineTextureImporter(ABC):
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
         diffuse_node_name = shader_identifier_service.get_shader_texture_node_names(shader).DIFFUSE
         outline_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name} Outlines') or self.get_outline_material_fallback(body_part_material_name)
-        
+
+        if not outline_material:
+            return
+
         diffuse_node = outline_material.node_tree.nodes.get(diffuse_node_name) \
             or None  # None for backwards compatibility in v1 where it did not exist
 
@@ -86,12 +94,14 @@ class OutlineTextureImporter(ABC):
         # If outlines could not be found, the material name may be too long.
         # Try searching for the outlines material by specific settings in it.
         shader_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part_material_name}')
-        return ShaderMaterial(shader_material).get_outlines_material()
+        if shader_material:
+            return ShaderMaterial(shader_material, self.shader_node_names).get_outlines_material()
 
 class OutlineTextureImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        shader_node_names = shader_identifier_service.get_shader_node_names(shader)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
@@ -101,21 +111,21 @@ class OutlineTextureImporterFactory:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
                 material_names = V4_PrimoToonGenshinImpactMaterialNames
-            return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names)
+            return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
-                return HonkaiStarRailOutlineTextureImporter(blender_operator, context, Nya222HonkaiStarRailShaderMaterialNames)
+                return HonkaiStarRailOutlineTextureImporter(blender_operator, context, Nya222HonkaiStarRailShaderMaterialNames, shader_node_names)
             else:  # is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER
-                return HonkaiStarRailOutlineTextureImporter(blender_operator, context, StellarToonShaderMaterialNames)
+                return HonkaiStarRailOutlineTextureImporter(blender_operator, context, StellarToonShaderMaterialNames, shader_node_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
-            return PunishingGrayRavenOutlineTextureImporter(blender_operator, context)
+            return PunishingGrayRavenOutlineTextureImporter(blender_operator, context, shader_node_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
 
 class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
-    def __init__(self, blender_operator, context, material_names):
-        super().__init__(blender_operator, context, material_names)
+    def __init__(self, blender_operator, context, material_names, shader_node_names):
+        super().__init__(blender_operator, context, material_names, shader_node_names)
         self.material_names = material_names
 
     def import_textures(self):
@@ -142,8 +152,8 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                                  material.name != self.material_names.OUTLINES and 
                                  material.name != self.material_names.NIGHT_SOUL_OUTLINES and
                                  self.material_names.VFX not in material.name and
-                                 ('Outlines' in material.name or 
-                                 ShaderMaterial(material).is_outlines_material())
+                                 (('Outlines' in material.name and not 'Night Soul Outlines' in material.name) or 
+                                 ShaderMaterial(material, self.shader_node_names).is_outlines_material())
             ]
 
             for outline_material in outline_materials:
@@ -196,8 +206,8 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
 
 
 class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
-    def __init__(self, blender_operator, context, shader_material_names):
-        super().__init__(blender_operator, context, shader_material_names)
+    def __init__(self, blender_operator, context, shader_material_names, shader_node_names: ShaderNodeNames):
+        super().__init__(blender_operator, context, shader_material_names, shader_node_names)
         self.shader_material_names = shader_material_names
 
     def import_textures(self):
@@ -285,8 +295,8 @@ class HonkaiStarRailOutlineTextureImporter(OutlineTextureImporter):
 
 
 class PunishingGrayRavenOutlineTextureImporter(OutlineTextureImporter):
-    def __init__(self, blender_operator, context):
-        super().__init__(blender_operator, context, JaredNytsPunishingGrayRavenShaderMaterialNames)
+    def __init__(self, blender_operator, context, shader_node_names: ShaderNodeNames):
+        super().__init__(blender_operator, context, JaredNytsPunishingGrayRavenShaderMaterialNames, shader_node_names)
 
     def import_textures(self):
         return

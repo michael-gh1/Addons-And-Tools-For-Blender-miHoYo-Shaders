@@ -40,6 +40,8 @@ class MaterialDataDirectory:
 
 
 class GameMaterialDataImporter(ABC):
+    shader_node_names: ShaderNodeNames
+
     @abstractmethod
     def import_material_data(self):
         raise NotImplementedError
@@ -92,7 +94,7 @@ class GameMaterialDataImporter(ABC):
                               self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
                               'Outlines' not in material.name
         ] if body_part else []
-        is_not_outlines_material = lambda material: not ShaderMaterial(material).is_outlines_material()
+        is_not_outlines_material = lambda material: not ShaderMaterial(material, self.shader_node_names).is_outlines_material()
         searched_material = next((material for material in searched_materials if is_not_outlines_material(material)), None)
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
@@ -108,7 +110,7 @@ class GameMaterialDataImporter(ABC):
 
         # If outlines could not be found, the material name may be too long.
         # Try searching for the outlines material by specific settings in it.
-        is_outlines_material = lambda material: ShaderMaterial(material).is_outlines_material()
+        is_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_outlines_material()
         if not searched_outlines_materials:
             searched_outlines_materials = [material for material in searched_materials if is_outlines_material(material)] or []
         searched_outlines_material = next(
@@ -178,9 +180,9 @@ class GameMaterialDataImporterFactory:
         if game_type == GameType.GENSHIN_IMPACT.name:
             return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
-            return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+            return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -322,7 +324,7 @@ class ShadowRampTypeSetter:
                 pass  # Intentionally do nothing.
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -333,6 +335,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
@@ -388,7 +391,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
 # Unused.
 class PunishingGrayRavenMaterialDataImporter(GameMaterialDataImporter):
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -399,6 +402,7 @@ class PunishingGrayRavenMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     def import_material_data(self):
         return {'FINISHED'}

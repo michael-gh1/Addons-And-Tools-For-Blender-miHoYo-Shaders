@@ -15,6 +15,7 @@ class ShaderNodeNames:
     OUTLINES = 'Outlines'  # Outlines material node OUTPUT
     EXTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
     INTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
+    OUTLINES_OUTPUT = 'Outlines'
     NIGHT_SOUL_OUTPUT = ''
     MATERIAL_OUTPUT_NODE = ''
     MATERIAL_OUTPUT_SHADER_INPUT = ''
@@ -57,6 +58,7 @@ class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
     TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
+    OUTLINES_OUTPUT = 'PrimoToon (Outlines)'
     NIGHT_SOUL_OUTPUT = 'PrimoToon (Night Soul)'
     MATERIAL_OUTPUT_NODE = 'Material Output'
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'
