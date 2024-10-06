@@ -530,7 +530,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             if self.material_names.MATERIAL_PREFIX in material.name and material.name != self.material_names.NIGHT_SOUL_OUTLINES and \
                 not material.name.endswith('Outlines'):
                 outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
-                new_outline_name = f'{material.name} Night Soul Outlines'
+                new_outline_name = f'{material.name} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}'
 
                 if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_night_soul_outlines_material():
                     new_outline_material = outline_material.copy()
@@ -563,7 +563,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
 
     def assign_night_soul_outlines_material(self, mesh, modifier):
         night_soul_outlines_material = [material for material in bpy.data.materials.values() if 
-                                        f'{mesh.name} Night Soul Outlines' in material.name]
+                                        f'{mesh.name} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}' in material.name]
         if night_soul_outlines_material:
             modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = night_soul_outlines_material[0]
 

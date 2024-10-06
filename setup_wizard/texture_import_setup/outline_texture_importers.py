@@ -152,7 +152,7 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                                  material.name != self.material_names.OUTLINES and 
                                  material.name != self.material_names.NIGHT_SOUL_OUTLINES and
                                  self.material_names.VFX not in material.name and
-                                 (('Outlines' in material.name and not 'Night Soul Outlines' in material.name) or 
+                                 (('Outlines' in material.name and not self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX in material.name) or 
                                  ShaderMaterial(material, self.shader_node_names).is_outlines_material())
             ]
 

@@ -11,7 +11,7 @@ from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinSha
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, ShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
@@ -41,6 +41,7 @@ class MaterialDataDirectory:
 
 class GameMaterialDataImporter(ABC):
     shader_node_names: ShaderNodeNames
+    material_names: ShaderMaterialNames
 
     @abstractmethod
     def import_material_data(self):
@@ -106,12 +107,12 @@ class GameMaterialDataImporter(ABC):
                                        body_part in material.name and 
                                        self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
                                        ' Outlines' in material.name and
-                                       not 'Night Soul Outlines' in material.name
+                                       not self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX in material.name
         ] if body_part else []
         searched_night_soul_outlines_materials = [material for material in bpy.data.materials.values() if 
                                        body_part in material.name and 
                                        self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
-                                       'Night Soul Outlines' in material.name
+                                       self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX in material.name
         ] if body_part else []
 
         # If outlines could not be found, the material name may be too long.
@@ -133,7 +134,7 @@ class GameMaterialDataImporter(ABC):
             bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or \
             searched_outlines_material
         night_soul_outlines_material: Material = self.outlines_material or \
-            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Night Soul Outlines') or \
+            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}') or \
             searched_night_soul_outlines_material
 
         return (material, outlines_material, night_soul_outlines_material)
