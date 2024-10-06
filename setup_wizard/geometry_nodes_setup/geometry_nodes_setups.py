@@ -498,6 +498,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
             self.__separate_materials_into_unique_meshes(mesh)
         super().setup_geometry_nodes()
+        self.clone_night_soul_outlines()
 
         for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
             create_light_vectors = [
@@ -519,6 +520,20 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             if 'Face Outlines' in material.name:
                 outline_shader_node = material.node_tree.nodes.get(self.outlines_shader_node_name)
                 outline_shader_node.inputs.get(self.shader_node_names.TOGGLE_FACE_OUTLINES).default_value = True
+
+    def clone_night_soul_outlines(self):
+        materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
+
+        for material in materials:
+            if self.material_names.MATERIAL_PREFIX in material.name and material.name != self.material_names.NIGHT_SOUL_OUTLINES and \
+                not material.name.endswith('Outlines'):
+                outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+                new_outline_name = f'{material.name} Night Soul Outlines'
+
+                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_outlines_material():
+                    new_outline_material = outline_material.copy()
+                    new_outline_material.name = new_outline_name
+                    new_outline_material.use_fake_user = True
 
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
