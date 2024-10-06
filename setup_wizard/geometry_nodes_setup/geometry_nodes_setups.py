@@ -540,7 +540,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     def set_up_modifier_default_values(self, modifier, mesh):
         super().set_up_modifier_default_values(modifier, mesh)
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
-        self.assign_night_soul_outlines_material(modifier)
+        self.assign_night_soul_outlines_material(mesh, modifier)
         self.assign_face_lightmap_texture(modifier)
         modifier.show_viewport = bpy.context.window_manager.enable_viewport_outlines
         print(f'Geometry Node Default Values Set for {modifier.name}: {mesh.name}')
@@ -561,10 +561,11 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                                 modifier[available_material_input] = bpy.data.materials.get(material.name + ' Outlines')
                                 break
 
-    def assign_night_soul_outlines_material(self, modifier):
-        night_soul_outlines_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+    def assign_night_soul_outlines_material(self, mesh, modifier):
+        night_soul_outlines_material = [material for material in bpy.data.materials.values() if 
+                                        f'{mesh.name} Night Soul Outlines' in material.name]
         if night_soul_outlines_material:
-            modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+            modifier[self.NIGHT_SOUL_OUTLINE_SOCKET] = night_soul_outlines_material[0]
 
     def assign_face_lightmap_texture(self, modifier):
         face_lightmap_node_group = bpy.data.node_groups.get(self.texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
