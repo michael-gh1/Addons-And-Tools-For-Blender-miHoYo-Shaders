@@ -105,7 +105,13 @@ class GameMaterialDataImporter(ABC):
         searched_outlines_materials = [material for material in bpy.data.materials.values() if 
                                        body_part in material.name and 
                                        self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
-                                       ' Outlines' in material.name
+                                       ' Outlines' in material.name and
+                                       not 'Night Soul Outlines' in material.name
+        ] if body_part else []
+        searched_night_soul_outlines_materials = [material for material in bpy.data.materials.values() if 
+                                       body_part in material.name and 
+                                       self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
+                                       'Night Soul Outlines' in material.name
         ] if body_part else []
 
         # If outlines could not be found, the material name may be too long.
@@ -116,12 +122,21 @@ class GameMaterialDataImporter(ABC):
         searched_outlines_material = next(
             (material for material in searched_outlines_materials if is_outlines_material(material)), None
         )
+        is_night_soul_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_outlines_material()
+        if not searched_night_soul_outlines_materials:
+            searched_night_soul_outlines_materials = [material for material in searched_materials if is_outlines_material(material)] or []
+            searched_night_soul_outlines_material = next(
+                (material for material in searched_outlines_materials if is_night_soul_outlines_material(material)), None
+            )
 
         outlines_material: Material = self.outlines_material or \
             bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or \
             searched_outlines_material
+        night_soul_outlines_material: Material = self.outlines_material or \
+            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Night Soul Outlines') or \
+            searched_night_soul_outlines_material
 
-        return (material, outlines_material)
+        return (material, outlines_material, night_soul_outlines_material)
 
     def get_material_data_files(self):
         # Attempt to use the Material or Materials folder in the cached character folder to import material data json
@@ -252,8 +267,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
-            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
-            outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
+            material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+            outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
 
             if not material or not outlines_material:
                 self.blender_operator.report({'WARNING'}, \

@@ -61,6 +61,7 @@ class MaterialDataApplier(ABC):
         self.material_data_parser = material_data_parser
         self.material = outline_material_group.material
         self.outline_material = outline_material_group.outlines_material
+        self.night_soul_outlines_material = outline_material_group.night_soul_outlines_material
         self.outlines_node_tree_node_name = outlines_node_tree_node_name
     
     @abstractmethod
@@ -506,11 +507,13 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
         outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
+        night_soul_outlines_shader_node = self.night_soul_outlines_material.node_tree.nodes[self.outlines_node_tree_node_name]
         global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
         global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
 
         self.set_up_mesh_material_data_with_tooltips(shader_node, shader_node)
         self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(night_soul_outlines_shader_node, night_soul_outlines_shader_node, is_outlines=True)
         self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
 
     def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):

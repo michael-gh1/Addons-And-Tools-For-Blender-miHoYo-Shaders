@@ -532,7 +532,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
                 new_outline_name = f'{material.name} Night Soul Outlines'
 
-                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_outlines_material():
+                if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_night_soul_outlines_material():
                     new_outline_material = outline_material.copy()
                     new_outline_material.name = new_outline_name
                     new_outline_material.use_fake_user = True
