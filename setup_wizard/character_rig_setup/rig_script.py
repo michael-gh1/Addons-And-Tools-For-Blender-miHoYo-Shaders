@@ -2856,10 +2856,11 @@ def rig_character(
         bpy.context.object.data.layers[17] = False
         bpy.context.object.data.layers[21] = True
         bpy.context.object.data.layers[28] = True
-        bpy.context.object.data.layers[26] = True
+        bpy.context.object.data.layers[26] = False
     else:            
         bpy.context.object.data.collections["Tweaks"].is_visible = False
         bpy.context.object.data.collections["Pivots & Pins"].is_visible = False
+        bpy.context.object.data.collections["Offsets"].is_visible = False
         bpy.context.object.data.collections["Torso (FK)"].is_visible = False
         bpy.context.object.data.collections["Fingers (Detail)"].is_visible = False
         bpy.context.object.data.collections["Arm.L (FK)"].is_visible = False
@@ -2869,6 +2870,8 @@ def rig_character(
         bpy.context.object.data.collections["Physics"].is_visible = False
         bpy.context.object.data.collections["Cage"].is_visible = False
         bpy.context.object.data.collections["Other"].is_visible = False
+        if lighting_panel_rig_obj:
+            bpy.context.object.data.collections["Lighting"].is_visible = False
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------
