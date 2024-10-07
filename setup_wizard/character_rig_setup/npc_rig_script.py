@@ -2011,7 +2011,26 @@ def rig_character(
     this_obj.pose.bones["hand-ik-R"].custom_shape_transform = bpy.data.objects[char_name].pose.bones["mch-hand-ik-pivot-R"]
     
     this_obj.pose.bones["ik-sub-pivot-L"].custom_shape_translation = (foot_L_x_diff*-1.0, 0.0, foot_L_z_diff*-1.0)
-    this_obj.pose.bones["ik-sub-pivot-R"].custom_shape_translation = (foot_R_x_diff*-1.0, 0.0, foot_R_z_diff*-1.0)     
+    this_obj.pose.bones["ik-sub-pivot-R"].custom_shape_translation = (foot_R_x_diff*-1.0, 0.0, foot_R_z_diff*-1.0)  
+
+    # thanks enthralpy for the code to delete the palm constraints that i fuckin forgot to do
+    blist = ['ORG-palm.04.R', 'ORG-palm.03.R', 'ORG-palm.02.R', 'ORG-palm.04.L', 'ORG-palm.03.L', 'ORG-palm.02.L']
+
+    for name in blist:
+        try:
+            bone = this_obj.pose.bones[name]
+            # Create a list of all the constraints to be deleted on this bone
+            get = [ c for c in bone.constraints if c.type == 'COPY_TRANSFORMS' ]
+            fucked = [ c for c in bone.constraints if c.type == 'COPY_ROTATION' ]
+
+            # Iterate over and delete them all
+            for c in get:
+                bone.constraints.remove( c ) 
+            for c in fucked:
+                bone.constraints.remove( c )
+        except:
+            pass
+            
         
     # Penultimate: Rename bones as needed
     for oldname, newname in rename_bones_list:
