@@ -2494,6 +2494,7 @@ def rig_character(
         cust_bone["torso_parent"] = 1
         id_prop = cust_bone.id_properties_ui("torso_parent")
         id_prop.update(min=0,max=2)  
+        cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone
     
     make_torso_custom()
         
