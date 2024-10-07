@@ -2250,28 +2250,28 @@ def rig_character(
             if group_name == "Root":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (0,1,0.169)
-                bone.color.custom.select = (0.184,1,0.713)
-                bone.color.custom.active = (0.125,0.949,0.816)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Torso":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0.867,0)
-                bone.color.custom.select = (1,0.671,0.502)
-                bone.color.custom.active = (0.949,0.431,0)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Limbs L":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0,1)
-                bone.color.custom.select = (1,0.129,0.467)
-                bone.color.custom.active = (1,0.518,0.969)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Limbs R":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (0,0.839,1)
-                bone.color.custom.select = (0.227,0.357,0.902)
-                bone.color.custom.active = (0.035,0.333,0.878)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Face":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0,0)
-                bone.color.custom.select = (0.506,0.902,0.078)
-                bone.color.custom.active = (0.094,0.714,0.878)        
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)         
 
     # Root BG
     assign_bone_to_group("root", "Root")
@@ -2401,11 +2401,12 @@ def rig_character(
         active_bg.colors.active = Color((color3))
     
     if not is_version_4:    
-        change_bone_group_colors('Root',(0,1,0.169),(0.184,1,0.713),(0.125,0.949,0.816))
-        change_bone_group_colors('Torso',(1,0.867,0),(1,0.671,0.502),(0.949,0.431,0))
-        change_bone_group_colors('Limbs L',(1,0,1),(1,0.129,0.467),(1,0.518,0.969))
-        change_bone_group_colors('Limbs R',(0,0.839,1),(0.227,0.357,0.902),(0.035,0.333,0.878))
-        change_bone_group_colors('Face',(1,0,0),(0.506,0.902,0.078),(0.094,0.714,0.878))
+        change_bone_group_colors('Root',(0,1,0.169),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Torso',(1,0.867,0),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Limbs L',(1,0,1),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Limbs R',(0,0.839,1),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Face',(1,0,0),(0.596,0.898,1.00),(0.769,1.00,1.00))
+
 
 
     # Automatically builds the constraint stuff for SWITCH PARENT. DO NOT FORGET TO REENABLE THE CONSTRAINTS BELOW!!!!!!
