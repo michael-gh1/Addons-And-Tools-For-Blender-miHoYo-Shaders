@@ -1998,6 +1998,9 @@ def rig_character(
         cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone
     
     make_torso_custom()
+    
+    # rig_id also needs to be library overridable.
+    bpy.data.armatures[original_name].property_overridable_library_set('["rig_id"]', True)
 
     # Fix NPC spaces
     this_obj.pose.bones["MCH-ROT-neck"].constraints["Copy Rotation"].owner_space = 'LOCAL'

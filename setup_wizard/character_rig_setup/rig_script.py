@@ -2499,6 +2499,9 @@ def rig_character(
         cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone
     
     make_torso_custom()
+    
+    # rig_id also needs to be library overridable.
+    bpy.data.armatures[original_name].property_overridable_library_set('["rig_id"]', True)
         
     # Adjustments to positioning
     this_obj.pose.bones["foot_ik.L"].custom_shape_transform = bpy.data.objects[char_name+"Rig"].pose.bones["mch-ik-pivot-L"]
