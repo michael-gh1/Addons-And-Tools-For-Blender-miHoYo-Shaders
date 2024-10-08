@@ -5,6 +5,7 @@ import bpy
 import os
 from mathutils import Color, Vector
 from math import pi
+import addon_utils
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -2229,6 +2230,10 @@ def rig_character(
     # Get the ID of this char's rig ui script.
     rig_char_id = rig_text.split("rig_id = \"")[1].split("\"")[0]
     
+    # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
+    setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
+    setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
+    
     def make_layer_str(text, layer, version):
         string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
         string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
@@ -2250,7 +2255,7 @@ def rig_character(
     # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
     def generate_rig_layers():
         # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        v_str = \""+bpy.app.version_string+"\"\n        row.label(text=v_str+\" rig for "+char_name.split("Costume")[0]+"\")\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        row.label(text=\"Rig: "+char_name.split("Costume")[0]+"\")\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
