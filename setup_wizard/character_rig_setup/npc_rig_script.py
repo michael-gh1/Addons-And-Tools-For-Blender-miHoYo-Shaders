@@ -783,10 +783,8 @@ def rig_character(
 
     # POST RIGIFY SCRIPT EXECUTION ----------------->
 
-    # Hide metarig (I think you can actually delete it instead?)
-    bpy.data.objects["metarig"].hide_select = True
-    bpy.data.objects["metarig"].hide_viewport = True
-    bpy.data.objects["metarig"].hide_render = True
+    # Delete metarig
+    bpy.data.objects.remove(bpy.data.objects['metarig'])
 
     # Moves specified param and it's children into the collection
     def move_into_collection(object,collection,include_children=True):
@@ -845,32 +843,20 @@ def rig_character(
 
     # Obfuscate light driving stuff not needed, keep the main light.        
     move_into_collection("Face Light Direction","wgt")
-    move_into_collection("Head Driver",char_name)
+    move_into_collection("Head Driver","wgt")
     move_into_collection("Main Light Direction",char_name)
 
     # V3 Shader Support - New empty names
-    move_into_collection("Head Origin",char_name)
+    move_into_collection("Head Origin","wgt")
     move_into_collection("Light Direction",char_name)
 
     bpy.data.collections["wgt"].hide_select = True
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
-    head_driver_obj = bpy.data.objects.get("Head Driver") or bpy.data.objects.get("Head Origin")
-    if head_driver_obj:
-        head_driver_obj.hide_select = True
-        head_driver_obj.hide_viewport = True
-        head_driver_obj.hide_render = True
+    move_into_collection("Head Forward", "wgt")
+    move_into_collection("Head Up", "wgt")
 
-    head_forward_obj = bpy.data.objects.get("Head Forward")
-    head_forward_obj.hide_select = True
-    head_forward_obj.hide_viewport = True
-    head_forward_obj.hide_render = True
-
-    head_up_obj = bpy.data.objects.get("Head Up")
-    head_up_obj.hide_select = True
-    head_up_obj.hide_viewport = True
-    head_up_obj.hide_render = True
 
     # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
     # remove lighting colls - also move the RGB wheels into the rig obj
