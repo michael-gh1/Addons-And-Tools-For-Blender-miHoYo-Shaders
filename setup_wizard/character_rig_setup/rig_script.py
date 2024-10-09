@@ -2727,7 +2727,7 @@ def rig_character(
     # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
     def generate_rig_layers():
         # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        row.label(text=\"Rig: "+char_name.split("Costume")[0]+"\")\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
@@ -2749,6 +2749,10 @@ def rig_character(
     # Used for already existing bones (torso and limbs)
     def generate_string_for_ik_switch(bone, prop1, prop2):
         str = "\n        if is_selected({'"+bone+"'}):\n            group1 = layout.row(align=True)\n            group2 = group1.split(factor=0.75, align=True)\n            props = group2.operator('pose.rigify_switch_parent_"+rig_char_id+"\', text=\'Parent Switch\', icon=\'DOWNARROW_HLT\')\n            props.bone = \'"+prop1+"\'\n            props.prop_bone = \'"+prop2+"\'\n            props.prop_id=\'IK_parent\'\n            props.parent_names = '[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)\n            group2.prop(pose_bones['"+prop2+"'], '[\"IK_parent\"]', text='')\n            props = group1.operator('pose.rigify_switch_parent_bake_"+rig_char_id+"', text='', icon='ACTION_TWEAK')\n            props.bone = '"+prop1+"'\n            props.prop_bone='"+prop2+"'\n            props.prop_id='IK_parent'\n            props.parent_names='[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)"
+        return str
+        
+    def generate_string_for_settings_slider():
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)'
         return str
     
     # because rigify makes the rig ui before i get to it, we have to change this stuff for the torso sliders below.
@@ -2781,6 +2785,7 @@ def rig_character(
 
     #complete_rig_text = complete_rig_text.replace("props.bone = 'torso'","props.bone = 'torso.002'").replace("props.prop_bone = 'torso'","props.prop_bone = 'torso.002'").replace("group2.prop(pose_bones['torso'], '[\"torso_parent\"]', text='')","group2.prop(pose_bones['torso.002'], '[\"torso_parent\"]', text='')")
     
+
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("forearm_tweak-pin.L"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_limb_pin("forearm_tweak-pin.L","upper_arm_parent.L","forearm_tweak.L","Elbow Pin"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("forearm_tweak-pin.R"))
@@ -2797,9 +2802,14 @@ def rig_character(
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("shin_tweak-pin.R"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_limb_pin("shin_tweak-pin.R","thigh_parent.R","shin_tweak.R","Knee Pin"))
     
+    complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_settings_slider())
+    
+    complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Layers\"", "bl_label = \"Rig Layers: \" + rig_name")
+    complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Main Properties\"", "bl_label = \"Rig Properties: \" + rig_name")
+    
     # Clear the text from the text block, reassemble it as needed with strings and modifications.
     rig_file.clear() 
-    rig_file.write(complete_rig_text)
+    rig_file.write(complete_rig_text.replace("rig_id = ", "rig_name = \""+char_name.split("Costume")[0]+"\"\nrig_id = ")) # give it all the modified text and the variable holding the char's name
     rig_file.write(rig_text_disclaimer)
       
        
