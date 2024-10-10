@@ -5,6 +5,7 @@ import bpy
 import os
 from mathutils import Color, Vector
 from math import pi
+import addon_utils
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -782,10 +783,8 @@ def rig_character(
 
     # POST RIGIFY SCRIPT EXECUTION ----------------->
 
-    # Hide metarig (I think you can actually delete it instead?)
-    bpy.data.objects["metarig"].hide_select = True
-    bpy.data.objects["metarig"].hide_viewport = True
-    bpy.data.objects["metarig"].hide_render = True
+    # Delete metarig
+    bpy.data.objects.remove(bpy.data.objects['metarig'])
 
     # Moves specified param and it's children into the collection
     def move_into_collection(object,collection,include_children=True):
@@ -844,34 +843,21 @@ def rig_character(
 
     # Obfuscate light driving stuff not needed, keep the main light.        
     move_into_collection("Face Light Direction","wgt")
-    move_into_collection("Head Driver",char_name)
+    move_into_collection("Head Driver","wgt")
     move_into_collection("Main Light Direction",char_name)
 
     # V3 Shader Support - New empty names
-    move_into_collection("Head Origin",char_name)
+    move_into_collection("Head Origin","wgt")
     move_into_collection("Light Direction",char_name)
 
     bpy.data.collections["wgt"].hide_select = True
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
-    head_driver_obj = bpy.data.objects.get("Head Driver") or bpy.data.objects.get("Head Origin")
-    if head_driver_obj:
-        head_driver_obj.hide_select = True
-        head_driver_obj.hide_viewport = True
-        head_driver_obj.hide_render = True
-
-    head_forward_obj = bpy.data.objects.get("Head Forward")
-    head_forward_obj.hide_select = True
-    head_forward_obj.hide_viewport = True
-    head_forward_obj.hide_render = True
-
-    head_up_obj = bpy.data.objects.get("Head Up")
-    head_up_obj.hide_select = True
-    head_up_obj.hide_viewport = True
-    head_up_obj.hide_render = True
-
-    # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
+    move_into_collection("Head Forward", "wgt")
+    move_into_collection("Head Up", "wgt")
+										  
+# IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
     # remove lighting colls - also move the RGB wheels into the rig obj
     lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
     if lighting_panel_rig_obj:
@@ -1557,7 +1543,7 @@ def rig_character(
         
     # NPC SHAPE KEYS
     # Get the selected object with the shape key
-    obj = bpy.data.objects.get("Body")
+    obj = bpy.data.objects.get("Face")
     # not all npcs have face fat/strong, so attempt on their own.
     has_extra_faces = True
     try:
@@ -1774,7 +1760,7 @@ def rig_character(
             # Assign the bone to the bone group
             pose_bone.bone_group = bone_group
 
-        # New 4.0 functionality: change the bone itself to the color of the group it was originally assigned to.
+																												
         else:
             # 4.0: Armature bones or Pose bones?
             bone = bpy.context.object.pose.bones[bone_name]
@@ -1782,28 +1768,28 @@ def rig_character(
             if group_name == "Root":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (0,1,0.169)
-                bone.color.custom.select = (0.184,1,0.713)
-                bone.color.custom.active = (0.125,0.949,0.816)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Torso":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0.867,0)
-                bone.color.custom.select = (1,0.671,0.502)
-                bone.color.custom.active = (0.949,0.431,0)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Limbs L":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0,1)
-                bone.color.custom.select = (1,0.129,0.467)
-                bone.color.custom.active = (1,0.518,0.969)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Limbs R":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (0,0.839,1)
-                bone.color.custom.select = (0.227,0.357,0.902)
-                bone.color.custom.active = (0.035,0.333,0.878)
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)
             elif group_name == "Face":
                 bone.color.palette = 'CUSTOM'
                 bone.color.custom.normal = (1,0,0)
-                bone.color.custom.select = (0.506,0.902,0.078)
-                bone.color.custom.active = (0.094,0.714,0.878)                                         
+                bone.color.custom.select = (0.596,0.898,1.00)
+                bone.color.custom.active = (0.769,1.00,1.00)                                       
 
     # Root BG
     assign_bone_to_group("root", "Root")
@@ -1906,11 +1892,11 @@ def rig_character(
         active_bg.colors.active = Color((color3))
         
     if not is_version_4:    
-        change_bone_group_colors('Root',(0,1,0.169),(0.184,1,0.713),(0.125,0.949,0.816))
-        change_bone_group_colors('Torso',(1,0.867,0),(1,0.671,0.502),(0.949,0.431,0))
-        change_bone_group_colors('Limbs L',(1,0,1),(1,0.129,0.467),(1,0.518,0.969))
-        change_bone_group_colors('Limbs R',(0,0.839,1),(0.227,0.357,0.902),(0.035,0.333,0.878))
-        change_bone_group_colors('Face',(1,0,0),(0.506,0.902,0.078),(0.094,0.714,0.878))
+        change_bone_group_colors('Root',(0,1,0.169),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Torso',(1,0.867,0),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Limbs L',(1,0,1),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Limbs R',(0,0.839,1),(0.596,0.898,1.00),(0.769,1.00,1.00))
+        change_bone_group_colors('Face',(1,0,0),(0.596,0.898,1.00),(0.769,1.00,1.00))
 
     # Automatically builds the constraint stuff for SWITCH PARENT. DO NOT FORGET TO REENABLE THE CONSTRAINTS BELOW!!!!!!
     def generate_switch_parent_constraints(toggle_parent, location_of_switcher):
@@ -1995,8 +1981,12 @@ def rig_character(
         cust_bone["torso_parent"] = 1
         id_prop = cust_bone.id_properties_ui("torso_parent")
         id_prop.update(min=0,max=2)  
+        cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone
     
     make_torso_custom()
+    
+    # rig_id also needs to be library overridable.
+    bpy.data.armatures[original_name].property_overridable_library_set('["rig_id"]', True)
 
     # Fix NPC spaces
     this_obj.pose.bones["MCH-ROT-neck"].constraints["Copy Rotation"].owner_space = 'LOCAL'
@@ -2011,7 +2001,26 @@ def rig_character(
     this_obj.pose.bones["hand-ik-R"].custom_shape_transform = bpy.data.objects[char_name].pose.bones["mch-hand-ik-pivot-R"]
     
     this_obj.pose.bones["ik-sub-pivot-L"].custom_shape_translation = (foot_L_x_diff*-1.0, 0.0, foot_L_z_diff*-1.0)
-    this_obj.pose.bones["ik-sub-pivot-R"].custom_shape_translation = (foot_R_x_diff*-1.0, 0.0, foot_R_z_diff*-1.0)     
+    this_obj.pose.bones["ik-sub-pivot-R"].custom_shape_translation = (foot_R_x_diff*-1.0, 0.0, foot_R_z_diff*-1.0)  
+
+    # thanks enthralpy for the code to delete the palm constraints that i fuckin forgot to do
+    blist = ['ORG-palm.04.R', 'ORG-palm.03.R', 'ORG-palm.02.R', 'ORG-palm.04.L', 'ORG-palm.03.L', 'ORG-palm.02.L']
+
+    for name in blist:
+        try:
+            bone = this_obj.pose.bones[name]
+            # Create a list of all the constraints to be deleted on this bone
+            get = [ c for c in bone.constraints if c.type == 'COPY_TRANSFORMS' ]
+            fucked = [ c for c in bone.constraints if c.type == 'COPY_ROTATION' ]
+
+            # Iterate over and delete them all
+            for c in get:
+                bone.constraints.remove( c ) 
+            for c in fucked:
+                bone.constraints.remove( c )
+        except:
+            pass
+            
         
     # Penultimate: Rename bones as needed
     for oldname, newname in rename_bones_list:
@@ -2210,6 +2219,10 @@ def rig_character(
     # Get the ID of this char's rig ui script.
     rig_char_id = rig_text.split("rig_id = \"")[1].split("\"")[0]
     
+    # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
+    setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
+    setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
+    
     def make_layer_str(text, layer, version):
         string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
         string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
@@ -2231,7 +2244,7 @@ def rig_character(
     # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
     def generate_rig_layers():
         # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        v_str = \""+bpy.app.version_string+"\"\n        row.label(text=v_str+\" rig for "+char_name.split("Costume")[0]+"\")\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
@@ -2253,6 +2266,10 @@ def rig_character(
     # Used for already existing bones (torso and limbs)
     def generate_string_for_ik_switch(bone, prop1, prop2):
         str = "\n        if is_selected({'"+bone+"'}):\n            group1 = layout.row(align=True)\n            group2 = group1.split(factor=0.75, align=True)\n            props = group2.operator('pose.rigify_switch_parent_"+rig_char_id+"\', text=\'Parent Switch\', icon=\'DOWNARROW_HLT\')\n            props.bone = \'"+prop1+"\'\n            props.prop_bone = \'"+prop2+"\'\n            props.prop_id=\'IK_parent\'\n            props.parent_names = '[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)\n            group2.prop(pose_bones['"+prop2+"'], '[\"IK_parent\"]', text='')\n            props = group1.operator('pose.rigify_switch_parent_bake_"+rig_char_id+"', text='', icon='ACTION_TWEAK')\n            props.bone = '"+prop1+"'\n            props.prop_bone='"+prop2+"'\n            props.prop_id='IK_parent'\n            props.parent_names='[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)"
+        return str
+        
+    def generate_string_for_settings_slider():
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)'
         return str
     
     # because rigify makes the rig ui before i get to it, we have to change this stuff for the torso sliders below.
@@ -2292,9 +2309,14 @@ def rig_character(
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("shin_tweak-pin.R"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_limb_pin("shin_tweak-pin.R","thigh_parent.R","shin_tweak.R","Knee Pin"))
     
+    complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_settings_slider())
+    
+    complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Layers\"", "bl_label = \"Rig Layers: \" + rig_name")
+    complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Main Properties\"", "bl_label = \"Rig Properties: \" + rig_name")
+    
     # Clear the text from the text block, reassemble it as needed with strings and modifications.
     rig_file.clear() 
-    rig_file.write(complete_rig_text)
+    rig_file.write(complete_rig_text.replace("rig_id = ", "rig_name = \""+char_name.split("Costume")[0]+"\"\nrig_id = ")) # give it all the modified text and the variable holding the char's name
     rig_file.write(rig_text_disclaimer)
     
     
@@ -2359,10 +2381,11 @@ def rig_character(
         bpy.context.object.data.layers[17] = False
         bpy.context.object.data.layers[21] = True
         bpy.context.object.data.layers[28] = True
-        bpy.context.object.data.layers[26] = True
+        bpy.context.object.data.layers[26] = False
     else:            
         bpy.context.object.data.collections["Tweaks"].is_visible = False
         bpy.context.object.data.collections["Pivots & Pins"].is_visible = False
+        bpy.context.object.data.collections["Offsets"].is_visible = False
         bpy.context.object.data.collections["Torso (FK)"].is_visible = False
         bpy.context.object.data.collections["Fingers (Detail)"].is_visible = False
         bpy.context.object.data.collections["Arm.L (FK)"].is_visible = False
@@ -2370,6 +2393,8 @@ def rig_character(
         bpy.context.object.data.collections["Leg.L (FK)"].is_visible = False
         bpy.context.object.data.collections["Leg.R (FK)"].is_visible = False
         bpy.context.object.data.collections["Other"].is_visible = False
+        if lighting_panel_rig_obj:
+            bpy.context.object.data.collections["Lighting"].is_visible = False
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------
