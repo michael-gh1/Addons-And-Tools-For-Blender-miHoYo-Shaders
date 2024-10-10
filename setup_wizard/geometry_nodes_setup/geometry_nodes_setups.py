@@ -525,11 +525,14 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
 
     def clone_night_soul_outlines(self):
         materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
+        outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
+
+        if not outline_material:
+            return
 
         for material in materials:
             if self.material_names.MATERIAL_PREFIX in material.name and material.name != self.material_names.NIGHT_SOUL_OUTLINES and \
                 not material.name.endswith('Outlines'):
-                outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
                 new_outline_name = f'{material.name} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}'
 
                 if not bpy.data.materials.get(new_outline_name) and not ShaderMaterial(material, self.shader_node_names).get_night_soul_outlines_material():
