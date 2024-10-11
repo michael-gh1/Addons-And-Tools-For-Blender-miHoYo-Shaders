@@ -837,7 +837,6 @@ def rig_character(
 
     # Delete metarig
     bpy.data.objects.remove(bpy.data.objects['metarig'])
-    
 
     # Moves specified param and it's children into the collection
     def move_into_collection(object,collection,include_children=True):
@@ -909,6 +908,7 @@ def rig_character(
 
     move_into_collection("Head Forward", "wgt")
     move_into_collection("Head Up", "wgt")
+
 
     # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
     # remove lighting colls - also move the RGB wheels into the rig obj
@@ -2370,6 +2370,7 @@ def rig_character(
         change_bone_group_colors('Face',(1,0,0),(0.596,0.898,1.00),(0.769,1.00,1.00))
 
 
+
     # Automatically builds the constraint stuff for SWITCH PARENT. DO NOT FORGET TO REENABLE THE CONSTRAINTS BELOW!!!!!!
     def generate_switch_parent_constraints(toggle_parent, location_of_switcher):
         const = this_obj.pose.bones[toggle_parent].constraints["SWITCH PARENT"]
@@ -2456,12 +2457,12 @@ def rig_character(
         cust_bone["torso_parent"] = 1
         id_prop = cust_bone.id_properties_ui("torso_parent")
         id_prop.update(min=0,max=2)  
-        cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone                                   
+        cust_bone.property_overridable_library_set('["torso_parent"]', True) # allow library override of this bone
     
     make_torso_custom()
     
     # rig_id also needs to be library overridable.
-    bpy.data.armatures[original_name].property_overridable_library_set('["rig_id"]', True)    
+    bpy.data.armatures[original_name].property_overridable_library_set('["rig_id"]', True)
         
     # Adjustments to positioning
     this_obj.pose.bones["foot_ik.L"].custom_shape_transform = bpy.data.objects[char_name+"Rig"].pose.bones["mch-ik-pivot-L"]
@@ -2471,7 +2472,6 @@ def rig_character(
     
     this_obj.pose.bones["ik-sub-pivot-L"].custom_shape_translation = (foot_L_x_diff*-1.0, 0.0, foot_L_z_diff*-1.0)
     this_obj.pose.bones["ik-sub-pivot-R"].custom_shape_translation = (foot_R_x_diff*-1.0, 0.0, foot_R_z_diff*-1.0)
-        
    
     # thanks enthralpy for the code to delete the palm constraints that i fuckin forgot to do
     blist = ['ORG-palm.04.R', 'ORG-palm.03.R', 'ORG-palm.02.R', 'ORG-palm.04.L', 'ORG-palm.03.L', 'ORG-palm.02.L']
@@ -2490,6 +2490,8 @@ def rig_character(
                 bone.constraints.remove( c )
         except:
             pass
+           
+        
     # Penultimate: Rename bones as needed
     for oldname, newname in rename_bones_list:
         bone = bpy.context.object.pose.bones.get(oldname)
@@ -2661,7 +2663,8 @@ def rig_character(
     
     # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
     setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
-    setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])                                                                                                                                                                                                                                                        
+    setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
+                                                                                                                                                                                                                                                    
     def make_layer_str(text, layer, version):
         string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
         string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
@@ -2708,9 +2711,10 @@ def rig_character(
     def generate_string_for_ik_switch(bone, prop1, prop2):
         str = "\n        if is_selected({'"+bone+"'}):\n            group1 = layout.row(align=True)\n            group2 = group1.split(factor=0.75, align=True)\n            props = group2.operator('pose.rigify_switch_parent_"+rig_char_id+"\', text=\'Parent Switch\', icon=\'DOWNARROW_HLT\')\n            props.bone = \'"+prop1+"\'\n            props.prop_bone = \'"+prop2+"\'\n            props.prop_id=\'IK_parent\'\n            props.parent_names = '[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)\n            group2.prop(pose_bones['"+prop2+"'], '[\"IK_parent\"]', text='')\n            props = group1.operator('pose.rigify_switch_parent_bake_"+rig_char_id+"', text='', icon='ACTION_TWEAK')\n            props.bone = '"+prop1+"'\n            props.prop_bone='"+prop2+"'\n            props.prop_id='IK_parent'\n            props.parent_names='[\"None\", \"root\", \"root.001\", \"root.002\", \"torso\", \"chest\"]'\n            props.locks = (False, False, False)"
         return str
+        
     def generate_string_for_settings_slider():
-        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Eye Correction Adjustment", slider=True)'
-        return str    
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)'
+        return str
     
     # because rigify makes the rig ui before i get to it, we have to change this stuff for the torso sliders below.
     def torso_str():
@@ -2742,6 +2746,7 @@ def rig_character(
 
     #complete_rig_text = complete_rig_text.replace("props.bone = 'torso'","props.bone = 'torso.002'").replace("props.prop_bone = 'torso'","props.prop_bone = 'torso.002'").replace("group2.prop(pose_bones['torso'], '[\"torso_parent\"]', text='')","group2.prop(pose_bones['torso.002'], '[\"torso_parent\"]', text='')")
     
+
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("forearm_tweak-pin.L"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_limb_pin("forearm_tweak-pin.L","upper_arm_parent.L","forearm_tweak.L","Elbow Pin"))
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("forearm_tweak-pin.R"))
@@ -2762,6 +2767,7 @@ def rig_character(
     
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Layers\"", "bl_label = \"Rig Layers: \" + rig_name")
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Main Properties\"", "bl_label = \"Rig Properties: \" + rig_name")
+
     # Clear the text from the text block, reassemble it as needed with strings and modifications.
     rig_file.clear() 
     rig_file.write(complete_rig_text.replace("rig_id = ", "rig_name = \""+char_name.split("Costume")[0]+"\"\nrig_id = ")) # give it all the modified text and the variable holding the char's name
@@ -2833,7 +2839,7 @@ def rig_character(
     else:            
         bpy.context.object.data.collections["Tweaks"].is_visible = False
         bpy.context.object.data.collections["Pivots & Pins"].is_visible = False
-        bpy.context.object.data.collections["Offsets"].is_visible = False                                          
+        bpy.context.object.data.collections["Offsets"].is_visible = False
         bpy.context.object.data.collections["Torso (FK)"].is_visible = False
         bpy.context.object.data.collections["Fingers (Detail)"].is_visible = False
         bpy.context.object.data.collections["Arm.L (FK)"].is_visible = False
@@ -2844,7 +2850,7 @@ def rig_character(
         bpy.context.object.data.collections["Cage"].is_visible = False
         bpy.context.object.data.collections["Other"].is_visible = False
         if lighting_panel_rig_obj:
-            bpy.context.object.data.collections["Lighting"].is_visible = False                                                                            
+            bpy.context.object.data.collections["Lighting"].is_visible = False
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------

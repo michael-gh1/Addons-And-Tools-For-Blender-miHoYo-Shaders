@@ -854,10 +854,9 @@ def rig_character(
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
-    move_into_collection("Head Forward", "wgt")
-    move_into_collection("Head Up", "wgt")
-										  
-# IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
+
+
+    # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
     # remove lighting colls - also move the RGB wheels into the rig obj
     lighting_panel_rig_obj = bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL)
     if lighting_panel_rig_obj:
@@ -1760,7 +1759,7 @@ def rig_character(
             # Assign the bone to the bone group
             pose_bone.bone_group = bone_group
 
-																												
+        # New 4.0 functionality: change the bone itself to the color of the group it was originally assigned to.
         else:
             # 4.0: Armature bones or Pose bones?
             bone = bpy.context.object.pose.bones[bone_name]
