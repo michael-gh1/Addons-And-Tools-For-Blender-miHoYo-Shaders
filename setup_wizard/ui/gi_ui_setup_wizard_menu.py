@@ -14,11 +14,6 @@ class UI_Properties:
             default = True
         )
 
-        bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
-            name = "Join Meshes Enabled",
-            default = False
-        )
-
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -90,7 +85,6 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
         settings_box.prop(window_manager, 'enable_viewport_outlines')
-        settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
         settings_box.prop(window_manager, 'post_processing_setup_enabled')
 
@@ -310,13 +304,6 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
             'Rename Shader Materials',
             'GREASEPENCIL',
             game_type=GameType.GENSHIN_IMPACT.name,
-        )
-        OperatorFactory.create(
-            sub_layout,
-            'hoyoverse.join_meshes_on_armature',
-            'Join Meshes on Armature',
-            'RNA',
-            game_type=GameType.GENSHIN_IMPACT.name
         )
 
 
