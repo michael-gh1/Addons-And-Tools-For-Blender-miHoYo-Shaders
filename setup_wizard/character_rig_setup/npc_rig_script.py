@@ -854,8 +854,6 @@ def rig_character(
     bpy.data.collections["wgt"].hide_viewport = True
     bpy.data.collections["wgt"].hide_render = True
 
-    move_into_collection("Head Forward", "wgt")
-    move_into_collection("Head Up", "wgt")
 
 
     # IMPORTANT: This must be done before deleting the "Collection" collection in case Lighting Panel gets appended in there
@@ -1544,7 +1542,7 @@ def rig_character(
         
     # NPC SHAPE KEYS
     # Get the selected object with the shape key
-    obj = bpy.data.objects.get("Body")
+    obj = bpy.data.objects.get("Face")
     # not all npcs have face fat/strong, so attempt on their own.
     has_extra_faces = True
     try:
@@ -1761,6 +1759,7 @@ def rig_character(
             # Assign the bone to the bone group
             pose_bone.bone_group = bone_group
 
+        # New 4.0 functionality: change the bone itself to the color of the group it was originally assigned to.
         else:
             # 4.0: Armature bones or Pose bones?
             bone = bpy.context.object.pose.bones[bone_name]

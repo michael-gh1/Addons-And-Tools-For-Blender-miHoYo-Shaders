@@ -5,7 +5,7 @@ import bpy
 import os
 from mathutils import Color, Vector
 from math import pi
-import addon_utils
+import addon_utils                  
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -112,73 +112,6 @@ def rig_character(
 
     #we need to override the context of our operator    
     override = get_override( 'VIEW_3D', 'WINDOW' )
-
-    # Function to create shape keys from given arguments: Works with only one element in vg to parse
-    def create_shape_key(obj_get, is_basis, shape_name, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
-        bpy.context.view_layer.objects.active = head_bone_arm_target
-        bpy.ops.object.mode_set(mode='EDIT')
-        for this_group in vertex_groups_to_parse:
-            if use_eye_1:
-                if " R " in this_group:
-                    if right_eye_exists:
-                        bpy.context.scene.cursor.location = (right_eye_1[0],right_eye_1[1],right_eye_1[2])
-                elif " L " in this_group:
-                    if left_eye_exists:
-                        bpy.context.scene.cursor.location = (left_eye_1[0],left_eye_1[1],left_eye_1[2])
-            else:
-                if " R " in this_group:
-                    if right_eye_exists:
-                        bpy.context.scene.cursor.location = (right_eye_2[0],right_eye_2[1],right_eye_2[2])
-                elif " L " in this_group:
-                    if left_eye_exists:
-                        bpy.context.scene.cursor.location = (left_eye_2[0],left_eye_2[1],left_eye_2[2])
-                        
-            # AFTER MOVING 3D CURSOR
-            this_obj = bpy.data.objects.get(obj_get)
-            bpy.context.view_layer.objects.active = this_obj
-            
-            if is_basis:
-                this_obj.shape_key_add(name='Basis')
-                
-            this_obj.shape_key_add(from_mix=False)   
-            sk = this_obj.data.shape_keys.key_blocks[-1]
-            sk.name = shape_name
-            sk.value = 1
-            shape_index = this_obj.data.shape_keys.key_blocks.keys().index(shape_name)
-            bpy.context.object.active_shape_key_index = shape_index
-            
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.ops.mesh.select_all(action='DESELECT')
-            bpy.context.tool_settings.transform_pivot_point = "CURSOR"   
-        
-            try:
-                bpy.ops.object.vertex_group_set_active(group=this_group)
-                bpy.ops.object.vertex_group_select()
-                
-                if transform_type == "RESIZE":
-                    # for documentation: v4 does not like the override argument lmao
-                    if not is_version_4:
-                        bpy.ops.transform.resize(override, value=(transformation_1), orient_type='LOCAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='LOCAL', mirror=False, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
-                    else:
-                        bpy.ops.transform.resize(value=(transformation_1), orient_type='LOCAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='LOCAL', mirror=False, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
-                    bpy.ops.object.vertex_group_deselect()
-                elif transform_type == "TRANSLATE":
-                    if not is_version_4:
-                        bpy.ops.transform.translate(override, value=transformation_1, orient_type='LOCAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='LOCAL', constraint_axis=(False, True, False), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
-                        bpy.ops.transform.resize(override, value=transformation_2)
-                        bpy.ops.object.vertex_group_deselect()
-                    else:
-                        bpy.ops.transform.translate(value=transformation_1, orient_type='LOCAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='LOCAL', constraint_axis=(False, True, False), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
-                        bpy.ops.transform.resize(override, value=transformation_2)
-                        bpy.ops.object.vertex_group_deselect()                    
-            except:
-                pass
-        
-            bpy.ops.object.vertex_group_deselect()
-            bpy.ops.mesh.select_all(action='DESELECT')
-            bpy.ops.object.mode_set(mode='OBJECT')
-            sk.value = 0.0
-            bpy.context.scene.cursor.location = (0.0,0.0,0.0)
       
     # Function to create shape keys that works with 2 elementsa        
     def create_shape_key2(obj_get, is_basis, shape_name, transform_pivot, vertex_groups_to_parse, transform_type, transformation_1, transformation_2=0, use_eye_1=False):
@@ -299,18 +232,7 @@ def rig_character(
         # DONE
         sk.value = 0.0
         bpy.context.scene.cursor.location = (0.0,0.0,0.0)
-
-
-    # Shape key to shrink pupils    
-    create_shape_key2("Body", True, "pupils", "CURSOR", ["+EyeBone L A02","+EyeBone R A02"], "RESIZE", (0.5,0.5,0.5))
-    # Shape keys to adjust eye during blink
-    # For some reason, the math is different for v4, therefore adjust the nums so its more like v3.6
-    if not is_version_4:
-        create_shape_key("Body", False, "pupil-pushback-R", "CURSOR", ["+EyeBone R A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True) # 0.0069, 70
-        create_shape_key("Body", False, "pupil-pushback-L", "CURSOR", ["+EyeBone L A02"], "TRANSLATE", (0, 0.00703, 0), (1.1,1.1,1.1),use_eye_1=True)
-    else:
-        create_shape_key("Body", False, "pupil-pushback-R", "CURSOR", ["+EyeBone R A02"], "TRANSLATE", (0, 0.00234, 0), (1.1,1.1,1.1),use_eye_1=True) # 0.0069, 70
-        create_shape_key("Body", False, "pupil-pushback-L", "CURSOR", ["+EyeBone L A02"], "TRANSLATE", (0, 0.00234, 0), (1.1,1.1,1.1),use_eye_1=True)    
+ 
     
     try:
         # Bring back EyeStar
@@ -349,6 +271,10 @@ def rig_character(
     print("New Run\n\n")
     ## Rename all bones in selected armature to ORG
     original_name = obj.name
+
+    kachina = False  # maybe change to 'mittens' if more mitten-wielding chars are created lol
+    if "kachina" in obj.name.lower():
+        kachina = True
     abadidea = {
         'Bip001 Pelvis': 'spine',
         'Bip001 L Thigh': 'thigh.L',
@@ -412,13 +338,28 @@ def rig_character(
         '+EyeBone L A01': 'eye.L', 
         '+Breast L A01': 'breast.L',
         '+Breast R A01': 'breast.R', 
-        }
+        '+ThumbS L A01': 'thumb.01.L',  # Kachina
+        '+ThumbS L A02': 'thumb.02.L',
+        '+ThumbS R A01': 'thumb.01.R',
+        '+ThumbS R A02': 'thumb.02.R',
+        '+GlovesS L A01': 'f_middle.01.L',
+        '+GlovesS L A02': 'f_middle.02.L',
+        '+GlovesS R A01': 'f_middle.01.R',
+        '+GlovesS R A02': 'f_middle.02.R',    
+    }
+
     if not toe_bones_exist:
         del abadidea['Bip001 L Toe0']
         del abadidea['Bip001 R Toe0']
 
     bpy.ops.object.mode_set(mode='EDIT')
     armature = bpy.context.selected_objects[0].data
+
+    if kachina:
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 L Finger2"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 L Finger0"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 R Finger2"])
+        obj.data.edit_bones.remove(obj.data.edit_bones["Bip001 R Finger0"])
 
     bpy.ops.armature.select_all(action='DESELECT')
     def select_bone(bone):
@@ -452,22 +393,23 @@ def rig_character(
             bone.name = abadidea[bone.name]
     
     # Fix finger rolls - Thanks Poke!
-    how_not = ['f_index.01.L', 'f_index.02.L', 'f_index.03.L']
-    hahaha = ['f_middle.01.L', 'f_middle.02.L', 'f_middle.03.L']
-    to_name = ['f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L']
-    things_efficiently = ['f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L']
+    if not kachina:
+        how_not = ['f_index.01.L', 'f_index.02.L', 'f_index.03.L']
+        hahaha = ['f_middle.01.L', 'f_middle.02.L', 'f_middle.03.L']
+        to_name = ['f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L']
+        things_efficiently = ['f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L']
 
-    for bone in how_not:
-        armature.edit_bones[bone].roll -= .1197
-        
-    for bone in hahaha:
-        armature.edit_bones[bone].roll -= .04
-        
-    for bone in to_name:
-        armature.edit_bones[bone].roll += .1297
-        
-    for bone in things_efficiently:
-        armature.edit_bones[bone].roll += .338
+        for bone in how_not:
+            armature.edit_bones[bone].roll -= .1197
+            
+        for bone in hahaha:
+            armature.edit_bones[bone].roll -= .04
+            
+        for bone in to_name:
+            armature.edit_bones[bone].roll += .1297
+            
+        for bone in things_efficiently:
+            armature.edit_bones[bone].roll += .338
     
     #Aw shit here we go again.  This second loop is for making it possible to symmetrize pose bones properly.
     for bone in bones_list:
@@ -484,12 +426,13 @@ def rig_character(
     
     
     # Fixes the thumb scale rotating inward on x instead of z
-    armature.edit_bones["thumb.01.L"].roll += 3.14 / 4
-    armature.edit_bones["thumb.02.L"].roll += 3.14 / 4
-    armature.edit_bones["thumb.03.L"].roll += 3.14 / 4     
-    armature.edit_bones["thumb.01.R"].roll -= 3.14 / 4
-    armature.edit_bones["thumb.02.R"].roll -= 3.14 / 4
-    armature.edit_bones["thumb.03.R"].roll -= 3.14 / 4 
+    if not kachina:
+        armature.edit_bones["thumb.01.L"].roll += 3.14 / 4
+        armature.edit_bones["thumb.02.L"].roll += 3.14 / 4
+        armature.edit_bones["thumb.03.L"].roll += 3.14 / 4     
+        armature.edit_bones["thumb.01.R"].roll -= 3.14 / 4
+        armature.edit_bones["thumb.02.R"].roll -= 3.14 / 4
+        armature.edit_bones["thumb.03.R"].roll -= 3.14 / 4 
 
                                     
                                                                                                                                 
@@ -614,12 +557,20 @@ def rig_character(
     # Fixes the finger rolls
     bpy.ops.object.mode_set(mode='OBJECT')
     metapose = bpy.data.objects['metarig'].pose
-    for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
-        metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
-        metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
-                                                                               
-    metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
-    metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = '-Z'                                                                               
+    if kachina:
+        for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
+            metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = '-Z'
+            metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = 'Z'
+
+        metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'X'
+        metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = 'X'
+    else:
+        for bone_name in ['f_index', 'f_middle', 'f_ring', 'f_pinky']:
+            metapose.bones[f"{bone_name}.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
+            metapose.bones[f"{bone_name}.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
+
+        metapose.bones["thumb.01.L"].rigify_parameters.primary_rotation_axis = 'Z'
+        metapose.bones["thumb.01.R"].rigify_parameters.primary_rotation_axis = '-Z'
                                           
 
     ## This part corrects metarm finger rolls
@@ -637,7 +588,10 @@ def rig_character(
     bpy.ops.object.mode_set(mode='EDIT')
     for bone in metarm.edit_bones:
         if "f_" in bone.name or "thumb" in bone.name:
-            bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
+            try:
+                bone.roll =  armature.edit_bones["DEF-"+bone.name].roll
+            except:
+                pass
 
     # Fix hand bones being rotated 90 degrees sideways and arm deformation bones being wonky
     if "Loli" in obj.name:
@@ -824,20 +778,51 @@ def rig_character(
     except:
         pass
     
-    # Fix scaling for finger tips.
-    rig = bpy.context.object
+    bpy.ops.object.mode_set(mode='EDIT') 
 
-    for oDrv in rig.animation_data.drivers:
-        for variable in oDrv.driver.variables:
-            for target in variable.targets:
-                if ".03" in oDrv.data_path and target.data_path[-7:] == "scale.y":
-                    target.data_path = target.data_path[:-1] + "x"
+    rig = bpy.context.object
+    if kachina:
+        # Deletes the extra useless finger bones
+        eatthis = ['f_index.03.L', 'f_index.01.L.001', 'f_index.01_master.L', 'thumb.03.L', 'thumb.01.L.001', 'f_middle.03.L', 'f_middle.01.L.001', 'f_ring.01_master.L', 'f_ring.01.L', 'f_ring.02.L', 'f_ring.03.L', 'f_ring.01.L.001', 'f_pinky.01_master.L', 'f_pinky.01.L', 'f_pinky.02.L', 'f_pinky.03.L', 'f_pinky.01.L.001', 'f_index.03.R', 'f_index.01.R.001', 'f_index.01_master.R', 'thumb.03.R', 'thumb.01.R.001', 'f_middle.03.R', 'f_middle.01.R.001', 'f_ring.01_master.R', 'f_ring.01.R', 'f_ring.02.R', 'f_ring.03.R', 'f_ring.01.R.001', 'f_pinky.01_master.R', 'f_pinky.01.R', 'f_pinky.02.R', 'f_pinky.03.R', 'f_pinky.01.R.001', 'ORG-palm.01.L', 'ORG-f_index.01.L', 'ORG-f_index.02.L', 'ORG-f_index.03.L', 'ORG-thumb.03.L', 'DEF-f_index.01.L', 'DEF-f_index.02.L', 'DEF-f_index.03.L', 'DEF-thumb.03.L', 'DEF-palm.01.L', 'MCH-f_index.01_drv.L', 'MCH-f_index.02_drv.L', 'MCH-f_index.03_drv.L', 'MCH-f_index.03.L', 'MCH-f_index.02.L', 'MCH-f_index.01.L', 'MCH-thumb.03_drv.L', 'MCH-thumb.03.L', 'ORG-f_middle.03.L', 'DEF-f_middle.03.L', 'MCH-f_middle.03_drv.L', 'MCH-f_middle.03.L', 'ORG-palm.03.L', 'DEF-palm.03.L', 'ORG-palm.04.L', 'DEF-palm.04.L', 'ORG-palm.01.R', 'ORG-f_index.01.R', 'ORG-f_index.02.R', 'ORG-f_index.03.R', 'ORG-thumb.03.R', 'DEF-f_index.01.R', 'DEF-f_index.02.R', 'DEF-f_index.03.R', 'DEF-thumb.03.R', 'DEF-palm.01.R', 'MCH-f_index.01_drv.R', 'MCH-f_index.02_drv.R', 'MCH-f_index.03_drv.R', 'MCH-f_index.03.R', 'MCH-f_index.02.R', 'MCH-f_index.01.R', 'MCH-thumb.03_drv.R', 'MCH-thumb.03.R', 'ORG-f_middle.03.R', 'DEF-f_middle.03.R', 'MCH-f_middle.03_drv.R', 'MCH-f_middle.03.R', 'ORG-palm.03.R', 'DEF-palm.03.R', 'ORG-palm.04.R', 'DEF-palm.04.R']
+        for this in eatthis:
+            ugh = rigifyr.data.edit_bones[this]
+            rigifyr.data.edit_bones.remove(ugh)
+
+        # This workaround is for an issue so stupid i dont even want to explain this lmao
+        bpy.ops.object.mode_set(mode='POSE') 
+        wtf = [ 'MCH-thumb.02.L', 'MCH-f_middle.02.L', 'MCH-thumb.02.R', 'MCH-f_middle.02.R']
+        for this in wtf:
+            rigifyr.pose.bones[this].constraints[0].enabled = False
+
+        bpy.ops.object.mode_set(mode='EDIT') 
+        # The scale controls for the fingers are big as hell lmao what.
+        sizethis = ['thumb.01_master.L', 'f_middle.01_master.L', 'thumb.01_master.R', 'f_middle.01_master.R']
+        for this in sizethis:
+            rigifyr.data.edit_bones[this].length *= .08
+
+        # This corrects the drivers on the superscale control. Without this fix, the scales operate opposite to how they should.
+        bpy.ops.object.mode_set(mode='POSE')
+        for oDrv in rigifyr.animation_data.drivers:
+            for variable in oDrv.driver.variables:
+                for target in variable.targets:
+                    if "MCH-f_middle.02_drv" in oDrv.data_path or "MCH-f_index.02_drv" in oDrv.data_path:
+                        oDrv.driver.expression += "* -1"
+    else:
+        # Fix scaling for finger tips.
+        for oDrv in rig.animation_data.drivers:
+            for variable in oDrv.driver.variables:
+                for target in variable.targets:
+                    if ".03" in oDrv.data_path and target.data_path[-7:] == "scale.y":
+                        target.data_path = target.data_path[:-1] + "x"
 
     fingerlist = ["thumb.01_master", "f_index.01_master", "f_middle.01_master", "f_ring.01_master", "f_pinky.01_master"]
 
     for side in [".L", ".R"]:
         for bone in fingerlist:
-            rig.pose.bones[bone + side].lock_scale[0] = False
+            try:
+                rig.pose.bones[bone + side].lock_scale[0] = False
+            except:
+                pass
 
     # Fix face shading being offset 90 degrees
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -1928,7 +1913,7 @@ def rig_character(
     # BROW SHAPE KEYS 
     # Get the selected object with the shape key
     try:
-        obj = bpy.data.objects.get("Brow") or (bpy.data.objects.get("Body") if meshes_joined else None)
+        obj = bpy.data.objects.get("Face")
         makeCon("Brow_Down_L","Brow-L-Control","bone * -4","LOC_Y")
         makeCon("Brow_Down_R","Brow-R-Control","bone * -4","LOC_Y")
         makeCon("Brow_Up_L","Brow-L-Control","bone * 4","LOC_Y")
@@ -1948,7 +1933,7 @@ def rig_character(
 
     try:
         # EYE SHAPE KEYS
-        obj = bpy.data.objects.get("Face_Eye") or (bpy.data.objects.get("Body") if meshes_joined else None)
+        obj = bpy.data.objects.get("Face")
         makeCon("Eye_WinkA_L","WinkA-L-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkA_R","WinkA-R-Invis","bone * -.82","LOC_Y")
         makeCon("Eye_WinkB_L","WinkB-L-Invis","bone * -.82","LOC_Y")
@@ -1966,14 +1951,14 @@ def rig_character(
         makeCon("Eye_Lowereyelid","Eye-LowerEyelid-Control","bone * -2.22","LOC_Y")
 
         # Pupils shape key drivers are set up below
-        obj = bpy.data.objects.get("EyeStar") or (bpy.data.objects.get("Body") if meshes_joined else None)
+        obj = bpy.data.objects.get("EyeStar")
         makeCon("EyeStar","Eye-Star-Control","1+(bone*2.23)","LOC_Y")
         
     except: 
         pass
 
     # MOUTH SHAPE KEYS
-    obj = bpy.data.objects.get("Face") or (bpy.data.objects.get("Body") if meshes_joined else None)
+    obj = bpy.data.objects.get("Face")
     makeCon("Mouth_Default","Mouth-Default-Control","bone * 1.67","LOC_X")
     makeCon("Mouth_A01","Mouth-Control","bone * -1.33","LOC_Y")
     makeCon("Mouth_Open01","Mouth-Control","bone * 1.33","LOC_Y")
@@ -1991,57 +1976,6 @@ def rig_character(
     makeCon("Mouth_Line02","Mouth-Control","bone * -1.33","LOC_X")
     makeCon("Mouth_Neko01","Mouth-Neko1-Control","bone * 1.67","LOC_X")
 
-    # Special drivers for pushing pupils back on blink
-    def makeCon2(shape_key,bn1,bn2,bn3,expression,transform):
-        # Get the bone object by name
-        armature = bpy.context.scene.objects[ourRig]  
-        bone = armature.pose.bones[bn1]
-
-        # Create a driver for the shape key
-        shape_key = obj.data.shape_keys.key_blocks[shape_key]  
-        driver = shape_key.driver_add("value").driver
-
-        # Create variables for the driver
-        var = driver.variables.new()
-        var.name = "invisA"
-        var.type = 'TRANSFORMS'
-        var.targets[0].id = armature
-        var.targets[0].bone_target = bn1
-        var.targets[0].transform_space = 'LOCAL_SPACE'
-        var.targets[0].transform_type = transform
-        
-        # Create variables for the driver
-        var1 = driver.variables.new()
-        var1.name = "invisB"
-        var1.type = 'TRANSFORMS'
-        var1.targets[0].id = armature
-        var1.targets[0].bone_target = bn2
-        var1.targets[0].transform_space = 'LOCAL_SPACE'
-        var1.targets[0].transform_type = transform
-        
-        # Create variables for the driver
-        var2 = driver.variables.new()
-        var2.name = "invisC"
-        var2.type = 'TRANSFORMS'
-        var2.targets[0].id = armature
-        var2.targets[0].bone_target = bn3
-        var2.targets[0].transform_space = 'LOCAL_SPACE'
-        var2.targets[0].transform_type = transform
-
-        # Create the scripted expression driver
-        driver.type = 'SCRIPTED'
-        driver.expression = expression  
-
-        # Update the dependencies
-        depsgraph = bpy.context.evaluated_depsgraph_get()
-        depsgraph.update()
-    obj = bpy.data.objects.get("Body")
-    try:
-        makeCon2("pupil-pushback-R","WinkA-R-Invis","WinkB-R-Invis","WinkC-R-Invis","max(invisA * -1.55, invisB * -1.55, invisC * -1.55)","LOC_Y") # -1.45
-        makeCon2("pupil-pushback-L","WinkA-L-Invis","WinkB-L-Invis","WinkC-L-Invis","max(invisA * -1.55, invisB * -1.55, invisC * -1.55)","LOC_Y")
-    except:
-        pass
-    # Pupils shape key driver is set up below. Like Eye Star, the shape key has to be made FIRST before adding a driver
 
     if(use_head_tracker):
         # Since we're still in object mode, here we can add the head pole object in the neck to track head movement
@@ -2057,10 +1991,6 @@ def rig_character(
     obj = bpy.data.objects.get("Body")  
     bpy.ops.object.select_all(action='DESELECT')
 
-    try:
-        makeCon("pupils","Eye-Pupil-Control","bone * -2.4","LOC_Y")
-    except:
-        pass
 
     # Going into pose mode with our character selected.
     bpy.ops.object.select_all(action='DESELECT')
@@ -2072,30 +2002,75 @@ def rig_character(
         bpy.ops.object.mode_set(mode='POSE')
         
         
-    def add_driver_to_eyelid():
-        eyelid_invis_bone = bpy.context.scene.objects[char_name+"Rig"].pose.bones["eyelid-invis-control"]
-        eyelid_control_driver = eyelid_invis_bone.driver_add('location', 1).driver
-        # Create variables for the driver
-        var = eyelid_control_driver.variables.new()
-        var.name = "bone"
-        var.type = 'TRANSFORMS'
-        var.targets[0].id = bpy.data.objects.get(ourRig)
-        var.targets[0].bone_target = "eyetrack"
-        var.targets[0].transform_space = 'LOCAL_SPACE'
-        var.targets[0].transform_type = "LOC_Y"
-
+    def add_driver_to_bone_transform(bone, transform, channel, variables, expr):
+        this_bone = bpy.context.scene.objects[char_name+"Rig"].pose.bones[bone]
+        driver = this_bone.driver_add(transform, channel).driver
+        
+        # Iterate through the list of variables and create each one
+        for var_info in variables:
+            var = driver.variables.new()
+            var.name = var_info['var_name']
+            if var_info['var_type'] == 'TRANSFORMS':
+                var.type = 'TRANSFORMS'
+                var.targets[0].id = bpy.data.objects.get(ourRig)
+                var.targets[0].bone_target = var_info['target']
+                var.targets[0].transform_space = var_info['trans_space']
+                var.targets[0].transform_type = var_info['trans_type']
+            elif var_info['var_type'] == 'SINGLE_PROP':
+                var.type = 'SINGLE_PROP'
+                var.targets[0].id = bpy.data.objects.get(ourRig)
+                var.targets[0].data_path = var_info["data_path"]
+            
+        
         # Create the scripted expression driver
-        eyelid_control_driver.type = 'SCRIPTED'
-        eyelid_control_driver.expression = "bone * 5"  
+        driver.type = 'SCRIPTED'
+        driver.expression = expr
 
         # Update the dependencies
         depsgraph = bpy.context.evaluated_depsgraph_get()
         depsgraph.update()
 
     try:
-        add_driver_to_eyelid()
+        add_driver_to_bone_transform("eyelid-invis-control", 
+        "location", 1, [
+            {"var_name":"var", "var_type":"TRANSFORMS", "target":"eyetrack", "trans_space":"LOCAL_SPACE", "trans_type":"LOC_Y"}
+        ], "var * 5")
     except: 
         pass
+        
+    # Let's now add the pupil resizer drivers
+    try:
+        variablesScale = [
+            {"var_name": "var", "var_type":"TRANSFORMS", "target": "Eye-Pupil-Control", "trans_space": "LOCAL_SPACE", "trans_type": "LOC_Y"},
+            {"var_name": "var2", "var_type":"SINGLE_PROP", "data_path": "pose.bones[\"plate-settings\"][\"EyeCorrection\"]"}
+        ]
+
+        add_driver_to_bone_transform("+EyeBoneA02.R", "scale", 0, variablesScale, "1.5556 * var + 1")
+        add_driver_to_bone_transform("+EyeBoneA02.R", "scale", 1, variablesScale, "1.5556 * var + 1")
+        add_driver_to_bone_transform("+EyeBoneA02.R", "scale", 2, variablesScale, "1.5556 * var + 1")
+        
+        # push back driver
+        add_driver_to_bone_transform("+EyeBoneA02.R", "location", 1, [
+            {"var_name": "var", "var_type":"TRANSFORMS", "target": "Wink-Control-R", "trans_space": "LOCAL_SPACE", "trans_type": "LOC_Y"},
+            {"var_name": "var2", "var_type":"SINGLE_PROP", "data_path": "pose.bones[\"plate-settings\"][\"EyeCorrection\"]"}
+        ],"(0.00273934 * var) * var2")
+    except:
+        pass
+
+    # Both eyes separately to handle eyeless/eye patch chars
+    try:
+        add_driver_to_bone_transform("+EyeBoneA02.L", "scale", 0, variablesScale, "1.5556 * var + 1")
+        add_driver_to_bone_transform("+EyeBoneA02.L", "scale", 1, variablesScale, "1.5556 * var + 1")
+        add_driver_to_bone_transform("+EyeBoneA02.L", "scale", 2, variablesScale, "1.5556 * var + 1")
+        
+        # push back driver
+        add_driver_to_bone_transform("+EyeBoneA02.L", "location", 1, [
+            {"var_name": "var", "var_type":"TRANSFORMS", "target": "Wink-Control-L", "trans_space": "LOCAL_SPACE", "trans_type": "LOC_Y"},
+            {"var_name": "var2", "var_type":"SINGLE_PROP", "data_path": "pose.bones[\"plate-settings\"][\"EyeCorrection\"]"}
+        ],"(0.00273934 * var) * var2")
+    except:
+        pass
+    
 
     # Disable IK Stretching & Turn on IK Poles. Toggle manually as needed.
     if disallow_leg_ik_stretch:
@@ -2689,7 +2664,7 @@ def rig_character(
     # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
     setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
     setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
-    
+                                                                                                                                                                                                                                                    
     def make_layer_str(text, layer, version):
         string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
         string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
@@ -2792,7 +2767,7 @@ def rig_character(
     
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Layers\"", "bl_label = \"Rig Layers: \" + rig_name")
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Main Properties\"", "bl_label = \"Rig Properties: \" + rig_name")
-    
+
     # Clear the text from the text block, reassemble it as needed with strings and modifications.
     rig_file.clear() 
     rig_file.write(complete_rig_text.replace("rig_id = ", "rig_name = \""+char_name.split("Costume")[0]+"\"\nrig_id = ")) # give it all the modified text and the variable holding the char's name

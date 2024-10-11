@@ -198,7 +198,7 @@ There are a few issues that cause this:
 2. Dress materials can be Body or Hair for AVATARs
 3. Dress materials are only Body (to be confirmed) for NPCs/MONSTERs
 '''
-def get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
+def get_actual_material_name_for_dress(material_name, character_type='AVATAR', is_skill_obj=False):
     # must check string instead of enum until this is moved out of import_order.py due to circular dependency
     if character_type == 'AVATAR' or character_type == 'HSR_AVATAR':
         for material in bpy.data.materials:
@@ -206,7 +206,10 @@ def get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
                 try:
                     # ex. 'Avatar_Lady_Pole_Rosaria_Tex_Body_Diffuse.png'
                     base_color_texture_image_name = material.node_tree.nodes['Principled BSDF'].inputs['Base Color'].links[0].from_node.image.name_full
-                    actual_material_name = base_color_texture_image_name.split('_')[-2]
+                    if is_skill_obj:
+                        actual_material_name = base_color_texture_image_name.split('_')[-3]
+                    else:
+                        actual_material_name = base_color_texture_image_name.split('_')[-2]
                     actual_material_name = \
                         actual_material_name if actual_material_name == 'Hair' or actual_material_name == 'Body' \
                             else 'Hair' if 'Hair' in base_color_texture_image_name \

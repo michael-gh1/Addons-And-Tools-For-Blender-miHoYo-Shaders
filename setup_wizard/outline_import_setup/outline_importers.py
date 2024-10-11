@@ -19,10 +19,12 @@ class GameOutlineImporterFactory:
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                outlines_node_group_name = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 outlines_node_group_name = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
             else:
-                outlines_node_group_name = OutlineNodeGroupNames.FESTIVITY_GENSHIN_OUTLINES
+                outlines_node_group_name = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
             return GenshinImpactOutlineNodeGroupImporter(blender_operator, context, outlines_node_group_name)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:

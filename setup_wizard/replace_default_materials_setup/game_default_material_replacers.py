@@ -12,8 +12,9 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 
 class GameDefaultMaterialReplacer(ABC):
@@ -25,17 +26,18 @@ class GameDefaultMaterialReplacer(ABC):
 class GameDefaultMaterialReplacerFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
+        shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups) is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                material_names = V2_FestivityGenshinImpactMaterialNames
+            elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V2_FestivityGenshinImpactMaterialNames 
+                material_names = V4_PrimoToonGenshinImpactMaterialNames 
             return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
-
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 return HonkaiStarRailDefaultMaterialReplacer(blender_operator, context, Nya222HonkaiStarRailShaderMaterialNames)
             else:  # shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER
@@ -73,6 +75,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 else:
                     mesh_body_part_name = material_name.split('_')[-1]
                     character_type = TextureImporterType.AVATAR
+
+                if material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material_name.endswith('Glass_Mat'):
+                    mesh_body_part_name = 'Glass'
+                elif material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material_name.endswith('Glass_Eff_Mat'):
+                    mesh_body_part_name = 'Glass_Eff'
+                elif material_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+                    skillobj_identifier = material_name.split('_')[2]
+                    mesh_body_part_name = f'{ShaderMaterialNameKeywords.SKILLOBJ} {skillobj_identifier}'
 
                 # If material_name is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
                 material_name = self.create_shader_material_if_unique_mesh(mesh, mesh_body_part_name, material_name)
@@ -129,10 +139,29 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Gauntlet':  # Wrioth
             gauntlet_material = self.create_body_material(self.material_names, self.material_names.GAUNTLET)
             material_name = gauntlet_material.name
+        elif mesh_body_part_name == 'Leather':
+            leather_material = self.create_body_material(self.material_names, self.material_names.LEATHER)
+            material_name = leather_material.name
+        elif mesh_body_part_name == 'Glass':
+            glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
+            material_name = glass_material.name
+        elif mesh_body_part_name == 'Glass_Eff':
+            glass_material = self.create_glass_material(self.material_names, self.material_names.GLASS_EFF)
+            glass_material.blend_method = 'BLEND'
+            glass_material.shadow_method = 'NONE'
+            glass_material.show_transparent_back = False
+            material_name = glass_material.name
+        elif mesh_body_part_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+            skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
+            skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
+            material_name = skillobj_material.name
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name
         elif mesh_body_part_name and ('Screw' in mesh_body_part_name or 'Hat' in mesh_body_part_name):  # Aranaras
+            new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
+            material_name = new_material.name
+        elif mesh_body_part_name and 'Others' in mesh_body_part_name:  # NPCs, Frem Penguins
             new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = new_material.name
         return material_name
@@ -146,7 +175,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             return 'Body'
         elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
             return 'Dress'
-        elif 'Item' in material_name or 'Screw' in material_name or 'Hat' in material_name:
+        elif 'Item' in material_name or 'Screw' in material_name or 'Hat' in material_name or 'Others' in material_name:
             return material_name
         else:
             return None
@@ -186,6 +215,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             hair_material.name = material_name
             hair_material.use_fake_user = True
         return hair_material
+
+    def create_glass_material(self, shader_material_names: ShaderMaterialNames, material_name):
+        glass_material = bpy.data.materials.get(material_name)
+        if not glass_material:
+            glass_material = bpy.data.materials.get(shader_material_names.VFX).copy()
+            glass_material.name = material_name
+            glass_material.use_fake_user = True
+        return glass_material
 
     '''
     This method was used for V1 shader and should NOT be used for V2 shader because the group name is different.

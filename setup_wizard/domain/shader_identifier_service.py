@@ -4,15 +4,18 @@
 from abc import abstractmethod
 from enum import Enum, auto
 
+from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames
-from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTextureNodeNames, JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, V1_GenshinImpactTextureNodeNames, V2_GenshinImpactTextureNodeNames, V3_GenshinImpactTextureNodeNames, V4_GenshinImpactTextureNodeNames
 
 
 class GenshinImpactShaders(Enum):
     V1_GENSHIN_IMPACT_SHADER = auto()
     V2_GENSHIN_IMPACT_SHADER = auto()
     V3_GENSHIN_IMPACT_SHADER = auto()
+    V4_GENSHIN_IMPACT_SHADER = auto()
+
 
 class HonkaiStarRailShaders(Enum):
     NYA222_HONKAI_STAR_RAIL_SHADER = auto()
@@ -21,6 +24,16 @@ class HonkaiStarRailShaders(Enum):
 
 class PunishingGrayRavenShaders(Enum):
     V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER = auto()
+
+
+class ShaderIdentifier:
+    def __init__(self, material_name, shader_node_name, shader_label_name, material_prefix_after_rename, material_endswith_after_rename):
+        self.material_name = material_name
+        self.shader_node_name = shader_node_name
+        self.shader_label_name = shader_label_name
+        self.material_prefix_after_rename = material_prefix_after_rename
+        self.material_endswith_after_rename = material_endswith_after_rename
+
 
 class ShaderIdentifierServiceFactory:
     def create(game_type):
@@ -37,12 +50,26 @@ class ShaderIdentifierServiceFactory:
 class ShaderIdentifierService:
     material_lists_to_search_through = {}
     node_groups_to_search_through = {}
+    shader_labels_to_search_through = {}
 
     def __init__(self):
         pass
 
     def identify_shader(self, materials, node_groups):
-        # Check for V1 shader first
+        # Check for V4 shader first
+        shader_identifier: ShaderIdentifier
+        for shader, shader_identifier in self.shader_labels_to_search_through.items():
+            shader_material = materials.get(shader_identifier.material_name)
+            renamed_shader_material = [material for material in materials if 
+                                       material.name.startswith(shader_identifier.material_prefix_after_rename) and material.name.endswith(shader_identifier.material_endswith_after_rename)]
+
+            shader_material = shader_material or renamed_shader_material[0] if renamed_shader_material else None
+            if shader_material:
+                shader_node = shader_material.node_tree.nodes.get(shader_identifier.shader_node_name)
+                if shader_node and shader_node.label == shader_identifier.shader_label_name:
+                    return shader
+
+        # Check for V1 shader
         for shader, node_group_list in self.node_groups_to_search_through.items():
             found_all = True
             for node_group in node_group_list:
@@ -57,31 +84,39 @@ class ShaderIdentifierService:
         for shader, material_list in self.material_lists_to_search_through.items():
             found_all = True
             for material in material_list:
-                if material not in materials:
+                if not [scene_material for scene_material in materials.values() if material in scene_material.name]:
                     found_all = False
                     break
             if found_all:
                 return shader
 
     def get_shader_material_names(self, game_type, materials, node_groups):
+        game_shader = self.identify_shader(materials, node_groups)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            game_shader = self.identify_shader(materials, node_groups)
-            if game_shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            if game_shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or game_shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+                return V2_FestivityGenshinImpactMaterialNames
+            elif game_shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                return V2_FestivityGenshinImpactMaterialNames
+                return V4_PrimoToonGenshinImpactMaterialNames
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            return Nya222HonkaiStarRailShaderMaterialNames
+            if game_shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+                return Nya222HonkaiStarRailShaderMaterialNames
+            else:
+                return StellarToonShaderMaterialNames
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             return JaredNytsPunishingGrayRavenShaderMaterialNames
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
     def get_shader_material_names_using_shader(self, shader: GenshinImpactShaders):
-        if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
-            return V2_FestivityGenshinImpactMaterialNames
+        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+            return V4_PrimoToonGenshinImpactMaterialNames
         elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
             return V3_BonnyFestivityGenshinImpactMaterialNames
+        elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
+            shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER:
+            return V2_FestivityGenshinImpactMaterialNames
         elif shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
             return Nya222HonkaiStarRailShaderMaterialNames
         elif shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
@@ -92,10 +127,14 @@ class ShaderIdentifierService:
             raise Exception(f'Unknown Shader: {shader}')
 
     def get_shader_texture_node_names(self, shader):
-        if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or \
-            shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
-            shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                return GenshinImpactTextureNodeNames
+        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+            return V4_GenshinImpactTextureNodeNames
+        elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            return V3_GenshinImpactTextureNodeNames
+        elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
+            return V2_GenshinImpactTextureNodeNames
+        elif shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER:
+            return V1_GenshinImpactTextureNodeNames
         elif shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
             return Nya222HonkaiStarRailTextureNodeNames
         elif shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
@@ -105,19 +144,32 @@ class ShaderIdentifierService:
         else:
             raise Exception(f'Unknown Shader: {shader}')
 
+    def get_shader_node_names(self, shader):
+        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+            return V4_PrimoToonShaderNodeNames
+        elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+            return V3_GenshinShaderNodeNames
+        elif shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
+            shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER:
+            return V2_GenshinShaderNodeNames
+        elif shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+            return StellarToonShaderNodeNames  # Unsued
+        elif shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
+            return ShaderNodeNames  # Unused, no ShaderNodeName available
+        elif shader is PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER:
+            return JaredNyts_PunishingGrayRavenNodeNames  # Unused
+        else:
+            raise Exception(f'Unknown Shader: {shader}')
+
+
 class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     V2_NAMES_OF_GENSHIN_MATERIALS = [
-        V2_FestivityGenshinImpactMaterialNames.BODY,
-        V2_FestivityGenshinImpactMaterialNames.FACE,
-        V2_FestivityGenshinImpactMaterialNames.HAIR,
-        V2_FestivityGenshinImpactMaterialNames.OUTLINES
+        V2_FestivityGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     V3_NAMES_OF_GENSHIN_MATERIALS = [
-        V3_BonnyFestivityGenshinImpactMaterialNames.BODY,
-        V3_BonnyFestivityGenshinImpactMaterialNames.FACE,
-        V3_BonnyFestivityGenshinImpactMaterialNames.HAIR,
-        V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES
+        V3_BonnyFestivityGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
+    V4_SHADER_LABEL_NAME = 'PrimoToon v4.0'
     material_lists_to_search_through = {
         GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER: V3_NAMES_OF_GENSHIN_MATERIALS,
         GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER: V2_NAMES_OF_GENSHIN_MATERIALS,
@@ -127,22 +179,26 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
         GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER: ['miHoYo - Genshin Face'],
     }
 
+    shader_labels_to_search_through = {
+        GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER: ShaderIdentifier(
+            material_name=V4_PrimoToonGenshinImpactMaterialNames.BODY,
+            shader_node_name=V4_PrimoToonShaderNodeNames.BODY_SHADER,
+            shader_label_name=V4_PrimoToonShaderNodeNames.BODY_SHADER_LABEL,
+            material_prefix_after_rename=V4_PrimoToonGenshinImpactMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
+            material_endswith_after_rename='Body'
+        ),
+    }
+
     def __init__(self):
         super().__init__()
 
 
 class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
     NYA222_NAMES_OF_SHADER_MATERIALS = [
-        Nya222HonkaiStarRailShaderMaterialNames.BODY1,
-        Nya222HonkaiStarRailShaderMaterialNames.FACE,
-        Nya222HonkaiStarRailShaderMaterialNames.HAIR,
-        Nya222HonkaiStarRailShaderMaterialNames.OUTLINES,
+        Nya222HonkaiStarRailShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     STELLARTOON_NAMES_OF_SHADER_MATERIALS = [
-        StellarToonShaderMaterialNames.BASE,
-        StellarToonShaderMaterialNames.HAIR,
-        StellarToonShaderMaterialNames.FACE,
-        StellarToonShaderMaterialNames.WEAPON,
+        StellarToonShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     material_lists_to_search_through = {
         HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER: NYA222_NAMES_OF_SHADER_MATERIALS,
@@ -156,12 +212,7 @@ class HonkaiStarRailShaderIdentifierService(ShaderIdentifierService):
 # Unused.
 class PunishingGrayRavenShaderIdentifierService(ShaderIdentifierService):
     V1_NAMES_OF_PGR_MATERIALS = [
-        JaredNytsPunishingGrayRavenShaderMaterialNames.ALPHA,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.EYE,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.FACE,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.HAIR,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.MAIN,
-        JaredNytsPunishingGrayRavenShaderMaterialNames.OUTLINES,
+        JaredNytsPunishingGrayRavenShaderMaterialNames.MATERIAL_PREFIX_AFTER_RENAME,
     ]
     material_lists_to_search_through = {
         PunishingGrayRavenShaders.V1_JAREDNYTS_PUNISHING_GRAY_RAVEN_SHADER: V1_NAMES_OF_PGR_MATERIALS

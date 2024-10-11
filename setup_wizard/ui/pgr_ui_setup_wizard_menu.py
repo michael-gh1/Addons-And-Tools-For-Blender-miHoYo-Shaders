@@ -19,7 +19,7 @@ class UI_Properties:
 
         # bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
         #     name = " Join Meshes Enabled",
-        #     default = True
+        #     default = False
         # )
 
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(

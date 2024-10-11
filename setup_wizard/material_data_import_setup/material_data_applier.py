@@ -1,14 +1,18 @@
 # Author: michael-gh1
 
+from enum import auto
 import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
+from setup_wizard.domain.shader_node_inputs import V4_PrimoToonShaderNodeInputNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -21,11 +25,20 @@ class MaterialDataAppliersFactory:
                     V1_MaterialDataApplier(material_data_parser, outline_material_group),
                 ]
             else:
-                return [
-                    V3_MaterialDataApplier(material_data_parser, outline_material_group),
-                    V2_MaterialDataApplier(material_data_parser, outline_material_group), 
-                    V1_MaterialDataApplier(material_data_parser, outline_material_group),
-                ]
+                shader_identifier_service = ShaderIdentifierServiceFactory.create(game_type)
+                shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+                if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or \
+                    shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER or \
+                    shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
+                    return [
+                        V3_MaterialDataApplier(material_data_parser, outline_material_group),
+                        V2_MaterialDataApplier(material_data_parser, outline_material_group), 
+                        V1_MaterialDataApplier(material_data_parser, outline_material_group),
+                    ]
+                else:
+                    return [
+                        V4_MaterialDataApplier(material_data_parser, outline_material_group),
+                    ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
                 StellarToon_MaterialDataApplier(material_data_parser, outline_material_group),
@@ -48,11 +61,15 @@ class MaterialDataApplier(ABC):
         self.material_data_parser = material_data_parser
         self.material = outline_material_group.material
         self.outline_material = outline_material_group.outlines_material
+        self.night_soul_outlines_material = outline_material_group.night_soul_outlines_material
         self.outlines_node_tree_node_name = outlines_node_tree_node_name
     
     @abstractmethod
     def set_up_mesh_material_data(self):
         raise NotImplementedError()
+
+    def set_up_outline_material_data(self):
+        return
 
     def set_up_outline_colors(self):
         outlines_shader_node_inputs = self.outline_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
@@ -64,37 +81,41 @@ class MaterialDataApplier(ABC):
 
     def apply_material_data(self, material_mapping, node_inputs):
         for material_json_name, material_node_name in material_mapping.items():
-            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_json_name)
+            material_node_names = material_node_name if type(material_node_name) is list else [material_node_name]
 
-            if material_json_value is None:  # explicitly check for None
-                self.__handle_material_value_not_found(material_json_name)
-                continue
+            for material_node_name in material_node_names:
+                material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_json_name)
 
-            # StellarToon: handle two "Stockings Color" inputs in same shader node
-            if material_node_name == 'Stockings Color':
-                stockings_color_inputs = [node_input for node_input in node_inputs if node_input.name == 'Stockings Color']
-                if len(stockings_color_inputs) > 1:
-                    node_input = stockings_color_inputs[1]
-            else:
-                node_input = node_inputs.get(material_node_name)
-            try:
-                # Convert to sRGB to Hex to RGB for Nya222 Shader 
-                # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
-                if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
-                    material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
-                node_input.default_value = material_json_value
-            except AttributeError as ex:
-                print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
-                    Falling back to next MaterialDataApplier version')
-                raise ex
+                if material_json_value is None:  # explicitly check for None
+                    self.__handle_material_value_not_found(material_json_name)
+                    continue
+
+                # StellarToon: handle two "Stockings Color" inputs in same shader node
+                if material_node_name == 'Stockings Color':
+                    stockings_color_inputs = [node_input for node_input in node_inputs if node_input.name == 'Stockings Color']
+                    if len(stockings_color_inputs) > 1:
+                        node_input = stockings_color_inputs[1]
+                else:
+                    node_input = node_inputs.get(material_node_name)
+                try:
+                    # Convert to sRGB to Hex to RGB for Nya222 Shader 
+                    # Currently it doesn't do a conversion from gamma-corrected RGB to linear color space
+                    if type(self) is V2_HSR_MaterialDataApplier and type(material_json_value) is tuple:
+                        material_json_value = self.convert_color_srgb_to_hex_to_rgb(material_json_value)
+                    node_input.default_value = material_json_value
+                except AttributeError as ex:
+                    print(f'Did not find {material_node_name} in {self.material.name}/{self.outline_material.name} material using {self} \
+                        Falling back to next MaterialDataApplier version')
+                    raise ex
 
     def get_value_in_json_parser(self, parser, key):
-        try:
-            return getattr(parser.m_floats, key)
-        except AttributeError:
-            return getattr(parser.m_colors, key, None)
-        except Exception:
-            return None
+        m_floats = getattr(parser.m_floats, key, None)
+        m_colors = getattr(parser.m_colors, key, None)
+        m_texEnvs = getattr(parser.m_texEnvs, key, None)
+
+        return m_floats if m_floats is not None else \
+            m_colors if m_colors is not None else \
+                m_texEnvs if m_texEnvs is not None else None
 
     def __handle_material_value_not_found(self, material_json_name):
         print(f'Info: Unable to find material data: {material_json_name} in selected JSON.')
@@ -275,9 +296,9 @@ class V2_MaterialDataApplier(MaterialDataApplier):
         )
 
     # We should consider abstracting this logic if we need to add additional logic for other material data values
-    def set_up_alpha_options_material_data(self, node_inputs, outlines_alpha_only=False):
+    def set_up_alpha_options_material_data(self, node_inputs, outlines_alpha_only=False, _MainTexAlphaUse_mapping=None):
         _MainTexAlphaUse_name = '_MainTexAlphaUse'
-        _MainTexAlphaUse_mapping = {
+        _MainTexAlphaUse_mapping = _MainTexAlphaUse_mapping if _MainTexAlphaUse_mapping else {
             0: {
                 "Use Alpha": 0,
                 "0 = Emission, 1 = Transparency": 0
@@ -398,7 +419,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
         '_MainTexAlphaCutoff': 'Transparency Cutoff',
     }
 
-    v3_2_local_material_mapping = {
+    additional_local_material_mapping = {
         '_Color': 'Color',
         '_Color2': 'Color 2',
         '_Color3': 'Color 3',
@@ -435,7 +456,7 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
             # This is to keep backwards compatibility for those who may still be on an older version of the shader.
             try:
                 super().apply_material_data(
-                    self.v3_2_local_material_mapping,
+                    self.additional_local_material_mapping,
                     base_material_shader_node_tree_inputs,
                 )
             except AttributeError:
@@ -447,6 +468,180 @@ class V3_MaterialDataApplier(V2_MaterialDataApplier):
             self.outline_mapping,
             outline_material_shader_node_tree_inputs
         )
+
+class mTexEnvsKeys:
+    def __init__(self, key, m_TexEnvs_key):
+        self.key = key
+        self.m_TexEnvs_key = m_TexEnvs_key
+
+class V4_MaterialDataApplier(V3_MaterialDataApplier):
+    class ShaderNodeType:
+        INPUT = auto()
+        OUTPUT = auto()
+
+    outline_mapping = {}
+    local_material_mapping = {}
+    additional_local_material_mapping = {}
+
+    body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
+    face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
+    outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
+    shader_node_input_names = V4_PrimoToonShaderNodeInputNames
+
+    _MainTexAlphaUse_mapping = {
+        0: {
+            "Toggle Alpha": 0,
+            "Emit / Transparency": 0
+        },
+        1: {
+            "Toggle Alpha": 1,
+            "Emit / Transparency": 1
+        },
+        2: {
+            "Toggle Alpha": 1,
+            "Emit / Transparency": 0
+        },
+        3: {},
+    }
+
+    def set_up_mesh_material_data(self):
+        shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
+        outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
+        night_soul_outlines_shader_node = self.night_soul_outlines_material.node_tree.nodes[self.outlines_node_tree_node_name]
+        global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
+        global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
+
+        self.set_up_mesh_material_data_with_tooltips(shader_node, shader_node)
+        self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(night_soul_outlines_shader_node, night_soul_outlines_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
+
+    def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):
+        shader_node_interface_input_items = interface_node.node_tree.interface.items_tree.values()
+        for node_interface_input in shader_node_interface_input_items:
+            material_data_key = node_interface_input.description.strip()  # Tooltip
+
+            if self.is_tooltip_TexEnv(material_data_key):
+                m_TexEnvs_keys: mTexEnvsKeys = self.get_TexEnv_Keys(material_data_key)
+                m_TexEnv_values = self.get_value_in_json_parser(self.material_data_parser, m_TexEnvs_keys.m_TexEnvs_key)
+                if m_TexEnv_values:
+                    material_json_value = m_TexEnv_values.get(m_TexEnvs_keys.key)
+                    material_json_value = (
+                        material_json_value.get('X') or 0.0, 
+                        material_json_value.get('Y') or 0.0, 
+                        material_json_value.get('Z') or 0.0
+                    )
+            else:
+                material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
+            if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
+                try:
+                    material_json_value = self.__manipulate_material_data_to_shader_value(
+                        material_data_key, 
+                        material_json_value,
+                        node_interface_input,
+                        inputs_node
+                    )
+
+                    if material_data_key == '_MainTexAlphaUse':
+                        self.set_up_alpha_options_material_data(
+                            inputs_node.inputs, 
+                            outlines_alpha_only=is_outlines,
+                            _MainTexAlphaUse_mapping=self._MainTexAlphaUse_mapping
+                        )
+                    else:
+                        inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
+                except AttributeError as ex:
+                    print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
+                        Falling back to next MaterialDataApplier version')
+                    raise ex
+                except TypeError as ex:
+                    print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
+
+        # Transparency for Glasses
+        if is_outlines and self.outline_material.name == f'{V4_PrimoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
+            toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
+            transparency_clip_node = inputs_node.inputs.get(self.shader_node_input_names.TRANSPARENCY_CLIP_THRESHOLD)
+
+            toggle_alpha_node.default_value = True
+            transparency_clip_node.default_value = 1.0
+
+    def is_tooltip_TexEnv(self, tooltip):
+        tooltip_keys = tooltip.split(' ')
+        if len(tooltip_keys) == 1:
+            return False
+
+        m_TexEnvs_key = tooltip_keys[1]
+        if m_TexEnvs_key.startswith('(') and m_TexEnvs_key.endswith(')'):
+            return True
+        return False
+
+    def get_TexEnv_Keys(self, tooltip):
+        tooltip_keys = tooltip.split(' ')
+        if len(tooltip_keys) == 1:
+            return False
+
+        key = tooltip_keys[0]
+        m_TexEnvs_key = tooltip_keys[1].replace('(', '').replace(')', '')
+        
+        return mTexEnvsKeys(key, m_TexEnvs_key)
+
+    def __manipulate_material_data_to_shader_value(self, material_data_key, material_json_value, node_interface_input, inputs_node=None):
+        input_object = inputs_node.inputs.get(node_interface_input.name) if inputs_node else node_interface_input
+
+        if (type(input_object) is bpy.types.NodeSocketBool or type(input_object) is bpy.types.NodeTreeInterfaceSocketBool) and \
+            type(material_json_value) is float:
+            material_json_value = bool(material_json_value)
+        elif self.is_number_of_values_mismatch(input_object, material_json_value):
+            material_json_value = material_json_value[:3]
+        return material_json_value
+
+    def set_up_outline_material_data(self, body_part, file):
+        self.set_up_outline_material_data_with_tooltips(body_part, file)
+
+    def set_up_outline_material_data_with_tooltips(self, body_part, file):
+        for scene_object in bpy.context.scene.objects.values():
+            for modifier in scene_object.modifiers:
+                if f'Outlines {body_part}' in modifier.name or f'Outlines {file.name.rsplit("_", 1)[0]}' in modifier.name:
+                    print(f"INFO: Modifying '{modifier.name}' using '{file.name}'")
+                    sockets = [item for item in modifier.node_group.interface.items_tree if item.item_type == 'SOCKET']
+                    for socket in sockets:
+                        material_data_key = socket.description  # Tooltip
+
+                        if self.is_tooltip_TexEnv(material_data_key):
+                            m_TexEnvs_keys: mTexEnvsKeys = self.get_TexEnv_Keys(material_data_key)
+                            m_TexEnv_values = self.get_value_in_json_parser(self.material_data_parser, m_TexEnvs_keys.m_TexEnvs_key)
+                            if m_TexEnv_values:
+                                material_json_value = m_TexEnv_values.get(m_TexEnvs_keys.key)
+                                material_json_value = (
+                                    material_json_value.get('X') or 0.0, 
+                                    material_json_value.get('Y') or 0.0, 
+                                    material_json_value.get('Z') or 0.0
+                                )
+                        else:
+                            material_json_value = self.get_value_in_json_parser(self.material_data_parser, material_data_key)
+                        if material_json_value is not None and type(material_json_value) is not dict:  # Explicit None check in case value is falsy
+                            try:
+                                material_json_value = self.__manipulate_material_data_to_shader_value(
+                                    material_data_key, 
+                                    material_json_value,
+                                    socket
+                                )
+                                modifier[socket.identifier] = material_json_value
+                            except AttributeError as ex:
+                                print(f'Did not find {socket.name} in {self.material.name}/{self.outline_material.name} material using {self} \
+                                    Falling back to next MaterialDataApplier version')
+                                raise ex
+                            except TypeError as ex:
+                                print(f'ERROR: {ex} on {socket.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
+
+    '''
+    Specifically for handling `NS Anim` and `NS Scale`, which both have only 3 inputs, but material data has 4 (rgba)
+    This was done on the shader because NodeSocketVectors can handle negative values while colors cannot
+    '''
+    def is_number_of_values_mismatch(self, input, material_json_value):
+        return (type(input) is bpy.types.NodeSocketVector or type(input) is bpy.types.NodeTreeInterfaceSocketVector) and \
+            len(input.default_value) == 3 and \
+            len(material_json_value) == 4
 
 
 class V2_WeaponMaterialDataApplier(V2_MaterialDataApplier):

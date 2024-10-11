@@ -21,10 +21,11 @@ class GI_OT_SetUpHeadDriver(Operator, CustomOperatorProperties):
 
         armature = [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]  # expecting 1 armature
         armature_bones = armature.data.bones
-        head_bone_name = [bone_name for bone_name in armature_bones.keys() if 'Head' in bone_name][0]  # expecting 1 bone with Head in the name
-
-        self.set_contraint_target_and_bone(child_of_constraint, armature, head_bone_name)
-        self.set_inverse(head_driver_object)
+        head_bone_names = [bone_name for bone_name in armature_bones.keys() if 'Head' in bone_name]
+        if head_bone_names:
+            head_bone_name = head_bone_names[0]  # expecting 1 Head bone
+            self.set_contraint_target_and_bone(child_of_constraint, armature, head_bone_name)
+            self.set_inverse(head_driver_object)
 
         if self.next_step_idx:
             NextStepInvoker().invoke(
