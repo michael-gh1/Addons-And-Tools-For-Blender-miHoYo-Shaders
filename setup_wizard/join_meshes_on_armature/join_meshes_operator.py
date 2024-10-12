@@ -35,10 +35,13 @@ class GI_OT_JoinMeshesOnArmature(Operator, CustomOperatorProperties):
         brow_mesh = bpy.data.objects.get(MeshNames.Brow)
 
         bpy.ops.object.select_all(action='DESELECT')
-        face_mesh.select_set(True)
-        face_eye_mesh.select_set(True)
-        brow_mesh.select_set(True)
-        bpy.context.view_layer.objects.active = face_mesh
-        print(f'Joining {face_eye_mesh}, {brow_mesh} to {face_mesh}')
-        bpy.ops.object.join()
+        if face_eye_mesh:
+            face_eye_mesh.select_set(True)
+        if brow_mesh:
+            brow_mesh.select_set(True)
+        if face_mesh:
+            face_mesh.select_set(True)
+            bpy.context.view_layer.objects.active = face_mesh
+            print(f'Joining {face_eye_mesh}, {brow_mesh} to {face_mesh}')
+            bpy.ops.object.join()
 
