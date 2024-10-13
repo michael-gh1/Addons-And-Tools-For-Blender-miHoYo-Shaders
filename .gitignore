@@ -3,7 +3,7 @@
 setup_wizard/tests/**/*.blend
 setup_wizard/tests/**/*.blend1
 setup_wizard/tests/config.json
-
+/*.zip # ignore zipped setup_wizard files
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
