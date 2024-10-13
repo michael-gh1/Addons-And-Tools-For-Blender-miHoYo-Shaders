@@ -2713,7 +2713,7 @@ def rig_character(
         return str
         
     def generate_string_for_settings_slider():
-        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)'
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
         return str
     
     # because rigify makes the rig ui before i get to it, we have to change this stuff for the torso sliders below.
