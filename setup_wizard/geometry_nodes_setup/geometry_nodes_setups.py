@@ -611,8 +611,11 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         bpy.ops.object.material_slot_select()
         bpy.ops.mesh.separate(type='SELECTED')
         bpy.ops.object.mode_set(mode='OBJECT')
-        
-        new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001')
+
+        # OR-check added for Blender < 4.1 where the separated mesh name is different than the parent mesh name
+        # Body [Mesh] --(Hair Material Selected)--> Body.001 [Mesh] (Blender >= 4.1)
+        # Body [Mesh] --(Hair Material Selected)--> Hair.001 [Mesh] (Blender <  4.0)
+        new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001') or bpy.data.objects.get(f'{new_mesh_name}.001')
         new_mesh_name_mesh = bpy.data.objects.get(new_mesh_name)
 
         # Clean the separated mesh of any other materials
