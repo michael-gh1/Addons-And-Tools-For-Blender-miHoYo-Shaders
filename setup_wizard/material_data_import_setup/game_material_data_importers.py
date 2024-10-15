@@ -85,7 +85,7 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
-    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material]:
+    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
@@ -383,7 +383,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
-            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+            material, outlines_material, __ = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:

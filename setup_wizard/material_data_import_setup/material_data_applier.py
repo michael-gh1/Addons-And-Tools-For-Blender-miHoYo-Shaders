@@ -68,8 +68,8 @@ class MaterialDataApplier(ABC):
     def set_up_mesh_material_data(self):
         raise NotImplementedError()
 
-    def set_up_outline_material_data(self):
-        return
+    def set_up_outline_material_data(self, body_part, file):
+        pass
 
     def set_up_outline_colors(self):
         outlines_shader_node_inputs = self.outline_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
