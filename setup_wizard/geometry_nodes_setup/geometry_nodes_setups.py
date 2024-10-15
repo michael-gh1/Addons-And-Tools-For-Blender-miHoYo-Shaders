@@ -609,7 +609,12 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         bpy.ops.object.mode_set(mode='EDIT')
         mesh.active_material_index = mesh.material_slots.get(material_slot.material.name).slot_index
         bpy.ops.object.material_slot_select()
-        bpy.ops.mesh.separate(type='SELECTED')
+        try:
+            bpy.ops.mesh.separate(type='SELECTED')
+        except RuntimeError as error:
+            print(f'Skipping, failed to separate material for: {material_slot.material.name} from {mesh.name}')
+            print(error)
+            return
         bpy.ops.object.mode_set(mode='OBJECT')
 
         # OR-check added for Blender < 4.1 where the separated mesh name is different than the parent mesh name
