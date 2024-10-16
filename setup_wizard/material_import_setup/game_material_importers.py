@@ -125,13 +125,13 @@ class GameMaterialImporter:
         if cache_enabled and (user_selected_shader_blend_file_path or project_root_directory_file_path):
             if user_selected_shader_blend_file_path:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_file_path, user_selected_shader_blend_file_path)
+
+                outlines_in_shader_blend_file = self.__get_outlines_node_group_from_shader_blend_file(
+                    user_selected_shader_blend_file_path)
+                if outlines_in_shader_blend_file:
+                    self.__set_outlines_cache(cache_enabled, user_selected_shader_blend_file_path)
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
-
-            outlines_in_shader_blend_file = self.__get_outlines_node_group_from_shader_blend_file(
-                user_selected_shader_blend_file_path)
-            if outlines_in_shader_blend_file:
-                self.__set_outlines_cache(cache_enabled, user_selected_shader_blend_file_path)
 
 
     def import_light_vectors_geometry_node(self, node_tree_filepath, object_file_path):
