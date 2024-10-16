@@ -8,6 +8,8 @@ class TextureNodeNames:
     LIGHTMAP = ''
     SHADER_TEXTURES_NODE_GROUP = ''
     NYX_COLOR_RAMP = ''
+    NIGHT_SOUL_MASK = ''
+    FACE_NIGHT_SOUL_MASK = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
