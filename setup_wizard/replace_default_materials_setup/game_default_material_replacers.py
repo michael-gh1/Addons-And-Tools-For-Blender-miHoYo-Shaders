@@ -151,7 +151,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             glass_material.shadow_method = 'NONE'
             glass_material.show_transparent_back = False
             material_name = glass_material.name
-        elif mesh_body_part_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+        elif mesh_body_part_name and mesh_body_part_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
             skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
             skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
             material_name = skillobj_material.name
