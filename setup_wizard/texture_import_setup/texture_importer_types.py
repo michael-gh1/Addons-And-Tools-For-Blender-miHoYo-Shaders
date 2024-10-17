@@ -281,6 +281,8 @@ class GenshinTextureImporter:
 
     def set_up_night_soul_outlines_material(self):
         night_soul_outline_material = self.create_night_soul_outlines()
+        if not night_soul_outline_material:
+            return None
         shader_node_names: ShaderNodeNames = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
 
         body_shader = night_soul_outline_material.node_tree.nodes[shader_node_names.BODY_SHADER]
@@ -292,6 +294,8 @@ class GenshinTextureImporter:
     def create_night_soul_outlines(self):
         shader_material_names: ShaderMaterialNames = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
         outline_material = bpy.data.materials.get(shader_material_names.OUTLINES)
+        if not shader_material_names.NIGHT_SOUL_OUTLINES:
+            return None
         night_soul_outlines_material = bpy.data.materials.get(shader_material_names.NIGHT_SOUL_OUTLINES)
         if not night_soul_outlines_material:
             night_soul_outlines_material = outline_material.copy()
@@ -517,7 +521,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.SKILLOBJ, 'Lightmap'], file):
                     expected_skillobj_identifier = file.split('_')[2]
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
-                    self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
+                    if skillobj_material:
+                        self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
                     self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)

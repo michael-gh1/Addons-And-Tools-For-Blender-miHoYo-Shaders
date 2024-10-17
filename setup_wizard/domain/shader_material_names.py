@@ -26,7 +26,7 @@ class ShaderMaterialNames:
     OUTLINES = ''
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = ''
-    SKILLOBJ = ''
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
     VFX = ''
     # HSR
     WEAPON = ''
@@ -66,6 +66,7 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
 
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
@@ -81,6 +82,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
 
 
 class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
