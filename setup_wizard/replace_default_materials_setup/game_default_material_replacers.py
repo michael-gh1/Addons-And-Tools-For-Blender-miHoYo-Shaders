@@ -147,10 +147,11 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             material_name = glass_material.name
         elif mesh_body_part_name == 'Glass_Eff':
             glass_material = self.create_glass_material(self.material_names, self.material_names.GLASS_EFF)
-            glass_material.blend_method = 'BLEND'
-            glass_material.shadow_method = 'NONE'
-            glass_material.show_transparent_back = False
-            material_name = glass_material.name
+            if glass_material:
+                glass_material.blend_method = 'BLEND'
+                glass_material.shadow_method = 'NONE'
+                glass_material.show_transparent_back = False
+                material_name = glass_material.name
         elif mesh_body_part_name and mesh_body_part_name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
             skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
             skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
@@ -218,8 +219,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
     def create_glass_material(self, shader_material_names: ShaderMaterialNames, material_name):
         glass_material = bpy.data.materials.get(material_name)
-        if not glass_material:
-            glass_material = bpy.data.materials.get(shader_material_names.VFX).copy()
+        vfx_template_material = bpy.data.materials.get(shader_material_names.VFX)
+        if vfx_template_material and not glass_material:
+            glass_material = vfx_template_material.copy()
             glass_material.name = material_name
             glass_material.use_fake_user = True
         return glass_material

@@ -502,11 +502,15 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "MetalMap" in file:
                     self.set_metalmap_texture(img)
                 elif self.is_texture_identifiers_in_texture_name(['Glass', 'Diffuse'], file):
-                    self.set_glass_diffuse_texture(glass_material, img)
-                    self.set_glass_diffuse_texture(glass_eff_material, img)
+                    if glass_material:
+                        self.set_glass_diffuse_texture(glass_material, img)
+                    if glass_eff_material:
+                        self.set_glass_diffuse_texture(glass_eff_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Glass', 'Lightmap'], file):
-                    self.set_lightmap_texture(TextureType.BODY, glass_material, img)
-                    self.set_lightmap_texture(TextureType.BODY, glass_eff_material, img)
+                    if glass_material:
+                        self.set_lightmap_texture(TextureType.BODY, glass_material, img)
+                    if glass_eff_material:
+                        self.set_lightmap_texture(TextureType.BODY, glass_eff_material, img)
                 elif "Gauntlet_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Ligntmap" in file:
