@@ -457,7 +457,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
-                starcloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
+                star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -486,7 +486,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
-                    self.set_diffuse_texture(TextureType.BODY, starcloak_material, img, override=False) if starcloak_material else None
+                    self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img, override=False) if star_cloak_material else None
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
@@ -532,13 +532,13 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     if skillobj_material:
                         self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
-                    if starcloak_material:
-                        self.set_diffuse_texture(TextureType.HAIR, starcloak_material, img)
+                    if star_cloak_material:
+                        self.set_diffuse_texture(TextureType.HAIR, star_cloak_material, img)
                     else:  # backwards compatible before VFX shader existed, pre-v4.0
                         self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
-                    if starcloak_material:  # No lightmap texture node as of this commit
-                        self.set_lightmap_texture(TextureType.HAIR, starcloak_material, img)
+                    if star_cloak_material:  # No lightmap texture node as of this commit
+                        self.set_lightmap_texture(TextureType.HAIR, star_cloak_material, img)
                     else:  # backwards compatible before VFX shader existed, pre-v4.0
                         self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
                 elif self.is_one_texture_identifier_in_texture_name([  # Nyx Color Ramp
