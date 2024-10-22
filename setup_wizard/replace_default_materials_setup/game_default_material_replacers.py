@@ -101,9 +101,15 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     self.blender_operator.report({'INFO'}, 'Dress detected on character model!')
 
                     actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type.name)
-                    if actual_material_for_dress == 'Cloak':
-                        # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
-                        continue
+                    if actual_material_for_dress == 'Cloak' or mesh_body_part_name == 'Cloak':
+                        if bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}VFX'):
+                            actual_material_for_dress = 'VFX'
+                            mesh_body_part_name = 'StarCloak'
+                        elif mesh_body_part_name == 'Cloak':
+                            pass  # Give Dainslief basic body shader (backwards compatibility)
+                        else:
+                            # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
+                            continue
                     elif actual_material_for_dress == 'Effect':  # Dress2 material w/ Effect texture filename (Skirk support)
                         # (dangerous) assumption that all Dress w/ Effect texture filename are Hair-type
                         actual_material_for_dress = 'Hair'  # backwards compatible before VFX shader existed, pre-v4.0
@@ -191,6 +197,8 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             return 'Dress'
         elif 'Item' in material_name or 'Screw' in material_name or 'Hat' in material_name or 'Others' in material_name:
             return material_name
+        elif 'Cloak' in material_name:
+            return 'Cloak'
         else:
             return None
 
@@ -219,9 +227,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         vfx_shader_node.inputs.get(self.shader_node_names.TOGGLE_GLASS_STAR_CLOAK).default_value = True
 
     def __set_star_cloak_type(self, material, original_material_name):
-        if StarCloakTypes.SKIRK.name.lower() in original_material_name.lower():
-            vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
-            vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value = StarCloakTypes.SKIRK.value
+        for star_cloak_type in StarCloakTypes._member_names_:
+            if star_cloak_type.lower() in original_material_name.lower():
+                vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
+                vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value = getattr(StarCloakTypes, star_cloak_type).value
 
     def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
