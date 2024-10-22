@@ -141,6 +141,7 @@ class GenshinTextureImporter:
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
             V4_GenshinImpactTextureNodeNames.DIFFUSE,
+            V4_GenshinImpactTextureNodeNames.VFX_DIFFUSE,
         ]
         
         for texture_node_name in possible_texture_node_names:
@@ -455,6 +456,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
+                starcloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -528,9 +530,15 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     if skillobj_material:
                         self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
-                    self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
+                    if starcloak_material:
+                        self.set_diffuse_texture(TextureType.HAIR, starcloak_material, img)
+                    else:  # backwards compatible before VFX shader existed, pre-v4.0
+                        self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
-                    self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
+                    if starcloak_material:  # No lightmap texture node as of this commit
+                        self.set_lightmap_texture(TextureType.HAIR, starcloak_material, img)
+                    else:  # backwards compatible before VFX shader existed, pre-v4.0
+                        self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
                 elif self.is_one_texture_identifier_in_texture_name([  # Nyx Color Ramp
                     "NyxState_Ramp",
                     "Nyx_Ramp",
