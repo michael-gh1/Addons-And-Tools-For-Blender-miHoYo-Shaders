@@ -101,7 +101,11 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         continue
                     elif actual_material_for_dress == 'Effect':  # Dress2 material w/ Effect texture filename (Skirk support)
                         # (dangerous) assumption that all Dress w/ Effect texture filename are Hair-type
-                        actual_material_for_dress = 'Hair'
+                        actual_material_for_dress = 'Hair'  # backwards compatible before VFX shader existed, pre-v4.0
+
+                        if bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}VFX'):
+                            actual_material_for_dress = 'VFX'
+                            mesh_body_part_name = 'StarCloak'
 
                     genshin_material = self.__clone_material_and_rename(
                         material_slot, 
