@@ -7,6 +7,6 @@ class StarCloakTypes(Enum):
     The value set here is used to set the value in the VFX shader node input.
     '''
     PAIMON = 1
-    DAINSLIEF = 2
+    DAINSLAIF = 2  # intentional "typo" based on armature name
     SKIRK = 3
     ASMODAY = 4
