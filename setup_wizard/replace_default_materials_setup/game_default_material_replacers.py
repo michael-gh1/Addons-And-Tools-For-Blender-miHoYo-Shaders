@@ -4,7 +4,8 @@ import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
-from setup_wizard.domain.shader_node_names import StellarToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
@@ -32,11 +33,14 @@ class GameDefaultMaterialReplacerFactory:
         if game_type == GameType.GENSHIN_IMPACT.name:
             if shader is GenshinImpactShaders.V1_GENSHIN_IMPACT_SHADER or shader is GenshinImpactShaders.V2_GENSHIN_IMPACT_SHADER:
                 material_names = V2_FestivityGenshinImpactMaterialNames
+                shader_node_names = V2_GenshinShaderNodeNames
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
+                shader_node_names = V3_GenshinShaderNodeNames
             else:
                 material_names = V4_PrimoToonGenshinImpactMaterialNames 
-            return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names)
+                shader_node_names = V4_PrimoToonShaderNodeNames
+            return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 return HonkaiStarRailDefaultMaterialReplacer(blender_operator, context, Nya222HonkaiStarRailShaderMaterialNames)
@@ -49,10 +53,11 @@ class GameDefaultMaterialReplacerFactory:
 
 
 class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
-    def __init__(self, blender_operator, context, material_names: ShaderMaterialNames):
+    def __init__(self, blender_operator, context, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     def replace_default_materials(self):
         mesh_ignore_list = [
@@ -112,6 +117,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         f'{self.material_names.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
+                    if genshin_material.name == f'{self.material_names.STAR_CLOAK}':
+                        self.__enable_glass_star_cloak_toggle(genshin_material)
+                        self.__set_star_cloak_type(genshin_material, material_name)  # original material name, which contains character name
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
                     material_slot.material = bpy.data.materials.get(self.material_names.BODY)
@@ -152,6 +160,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Glass_Eff':
             glass_material = self.create_glass_material(self.material_names, self.material_names.GLASS_EFF)
             if glass_material:
+                self.__enable_glass_star_cloak_toggle(glass_material)
                 glass_material.blend_method = 'BLEND'
                 glass_material.shadow_method = 'NONE'
                 glass_material.show_transparent_back = False
@@ -204,6 +213,15 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
 
         material_slot.material = new_material
         return new_material
+
+    def __enable_glass_star_cloak_toggle(self, material):
+        vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
+        vfx_shader_node.inputs.get(self.shader_node_names.TOGGLE_GLASS_STAR_CLOAK).default_value = True
+
+    def __set_star_cloak_type(self, material, original_material_name):
+        if StarCloakTypes.SKIRK.name.lower() in original_material_name.lower():
+            vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
+            vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value = StarCloakTypes.SKIRK.value
 
     def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
