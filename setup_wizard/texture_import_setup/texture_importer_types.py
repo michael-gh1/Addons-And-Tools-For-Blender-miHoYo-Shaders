@@ -319,7 +319,7 @@ class GenshinTextureImporter:
                 shader_cloak_materials[0].name.split(' ')[-1]
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
             actual_cloak_material = get_actual_material_name_for_dress(original_cloak_material.name, character_type.name)
-            if actual_cloak_material in texture_img:
+            if actual_cloak_material in texture_img.name:
                 material_shader_nodes = bpy.data.materials.get(shader_cloak_materials[0].name).node_tree.nodes
                 if material_shader_nodes.get(texture_name):
                     material_shader_nodes.get(texture_name).image = texture_img
