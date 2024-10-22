@@ -136,7 +136,7 @@ class GenshinTextureImporter:
                     return False
         return True
 
-    def set_diffuse_texture(self, texture_type: TextureType, material, img):
+    def set_diffuse_texture(self, texture_type: TextureType, material, img, override=True):
         possible_texture_node_names = [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
@@ -146,7 +146,8 @@ class GenshinTextureImporter:
         
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
-                material.node_tree.nodes[texture_node_name].image = img
+                if override or not material.node_tree.nodes[texture_node_name].image:
+                    material.node_tree.nodes[texture_node_name].image = img
 
                 if self.game_type == GameType.GENSHIN_IMPACT:
                     if not self.does_dress_texture_exist_in_directory_files() or \
@@ -485,6 +486,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
+                    self.set_diffuse_texture(TextureType.BODY, starcloak_material, img, override=False) if starcloak_material else None
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
