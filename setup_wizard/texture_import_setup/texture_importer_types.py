@@ -405,6 +405,14 @@ class GenshinTextureImporter:
                             material_output_node_surface_input
                         )
 
+    def star_cloak_uses_body_texture(self, file):
+        texture_name_identifiers = [
+            'Dainslaif',
+        ]
+        for identifier in texture_name_identifiers:
+            if identifier in file:
+                return True
+        return False
 
     '''
     Deprecated: No longer needed after shader rewrite because normal map is plugged by default
@@ -486,7 +494,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
-                    self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img, override=False) if star_cloak_material else None
+                    if star_cloak_material and self.star_cloak_uses_body_texture(file):
+                        self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
