@@ -88,6 +88,7 @@ gi_meshes_to_create_outlines_on = [
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
+    'StarCloak',
 ]
 
 hsr_meshes_to_create_outlines_on = [
@@ -485,6 +486,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass_Eff': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
+        'StarCloak': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
     }
 
     def __init__(self, blender_operator, context):
