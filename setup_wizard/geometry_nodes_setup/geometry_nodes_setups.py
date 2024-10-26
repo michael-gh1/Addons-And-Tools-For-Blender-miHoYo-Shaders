@@ -551,7 +551,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         print(f'Geometry Node Default Values Set for {modifier.name}: {mesh.name}')
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
-        for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
+        for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on + meshes_to_create_outlines_on:
             if mesh_keyword in mesh.name:
                 for material_slot in mesh.material_slots:
                     material = material_slot.material
