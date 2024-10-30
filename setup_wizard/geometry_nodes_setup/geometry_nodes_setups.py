@@ -469,6 +469,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     OUTLINE_THICKNESS_INPUT = 'Input_7'
     NIGHT_SOUL_OUTLINE_SOCKET = 'Socket_10'
     FACE_LIGHTMAP_SOCKET = 'Socket_31'
+    TOGGLE_OUTLINES_SOCKET = 'Socket_24'
 
     outline_to_material_mapping = {
         'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
@@ -547,6 +548,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
         self.assign_night_soul_outlines_material(mesh, modifier)
         self.assign_face_lightmap_texture(modifier)
+        self.__disable_outlines(mesh, modifier, ['Paimon'])
         modifier.show_viewport = bpy.context.window_manager.enable_viewport_outlines
         print(f'Geometry Node Default Values Set for {modifier.name}: {mesh.name}')
 
@@ -655,6 +657,17 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 bpy.context.view_layer.objects.active = mesh
                 bpy.ops.object.material_slot_remove()
 
+    '''
+    Very targeted method for disabling outlines on Paimon's cloak
+    May require refactoring if used for other purposes.
+    '''
+    def __disable_outlines(self, mesh, modifier, character_names):
+        for material_slot in mesh.material_slots:
+            material = material_slot.material
+
+            for character_name in character_names:
+                if material.name == self.material_names.STAR_CLOAK and character_name in material.node_tree.nodes.get(self.texture_node_names.VFX_DIFFUSE).image.name:
+                    modifier[self.TOGGLE_OUTLINES_SOCKET] = False
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
