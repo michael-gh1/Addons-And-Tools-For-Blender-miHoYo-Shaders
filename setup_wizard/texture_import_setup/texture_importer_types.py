@@ -14,6 +14,7 @@ from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialName
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames, V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.original_texture_locator_utils import OriginalTextureLocatorUtils
 
 
 class TextureImporterType(Enum):
@@ -326,17 +327,34 @@ class GenshinTextureImporter:
                     material_shader_nodes.get(texture_name).image = texture_img
 
         for shader_dress_material in shader_dress_materials:
-            original_dress_material = [material for material in bpy.data.materials if material.name.endswith(
-                shader_dress_material.name.split(' ')[-1]
-            )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
+            original_dress_material = self.get_original_dress_material(shader_dress_material)
+            if not original_dress_material:
+                print(f'ERROR: Could not find original dress material for "{shader_dress_material.name}", skipping texture import')
+                return
 
-            actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
+            if character_type == TextureImporterType.MONSTER:
+                actual_material = OriginalTextureLocatorUtils.get_monster_original_texture_part(original_dress_material)
+            else:
+                actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
             if actual_material in texture_img.name:
                 print(f'Importing texture "{texture_name}" onto material "{shader_dress_material.name}"')
                 material_shader_nodes = bpy.data.materials.get(shader_dress_material.name).node_tree.nodes
                 if material_shader_nodes.get(texture_name):
                     material_shader_nodes.get(texture_name).image = texture_img
                 return
+
+    def get_original_dress_material(self, shader_dress_material):
+        for material in bpy.data.materials:
+            is_not_original_material = material.name.startswith(self.material_names.MATERIAL_PREFIX)
+            if is_not_original_material:
+                continue
+
+            is_playable_character_original_material = material.name.endswith(shader_dress_material.name.split(' ')[-1])
+            # ex. 'Monster_Fatuus_Agent_01_Fire_Dress_Mat' and 'HoYoverse - Genshin Dress'
+            is_npc_original_material = len(material.name.split('_')) > 2 and material.name.split('_')[-2].endswith(shader_dress_material.name.split(' ')[-1])
+
+            if is_playable_character_original_material or is_npc_original_material:
+                return material  # material that ends with 'Dress', 'Dress1', 'Dress2'
 
     def does_dress_texture_exist_in_directory_files(self):
         dress_texture_detected = False
