@@ -351,6 +351,7 @@ class GenshinTextureImporter:
 
             is_playable_character_original_material = material.name.endswith(shader_dress_material.name.split(' ')[-1])
             # ex. 'Monster_Fatuus_Agent_01_Fire_Dress_Mat' and 'HoYoverse - Genshin Dress'
+            # ex. 'Monster_Eremite_Male_Strong_Katar_01_Rock_Dress_Mat' and 'HoYoverse - Genshin Dress'
             is_npc_original_material = len(material.name.split('_')) > 2 and material.name.split('_')[-2].endswith(shader_dress_material.name.split(' ')[-1])
 
             if is_playable_character_original_material or is_npc_original_material:

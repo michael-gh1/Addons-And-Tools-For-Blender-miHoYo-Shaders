@@ -6,6 +6,7 @@ class OriginalTextureLocatorUtils:
         if original_texture_name:  # Some materials don't have a texture hooked up
             original_texture_name_split = original_texture_name.split('_')
             # ex. 'Fire' in 'Monster_Fatuus_Agent_01_Fire_Tex_Diffuse.png'
+            # ex. 'Rock' in 'Monster_Eremite_Male_Strong_Katar_01_Rock_Tex_Diffuse.png'
             if len(original_texture_name_split) > 2:  # Safety check, ensure we have at least 3 parts
                 return original_texture_name_split[-3]
         return ''
