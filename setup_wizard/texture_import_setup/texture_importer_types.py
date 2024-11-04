@@ -739,6 +739,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
                 face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
                 body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
+                star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -785,6 +786,9 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
                     self.set_metalmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hand', 'Tex', 'Eff'], file):  # Asmoday - VFX Support
+                    self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')

@@ -9,4 +9,4 @@ class StarCloakTypes(Enum):
     PAIMON = 1
     DAINSLAIF = 2  # intentional "typo" based on armature name
     SKIRK = 3
-    ASMODAY = 4
+    ASMODA = 4  # inetntional "typo" based on the character/armature/material name
