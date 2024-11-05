@@ -83,7 +83,8 @@ meshes_to_create_outlines_on = \
     pgr_meshes_to_create_outlines_on
 
 meshes_to_create_light_vectors_on = meshes_to_create_outlines_on + [
-    'Brow'
+    'Brow',
+    'EyeStar',
 ]
 
 class GameGeometryNodesSetupFactory:
