@@ -1,10 +1,13 @@
 # Author: michael-gh1
 
+from typing import List
 import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.node_group_names import ShaderNodeGroupNames
+from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
@@ -526,6 +529,10 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 outline_shader_node = material.node_tree.nodes.get(self.outlines_shader_node_name)
                 outline_shader_node.inputs.get(self.shader_node_names.TOGGLE_FACE_OUTLINES).default_value = True
 
+        starcloak_material = bpy.data.materials.get(self.material_names.STAR_CLOAK)
+        if starcloak_material:
+            self.__connect_shader_node_to_vfx_node(starcloak_material, [StarCloakTypes.ASMODA])
+
     def clone_night_soul_outlines(self):
         materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
         outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
@@ -668,6 +675,39 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             for character_name in character_names:
                 if material.name == self.material_names.STAR_CLOAK and character_name in material.node_tree.nodes.get(self.texture_node_names.VFX_DIFFUSE).image.name:
                     modifier[self.TOGGLE_OUTLINES_SOCKET] = False
+
+    def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
+        MAIN_SHADER_NODE_NAME = 'PrimoToon - Main Shader'
+        MAIN_SHADER_OUTPUT_NAME = 'PrimoToon'
+        VFX_SHADER_NODE_NAME = 'PrimoToon'
+        VFX_SHADER_INPUT_NAME = 'PrimoToon'
+
+        vfx_shader_node = material.node_tree.nodes.get('PrimoToon')
+        for starcloak_type in starcloak_types:
+            if vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value == starcloak_type.value:
+                node_tree = material.node_tree
+                node_type = 'ShaderNodeGroup'
+                node = node_tree.nodes.new(
+                    type=node_type
+                )
+                node.node_tree = bpy.data.node_groups.get(ShaderNodeGroupNames.MAIN_SHADER)
+                node.name = MAIN_SHADER_NODE_NAME
+
+                self.__connect_main_shader_to_vfx_shader(material, MAIN_SHADER_NODE_NAME, MAIN_SHADER_OUTPUT_NAME, VFX_SHADER_NODE_NAME, VFX_SHADER_INPUT_NAME)
+
+    def __connect_main_shader_to_vfx_shader(self, 
+                                            material, 
+                                            main_shader_node_name, 
+                                            main_shader_output_name, 
+                                            vfx_shader_node_name, 
+                                            vfx_shader_input_name
+                                            ):
+        main_shader_node = material.node_tree.nodes.get(main_shader_node_name)
+        vfx_shader_node = material.node_tree.nodes.get(vfx_shader_node_name)
+
+        output = main_shader_node.outputs.get(main_shader_output_name)
+        input = vfx_shader_node.inputs.get(vfx_shader_input_name)
+        material.node_tree.links.new(output, input)
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
