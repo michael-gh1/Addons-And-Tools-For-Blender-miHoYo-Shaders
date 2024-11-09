@@ -677,12 +677,12 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                     modifier[self.TOGGLE_OUTLINES_SOCKET] = False
 
     def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
-        MAIN_SHADER_NODE_NAME = 'PrimoToon - Main Shader'
-        MAIN_SHADER_OUTPUT_NAME = 'PrimoToon'
-        VFX_SHADER_NODE_NAME = 'PrimoToon'
-        VFX_SHADER_INPUT_NAME = 'PrimoToon'
+        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER} - Main Shader'
+        MAIN_SHADER_OUTPUT_NAME = self.shader_node_names.BODY_SHADER_OUTPUT
+        VFX_SHADER_NODE_NAME = self.shader_node_names.VFX_SHADER
+        VFX_SHADER_INPUT_NAME = self.shader_node_names.VFX_SHADER_INPUT
 
-        vfx_shader_node = material.node_tree.nodes.get('PrimoToon')
+        vfx_shader_node = material.node_tree.nodes.get(VFX_SHADER_NODE_NAME)
         for starcloak_type in starcloak_types:
             if vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value == starcloak_type.value:
                 node_tree = material.node_tree
