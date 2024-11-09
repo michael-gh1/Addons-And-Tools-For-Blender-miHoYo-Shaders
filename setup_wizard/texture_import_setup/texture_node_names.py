@@ -8,6 +8,9 @@ class TextureNodeNames:
     LIGHTMAP = ''
     SHADER_TEXTURES_NODE_GROUP = ''
     NYX_COLOR_RAMP = ''
+    NIGHT_SOUL_MASK = ''
+    FACE_NIGHT_SOUL_MASK = ''
+    VFX_DIFFUSE = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
@@ -73,6 +76,7 @@ class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     NYX_COLOR_RAMP = 'NYX_Color_Ramp'
     NIGHT_SOUL_MASK = 'Main_NYXmask'
     FACE_NIGHT_SOUL_MASK = 'Face_NYXmask'
+    VFX_DIFFUSE = 'Glass_Diffuse'
 
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):

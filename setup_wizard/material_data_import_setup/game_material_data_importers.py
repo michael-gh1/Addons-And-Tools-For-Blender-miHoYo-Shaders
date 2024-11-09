@@ -85,7 +85,7 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
-    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material]:
+    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
@@ -267,9 +267,14 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
+            material_data_parser = self.get_material_data_json_parser(json_material_data)
 
             material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
+
+            # Skirk's Dress2 material data JSON is for her StarCloak
+            if body_part == 'Dress2' and 'Skirk' in file.name:
+                self.__customized_skirk_starcloak_material_data_setup(material_data_parser, character_type, file)
 
             if not material or not outlines_material:
                 self.blender_operator.report({'WARNING'}, \
@@ -282,7 +287,6 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             shadow_ramp_type_setter = ShadowRampTypeSetter(file, material_data_directory, self.shader_node_names)
             shadow_ramp_type_setter.set_shadow_ramp_type(material)
 
-            material_data_parser = self.get_material_data_json_parser(json_material_data)
             material_data_appliers = MaterialDataAppliersFactory.create(
                 self.blender_operator.game_type,
                 material_data_parser,
@@ -291,6 +295,19 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             )
             self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
+
+    def __customized_skirk_starcloak_material_data_setup(self, material_data_parser, character_type, file):
+        body_part = 'StarCloak'
+        material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+        outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
+
+        material_data_appliers = MaterialDataAppliersFactory.create(
+            self.blender_operator.game_type,
+            material_data_parser,
+            outline_material_group,
+            character_type
+        )
+        self.apply_material_data(body_part, material_data_appliers, file)
 
 class ShadowRampTypeSetter:
     def __init__(self, target_file, material_data_directory: MaterialDataDirectory, shader_node_names: ShaderNodeNames):
@@ -383,7 +400,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
-            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+            material, outlines_material, __ = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:

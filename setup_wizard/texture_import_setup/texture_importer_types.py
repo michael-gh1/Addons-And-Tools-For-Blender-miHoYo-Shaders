@@ -14,6 +14,7 @@ from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialName
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
 from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames, V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.original_texture_locator_utils import OriginalTextureLocatorUtils
 
 
 class TextureImporterType(Enum):
@@ -136,16 +137,18 @@ class GenshinTextureImporter:
                     return False
         return True
 
-    def set_diffuse_texture(self, texture_type: TextureType, material, img):
+    def set_diffuse_texture(self, texture_type: TextureType, material, img, override=True):
         possible_texture_node_names = [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
             V4_GenshinImpactTextureNodeNames.DIFFUSE,
+            V4_GenshinImpactTextureNodeNames.VFX_DIFFUSE,
         ]
         
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
-                material.node_tree.nodes[texture_node_name].image = img
+                if override or not material.node_tree.nodes[texture_node_name].image:
+                    material.node_tree.nodes[texture_node_name].image = img
 
                 if self.game_type == GameType.GENSHIN_IMPACT:
                     if not self.does_dress_texture_exist_in_directory_files() or \
@@ -281,6 +284,8 @@ class GenshinTextureImporter:
 
     def set_up_night_soul_outlines_material(self):
         night_soul_outline_material = self.create_night_soul_outlines()
+        if not night_soul_outline_material:
+            return None
         shader_node_names: ShaderNodeNames = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
 
         body_shader = night_soul_outline_material.node_tree.nodes[shader_node_names.BODY_SHADER]
@@ -292,6 +297,8 @@ class GenshinTextureImporter:
     def create_night_soul_outlines(self):
         shader_material_names: ShaderMaterialNames = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
         outline_material = bpy.data.materials.get(shader_material_names.OUTLINES)
+        if not shader_material_names.NIGHT_SOUL_OUTLINES:
+            return None
         night_soul_outlines_material = bpy.data.materials.get(shader_material_names.NIGHT_SOUL_OUTLINES)
         if not night_soul_outlines_material:
             night_soul_outlines_material = outline_material.copy()
@@ -314,23 +321,41 @@ class GenshinTextureImporter:
                 shader_cloak_materials[0].name.split(' ')[-1]
             )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
             actual_cloak_material = get_actual_material_name_for_dress(original_cloak_material.name, character_type.name)
-            if actual_cloak_material in texture_img:
+            if actual_cloak_material in texture_img.name:
                 material_shader_nodes = bpy.data.materials.get(shader_cloak_materials[0].name).node_tree.nodes
                 if material_shader_nodes.get(texture_name):
                     material_shader_nodes.get(texture_name).image = texture_img
 
         for shader_dress_material in shader_dress_materials:
-            original_dress_material = [material for material in bpy.data.materials if material.name.endswith(
-                shader_dress_material.name.split(' ')[-1]
-            )][0]  # the material that ends with 'Dress', 'Dress1', 'Dress2'
+            original_dress_material = self.get_original_dress_material(shader_dress_material)
+            if not original_dress_material:
+                print(f'ERROR: Could not find original dress material for "{shader_dress_material.name}", skipping texture import')
+                return
 
-            actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
+            if character_type == TextureImporterType.MONSTER:
+                actual_material = OriginalTextureLocatorUtils.get_monster_original_texture_part(original_dress_material)
+            else:
+                actual_material = get_actual_material_name_for_dress(original_dress_material.name, character_type.name)
             if actual_material in texture_img.name:
                 print(f'Importing texture "{texture_name}" onto material "{shader_dress_material.name}"')
                 material_shader_nodes = bpy.data.materials.get(shader_dress_material.name).node_tree.nodes
                 if material_shader_nodes.get(texture_name):
                     material_shader_nodes.get(texture_name).image = texture_img
                 return
+
+    def get_original_dress_material(self, shader_dress_material):
+        for material in bpy.data.materials:
+            is_not_original_material = material.name.startswith(self.material_names.MATERIAL_PREFIX)
+            if is_not_original_material:
+                continue
+
+            is_playable_character_original_material = material.name.endswith(shader_dress_material.name.split(' ')[-1])
+            # ex. 'Monster_Fatuus_Agent_01_Fire_Dress_Mat' and 'HoYoverse - Genshin Dress'
+            # ex. 'Monster_Eremite_Male_Strong_Katar_01_Rock_Dress_Mat' and 'HoYoverse - Genshin Dress'
+            is_npc_original_material = len(material.name.split('_')) > 2 and material.name.split('_')[-2].endswith(shader_dress_material.name.split(' ')[-1])
+
+            if is_playable_character_original_material or is_npc_original_material:
+                return material  # material that ends with 'Dress', 'Dress1', 'Dress2'
 
     def does_dress_texture_exist_in_directory_files(self):
         dress_texture_detected = False
@@ -399,6 +424,14 @@ class GenshinTextureImporter:
                             material_output_node_surface_input
                         )
 
+    def star_cloak_uses_body_texture(self, file):
+        texture_name_identifiers = [
+            'Dainslaif',
+        ]
+        for identifier in texture_name_identifiers:
+            if identifier in file:
+                return True
+        return False
 
     '''
     Deprecated: No longer needed after shader rewrite because normal map is plugged by default
@@ -451,6 +484,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
+                star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -479,6 +513,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
+                    if star_cloak_material and self.star_cloak_uses_body_texture(file):
+                        self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
                 elif "Body_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.BODY, body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
@@ -498,11 +534,15 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "MetalMap" in file:
                     self.set_metalmap_texture(img)
                 elif self.is_texture_identifiers_in_texture_name(['Glass', 'Diffuse'], file):
-                    self.set_glass_diffuse_texture(glass_material, img)
-                    self.set_glass_diffuse_texture(glass_eff_material, img)
+                    if glass_material:
+                        self.set_glass_diffuse_texture(glass_material, img)
+                    if glass_eff_material:
+                        self.set_glass_diffuse_texture(glass_eff_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Glass', 'Lightmap'], file):
-                    self.set_lightmap_texture(TextureType.BODY, glass_material, img)
-                    self.set_lightmap_texture(TextureType.BODY, glass_eff_material, img)
+                    if glass_material:
+                        self.set_lightmap_texture(TextureType.BODY, glass_material, img)
+                    if glass_eff_material:
+                        self.set_lightmap_texture(TextureType.BODY, glass_eff_material, img)
                 elif "Gauntlet_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Ligntmap" in file:
@@ -517,11 +557,18 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.SKILLOBJ, 'Lightmap'], file):
                     expected_skillobj_identifier = file.split('_')[2]
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
-                    self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
+                    if skillobj_material:
+                        self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
-                    self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
+                    if star_cloak_material:
+                        self.set_diffuse_texture(TextureType.HAIR, star_cloak_material, img)
+                    else:  # backwards compatible before VFX shader existed, pre-v4.0
+                        self.set_diffuse_texture(TextureType.HAIR, dress2_material, img)
                 elif "Effect_Lightmap" in file:  # keep at bottom as a last resort check (Skirk support)
-                    self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
+                    if star_cloak_material:  # No lightmap texture node as of this commit
+                        self.set_lightmap_texture(TextureType.HAIR, star_cloak_material, img)
+                    else:  # backwards compatible before VFX shader existed, pre-v4.0
+                        self.set_lightmap_texture(TextureType.HAIR, dress2_material, img)
                 elif self.is_one_texture_identifier_in_texture_name([  # Nyx Color Ramp
                     "NyxState_Ramp",
                     "Nyx_Ramp",
@@ -558,6 +605,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
                 face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
                 body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
+                star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -605,6 +653,10 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
                     self.set_metalmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Cloak', 'Diffuse'], file):  # Paimon - VFX support
+                    if star_cloak_material:
+                        self.set_diffuse_texture(TextureType.HAIR, star_cloak_material, img)
 
                 elif self.is_texture_identifiers_in_texture_name(['Item', 'Diffuse'], file):
                     # Remove the '_Mat' suffix on materials and the MATERIAL_PREFIX, then search if it matches the texture filename
@@ -687,6 +739,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Hair')
                 face_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Face')
                 body_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Body')
+                star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -733,6 +786,9 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
                 elif self.is_texture_identifiers_in_texture_name(['MetalMap'], file):
                     self.set_metalmap_texture(img)
+
+                elif self.is_texture_identifiers_in_texture_name(['Hand', 'Tex', 'Eff'], file):  # Asmoday - VFX Support
+                    self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
 
                 else:
                     print(f'WARN: Ignoring texture {file}')

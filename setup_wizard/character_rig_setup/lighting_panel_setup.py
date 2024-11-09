@@ -41,7 +41,8 @@ class LightingPanel:
             global_properties_internal_nodes = global_properties_external_node.node_tree.nodes
 
             for node_name, input_output_names in GlobalPropertiesNames.NODES_TO_GLOBAL_PROPERTIES.items():
-                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output'])
+                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output']) or \
+                    global_properties_internal_nodes[node_name].outputs.get(input_output_names['old_output_name'])
                 input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
                 global_properties_external_node.node_tree.links.new(output, input)
 
@@ -83,22 +84,27 @@ class GlobalPropertiesNames:
         LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
             'input': Inputs.AMBIENT_COLOUR,
             'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
             'input': Inputs.SHARP_LIT_COLOUR,
             'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
             'input': Inputs.SOFT_LIT_COLOUR,
             'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
             'input': Inputs.SHARP_SHADOW_COLOUR,
             'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
             'input': Inputs.SOFT_SHADOW_COLOUR,
             'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.RIM_LIT_NODE: {
             'input': Inputs.RIM_LIT,

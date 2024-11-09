@@ -4,10 +4,13 @@
 class ShaderNodeNames:
     BODY_SHADER = ''
     BODY_SHADER_LABEL = ''
+    BODY_SHADER_OUTPUT = ''
     HAIR_SHADER = ''
     FACE_SHADER = ''
     FACE_MATERIAL_ID = ''
     OUTLINES_SHADER = ''
+    VFX_SHADER = ''
+    VFX_SHADER_INPUT = ''
     USE_SHADOW_RAMP = ''
     USE_LIGHTMAP_AO = ''
     DEPTH_BASED_RIM = ''
@@ -19,6 +22,9 @@ class ShaderNodeNames:
     NIGHT_SOUL_OUTPUT = ''
     MATERIAL_OUTPUT_NODE = ''
     MATERIAL_OUTPUT_SHADER_INPUT = ''
+    STAR_CLOAK_TYPE = ''
+    TOGGLE_FACE_OUTLINES = ''
+    TOGGLE_GLASS_STAR_CLOAK = ''
 
     # StellarToon
     ENABLE_STOCKINGS = ''
@@ -54,10 +60,15 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
 class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     BODY_SHADER = 'PrimoToon'
     BODY_SHADER_LABEL = 'PrimoToon v4.0'
+    BODY_SHADER_OUTPUT = 'PrimoToon'
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
+    VFX_SHADER = BODY_SHADER
+    VFX_SHADER_INPUT = 'PrimoToon'
+    STAR_CLOAK_TYPE = '[Paimon / Dainslief / Skirk / Asmoday] - Star Cloak'
     TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
+    TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak]'
     OUTLINES_OUTPUT = 'PrimoToon (Outlines)'
     NIGHT_SOUL_OUTPUT = 'PrimoToon (Night Soul)'
     MATERIAL_OUTPUT_NODE = 'Material Output'

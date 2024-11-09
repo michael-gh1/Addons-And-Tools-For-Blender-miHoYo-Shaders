@@ -52,7 +52,6 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
             game_type=GameType.HONKAI_STAR_RAIL.name,
         )
 
-        # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         # settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')  # temp disabled, feature preview only
 
 class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):

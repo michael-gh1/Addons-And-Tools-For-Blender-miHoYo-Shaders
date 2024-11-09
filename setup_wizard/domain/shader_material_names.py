@@ -26,7 +26,8 @@ class ShaderMaterialNames:
     OUTLINES = ''
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = ''
-    SKILLOBJ = ''
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    STAR_CLOAK = ''
     VFX = ''
     # HSR
     WEAPON = ''
@@ -61,11 +62,13 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     GAUNTLET = f'{MATERIAL_PREFIX}Gauntlet'
+    GLASS = f'{MATERIAL_PREFIX}Glass'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     HELMET = f'{MATERIAL_PREFIX}Helmet'
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
 
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
@@ -76,11 +79,13 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     GAUNTLET = f'{MATERIAL_PREFIX}Gauntlet'
+    GLASS = f'{MATERIAL_PREFIX}Glass'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     HELMET = f'{MATERIAL_PREFIX}Helmet'
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
 
 
 class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
@@ -93,6 +98,7 @@ class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMater
     VFX = f'{MATERIAL_PREFIX}VFX'
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX}{NIGHT_SOUL_OUTLINES_SUFFIX}'
+    STAR_CLOAK = f'{MATERIAL_PREFIX}StarCloak'
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):

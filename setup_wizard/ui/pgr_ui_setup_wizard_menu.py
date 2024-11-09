@@ -17,11 +17,6 @@ class UI_Properties:
                 default = True
             )
 
-        # bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
-        #     name = " Join Meshes Enabled",
-        #     default = False
-        # )
-
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -80,7 +75,6 @@ class PGR_PT_Setup_Wizard_UI_Layout(Panel):
             row2 = settings_box.row()
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
-        # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         if rigging_global_settings_feature_flag:
             settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
 

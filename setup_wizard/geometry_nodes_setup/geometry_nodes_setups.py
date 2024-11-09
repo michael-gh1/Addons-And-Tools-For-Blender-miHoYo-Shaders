@@ -1,10 +1,13 @@
 # Author: michael-gh1
 
+from typing import List
 import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.node_group_names import ShaderNodeGroupNames
+from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
@@ -88,6 +91,7 @@ gi_meshes_to_create_outlines_on = [
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
+    'StarCloak',
 ]
 
 hsr_meshes_to_create_outlines_on = [
@@ -469,6 +473,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     OUTLINE_THICKNESS_INPUT = 'Input_7'
     NIGHT_SOUL_OUTLINE_SOCKET = 'Socket_10'
     FACE_LIGHTMAP_SOCKET = 'Socket_31'
+    TOGGLE_OUTLINES_SOCKET = 'Socket_24'
 
     outline_to_material_mapping = {
         'Hair': (NAME_OF_OUTLINE_1_MASK_INPUT, NAME_OF_OUTLINE_1_MATERIAL_INPUT),
@@ -486,6 +491,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass_Eff': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
+        'StarCloak': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
     }
 
     def __init__(self, blender_operator, context):
@@ -524,6 +530,10 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 outline_shader_node = material.node_tree.nodes.get(self.outlines_shader_node_name)
                 outline_shader_node.inputs.get(self.shader_node_names.TOGGLE_FACE_OUTLINES).default_value = True
 
+        starcloak_material = bpy.data.materials.get(self.material_names.STAR_CLOAK)
+        if starcloak_material:
+            self.__connect_shader_node_to_vfx_node(starcloak_material, [StarCloakTypes.ASMODA])
+
     def clone_night_soul_outlines(self):
         materials = [material for material in bpy.data.materials.values() if material.name not in self.GEOMETRY_NODES_MATERIAL_IGNORE_LIST]
         outline_material = bpy.data.materials.get(self.material_names.NIGHT_SOUL_OUTLINES)
@@ -546,11 +556,12 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         self.assign_materials_to_empty_modifier_slots(mesh, modifier)
         self.assign_night_soul_outlines_material(mesh, modifier)
         self.assign_face_lightmap_texture(modifier)
+        self.__disable_outlines(mesh, modifier, ['Paimon'])
         modifier.show_viewport = bpy.context.window_manager.enable_viewport_outlines
         print(f'Geometry Node Default Values Set for {modifier.name}: {mesh.name}')
 
     def assign_materials_to_empty_modifier_slots(self, mesh, modifier):
-        for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on:
+        for mesh_keyword in mesh_keywords_to_create_geometry_nodes_on + meshes_to_create_outlines_on:
             if mesh_keyword in mesh.name:
                 for material_slot in mesh.material_slots:
                     material = material_slot.material
@@ -610,10 +621,18 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         bpy.ops.object.mode_set(mode='EDIT')
         mesh.active_material_index = mesh.material_slots.get(material_slot.material.name).slot_index
         bpy.ops.object.material_slot_select()
-        bpy.ops.mesh.separate(type='SELECTED')
+        try:
+            bpy.ops.mesh.separate(type='SELECTED')
+        except RuntimeError as error:
+            print(f'Skipping, failed to separate material for: {material_slot.material.name} from {mesh.name}')
+            print(error)
+            return
         bpy.ops.object.mode_set(mode='OBJECT')
-        
-        new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001')
+
+        # OR-check added for Blender < 4.1 where the separated mesh name is different than the parent mesh name
+        # Body [Mesh] --(Hair Material Selected)--> Body.001 [Mesh] (Blender >= 4.1)
+        # Body [Mesh] --(Hair Material Selected)--> Hair.001 [Mesh] (Blender <  4.0)
+        new_separated_mesh = bpy.data.objects.get(f'{mesh.name}.001') or bpy.data.objects.get(f'{new_mesh_name}.001')
         new_mesh_name_mesh = bpy.data.objects.get(new_mesh_name)
 
         # Clean the separated mesh of any other materials
@@ -646,6 +665,50 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                 bpy.context.view_layer.objects.active = mesh
                 bpy.ops.object.material_slot_remove()
 
+    '''
+    Very targeted method for disabling outlines on Paimon's cloak
+    May require refactoring if used for other purposes.
+    '''
+    def __disable_outlines(self, mesh, modifier, character_names):
+        for material_slot in mesh.material_slots:
+            material = material_slot.material
+
+            for character_name in character_names:
+                if material.name == self.material_names.STAR_CLOAK and character_name in material.node_tree.nodes.get(self.texture_node_names.VFX_DIFFUSE).image.name:
+                    modifier[self.TOGGLE_OUTLINES_SOCKET] = False
+
+    def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
+        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER} - Main Shader'
+        MAIN_SHADER_OUTPUT_NAME = self.shader_node_names.BODY_SHADER_OUTPUT
+        VFX_SHADER_NODE_NAME = self.shader_node_names.VFX_SHADER
+        VFX_SHADER_INPUT_NAME = self.shader_node_names.VFX_SHADER_INPUT
+
+        vfx_shader_node = material.node_tree.nodes.get(VFX_SHADER_NODE_NAME)
+        for starcloak_type in starcloak_types:
+            if vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value == starcloak_type.value:
+                node_tree = material.node_tree
+                node_type = 'ShaderNodeGroup'
+                node = node_tree.nodes.new(
+                    type=node_type
+                )
+                node.node_tree = bpy.data.node_groups.get(ShaderNodeGroupNames.MAIN_SHADER)
+                node.name = MAIN_SHADER_NODE_NAME
+
+                self.__connect_main_shader_to_vfx_shader(material, MAIN_SHADER_NODE_NAME, MAIN_SHADER_OUTPUT_NAME, VFX_SHADER_NODE_NAME, VFX_SHADER_INPUT_NAME)
+
+    def __connect_main_shader_to_vfx_shader(self, 
+                                            material, 
+                                            main_shader_node_name, 
+                                            main_shader_output_name, 
+                                            vfx_shader_node_name, 
+                                            vfx_shader_input_name
+                                            ):
+        main_shader_node = material.node_tree.nodes.get(main_shader_node_name)
+        vfx_shader_node = material.node_tree.nodes.get(vfx_shader_node_name)
+
+        output = main_shader_node.outputs.get(main_shader_output_name)
+        input = vfx_shader_node.inputs.get(vfx_shader_input_name)
+        material.node_tree.links.new(output, input)
 
 class HonkaiStarRailGeometryNodesSetup(GameGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []

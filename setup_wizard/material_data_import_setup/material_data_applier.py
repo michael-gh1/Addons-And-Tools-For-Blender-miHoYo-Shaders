@@ -68,8 +68,8 @@ class MaterialDataApplier(ABC):
     def set_up_mesh_material_data(self):
         raise NotImplementedError()
 
-    def set_up_outline_material_data(self):
-        return
+    def set_up_outline_material_data(self, body_part, file):
+        pass
 
     def set_up_outline_colors(self):
         outlines_shader_node_inputs = self.outline_material.node_tree.nodes.get(self.outlines_node_tree_node_name).inputs
@@ -485,6 +485,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
 
     body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
     face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
+    vfx_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.VFX_SHADER
     outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
     shader_node_input_names = V4_PrimoToonShaderNodeInputNames
 
@@ -507,6 +508,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
         outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
+        vfx_shader_node = self.material.node_tree.nodes[self.vfx_shader_node_tree_node_name]
         night_soul_outlines_shader_node = self.night_soul_outlines_material.node_tree.nodes[self.outlines_node_tree_node_name]
         global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
         global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
@@ -514,6 +516,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         self.set_up_mesh_material_data_with_tooltips(shader_node, shader_node)
         self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
         self.set_up_mesh_material_data_with_tooltips(night_soul_outlines_shader_node, night_soul_outlines_shader_node, is_outlines=True)
+        self.set_up_mesh_material_data_with_tooltips(vfx_shader_node, vfx_shader_node)
         self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
 
     def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):

@@ -1957,25 +1957,27 @@ def rig_character(
     except: 
         pass
 
-    # MOUTH SHAPE KEYS
-    obj = bpy.data.objects.get("Face")
-    makeCon("Mouth_Default","Mouth-Default-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_A01","Mouth-Control","bone * -1.33","LOC_Y")
-    makeCon("Mouth_Open01","Mouth-Control","bone * 1.33","LOC_Y")
-    makeCon("Mouth_Smile01","Mouth-Smile1-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Smile02","Mouth-Smile2-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Angry01","Mouth-Angry1-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Angry02","Mouth-Angry2-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Angry03","Mouth-Angry3-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Fury01","Mouth-Fury1-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Doya01","Mouth-Doya1-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Doya02","Mouth-Doya2-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Pero01","Mouth-Pero1-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Pero02","Mouth-Pero2-Control","bone * 1.67","LOC_X")
-    makeCon("Mouth_Line01","Mouth-Control","bone * 1.33","LOC_X")
-    makeCon("Mouth_Line02","Mouth-Control","bone * -1.33","LOC_X")
-    makeCon("Mouth_Neko01","Mouth-Neko1-Control","bone * 1.67","LOC_X")
-
+    try:
+        # MOUTH SHAPE KEYS
+        obj = bpy.data.objects.get("Face") or (bpy.data.objects.get("Body") if meshes_joined else None)
+        makeCon("Mouth_Default","Mouth-Default-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_A01","Mouth-Control","bone * -1.33","LOC_Y")
+        makeCon("Mouth_Open01","Mouth-Control","bone * 1.33","LOC_Y")
+        makeCon("Mouth_Smile01","Mouth-Smile1-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Smile02","Mouth-Smile2-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Angry01","Mouth-Angry1-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Angry02","Mouth-Angry2-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Angry03","Mouth-Angry3-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Fury01","Mouth-Fury1-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Doya01","Mouth-Doya1-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Doya02","Mouth-Doya2-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Pero01","Mouth-Pero1-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Pero02","Mouth-Pero2-Control","bone * 1.67","LOC_X")
+        makeCon("Mouth_Line01","Mouth-Control","bone * 1.33","LOC_X")
+        makeCon("Mouth_Line02","Mouth-Control","bone * -1.33","LOC_X")
+        makeCon("Mouth_Neko01","Mouth-Neko1-Control","bone * 1.67","LOC_X")
+    except:
+        pass
 
     if(use_head_tracker):
         # Since we're still in object mode, here we can add the head pole object in the neck to track head movement
