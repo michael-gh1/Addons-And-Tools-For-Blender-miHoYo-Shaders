@@ -510,7 +510,12 @@ def rig_character(
     bpy.ops.object.expykit_convert_bone_names(src_preset='Rigify_Metarig.py', trg_preset='Rigify_Deform.py')
     bpy.ops.object.expykit_extract_metarig(rig_preset='Rigify_Metarig.py', assign_metarig=True)
 
-
+    # Poke's code to turn on the finger's IK.
+    if not kachina:
+        fuckyou = ["thumb.01", "f_index.01", "f_middle.01", "f_ring.01", "f_pinky.01"]
+        for side in [".L", ".R"]:
+            for fucks in fuckyou:
+                bpy.context.object.pose.bones[fucks + side].rigify_parameters.make_extra_ik_control = True
 
     ## Fixes the tiddy bones.  Expykit, why did you neglect them
 
@@ -3021,6 +3026,21 @@ def rig_character(
     bone_to_layer("f_pinky.03.R", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.L.001", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.R.001", 6, "Fingers (Detail)") 
+
+    # IK Fingers
+    try:
+        bone_to_layer("thumb.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("thumb.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_index.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_index.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_middle.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_middle.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_ring.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_ring.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_pinky.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_pinky.01_ik.R", 6, "Fingers (Detail)") 
+    except:
+        pass
 
     if lighting_panel_rig_obj:
         bone_to_layer("Lighting Panel", 1, "Lighting")

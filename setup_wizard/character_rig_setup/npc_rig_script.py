@@ -491,8 +491,6 @@ def rig_character(
     bpy.ops.object.expykit_convert_bone_names(src_preset='Rigify_Metarig.py', trg_preset='Rigify_Deform.py')
     bpy.ops.object.expykit_extract_metarig(rig_preset='Rigify_Metarig.py', assign_metarig=True)
 
-
-
     ## Fixes the tiddy bones.  Expykit, why did you neglect them
 
     metarm = bpy.data.objects["metarig"].data
