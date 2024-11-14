@@ -2454,7 +2454,8 @@ def rig_character(
         cust_bone["tweak_pin"] = 0.00
         # Setting the min/max ranges: https://blender.stackexchange.com/a/258099
         id_prop = cust_bone.id_properties_ui("tweak_pin")
-        id_prop.update(min=0.0,max=1.0)        
+        id_prop.update(min=0.0,max=1.0)    
+        cust_bone.property_overridable_library_set('["tweak_pin"]', True)    
 
         # Make Constraint
         con = this_obj.pose.bones[tweak_bone].constraints.new('COPY_LOCATION')
