@@ -11,6 +11,8 @@ class TextureNodeNames:
     NIGHT_SOUL_MASK = ''
     FACE_NIGHT_SOUL_MASK = ''
     VFX_DIFFUSE = ''
+    FACE_SHADOW_MAP = ''  # GI/PGR
+    FACE_SHADOW_MAP_NODE_GROUP = ''
     # HSR
     STOCKINGS_BODY1_NODE_GROUP = ''
     STOCKINGS_BODY2_NODE_GROUP = ''
@@ -56,15 +58,18 @@ class GenshinImpactTextureNodeNames(TextureNodeNames):
 
 class V1_GenshinImpactTextureNodeNames(GenshinImpactTextureNodeNames):
     LIGHTMAP = 'Image Texture'
+    FACE_SHADOW_MAP = 'Face_Shadow'
 
 class V2_GenshinImpactTextureNodeNames(V1_GenshinImpactTextureNodeNames):
     DIFFUSE = 'Outline_Diffuse'
     LIGHTMAP = 'Outline_Lightmap'
     FACE_LIGHTMAP = 'Face_Lightmap'
     FACE_LIGHTMAP_NODE_GROUP = 'Face Lightmap'
+    FACE_SHADOW_MAP = 'Face_Shadow'
 
 class V3_GenshinImpactTextureNodeNames(V2_GenshinImpactTextureNodeNames):
     FACE_LIGHTMAP_NODE_GROUP = ''
+    FACE_SHADOW_MAP = ''
 
 class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     SHADER_TEXTURES_NODE_GROUP = 'Shader Textures'
@@ -72,6 +77,8 @@ class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     MAIN_DIFFUSE = DIFFUSE  # For getting body shader name when renaming shader material names
     LIGHTMAP = 'Main_Lightmap'
     FACE_LIGHTMAP_NODE_GROUP = SHADER_TEXTURES_NODE_GROUP
+    FACE_SHADOW_MAP = 'Face_Shadow'
+    FACE_SHADOW_MAP_NODE_GROUP = SHADER_TEXTURES_NODE_GROUP
     NORMALMAP = 'Main_Normalmap'
     NYX_COLOR_RAMP = 'NYX_Color_Ramp'
     NIGHT_SOUL_MASK = 'Main_NYXmask'

@@ -236,11 +236,20 @@ class GenshinTextureImporter:
                     face_lightmap_input.default_value = 5.0
 
     def set_face_shadow_texture(self, face_material, img):
-        face_shadow_node_exists = face_material.node_tree.nodes.get('Face_Shadow')
-
-        if face_shadow_node_exists:
+        # V1/V2 - Node
+        face_shadow_node = face_material.node_tree.nodes.get('Face_Shadow')
+        if face_shadow_node:
             img.colorspace_settings.name='Non-Color'
-            face_material.node_tree.nodes['Face_Shadow'].image = img        
+            face_material.node_tree.nodes['Face_Shadow'].image = img
+
+        # V4 - Node Group
+        texture_node_names = self.shader_identifier_service.get_shader_texture_node_names(self.genshin_shader_version)
+        face_shadow_map_node_group = bpy.data.node_groups.get(texture_node_names.FACE_SHADOW_MAP_NODE_GROUP)
+
+        if face_shadow_map_node_group:
+            img.colorspace_settings.name='Non-Color'
+            face_shadow_map_node_group.nodes[texture_node_names.FACE_SHADOW_MAP].image = img
+
 
     def set_face_lightmap_texture(self, img):
         # Genshin Impact Shader V2/V4
