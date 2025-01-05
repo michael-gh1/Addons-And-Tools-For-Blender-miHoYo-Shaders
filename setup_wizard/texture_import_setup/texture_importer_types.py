@@ -252,13 +252,13 @@ class GenshinTextureImporter:
 
 
     def set_face_lightmap_texture(self, img):
-        # Genshin Impact Shader V2/V4
+        # Genshin Impact Shader V1/V2/V4
         texture_node_names = self.shader_identifier_service.get_shader_texture_node_names(self.genshin_shader_version)
-        face_lightmap_node = bpy.data.node_groups.get(texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
+        face_lightmap_node_group = bpy.data.node_groups.get(texture_node_names.FACE_LIGHTMAP_NODE_GROUP)
 
-        if face_lightmap_node:
+        if face_lightmap_node_group:
             img.colorspace_settings.name='Non-Color'
-            face_lightmap_node.nodes[texture_node_names.FACE_LIGHTMAP].image = img
+            face_lightmap_node_group.nodes[texture_node_names.FACE_LIGHTMAP].image = img
 
     def set_metalmap_texture(self, img):
         metallic_matcap_node_exists = bpy.data.node_groups.get('Metallic Matcap')
