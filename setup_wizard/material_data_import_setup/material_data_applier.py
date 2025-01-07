@@ -596,7 +596,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
             material_json_value = bool(material_json_value)
         elif (type(input_object) is bpy.types.NodeSocketInt or type(input_object) is bpy.types.NodeTreeInterfaceSocketInt) and \
             type(material_json_value) is float:
-            material_json_value = int(material_json_value)
+            material_json_value = int(material_json_value) + 1  # Shader values are one-based while material data is zero-based indexing
         elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
