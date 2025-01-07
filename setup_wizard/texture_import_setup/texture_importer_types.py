@@ -536,7 +536,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_specular_ramp_texture(TextureType.BODY, img)
                 elif "Face_Diffuse" in file:
                     self.set_face_diffuse_texture(face_material, img)
-                elif "Face_Shadow" in file:
+                elif self.is_texture_identifiers_in_texture_name(['Face', 'Shadow'], file):
                     self.set_face_shadow_texture(face_material, img)
                 elif "FaceLightmap" in file:
                     self.set_face_lightmap_texture(img)
