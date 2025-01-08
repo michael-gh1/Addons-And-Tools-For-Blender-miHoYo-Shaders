@@ -510,7 +510,12 @@ def rig_character(
     bpy.ops.object.expykit_convert_bone_names(src_preset='Rigify_Metarig.py', trg_preset='Rigify_Deform.py')
     bpy.ops.object.expykit_extract_metarig(rig_preset='Rigify_Metarig.py', assign_metarig=True)
 
-
+    # Poke's code to turn on the finger's IK.
+    if not kachina:
+        fuckyou = ["thumb.01", "f_index.01", "f_middle.01", "f_ring.01", "f_pinky.01"]
+        for side in [".L", ".R"]:
+            for fucks in fuckyou:
+                bpy.context.object.pose.bones[fucks + side].rigify_parameters.make_extra_ik_control = True
 
     ## Fixes the tiddy bones.  Expykit, why did you neglect them
 
@@ -1472,22 +1477,21 @@ def rig_character(
     neck_bone = armature.edit_bones['neck']
     neck_pos = neck_bone.head[2]
 
-    if(use_head_tracker):
-        # Let's position our head controller bone here. We need it to match our head bone's position
-        head_bone = armature.edit_bones['head']
-        head_pos_head2 = head_bone.head[2]
-        head_pos_tail2 = head_bone.tail[2]
-        head_pos_head1 = head_bone.head[1]
-        head_pos_tail1 = head_bone.tail[1]
+    # Let's position our head controller bone here. We need it to match our head bone's position
+    head_bone = armature.edit_bones['head']
+    head_pos_head2 = head_bone.head[2]
+    head_pos_tail2 = head_bone.tail[2]
+    head_pos_head1 = head_bone.head[1]
+    head_pos_tail1 = head_bone.tail[1]
 
-        # Select the head controller bone and position w/ head bone's location.
-        head_cont_bone =  armature.edit_bones['head-controller']
-        head_cont_bone.head[0] = 0
-        head_cont_bone.head[1] = -0.3
-        head_cont_bone.head[2] = head_pos_head2
-        head_cont_bone.tail[0] = 0
-        head_cont_bone.tail[1] = -0.3
-        head_cont_bone.tail[2] = head_pos_tail2
+    # Select the head controller bone and position w/ head bone's location.
+    head_cont_bone =  armature.edit_bones['head-controller']
+    head_cont_bone.head[0] = 0
+    head_cont_bone.head[1] = -0.3
+    head_cont_bone.head[2] = head_pos_head2
+    head_cont_bone.tail[0] = 0
+    head_cont_bone.tail[1] = -0.3
+    head_cont_bone.tail[2] = head_pos_tail2
 
     # Delete ugly lines that connect to the pole bones.
     def del_bone(bone_name):
@@ -1979,14 +1983,13 @@ def rig_character(
     except:
         pass
 
-    if(use_head_tracker):
-        # Since we're still in object mode, here we can add the head pole object in the neck to track head movement
-        bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
-        bpy.data.objects["Empty"].name = "Head_Pole"
-        bpy.data.objects["Head_Pole"].empty_display_size = 0.01
-        bpy.data.objects["Head_Pole"].parent = bpy.data.objects[char_name+"Rig"]
-        bpy.data.objects["Head_Pole"].parent_type = "BONE"
-        bpy.data.objects["Head_Pole"].parent_bone = "neck"
+    # Since we're still in object mode, here we can add the head pole object in the neck to track head movement
+    bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+    bpy.data.objects["Empty"].name = "Head_Pole"
+    bpy.data.objects["Head_Pole"].empty_display_size = 0.01
+    bpy.data.objects["Head_Pole"].parent = bpy.data.objects[char_name+"Rig"]
+    bpy.data.objects["Head_Pole"].parent_type = "BONE"
+    bpy.data.objects["Head_Pole"].parent_bone = "neck"
 
     # Let's go into object mode and select the body for the pupil shape keys, and to control our glow sliders.
     bpy.ops.object.select_all(action='DESELECT')
@@ -2158,23 +2161,46 @@ def rig_character(
         add_child_of("root")
         
         
-    if(use_head_tracker):    
+    # Here we can set up the two damped track constraints to make the head follow the controller bone.
+    # This makes the head bone follow the controller
+    head_controller = bpy.context.scene.objects[char_name+"Rig"].pose.bones["head"]
+    co = head_controller.constraints.new('DAMPED_TRACK')
+    head_track_const = bpy.data.objects[char_name+"Rig"].pose.bones["head"].constraints["Damped Track"]
+    head_track_const.target = our_char 
+    head_track_const.subtarget = "head-controller"
+    head_track_const.track_axis = "TRACK_Z"
+    # driver
+    head_track_driver = head_track_const.driver_add("influence").driver
+    head_track_driver.type = 'SCRIPTED'
+    head_track_driver.expression = 'bone'
+    head_var = head_track_driver.variables.new()
+    head_var.name = "bone"
+    head_var.type = 'SINGLE_PROP'
+    head_var.targets[0].id = bpy.context.scene.objects[ourRig]
+    head_var.targets[0].data_path = "pose.bones[\"plate-settings\"][\"Use Head Controller\"]"
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    depsgraph.update()
 
-        # Here we can set up the two damped track constraints to make the head follow the controller bone.
-        # This makes the head bone follow the controller
-        head_controller = bpy.context.scene.objects[char_name+"Rig"].pose.bones["head"]
-        co = head_controller.constraints.new('DAMPED_TRACK')
-        head_track_const = bpy.data.objects[char_name+"Rig"].pose.bones["head"].constraints["Damped Track"]
-        head_track_const.target = our_char 
-        head_track_const.subtarget = "head-controller"
-        head_track_const.track_axis = "TRACK_Z"
-
-        # This makes the controller follow the obj in the neck to keep it 'on' the head.
-        head_pole_cont = bpy.context.scene.objects[char_name+"Rig"].pose.bones["head-controller"]
-        co2 = head_pole_cont.constraints.new('DAMPED_TRACK')
-        head_pole_const = bpy.data.objects[char_name+"Rig"].pose.bones["head-controller"].constraints["Damped Track"]
-        head_pole_const.target = bpy.data.objects.get("Head_Pole") 
-        head_pole_const.track_axis = "TRACK_NEGATIVE_Z"
+    if not use_head_tracker:
+        this_obj.pose.bones["plate-settings"]["Use Head Controller"] = 0.00
+ 
+    # This makes the controller follow the obj in the neck to keep it 'on' the head.
+    head_pole_cont = bpy.context.scene.objects[char_name+"Rig"].pose.bones["head-controller"]
+    co2 = head_pole_cont.constraints.new('DAMPED_TRACK')
+    head_pole_const = bpy.data.objects[char_name+"Rig"].pose.bones["head-controller"].constraints["Damped Track"]
+    head_pole_const.target = bpy.data.objects.get("Head_Pole") 
+    head_pole_const.track_axis = "TRACK_NEGATIVE_Z"
+    # driver
+    head_pole_driver = head_pole_const.driver_add("influence").driver
+    head_pole_driver.type = 'SCRIPTED'
+    head_pole_driver.expression = 'bone'
+    head_pole_var = head_pole_driver.variables.new()
+    head_pole_var.name = "bone"
+    head_pole_var.type = 'SINGLE_PROP'
+    head_pole_var.targets[0].id = bpy.context.scene.objects[ourRig]
+    head_pole_var.targets[0].data_path = "pose.bones[\"plate-settings\"][\"Use Head Controller\"]"
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    depsgraph.update()
 
     # We can now make our final bone groups look good! (Both 3.6 and 4.0 functionality.)
     def assign_bone_to_group(bone_name, group_name):
@@ -2413,8 +2439,7 @@ def rig_character(
     
     # REENABLE CONSTRAINTS BELOW
 
-    if use_head_tracker:
-        generate_switch_parent_constraints("MCH-head-controller-parent","head-controller")
+    generate_switch_parent_constraints("MCH-head-controller-parent","head-controller")
     
     # REENABLE THE CONSTRAINT BELOW.
     generate_switch_parent_constraints("MCH-forearm_tweak-pin.parent.L","forearm_tweak-pin.L")
@@ -2429,7 +2454,8 @@ def rig_character(
         cust_bone["tweak_pin"] = 0.00
         # Setting the min/max ranges: https://blender.stackexchange.com/a/258099
         id_prop = cust_bone.id_properties_ui("tweak_pin")
-        id_prop.update(min=0.0,max=1.0)        
+        id_prop.update(min=0.0,max=1.0)    
+        cust_bone.property_overridable_library_set('["tweak_pin"]', True)    
 
         # Make Constraint
         con = this_obj.pose.bones[tweak_bone].constraints.new('COPY_LOCATION')
@@ -2631,8 +2657,7 @@ def rig_character(
                 this_obj.pose.bones[bone].custom_shape_transform = this_obj.pose.bones["MCH-thigh_parent_widget.R"]
         
     # ENABLE CONSTRAINTS AGAIN HERE
-    if use_head_tracker:
-        this_obj.pose.bones["MCH-head-controller-parent"].constraints[0].enabled = True
+    this_obj.pose.bones["MCH-head-controller-parent"].constraints[0].enabled = True
     this_obj.pose.bones["MCH-forearm_tweak-pin.parent.L"].constraints[0].enabled = True
     this_obj.pose.bones["MCH-forearm_tweak-pin.parent.R"].constraints[0].enabled = True
     this_obj.pose.bones["MCH-shin_tweak-pin.parent.L"].constraints[0].enabled = True
@@ -2651,13 +2676,14 @@ def rig_character(
     complete_rig_text = rig_text
     # My disclaimer, out of respect for modifying Rigify core's script
     rig_text_disclaimer = """
-# This RigUI script has been modified by Llama for use with Genshin Impact characters using a custom-made rig. Any issues arising as a result of these modifications are not indicative of Rigify's original functionalities.
-# Rigify's authors bear no responsibility for issues/errors resulting from these modifications. Additionally, these modifications have been made to improve the custom-made rigs for Genshin Impact characters.
-# Attempting to use this script with characters/models/skeletons it was not intended for could yield improper or erroneous results, for which neither Rigify's development team nor I are responsible.
+# This RigUI script has been modified by Llama specifically for use with custom rigs designed for Genshin Impact characters. Any issues resulting from these modifications do not reflect the original functionality of Rigify.
+# The authors of Rigify are not responsible for any issues or errors that may arise from these changes, which have been made to enhance compatibility with custom Genshin Impact rigs.
+# Attempting to use this script with other characters, models, or skeletons may produce unintended or incorrect results. Neither the Rigify development team nor I can take responsibility for such outcomes.
 
-# If you are seeing this disclaimer on a Hoyoverse character made with the proper addons, run this as needed (e.g., after appending to build the rig layers).
-# Do NOT, however, attempt to use this rig in a version of Blender other than the one it was made in. (3.6.X rigs will NOT work adequately in 4.X or beyond, and 4.X rigs will not work in versions before 4.0).
+# If this disclaimer appears for a properly configured Hoyoverse character, use this script as needed (e.g., after appending to set up rig layers).
+# Note: This rig is designed to work only in the specific Blender version it was created in. Rigs made for Blender 3.6.X will NOT function correctly in Blender 4.X or higher, and rigs for Blender 4.X will not work in earlier versions.
 """
+
     
     # MODIFICATIONS to the text file are made here:
     # Get the ID of this char's rig ui script.
@@ -2715,7 +2741,12 @@ def rig_character(
         return str
         
     def generate_string_for_settings_slider():
-        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
+        return str
+
+    def generate_string_for_head_controller_slider():
+        str = '\n        if is_selected({"head-controller"}):\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)'
+        str = str + '\n        if is_selected({"head"}):\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)'
         return str
     
     # because rigify makes the rig ui before i get to it, we have to change this stuff for the torso sliders below.
@@ -2739,9 +2770,7 @@ def rig_character(
         split = complete_rig_text.split(divider)
         return split[0]+divider+text+split[1]
     
-    # If head controller, add the rig main controls for it.
-    if use_head_tracker:
-        complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("head-controller"))
+
     
     # Make the limb edits   
     # Below is the emergency cut for the torso repair. (WHY rigify?!?!?)
@@ -2766,6 +2795,10 @@ def rig_character(
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_limb_pin("shin_tweak-pin.R","thigh_parent.R","shin_tweak.R","Knee Pin"))
     
     complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_settings_slider())
+    complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_head_controller_slider())
+
+        # If head controller, add the rig main controls for it.
+    complete_rig_text = splice_into_text("num_rig_separators[0] += 1", generate_string_for_parent_switch("head-controller"))
     
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Layers\"", "bl_label = \"Rig Layers: \" + rig_name")
     complete_rig_text = complete_rig_text.replace("bl_label = \"Rig Main Properties\"", "bl_label = \"Rig Properties: \" + rig_name")
@@ -2903,10 +2936,7 @@ def rig_character(
     bone_to_layer("plate-border", 0, "Face")        
     bone_to_layer("Plate", 0, "Face")        
     bone_to_layer("eyetrack", 0, "Face")
-    if use_head_tracker:
-        bone_to_layer("head-controller", 0, "Face")  
-    else:
-        bone_to_layer("head-controller", 25, "Other") 
+    bone_to_layer("head-controller", 0, "Face")  
     bone_to_layer("eyetrack_L", 0, "Face")        
     bone_to_layer("eyetrack_R", 0, "Face")  
     
@@ -3022,6 +3052,21 @@ def rig_character(
     bone_to_layer("f_pinky.01.L.001", 6, "Fingers (Detail)")  
     bone_to_layer("f_pinky.01.R.001", 6, "Fingers (Detail)") 
 
+    # IK Fingers
+    try:
+        bone_to_layer("thumb.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("thumb.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_index.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_index.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_middle.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_middle.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_ring.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_ring.01_ik.R", 6, "Fingers (Detail)") 
+        bone_to_layer("f_pinky.01_ik.L", 6, "Fingers (Detail)") 
+        bone_to_layer("f_pinky.01_ik.R", 6, "Fingers (Detail)") 
+    except:
+        pass
+
     if lighting_panel_rig_obj:
         bone_to_layer("Lighting Panel", 1, "Lighting")
         bone_to_layer("Fresnel", 1, "Lighting")
@@ -3078,10 +3123,7 @@ def rig_character(
         bone_to_layer("+EyeBone R A01.001", 25, "Other")
     except:
         pass
-        
-    if not use_head_tracker:
-        bone_to_layer("head-controller", 25, "Other")
-        
+               
     if no_eyes:
         bone_to_layer("eyetrack",25,"Other")
         bone_to_layer("eyetrack_L",25,"Other")
