@@ -3069,7 +3069,9 @@ def rig_character(
 
     if lighting_panel_rig_obj:
         bone_to_layer("Lighting Panel", 1, "Lighting")
+        bone_to_layer("FresnelToggle", 1, "Lighting")
         bone_to_layer("Fresnel", 1, "Lighting")
+        bone_to_layer("FresnelSize", 1, "Lighting")
         bone_to_layer("Ambient", 1, "Lighting")
         bone_to_layer("SoftLit", 1, "Lighting")
         bone_to_layer("Lit", 1, "Lighting")  # Sharp Lit
@@ -3080,6 +3082,7 @@ def rig_character(
         bone_to_layer("RimX", 1, "Lighting")
         bone_to_layer("RimY", 1, "Lighting")
         bone_to_layer("RimLitPin", 1, "Lighting")
+        bone_to_layer("ShadowOffset", 1, "Lighting")
         bone_to_layer("ShadowPin", 1, "Lighting")
         bone_to_layer("LitPin", 1, "Lighting")
         bone_to_layer("AmbientPin", 1, "Lighting")
