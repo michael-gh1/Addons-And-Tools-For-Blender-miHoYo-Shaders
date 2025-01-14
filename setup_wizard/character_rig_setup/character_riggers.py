@@ -79,7 +79,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
 
         armature: Armature = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE'][0]
         hand_bones = [bone for bone in armature.pose.bones.values() if 'Hand' in bone.name]
-        number_of_hand_bone_children = max([len(hand_bone.children) for hand_bone in hand_bones])
+        number_of_hand_bone_children = max([len(hand_bone.children) for hand_bone in hand_bones]) if hand_bones else 0
         is_player_hand = number_of_hand_bone_children >= 5
         avatar_in_texture_name = self.__get_body_diffuse_texture_name().startswith('Avatar')
         is_playable_character = avatar_in_texture_name or is_player_hand
