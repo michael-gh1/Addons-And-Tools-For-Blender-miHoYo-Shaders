@@ -227,35 +227,37 @@ class HonkaiStarRailDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 if mesh_body_part_name == 'Body':
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY)
                     material_name = body_material.name
-                if mesh_body_part_name == 'Body1':  # for StellarToon
+                elif mesh_body_part_name == 'Body1':  # for StellarToon
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY1)
                     material_name = body_material.name
-                if mesh_body_part_name == 'Body2':  # for StellarToon
+                elif mesh_body_part_name == 'Body2':  # for StellarToon
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY2)
                     material_name = body_material.name
-                if mesh_body_part_name == 'Body3':
+                elif mesh_body_part_name == 'Body3':
                     body_material = self.create_body_material(mesh, self.shader_material_names.BODY3)
                     material_name = body_material.name
-                if mesh_body_part_name ==  'Body_Trans' or mesh_body_part_name == 'Mat_Trans':
+                elif mesh_body_part_name ==  'Body_Trans' or mesh_body_part_name == 'Mat_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY_TRANS) 
                     mesh_body_part_name = 'Body_Trans'
                     material_name = body_material.name
-                if mesh_body_part_name ==  'Body2_Trans':
+                elif mesh_body_part_name ==  'Body2_Trans':
                     body_material = self.create_body_trans_material(mesh, self.shader_material_names.BODY2_TRANS) 
                     material_name = body_material.name
-                if 'Coat' in mesh_body_part_name:
+                elif 'Coat' in mesh_body_part_name:
                     body_material = self.create_body_material(mesh, self.shader_material_names.COAT)
                     material_name = body_material.name
-
-                if 'Weapon' in mesh_body_part_name:
+                elif 'Weapon' in mesh_body_part_name:
                     weapon_material = self.create_weapon_materials(mesh_body_part_name)
                     material_name = weapon_material.name
-                if 'Handbag' in mesh_body_part_name:
+                elif 'Handbag' in mesh_body_part_name:
                     handbag_material = self.create_weapon_materials(mesh_body_part_name)
                     material_name = handbag_material.name
-                if 'Kendama' in mesh_body_part_name:
+                elif 'Kendama' in mesh_body_part_name:
                     handbag_material = self.create_weapon_materials(mesh_body_part_name)
                     material_name = handbag_material.name
+                else:  # Fallback, best guess attempt by creating a Body-type material for the unknown material body part
+                    material_name = f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
+                    self.create_body_material(mesh, material_name)
 
                 honkai_star_rail_material = bpy.data.materials.get(
                     f'{self.shader_material_names.MATERIAL_PREFIX}{mesh_body_part_name}'
