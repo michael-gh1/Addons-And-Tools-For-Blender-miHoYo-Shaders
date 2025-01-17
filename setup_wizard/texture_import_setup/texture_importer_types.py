@@ -915,6 +915,24 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(['Kendama', 'Lightmap'], file):
                     self.set_lightmap_texture(TextureType.WEAPON, kendama_material, img)
 
+                # Fallback, best guess attempt by assigning the texture to materials containing the texture name
+                elif self.is_texture_identifiers_in_texture_name(['Color'], file):
+                    try:
+                        body_part = file.split('_')[3]
+                        body_part_materials = [material for material in bpy.data.materials if body_part in material.name]
+                        for body_part_material in body_part_materials:
+                            self.set_diffuse_texture(TextureType.BODY, body_part_material, img)
+                    except IndexError:
+                        print(f'WARN: Unexpected format when trying fallback texture assignment on: {file}')
+                elif self.is_texture_identifiers_in_texture_name(['LightMap'], file):
+                    try:
+                        body_part = file.split('_')[3]
+                        body_part_materials = [material for material in bpy.data.materials if body_part in material.name]
+                        for body_part_material in body_part_materials:
+                            self.set_lightmap_texture(TextureType.BODY, body_part_material, img)
+                    except IndexError:
+                        print(f'WARN: Unexpected format when trying fallback texture assignment on: {file}')
+
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
