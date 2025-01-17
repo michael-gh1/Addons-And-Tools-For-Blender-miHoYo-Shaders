@@ -385,7 +385,8 @@ class StellarToonDefaultMaterialReplacer(HonkaiStarRailDefaultMaterialReplacer):
 
     def create_weapon_materials(self, mesh_body_part_name):
         weapon_material = super().create_weapon_materials(mesh_body_part_name)
-        weapon_material.node_tree.nodes.get(StellarToonShaderNodeNames.MAIN_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
+        if self.shader_material_names.WEAPON_TRANS in weapon_material.name:
+            weapon_material.node_tree.nodes.get(StellarToonShaderNodeNames.MAIN_SHADER).inputs.get(self.ENABLE_TRANSPARENCY).default_value = 1.0
         return weapon_material
 
 
