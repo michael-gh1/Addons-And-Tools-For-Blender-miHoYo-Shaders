@@ -8,7 +8,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
     JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
-from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
+from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache, \
     GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
@@ -32,6 +32,7 @@ class GameMaterialImporter:
     MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
     NODE_TREE_PATH_INSIDE_BLEND_FILE = 'NodeTree'
     OBJECT_PATH_INSIDE_BLEND_FILE = 'Object'
+    OUTLINES_FILE_PATH = None
 
     def __init__(self, 
                  blender_operator: Operator, 
@@ -124,6 +125,11 @@ class GameMaterialImporter:
         if cache_enabled and (user_selected_shader_blend_file_path or project_root_directory_file_path):
             if user_selected_shader_blend_file_path:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_file_path, user_selected_shader_blend_file_path)
+
+                outlines_in_shader_blend_file = self.__get_outlines_node_group_from_shader_blend_file(
+                    user_selected_shader_blend_file_path)
+                if outlines_in_shader_blend_file:
+                    self.__set_outlines_cache(cache_enabled, user_selected_shader_blend_file_path)
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
@@ -145,6 +151,19 @@ class GameMaterialImporter:
             files=light_direction_empties_to_append
         )
 
+    def __get_outlines_node_group_from_shader_blend_file(self, shader_blend_file_path):
+        with bpy.data.libraries.load(shader_blend_file_path) as (data_from, data_to):
+            outlines_in_shader_blend_file = [node_group for node_group in data_from.node_groups if
+                                                node_group in [
+                                                    node_group_name for node_group_name in OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+                                                ]
+                                            ]
+        return outlines_in_shader_blend_file
+
+    def __set_outlines_cache(self, cache_enabled, shader_file_path):
+        if self.OUTLINES_FILE_PATH and cache_enabled and shader_file_path:
+            cache_using_cache_key(get_cache(cache_enabled), self.OUTLINES_FILE_PATH, shader_file_path)
+
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse - Genshin Impact - Goo Engine v3.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
@@ -158,6 +177,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES},
         {'name': V4_PrimoToonGenshinImpactMaterialNames.VFX},
     ]
+    OUTLINES_FILE_PATH = GENSHIN_IMPACT_OUTLINES_FILE_PATH
 
     def __init__(self, blender_operator, context):
         super().__init__(

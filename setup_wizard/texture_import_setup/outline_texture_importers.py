@@ -178,12 +178,15 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
                     # original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and 'Body' in material.name][0]
                     character_type = TextureImporterType.MONSTER
                 else:
-                    original_mesh_material = [material for material in bpy.data.materials if 
+                    original_mesh_materials = [material for material in bpy.data.materials if 
                                               material.name.endswith(f'Mat_{body_part_material_name}') or \
                                                 material.name.endswith(f'{body_part_material_name}_Eff_Mat') or \
                                                     material.name.endswith(f'{body_part_material_name}_Mat') or \
                                                         (material.name.startswith(ShaderMaterialNameKeywords.SKILLOBJ) and material.name.endswith('_Mat'))
-                                                        ][0]
+                                                        ]
+                    if not original_mesh_materials:
+                        continue
+                    original_mesh_material = original_mesh_materials[0]
                     character_type = TextureImporterType.AVATAR
 
                 if character_type == TextureImporterType.MONSTER:
