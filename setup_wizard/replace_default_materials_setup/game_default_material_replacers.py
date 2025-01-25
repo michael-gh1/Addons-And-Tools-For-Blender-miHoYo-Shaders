@@ -133,7 +133,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         mesh_body_part_name
                     )
                     if genshin_material.name == f'{self.material_names.STAR_CLOAK}':
-                        self.__enable_glass_star_cloak_toggle(genshin_material)
+                        self.__set_glass_star_cloak_toggle(genshin_material, True)
                         self.__set_star_cloak_type(genshin_material, material_name)  # original material name, which contains character name
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
@@ -175,7 +175,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Glass_Eff':
             glass_material = self.create_glass_material(self.material_names, self.material_names.GLASS_EFF)
             if glass_material:
-                self.__enable_glass_star_cloak_toggle(glass_material)
+                self.__set_glass_star_cloak_toggle(glass_material, False)
                 glass_material.blend_method = 'BLEND'
                 glass_material.shadow_method = 'NONE'
                 glass_material.show_transparent_back = False
@@ -231,9 +231,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         material_slot.material = new_material
         return new_material
 
-    def __enable_glass_star_cloak_toggle(self, material):
+    def __set_glass_star_cloak_toggle(self, material, value):
         vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
-        vfx_shader_node.inputs.get(self.shader_node_names.TOGGLE_GLASS_STAR_CLOAK).default_value = True
+        vfx_shader_node.inputs.get(self.shader_node_names.TOGGLE_GLASS_STAR_CLOAK).default_value = value
 
     def __set_star_cloak_type(self, material, original_material_name):
         for star_cloak_type in StarCloakTypes._member_names_:
