@@ -23,7 +23,7 @@ jobs:
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
       - name: Upload Standalone Setup Wizard Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "Character_Setup_Wizard_Addon_${{github.ref_name}}_Standalone"
           path: dist/setup_wizard/
@@ -38,7 +38,7 @@ jobs:
           mkdir -p dist/setup_wizard/setup_wizard
           mv setup_wizard dist/setup_wizard
       - name: Upload Setup Wizard Package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "Character_Setup_Wizard_Addon_${{github.ref_name}}"
           path: dist/setup_wizard/
