@@ -3,23 +3,20 @@
 import bpy
 from bpy.types import Panel, UILayout
 
-from setup_wizard import bl_info
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.ui.ui_render_checker import HonkaiStarRailUIRenderChecker
 
 
-class HSR_PT_Setup_Wizard_UI_Layout(Panel):
+class HSR_PT_Setup_Wizard_UI_Layout(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = "Honkai Star Rail Setup Wizard"
     bl_idname = "HSR_PT_Setup_Wizard_UI_Layout"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Honkai Star Rail"
+    bl_category = "Character Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
         window_manager = context.window_manager
-
-        version_text = layout.row()
-        version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
         run_entire_setup_column = sub_layout.column()
@@ -54,12 +51,12 @@ class HSR_PT_Setup_Wizard_UI_Layout(Panel):
 
         # settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')  # temp disabled, feature preview only
 
-class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
+class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Basic Setup'
     bl_idname = 'HSR_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Honkai Star Rail"
+    bl_category = "Character Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
@@ -103,19 +100,19 @@ class HSR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         OperatorFactory.create_rig_character_ui(sub_layout)
 
 
-class HSR_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
+class HSR_PT_Advanced_Setup_Wizard_UI_Layout(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Advanced Setup'
     bl_idname = 'HSR_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Honkai Star Rail"
+    bl_category = "Character Setup Wizard"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
 
 
-class HSR_PT_UI_Character_Model_Menu(Panel):
+class HSR_PT_UI_Character_Model_Menu(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Set Up Character Menu'
     bl_idname = 'HSR_PT_UI_Character_Model_Menu'
     bl_space_type = 'VIEW_3D'
@@ -143,7 +140,7 @@ class HSR_PT_UI_Character_Model_Menu(Panel):
         )
 
 
-class HSR_PT_UI_Materials_Menu(Panel):
+class HSR_PT_UI_Materials_Menu(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Set Up Materials Menu'
     bl_idname = 'HSR_PT_UI_Materials_Menu'
     bl_space_type = 'VIEW_3D'
@@ -177,7 +174,7 @@ class HSR_PT_UI_Materials_Menu(Panel):
         )
 
 
-class HSR_PT_UI_Outlines_Menu(Panel):
+class HSR_PT_UI_Outlines_Menu(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Set Up Outlines Menu'
     bl_idname = 'HSR_PT_UI_Outlines_Menu'
     bl_space_type = 'VIEW_3D'
@@ -227,7 +224,7 @@ class HSR_PT_UI_Outlines_Menu(Panel):
             layout.label(text='(Outlines Disabled < v3.3.0)')
 
 
-class HSR_PT_UI_Finish_Setup_Menu(Panel):
+class HSR_PT_UI_Finish_Setup_Menu(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Finish Setup Menu'
     bl_idname = 'HSR_PT_UI_Misc_Setup_Menu'
     bl_space_type = 'VIEW_3D'
@@ -291,7 +288,7 @@ class HSR_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
-class HSR_PT_UI_Character_Rig_Setup_Menu(Panel):
+class HSR_PT_UI_Character_Rig_Setup_Menu(Panel, HonkaiStarRailUIRenderChecker):
     bl_label = 'Character Rig Menu'
     bl_idname = 'HSR_PT_Rigify_Setup_Menu'
     bl_space_type = 'VIEW_3D'
@@ -328,7 +325,7 @@ class HSR_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
-# class HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout(Panel):
+# class HSR_PT_UI_Compositing_Panel_Post_Processing_UI_Layout(Panel, HonkaiStarRailUIRenderChecker):
 #     bl_label = "Compositing Setup Wizard"
 #     bl_idname = "HSR_PT_Custom_Compositing_Node_UI_Layout"
 #     bl_space_type = "NODE_EDITOR"

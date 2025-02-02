@@ -26,6 +26,8 @@ from setup_wizard.character_rig_setup.character_rigger_props import CharacterRig
 from setup_wizard.genshin_compositing_node_setup import GI_OT_PostProcessingCompositingSetup
 
 import setup_wizard.ui.gi_ui_setup_wizard_menu
+from setup_wizard.ui.unified_ui_setup_wizard_menu import \
+    CSW_PT_Unified_Character_Setup_Wizard_UI_Layout
 from setup_wizard.ui.gi_ui_setup_wizard_menu import \
     UI_Properties, \
     GI_PT_Setup_Wizard_UI_Layout, \
@@ -74,6 +76,7 @@ modules = [
 classes = [
     CharacterRiggerPropertyGroup,
     CharacterRiggerPropertyManager,
+    CSW_PT_Unified_Character_Setup_Wizard_UI_Layout,
     GI_PT_Setup_Wizard_UI_Layout, 
     GI_PT_Basic_Setup_Wizard_UI_Layout,
     GI_PT_Advanced_Setup_Wizard_UI_Layout,

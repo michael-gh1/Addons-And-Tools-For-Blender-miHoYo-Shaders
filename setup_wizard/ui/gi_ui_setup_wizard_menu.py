@@ -3,8 +3,8 @@
 import bpy
 from bpy.types import Panel, UILayout
 
-from setup_wizard import bl_info
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.ui.ui_render_checker import GenshinImpactUIRenderChecker
 
 class UI_Properties:
     @staticmethod
@@ -37,19 +37,17 @@ class UI_Properties:
         )
 
 
-class GI_PT_Setup_Wizard_UI_Layout(Panel):
+class GI_PT_Setup_Wizard_UI_Layout(Panel, GenshinImpactUIRenderChecker):
     bl_label = "Genshin Impact Setup Wizard"
     bl_idname = "GI_PT_Setup_Wizard_UI_Layout"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Genshin Impact"
+    bl_category = "Character Setup Wizard"
+    bl_parent_id = 'CSW_PT_Unified_Character_Setup_Wizard_UI_Layout'
 
     def draw(self, context):
         layout = self.layout
         window_manager = context.window_manager
-
-        version_text = layout.row()
-        version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
         OperatorFactory.create(
@@ -88,12 +86,12 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel):
         settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
         settings_box.prop(window_manager, 'post_processing_setup_enabled')
 
-class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
+class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Basic Setup'
     bl_idname = 'GI_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin Impact"
+    bl_category = "Character Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
@@ -141,19 +139,19 @@ class GI_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         )
 
 
-class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
+class GI_PT_Advanced_Setup_Wizard_UI_Layout(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Advanced Setup'
     bl_idname = 'GI_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Genshin Impact"
+    bl_category = "Character Setup Wizard"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
 
 
-class GI_PT_UI_Character_Model_Menu(Panel):
+class GI_PT_UI_Character_Model_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Set Up Character Menu'
     bl_idname = 'GI_PT_UI_Character_Model_Menu'
     bl_space_type = 'VIEW_3D'
@@ -178,7 +176,7 @@ class GI_PT_UI_Character_Model_Menu(Panel):
         )
 
 
-class GI_PT_UI_Materials_Menu(Panel):
+class GI_PT_UI_Materials_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Set Up Materials Menu'
     bl_idname = 'GI_PT_UI_Materials_Menu'
     bl_space_type = 'VIEW_3D'
@@ -212,7 +210,7 @@ class GI_PT_UI_Materials_Menu(Panel):
         )
 
 
-class GI_PT_UI_Outlines_Menu(Panel):
+class GI_PT_UI_Outlines_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Set Up Outlines Menu'
     bl_idname = 'GI_PT_UI_Outlines_Menu'
     bl_space_type = 'VIEW_3D'
@@ -262,7 +260,7 @@ class GI_PT_UI_Outlines_Menu(Panel):
             layout.label(text='(Outlines Disabled < v3.3.0)')
 
 
-class GI_PT_UI_Finish_Setup_Menu(Panel):
+class GI_PT_UI_Finish_Setup_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Finish Setup Menu'
     bl_idname = 'GI_PT_UI_Misc_Setup_Menu'
     bl_space_type = 'VIEW_3D'
@@ -307,7 +305,7 @@ class GI_PT_UI_Finish_Setup_Menu(Panel):
         )
 
 
-class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
+class GI_PT_UI_Character_Rig_Setup_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Character Rig Menu'
     bl_idname = 'GI_PT_Rigify_Setup_Menu'
     bl_space_type = 'VIEW_3D'
@@ -345,7 +343,7 @@ class GI_PT_UI_Character_Rig_Setup_Menu(Panel):
         col.prop(character_rigger_props, 'use_head_tracker')
 
 
-class GI_PT_UI_Post_Processing_Setup_Menu(Panel):
+class GI_PT_UI_Post_Processing_Setup_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = 'Post Processing Menu'
     bl_idname = 'GI_PT_UI_Post_Processing_Setup_Menu'
     bl_space_type = 'VIEW_3D'
@@ -370,7 +368,7 @@ class GI_PT_UI_Post_Processing_Setup_Menu(Panel):
         )
 
 
-class GI_PT_UI_Post_Processing_Node_Editor_Setup_Menu(Panel):
+class GI_PT_UI_Post_Processing_Node_Editor_Setup_Menu(Panel, GenshinImpactUIRenderChecker):
     bl_label = "Compositing Setup Wizard"
     bl_idname = "GI_PT_Custom_Compositing_Node_UI_Layout"
     bl_space_type = "NODE_EDITOR"
