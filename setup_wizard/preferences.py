@@ -50,4 +50,4 @@ class CharacterSetupWizardAddonPreferences(bpy.types.AddonPreferences):
 
         col = layout.box().column()
         col.label(text=('(Experimental) Add-on Update'), icon='ERROR')
-        addon_updater_ops.update_settings_ui_condensed(self, context, col)
+        addon_updater_ops.update_settings_ui(self, context, col)
