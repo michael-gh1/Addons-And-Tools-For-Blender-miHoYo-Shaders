@@ -79,7 +79,7 @@ except Exception as e:
 # not match and have errors. Must be all lowercase and no spaces! Should also
 # be unique among any other addons that could exist (using this updater code),
 # to avoid clashes in operator registration.
-updater.addon = "hoyoverse_setup_wizard"
+updater.addon = "character_setup_wizard"
 
 
 # -----------------------------------------------------------------------------
@@ -1417,7 +1417,7 @@ def register(bl_info):
     # update. If a pattern file is not found in new update, no action is taken
     # NOTE: This does NOT delete anything proactively, rather only defines what
     # is allowed to be overwritten during an update execution.
-    updater.overwrite_patterns = ["*.png", "*.jpg", "*.blend", "readme.md", "LICENSE"]
+    updater.overwrite_patterns = ["*.png", "*.jpg", "*.blend", "README.md", "LICENSE"]
     # updater.overwrite_patterns = []
     # other examples:
     # ["*"] means ALL files/folders will be overwritten by update, was the
