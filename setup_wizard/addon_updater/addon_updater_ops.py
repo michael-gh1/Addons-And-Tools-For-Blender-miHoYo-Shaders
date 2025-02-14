@@ -1482,7 +1482,7 @@ def register(bl_info):
 
     # Used for development only, "pretend" to install an update to test
     # reloading conditions.
-    updater.fake_install = True  # Set to true to test callback/reloading.
+    updater.fake_install = False  # Set to true to test callback/reloading.
 
     # Show popups, ie if auto-check for update is enabled or a previous
     # check for update in user preferences found a new version, show a popup
