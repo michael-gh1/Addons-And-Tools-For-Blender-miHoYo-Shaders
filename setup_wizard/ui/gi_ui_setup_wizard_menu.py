@@ -43,7 +43,6 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel, GenshinImpactUIRenderChecker):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Character Setup Wizard"
-    bl_parent_id = 'CSW_PT_Unified_Character_Setup_Wizard_UI_Layout'
 
     def draw(self, context):
         layout = self.layout
