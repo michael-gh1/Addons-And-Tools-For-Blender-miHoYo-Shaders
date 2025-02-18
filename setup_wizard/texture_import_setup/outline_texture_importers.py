@@ -124,6 +124,10 @@ class OutlineTextureImporterFactory:
 
 
 class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
+    SET_UP_MONSTER_AS_PLAYABLE_CHARACTER = [
+        'LaSignora'
+    ]
+
     def __init__(self, blender_operator, context, material_names, shader_node_names):
         super().__init__(blender_operator, context, material_names, shader_node_names)
         self.material_names = material_names
@@ -173,7 +177,9 @@ class GenshinImpactOutlineTextureImporter(OutlineTextureImporter):
 
                     original_mesh_material = original_mesh_materials[0]
                     character_type = TextureImporterType.NPC
-                elif [material for material in bpy.data.materials if material.name.startswith('Monster')]:
+                elif [material for material in bpy.data.materials if material.name.startswith('Monster') and 
+                    [playable_character_identifier for playable_character_identifier in self.SET_UP_MONSTER_AS_PLAYABLE_CHARACTER if playable_character_identifier not in material.name]
+                    ]:
                     # Assuming all body parts are Body for now
                     # original_mesh_material = [material for material in bpy.data.materials if material.name.startswith('Monster') and 'Body' in material.name][0]
                     character_type = TextureImporterType.MONSTER
