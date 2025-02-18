@@ -221,7 +221,12 @@ class GI_OT_RenameShaderMaterials(Operator, CustomOperatorProperties):
         if game_type == GameType.HONKAI_STAR_RAIL.name:
             character_name = body_diffuse_filename.split('_')[1]
         elif game_type == GameType.GENSHIN_IMPACT.name:
-            character_name = body_diffuse_filename.split('_')[3]
+            body_diffuse_filename_lowercased = body_diffuse_filename.lower()
+            if 'monster' in body_diffuse_filename_lowercased:
+                monster_start_index = body_diffuse_filename_lowercased.index('monster')
+                character_name = body_diffuse_filename[monster_start_index:].split('_')[1]
+            else:
+                character_name = body_diffuse_filename.split('_')[3]
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
             armature =  [object for object in bpy.data.objects if object.type == 'ARMATURE'][0]
             character_name = armature.name
