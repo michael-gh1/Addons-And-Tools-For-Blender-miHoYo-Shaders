@@ -17,7 +17,10 @@ class LightingPanel:
             self.connect_lighting_panel_nodes_to_global_material_properties()
 
             for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
-                light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
+                try:
+                    light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
+                except KeyError:
+                    pass  # Skip if modifier input name does not exist, must do try-except because it may not have a value yet
 
     def import_lighting_panel(self):
         lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
