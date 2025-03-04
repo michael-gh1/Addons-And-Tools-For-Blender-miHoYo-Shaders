@@ -2609,7 +2609,8 @@ def rig_character(
         collections.new("Leg.L (FK)")
         collections.new("Leg.R (FK)")
         collections.new("Root")
-        collections.new("Physics")
+        collections.new("Hair")
+        collections.new("Clothes")
         collections.new("Cage")
         if lighting_panel_rig_obj:
             collections.new("Lighting")
@@ -2692,39 +2693,277 @@ def rig_character(
     # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
     setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
     setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
+
                                                                                                                                                                                                                                                     
-    def make_layer_str(text, layer, version):
-        string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
-        string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
+    def make_layer_str(text, layer, version, title=""):
+        string3 = "row.prop(context.active_object.data, 'layers', index=" + str(layer) + ", toggle=True, text='" + text + "')"
+        string4 = "row.prop(collection[\"" + text + "\"], 'is_visible', toggle=True, text='" + text + "')"
         
         if version == 4:
-            return string4
+            return string4 if title == "" else string4.replace("row.","row_"+title+".")
         else:
-            return string3
-    
+            return string3 if title == "" else string3.replace("row.","row_"+title+".")
+
+    def make_solo_str(text, title=""):
+        solo_str = "row.prop(collection[\"" + text + "\"], 'is_solo', toggle=True, text='★')"
+        return solo_str if title == "" else solo_str.replace("row.","row_"+title+".")
+
     # String object of the actual layers
     def layers_to_generate(vers):
-        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            "+make_layer_str("Props", 21, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)
-        
-        if lighting_panel_rig_obj:
-            str+="\n            row = col.row()\n            "+make_layer_str("Lighting", 1, vers)
-        
-        str+="\n            row = col.row()\n            "+make_layer_str("Physics", 20, vers)+"\n            row = col.row()\n            "+make_layer_str("Cage", 24, vers)+"\n            "+make_layer_str("Other", 25, vers)
-                
-        return str
-        
-    # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
+        if vers == 3:
+            str = (
+                "\n            row=col.row()\n            " + make_layer_str("Tweaks", 2, vers) +
+                "\n            row=col.row()\n            " + make_layer_str("Pivots & Pins", 19, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Offsets", 26, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Props", 21, vers) +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            " + make_layer_str("Face", 0, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Torso (IK)", 3, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Torso (FK)", 4, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Fingers", 5, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Fingers (Detail)", 6, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Arm.L (IK)", 7, vers) +
+                "\n            " + make_layer_str("Arm.R (IK)", 10, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Arm.L (FK)", 8, vers) +
+                "\n            " + make_layer_str("Arm.R (FK)", 11, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Leg.L (IK)", 13, vers) +
+                "\n            " + make_layer_str("Leg.R (IK)", 16, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Leg.L (FK)", 14, vers) +
+                "\n            " + make_layer_str("Leg.R (FK)", 17, vers) +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            " + make_layer_str("Root", 28, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Lighting", 1, vers) +
+                "\n            " + make_layer_str("Hair", 20, vers) +
+                "\n            " + make_layer_str("Clothes", 22, vers) +
+                "\n            " + make_layer_str("Cage", 24, vers) +
+                "\n            " + make_layer_str("Other", 25, vers)
+            )
+            return str
+        elif vers == 4:
+            str = (
+                # Initial setup for split layout
+                "\n            layout = self.layout" +
+                "\n            split_size = 0.9" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            split_small = 0.8" +
+                "\n            split_tri = 0.78" +
+                # Lighting (single row with solo)
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Lighting", 1, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Lighting") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Tweaks and Pivots & Pins
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Tweaks", 2, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Tweaks", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Pivots & Pins", 19, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Pivots & Pins", "pivots") +
+                "\n            row = col.row()" +
+                # Offsets and Props
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Offsets", 26, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Offsets", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Props", 21, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Props", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Face
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Face", 0, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Face") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Torso
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Torso (IK)", 3, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Torso (IK)") +
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Torso (FK)", 4, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Torso (FK)") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Fingers
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Fingers", 5, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Fingers") +
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Fingers (Detail)", 6, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Fingers (Detail)") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Arms IK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.L (IK)", 7, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.L (IK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.R (IK)", 10, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.R (IK)", "pivots") +
+                "\n            row = col.row()" +
+                # Arms FK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.L (FK)", 8, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.L (FK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.R (FK)", 11, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.R (FK)", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Legs IK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.L (IK)", 13, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.L (IK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.R (IK)", 16, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.R (IK)", "pivots") +
+                "\n            row = col.row()" +
+                # Legs FK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.L (FK)", 14, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.L (FK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.R (FK)", 17, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.R (FK)", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Root
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Root", 28, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Root") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Hair and Clothes
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Hair", 20, vers, "tweaks") + 
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Hair", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Clothes", 21, vers, "pivots") + 
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Clothes", "pivots") +
+                "\n            row = col.row()" +
+                # Cage and Other
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Cage", 24, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Cage", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Other", 25, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Other", "pivots")
+            )
+            return str
+
+    # Function to add layer to rigUI
     def generate_rig_layers():
-        # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = (
+            "\n        layout = self.layout" +
+            "\n        col = layout.column()" +
+            "\n        row = col.row()" +
+            "\n        setup_vers=\"" + setup_version + "\"" +
+            "\n        v_str = \"" + bpy.app.version_string + "\"" +
+            "\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":" +
+            layers_to_generate(3) +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)" +
+            "\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":" +
+            "\n            # If you want to use duplicated armatures for the same character, you'd have to change the rig_id for each so that they all have their own rig layers. " +
+            "\n            collection = bpy.data.armatures[\"" + original_name + "\"].collections" +
+            layers_to_generate(4) +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)" +
+            "\n        else:" +
+            "\n            row.label(text=\"ERROR: Version mismatch!\")" +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")" +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Please remake your rig for this version!\")"
+        )
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
         
-        merged_layer_code = cut_rig_layer[0]+"class RigLayers(bpy.types.Panel):"+separate_draw_func[0]+"def draw(self, context):"+rig_add_layer_code+"\ndef register():"+separate_draw_end[1]
+        merged_layer_code = (
+            cut_rig_layer[0] +
+            "class RigLayers(bpy.types.Panel):" +
+            separate_draw_func[0] +
+            "def draw(self, context):" +
+            rig_add_layer_code +
+            "\ndef register():" +
+            separate_draw_end[1]
+        )
         
         return merged_layer_code
-    
+
     complete_rig_text = generate_rig_layers()
 
     # These functions make it easy to quickly write to the text file. Use as needed.
@@ -2868,11 +3107,14 @@ def rig_character(
         bpy.context.object.data.layers[14] = False
         bpy.context.object.data.layers[16] = True
         bpy.context.object.data.layers[17] = False
+        bpy.context.object.data.layers[20] = False
         bpy.context.object.data.layers[21] = True
+        bpy.context.object.data.layers[22] = False
         bpy.context.object.data.layers[28] = True
         bpy.context.object.data.layers[26] = False
     else:            
         bpy.context.object.data.collections["Tweaks"].is_visible = False
+        bpy.context.object.data.collections["Props"].is_visible = False
         bpy.context.object.data.collections["Pivots & Pins"].is_visible = False
         bpy.context.object.data.collections["Offsets"].is_visible = False
         bpy.context.object.data.collections["Torso (FK)"].is_visible = False
@@ -2881,9 +3123,12 @@ def rig_character(
         bpy.context.object.data.collections["Arm.R (FK)"].is_visible = False
         bpy.context.object.data.collections["Leg.L (FK)"].is_visible = False
         bpy.context.object.data.collections["Leg.R (FK)"].is_visible = False
-        bpy.context.object.data.collections["Physics"].is_visible = False
+        bpy.context.object.data.collections["Hair"].is_visible = False
+        bpy.context.object.data.collections["Clothes"].is_visible = False
         bpy.context.object.data.collections["Cage"].is_visible = False
         bpy.context.object.data.collections["Other"].is_visible = False
+        if lighting_panel_rig_obj:
+            bpy.context.object.data.collections["Lighting"].is_visible = False
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------
@@ -3186,8 +3431,8 @@ def rig_character(
     bone_to_layer("foot_fk.R",17,"Leg.R (FK)")
     bone_to_layer("toe_fk.R",17,"Leg.R (FK)")
     
-    bone_to_layer("breast.L",20,"Physics")
-    bone_to_layer("breast.R",20,"Physics")
+    bone_to_layer("breast.L",22,"Clothes")
+    bone_to_layer("breast.R",22,"Clothes")
     
     bone_to_layer("prop.L",21,"Props")
     bone_to_layer("prop.R",21,"Props")
@@ -3200,11 +3445,11 @@ def rig_character(
             for bone in armature.bones:
                 # The gods of the universe have blessed us with every physics bone starting with "+". We just do some extra filtering and we got what we need.
                 if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
-                    bone_to_layer(bone.name,20,"Physics")
+                    bone_to_layer(bone.name,22,"Clothes")
         else:
             for bone in bpy.context.active_object.pose.bones:
                 if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
-                    bone_to_layer(bone.name,20,"Physics")
+                    bone_to_layer(bone.name,22,"Clothes")
 
     loop_place_physics()
     
