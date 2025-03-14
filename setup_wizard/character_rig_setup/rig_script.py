@@ -1991,6 +1991,43 @@ def rig_character(
     bpy.data.objects["Head_Pole"].parent_type = "BONE"
     bpy.data.objects["Head_Pole"].parent_bone = "neck"
 
+
+    # In object mode, let's take the time to add drivers for viewport outlines (Based on a toggle, optionally to see them before rendering)
+    def setup_viewport_outlines(prop):
+        driver = prop.driver_add("show_viewport").driver
+        driver.type = 'SCRIPTED'
+        driver.expression = 'var'
+
+        var = driver.variables.new()
+        var.name = "var"
+        var.type = 'SINGLE_PROP'
+        var.targets[0].id = bpy.data.objects.get(ourRig)
+        var.targets[0].data_path = "pose.bones[\"plate-settings\"][\"Viewport Outlines\"]"
+        
+        # Update the dependencies
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        depsgraph.update()
+
+
+    try:
+        setup_viewport_outlines(bpy.data.objects["Body"].modifiers["Outlines Body"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Hair"].modifiers["Outlines Hair"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
+    except:
+        pass
+
+
+
     # Let's go into object mode and select the body for the pupil shape keys, and to control our glow sliders.
     bpy.ops.object.select_all(action='DESELECT')
     obj = bpy.data.objects.get("Body")  
@@ -2980,7 +3017,7 @@ def rig_character(
         return str
         
     def generate_string_for_settings_slider():
-        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Viewport Outlines"]\', text="Show Viewport Outlines", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
         return str
 
     def generate_string_for_head_controller_slider():
