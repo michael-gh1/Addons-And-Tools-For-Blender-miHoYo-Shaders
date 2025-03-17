@@ -6,7 +6,7 @@ import os
 from mathutils import Color, Vector
 from math import pi
 import addon_utils   
-import re               
+import re             
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -2086,14 +2086,13 @@ def rig_character(
 
         bpy.data.collections.remove(bpy.data.collections.get("append_extras"),do_unlink=True)
 
-
         # From extra header's position, we can setup the first position to use
         slider_starting_position = extras_position.copy()
-        print("VV SLIDER NUMBERS: compare to extras edit bone pos")
-        print(slider_starting_position)
         slider_starting_position[0] -= 0.058497
         slider_starting_position[1] = slider_starting_position[2] - 0.04631
         slider_starting_position[2] = 0
+
+        count = 0
 
         # For each shapekey, we can append a copy of the slider needed to support it.
         for sk in face_shape_keys:
@@ -2112,11 +2111,23 @@ def rig_character(
             bpy.ops.object.join()
 
             bpy.ops.object.mode_set(mode='EDIT')
+            # Position the Slider Frame
             armature.edit_bones['slider-frame'].parent = armature.edit_bones['extras-panel']
+            armature.edit_bones['slider-frame'].head = armature.edit_bones['extras-panel'].head
+            armature.edit_bones['slider-frame'].head.x -= 0.058479
+            armature.edit_bones['slider-frame'].tail.x = armature.edit_bones['slider-frame'].head.x
+            armature.edit_bones['slider-frame'].head.z -= (0.0466 + (count*0.03042)) 
+            armature.edit_bones['slider-frame'].tail.z = armature.edit_bones['slider-frame'].head.z + 1
 
+            # Position the slider itself
+            armature.edit_bones['slider'].head = armature.edit_bones['slider-frame'].head
+            armature.edit_bones['slider'].tail = armature.edit_bones['slider-frame'].tail
+            armature.edit_bones['slider'].head.x -= 0.030134
+            armature.edit_bones['slider'].tail.x = armature.edit_bones['slider'].head.x
+
+            count += 1
+            
             bpy.ops.object.mode_set(mode='POSE')
-            this_obj.pose.bones["slider-frame"].location = slider_starting_position
-            slider_starting_position[1] -= 0.03
 
             bpy.context.object.pose.bones.get('slider-frame').name = f'slider-frame-{sk}'
             bpy.context.object.pose.bones.get('slider').name = f'slider-{sk}'
@@ -2131,14 +2142,7 @@ def rig_character(
             makeCon(sk,f"slider-{sk}","bone * 16.7","LOC_X")
             merge_duplicate_collections("wgt")
             merge_duplicate_collections("append_slider")
-
-
-            # closing up, dont forget to rename bones, delete wgts and other appending colls, disable selecting slider frame
-
-
-
-
-
+            bpy.data.collections.remove(bpy.data.collections.get("append_slider"),do_unlink=True)
 
 
     # Let's go into object mode and select the body for the pupil shape keys, and to control our glow sliders.
@@ -2767,7 +2771,12 @@ def rig_character(
         collections.new("Other")
         
         for bone in armature.bones:
-            collections["Other"].assign(bone)
+            if 'slider-' in bone.name:
+                collections["Face"].assign(bone)
+                if 'frame-' not in bone.name:
+                    assign_bone_to_group(bone.name, "Face")
+            else:    
+                collections["Other"].assign(bone)
           
     #Thanks Enthralpy for the code to ensure that the arm/leg "gears" are moveable.
     for bone in ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']:
@@ -3346,7 +3355,8 @@ def rig_character(
     bone_to_layer("Brow-Smily-R-Control", 0, "Face")        
     bone_to_layer("Brow-Smily-L-Control", 0, "Face")        
     bone_to_layer("Brow-R-Control", 0, "Face")        
-    bone_to_layer("Brow-L-Control", 0, "Face")        
+    bone_to_layer("Brow-L-Control", 0, "Face")  
+    bone_to_layer("extras-panel", 0, "Face")      
     
     bone_to_layer("Eye-Up-Control", 0, "Face")        
     bone_to_layer("Eye-Tired-Control", 0, "Face")        
@@ -3586,6 +3596,8 @@ def rig_character(
     
     bone_to_layer("prop.L",21,"Props")
     bone_to_layer("prop.R",21,"Props")
+
+    print("Done.")
     
     def loop_place_physics():
         if is_version_4:
