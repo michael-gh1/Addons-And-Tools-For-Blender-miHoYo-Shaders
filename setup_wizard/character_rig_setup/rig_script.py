@@ -5,7 +5,8 @@ import bpy
 import os
 from mathutils import Color, Vector
 from math import pi
-import addon_utils                  
+import addon_utils   
+import re               
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -870,6 +871,19 @@ def rig_character(
                     for coll in child_obj.users_collection:
                         coll.objects.unlink(child_obj)
                     this_coll.objects.link(child_obj)
+
+    # Automatic code to just loop through and delete excess collections on append - thanks cgpt for regeex
+    def merge_duplicate_collections(base_name):
+        pattern = re.compile(rf"{re.escape(base_name)}\.\d{{3}}$")  # Matches "base_name.001", "base_name.002", etc.
+
+        # Iterate through collections and find matching ones
+        for coll in list(bpy.data.collections):
+            if pattern.match(coll.name):
+                for obj in list(coll.objects):
+                    move_into_collection(obj.name, base_name)
+
+                # Remove the now-empty collection
+                bpy.data.collections.remove(coll)
                 
     # Move the rig into the char name's collection                        
     move_into_collection(char_name+"Rig",char_name)
@@ -2025,6 +2039,105 @@ def rig_character(
         setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
     except:
         pass
+
+    # handled list of face SK
+    handled_sks = ['Basis', 'Mouth_Default', 'Mouth_A01', 'Mouth_Open01', 'Mouth_Smile01', 'Mouth_Smile02', 'Mouth_Angry01', 'Mouth_Angry02',
+    'Mouth_Angry03', 'Mouth_Fury01', 'Mouth_Doya01', 'Mouth_Doya02', 'Mouth_Neko01', 'Mouth_Pero01', 'Mouth_Pero02', 'Mouth_Line01', 'Mouth_Line02',
+    'Mouth_BigTongue01', 'Brow_Default', 'Brow_Trouble_L', 'Brow_Trouble_R', 'Brow_Smily_L', 'Brow_Smily_R',
+    'Brow_Angry_L', 'Brow_Angry_R', 'Brow_Shy_L', 'Brow_Shy_R', 'Brow_Up_L', 'Brow_Up_R', 'Brow_Down_L', 'Brow_Down_R', 'Brow_Squeeze_L', 'Brow_Squeeze_R', 
+    'Eye_Default', 'Eye_WinkA_L', 'Eye_WinkA_R', 'Eye_WinkB_L', 'Eye_WinkB_R', 'Eye_WinkC_L', 'Eye_WinkC_R', 'Eye_Ha', 'Eye_Jito', 'Eye_Wail', 
+    'Eye_Hostility', 'Eye_Tired', 'Eye_WUp', 'Eye_WDown', 'Eye_Lowereyelid']
+
+
+    def get_shape_keys(obj_name, handled_sks):
+        obj = bpy.data.objects.get(obj_name)
+        if obj and obj.data.shape_keys:
+            return [shape_key.name for shape_key in obj.data.shape_keys.key_blocks if shape_key.name not in handled_sks]
+        return []
+
+    # Get shape keys for the face. We can dynamically make SK sliders for shapekeys we do not handle in the face panel
+    face_shape_keys = get_shape_keys("Face", handled_sks)
+
+    # We have existing SK's we need to support, bring in the 'extras' header and do the work
+    if len(face_shape_keys) > 0:
+        bpy.ops.wm.append(filename='append_extras', directory=path_to_file)
+
+        # Select the rigs in question
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.data.objects["extras"].select_set(True) # select the extras
+        bpy.data.objects[char_name+"Rig"].select_set(True) # select the char rig
+        bpy.context.view_layer.objects.active = bpy.data.objects[char_name+"Rig"] # ensure the rig is the active object
+        bpy.ops.object.join() # join them
+        bpy.ops.object.mode_set(mode='EDIT')
+        armature.edit_bones['extras-panel'].parent = armature.edit_bones['plate-border']
+        armature.edit_bones['extras-panel'].head = armature.edit_bones['plate-settings'].head
+        armature.edit_bones['extras-panel'].head.x += 0.723336
+        armature.edit_bones['extras-panel'].tail.x = armature.edit_bones['extras-panel'].head.x
+        armature.edit_bones['extras-panel'].head.z -= 0.01397
+        armature.edit_bones['extras-panel'].tail.z = armature.edit_bones['extras-panel'].head.z + 1
+
+        extras_position = armature.edit_bones['extras-panel'].head
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        to_del_coll = bpy.data.collections.get("wgt.008") # note to future self, at some point, we can switch to a single mechanism that identifies wgt.00X and moves into wgt
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+
+        bpy.data.collections.remove(bpy.data.collections.get("append_extras"),do_unlink=True)
+
+
+        # From extra header's position, we can setup the first position to use
+        slider_starting_position = extras_position.copy()
+        print("VV SLIDER NUMBERS: compare to extras edit bone pos")
+        print(slider_starting_position)
+        slider_starting_position[0] -= 0.058497
+        slider_starting_position[1] = slider_starting_position[2] - 0.04631
+        slider_starting_position[2] = 0
+
+        # For each shapekey, we can append a copy of the slider needed to support it.
+        for sk in face_shape_keys:
+            bpy.ops.wm.append(filename='append_slider', directory=path_to_file)
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.select_all(action='DESELECT')
+
+            # Select custom face armature
+            bpy.data.objects["slider_rig"].select_set(True)
+
+            bpy.data.objects[char_name+"Rig"].select_set(True)
+            
+            bpy.context.view_layer.objects.active = bpy.data.objects[char_name+"Rig"]
+
+            bpy.ops.object.join()
+
+            bpy.ops.object.mode_set(mode='EDIT')
+            armature.edit_bones['slider-frame'].parent = armature.edit_bones['extras-panel']
+
+            bpy.ops.object.mode_set(mode='POSE')
+            this_obj.pose.bones["slider-frame"].location = slider_starting_position
+            slider_starting_position[1] -= 0.03
+
+            bpy.context.object.pose.bones.get('slider-frame').name = f'slider-frame-{sk}'
+            bpy.context.object.pose.bones.get('slider').name = f'slider-{sk}'
+
+            this_obj.pose.bones[f"slider-frame-{sk}"].bone.hide_select = True
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            bpy.data.objects.get("Face")
+
+            obj = bpy.data.objects.get("Face")
+            makeCon(sk,f"slider-{sk}","bone * 16.7","LOC_X")
+            merge_duplicate_collections("wgt")
+            merge_duplicate_collections("append_slider")
+
+
+            # closing up, dont forget to rename bones, delete wgts and other appending colls, disable selecting slider frame
+
+
+
+
 
 
 
