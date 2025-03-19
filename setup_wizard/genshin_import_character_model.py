@@ -9,7 +9,7 @@ import pathlib
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty
+from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 import os
 
@@ -55,6 +55,18 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
+
+    use_auto_bone_orientation: BoolProperty(
+        name="Automatic Bone Orientation",
+        description="Automatically sort bones orientations, if you want to preserve the original armature, please disable the option",
+        default=True,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        box = layout.box()
+        box.label(text="BetterFBX Bone Options:")
+        box.prop(self, 'use_auto_bone_orientation')
 
     def execute(self, context):
         is_character_model_file = not os.path.isdir(self.filepath) and self.filepath
@@ -115,6 +127,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             bpy.ops.better_import.fbx(
                 'EXEC_DEFAULT',
                 filepath=character_model_file_path,
+                use_auto_bone_orientation=self.use_auto_bone_orientation,
             )
             self.report({'INFO'}, 'Imported character model using BetterFBX')
         else:
