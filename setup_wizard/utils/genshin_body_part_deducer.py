@@ -7,19 +7,19 @@ from setup_wizard.domain.character_types import CharacterType
 
 
 def get_monster_body_part_name(name):
-        if 'Hair' in name:
-            return 'Hair'
-        elif 'Face' in name:
-            return 'Face'
-        elif 'Body' in name:
-            return 'Body'
-        elif 'Dress' in name:
-            return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
-        elif 'None' in name:
-            return 'Body'  # TODO: Current assumption/belief all None are Body-type
-        else:
-            print(f'"Best Guess" attempt made for retrieving mosnter body part name {name}')
-            return 'Body'
+    if 'Hair' in name:
+        return 'Hair'
+    elif 'Face' in name:
+        return 'Face'
+    elif 'Body' in name:
+        return 'Body'
+    elif 'Dress' in name:
+        return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
+    elif 'None' in name:
+        return 'Body'  # TODO: Current assumption/belief all None are Body-type
+    else:
+        print(f'"Best Guess" attempt made for retrieving mosnter body part name {name}')
+        return 'Body'
 
 
 def get_npc_mesh_body_part_name(material_name):
