@@ -1,6 +1,6 @@
 import pytest
 import sys
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import MagicMock, call, patch, ANY
 
 # Create mock bpy module with all necessary components
 def setup_mock_bpy():
@@ -70,25 +70,47 @@ class TestGenshinImpactDefaultMaterialReplacer:
         mesh1.name = "Body_Mesh"
         
         material_slot_body = MagicMock()
-        material_slot_body.name = "Avatar_Test_Body"
+        material_slot_body.name = "Avatar_Mat_Body"
         
         material_slot_hair = MagicMock()
-        material_slot_hair.name = "Avatar_Test_Hair"
-        
+        material_slot_hair.name = "Avatar_Mat_Hair"
+
+        material_slot_dress = MagicMock()
+        material_slot_dress.name = "Avatar_Mat_Dress"
+
+        material_slot_cloak = MagicMock()
+        material_slot_cloak.name = "Avatar_Dainsleif_Mat_Cloak"
+
         material_slot_skillobj = MagicMock()
         material_slot_skillobj.name = "SkillObj_Test_Glass_Mat"
         
+        material_slot_npc_hair = MagicMock()
+        material_slot_npc_hair.name = "NPC_Hair_Mat"
+
+        material_slot_npc_face = MagicMock()
+        material_slot_npc_face.name = "NPC_Face_Mat"
+
         material_slot_npc_body = MagicMock()
         material_slot_npc_body.name = "NPC_Body_Mat"
 
-        material_slot_npc_hair = MagicMock()
-        material_slot_npc_hair.name = "NPC_Hair_Mat"
+        material_slot_npc_item = MagicMock()
+        material_slot_npc_item.name = "NPC_Item_Mat"
+
+        material_slot_npc_screw = MagicMock()
+        material_slot_npc_screw.name = "NPC_Screw_Mat"
+
+        material_slot_npc_hat = MagicMock()
+        material_slot_npc_hat.name = "NPC_Hat_Mat"
+
+        material_slot_npc_others = MagicMock()
+        material_slot_npc_others.name = "NPC_Others_Mat"
+
+        material_slot_npc_cloak = MagicMock()
+        material_slot_npc_cloak.name = "NPC_Paimon_Cloak_Mat"
         
         material_slot_monster = MagicMock()
         material_slot_monster.name = "Monster_Body_Mat"
-        
-        material_slot_dress = MagicMock()
-        material_slot_dress.name = "Avatar_Test_Dress"
+    
         
         material_slot_mihoyo = MagicMock()
         material_slot_mihoyo.name = "miHoYoDiffuse"
@@ -96,11 +118,18 @@ class TestGenshinImpactDefaultMaterialReplacer:
         mesh1.material_slots = [
             material_slot_body, 
             material_slot_hair, 
+            material_slot_dress,
+            material_slot_cloak,
             material_slot_skillobj,
             material_slot_npc_body,
+            material_slot_npc_face,
             material_slot_npc_hair,
+            material_slot_npc_item,
+            material_slot_npc_screw,
+            material_slot_npc_hat,
+            material_slot_npc_others,
+            material_slot_npc_cloak,
             material_slot_monster,
-            material_slot_dress,
             material_slot_mihoyo
         ]
         
@@ -145,10 +174,18 @@ class TestGenshinImpactDefaultMaterialReplacer:
 
         # Setup material mocks
         mock_body_material = MagicMock(name="body_material")
+        mock_face_material = MagicMock(name="face_material")
         mock_hair_material = MagicMock(name="hair_material")
+        mock_dress_material = MagicMock(name="dress_material")
+        mock_cloak_material = MagicMock(name="cloak_material")
+        mock_item_material = MagicMock(name="item_material")
+        mock_screw_material = MagicMock(name="screw_material")
+        mock_hat_material = MagicMock(name="hat_material")
+        mock_others_material = MagicMock(name="others_material")
+        mock_cloak_material = MagicMock(name="cloak_material")
         mock_glass_material = MagicMock(name="glass_material")
         mock_vfx_material = MagicMock(name="vfx_material")
-        mock_dress_material = MagicMock(name="dress_material")
+
         
         # Attach to material
         mock_dress_material.node_tree = mock_node_tree
@@ -158,7 +195,13 @@ class TestGenshinImpactDefaultMaterialReplacer:
         def material_get_side_effect(name):
             material_map = {
                 f'{replacer.material_names.MATERIAL_PREFIX}Body': mock_body_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Face': mock_face_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}Hair': mock_hair_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_item.name}': mock_item_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_screw.name}': mock_screw_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_hat.name}': mock_hat_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_others.name}': mock_others_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_cloak.name}': mock_cloak_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}Glass': mock_glass_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}VFX': mock_vfx_material,
             }
@@ -176,14 +219,21 @@ class TestGenshinImpactDefaultMaterialReplacer:
         
         # Add .name attribute to each mock material
         mock_body_material.name = material_slot_body.name
+        mock_face_material.name = material_slot_npc_face.name
         mock_hair_material.name = material_slot_hair.name
+        mock_dress_material.name = material_slot_dress.name
+        mock_cloak_material.name = material_slot_cloak.name
+        mock_item_material.name = material_slot_npc_item.name
+        mock_screw_material.name = material_slot_npc_screw.name
+        mock_hat_material.name = material_slot_npc_hat.name
+        mock_others_material.name = material_slot_npc_others.name
+        mock_cloak_material.name = material_slot_npc_cloak.name
         mock_glass_material.name = material_slot_skillobj.name
         mock_vfx_material.name = material_slot_skillobj.name
-        mock_dress_material.name = material_slot_dress.name
 
         # Mock helper methods
-        with patch.object(replacer, '_GenshinImpactDefaultMaterialReplacer__set_glass_star_cloak_toggle') as mock_set_toggle, \
-            patch.object(replacer, '_GenshinImpactDefaultMaterialReplacer__set_star_cloak_type') as mock_set_cloak_type:
+        with patch.object(replacer, '_GenshinImpactDefaultMaterialReplacer__set_glass_star_cloak_toggle') as mock_set_star_cloak_toggle, \
+            patch.object(replacer, '_GenshinImpactDefaultMaterialReplacer__set_star_cloak_type') as mock_set_star_cloak_type:
             
             # For Dress material, mock return a VFX material
             mock_vfx_material.name = f'{replacer.material_names.STAR_CLOAK}'
@@ -195,8 +245,6 @@ class TestGenshinImpactDefaultMaterialReplacer:
             mock_blender_operator.report.assert_any_call({'INFO'}, 'Replaced default materials with Genshin shader materials...')
             
             # Check regular material replacement
-            print(material_slot_body.material.name)
-            print(mock_body_material.name)
             assert material_slot_body.material == mock_body_material
             assert material_slot_hair.material == mock_hair_material
             
@@ -205,18 +253,30 @@ class TestGenshinImpactDefaultMaterialReplacer:
             
             # Check NPC material handling
             assert material_slot_npc_body.material == mock_body_material
+            assert material_slot_npc_face.material == mock_face_material
             assert material_slot_npc_hair.material == mock_hair_material
+            assert material_slot_npc_item.material == mock_item_material
+            assert material_slot_npc_screw.material == mock_screw_material
+            assert material_slot_npc_hat.material == mock_hat_material
+            assert material_slot_npc_others.material == mock_others_material
             
             # Check Monster material handling
             assert material_slot_monster.material == mock_body_material
             
             # Check Dress/VFX/StarCloak handling
-            mock_set_toggle.assert_called_with(ANY, True)
-            material_arg = mock_set_toggle.call_args[0][0]  # Get the first argument
+            assert mock_set_star_cloak_toggle.call_count == 3
+            mock_set_star_cloak_toggle.assert_called_with(ANY, True)
+            material_arg = mock_set_star_cloak_toggle.call_args[0][0]  # Get the first argument
             assert material_arg.name == replacer.material_names.STAR_CLOAK
 
-            mock_set_cloak_type.assert_called_with(ANY, 'Avatar_Test_Dress')
-            material_arg = mock_set_cloak_type.call_args[0][0]  # Get the first argument
+            assert mock_set_star_cloak_type.call_count == 3
+            expected_calls = [
+                call(ANY, 'Avatar_Mat_Dress'),
+                call(ANY, 'Avatar_Dainsleif_Mat_Cloak'),
+                call(ANY, 'NPC_Paimon_Cloak_Mat'),
+            ]
+            mock_set_star_cloak_type.assert_has_calls(expected_calls)
+            material_arg = mock_set_star_cloak_type.call_args[0][0]  # Get the first argument
             assert material_arg.name == replacer.material_names.STAR_CLOAK
             
             # Check miHoYoDiffuse special case
