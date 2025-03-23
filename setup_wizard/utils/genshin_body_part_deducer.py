@@ -46,7 +46,6 @@ def get_npc_mesh_body_part_name(material_name):
         return None
 
 
-# TODO: Refactor out of GenshinImpactMaterialDataImporter
 def get_body_part(file):
     if 'Monster' in file.name:
         expected_body_part_name = Path(file.name).stem.split('_')[-2]

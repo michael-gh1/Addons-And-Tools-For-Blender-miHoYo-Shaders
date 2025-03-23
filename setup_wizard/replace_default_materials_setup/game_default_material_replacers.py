@@ -16,7 +16,8 @@ from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialN
     ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
-
+from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, \
+    get_npc_mesh_body_part_name
 
 class GameDefaultMaterialReplacer(ABC):
     @abstractmethod
@@ -72,10 +73,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 character_type = None
 
                 if material_name.startswith('NPC'):
-                    mesh_body_part_name = self.__get_npc_mesh_body_part_name(material_name)
+                    mesh_body_part_name = get_npc_mesh_body_part_name(material_name)
                     character_type = TextureImporterType.NPC
                 elif material_name.startswith('Monster'):
-                    mesh_body_part_name = self.__get_monster_mesh_body_part_name(material_name)
+                    mesh_body_part_name = get_monster_body_part_name(material_name)
                     character_type = TextureImporterType.MONSTER
                 else:
                     mesh_body_part_name = material_name.split('_')[-1]
@@ -194,34 +195,6 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = new_material.name
         return material_name
-
-    def __get_npc_mesh_body_part_name(self, material_name):
-        if 'Hair' in material_name:
-            return 'Hair'
-        elif 'Face' in material_name:
-            return 'Face'
-        elif 'Body' in material_name:
-            return 'Body'
-        elif 'Dress' in material_name:  # I don't think this is a valid case, either they use Hair or Body textures
-            return 'Dress'
-        elif 'Item' in material_name or 'Screw' in material_name or 'Hat' in material_name or 'Others' in material_name:
-            return material_name
-        elif 'Cloak' in material_name:
-            return 'Cloak'
-        else:
-            return None
-
-    def __get_monster_mesh_body_part_name(self, material_name):
-        if 'Hair' in material_name:
-            return 'Hair'
-        elif 'Face' in material_name:
-            return 'Face'
-        elif 'Body' in material_name:
-            return 'Body'
-        elif 'Dress' in material_name:
-            return 'Dress'  # TODO: Not sure if all 'Dress' are 'Body'
-        else:
-            return 'Body'  # Assumption that everything else should be a Body material
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()

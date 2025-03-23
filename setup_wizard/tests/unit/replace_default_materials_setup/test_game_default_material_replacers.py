@@ -92,7 +92,7 @@ class TestGenshinImpactDefaultMaterialReplacer:
         material_slot_npc_body.name = "NPC_Body_Mat"
 
         material_slot_npc_item = MagicMock()
-        material_slot_npc_item.name = "NPC_Item_Mat"
+        material_slot_npc_item.name = "NPC_Item_06_Mat"
 
         material_slot_npc_screw = MagicMock()
         material_slot_npc_screw.name = "NPC_Screw_Mat"
@@ -206,11 +206,12 @@ class TestGenshinImpactDefaultMaterialReplacer:
                 f'{replacer.material_names.MATERIAL_PREFIX}Body': mock_body_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}Face': mock_face_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}Hair': mock_hair_material,
-                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_item.name}': mock_item_material,
-                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_screw.name}': mock_screw_material,
-                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_hat.name}': mock_hat_material,
-                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_others.name}': mock_others_material,
-                f'{replacer.material_names.MATERIAL_PREFIX}{material_slot_npc_cloak.name}': mock_cloak_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Dress': None,
+                f'{replacer.material_names.MATERIAL_PREFIX}Item_06': mock_item_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Screw': mock_screw_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Hat': mock_hat_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Others': mock_others_material,
+                f'{replacer.material_names.MATERIAL_PREFIX}Cloak': None,
                 f'{replacer.material_names.MATERIAL_PREFIX}Glass': mock_glass_material,
                 f'{replacer.material_names.MATERIAL_PREFIX}VFX': mock_vfx_material,
             }
@@ -361,25 +362,6 @@ class TestGenshinImpactDefaultMaterialReplacer:
             mock_create_body.assert_not_called()
             mock_create_glass.assert_not_called()
             assert result == 'original_material'
-
-    def test_get_npc_mesh_body_part_name(self, replacer):
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Hair_Mat") == "Hair"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Face_Mat") == "Face"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Body_Mat") == "Body"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Dress_Mat") == "Dress"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Item_Mat") == "NPC_Item_Mat"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Screw_Mat") == "NPC_Screw_Mat"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Hat_Mat") == "NPC_Hat_Mat"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Others_Mat") == "NPC_Others_Mat"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Cloak_Mat") == "Cloak"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_npc_mesh_body_part_name("NPC_Unknown_Mat") is None
-    
-    def test_get_monster_mesh_body_part_name(self, replacer):
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_monster_mesh_body_part_name("Monster_Hair_Mat") == "Hair"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_monster_mesh_body_part_name("Monster_Face_Mat") == "Face"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_monster_mesh_body_part_name("Monster_Body_Mat") == "Body"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_monster_mesh_body_part_name("Monster_Dress_Mat") == "Dress"
-        assert replacer._GenshinImpactDefaultMaterialReplacer__get_monster_mesh_body_part_name("Monster_Unknown_Mat") == "Body"  # Default case
     
     @patch('bpy.data.materials.get')
     def test_create_body_material(self, mock_materials_get, replacer, material_names):
