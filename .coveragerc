@@ -1,0 +1,5 @@
+[run]
+omit = 
+    */tests/*
+    */test_*.py
+    setup_wizard/tests/*
