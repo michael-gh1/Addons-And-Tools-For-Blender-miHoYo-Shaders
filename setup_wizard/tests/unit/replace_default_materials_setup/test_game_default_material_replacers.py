@@ -108,8 +108,17 @@ class TestGenshinImpactDefaultMaterialReplacer:
         material_slot_npc_cloak = MagicMock()
         material_slot_npc_cloak.name = "NPC_Paimon_Cloak_Mat"
         
-        material_slot_monster = MagicMock()
-        material_slot_monster.name = "Monster_Body_Mat"
+        material_slot_monster_hair = MagicMock()
+        material_slot_monster_hair.name = "Monster_Hair_Mat"
+
+        material_slot_monster_face = MagicMock()
+        material_slot_monster_face.name = "Monster_Face_Mat"
+
+        material_slot_monster_body = MagicMock()
+        material_slot_monster_body.name = "Monster_Body_Mat"
+
+        material_slot_monster_other = MagicMock()
+        material_slot_monster_other.name = "Monster_Other_Mat"
     
         
         material_slot_mihoyo = MagicMock()
@@ -129,7 +138,10 @@ class TestGenshinImpactDefaultMaterialReplacer:
             material_slot_npc_hat,
             material_slot_npc_others,
             material_slot_npc_cloak,
-            material_slot_monster,
+            material_slot_monster_hair,
+            material_slot_monster_face,
+            material_slot_monster_body,
+            material_slot_monster_other,
             material_slot_mihoyo
         ]
         
@@ -261,7 +273,10 @@ class TestGenshinImpactDefaultMaterialReplacer:
             assert material_slot_npc_others.material == mock_others_material
             
             # Check Monster material handling
-            assert material_slot_monster.material == mock_body_material
+            assert material_slot_monster_hair.material == mock_hair_material
+            assert material_slot_monster_face.material == mock_face_material
+            assert material_slot_monster_body.material == mock_body_material
+            assert material_slot_monster_other.material == mock_body_material
             
             # Check Dress/VFX/StarCloak handling
             assert mock_set_star_cloak_toggle.call_count == 3
