@@ -3600,18 +3600,60 @@ def rig_character(
     print("Done.")
     
     def loop_place_physics():
+
+        # This list contains every bone that we should simply not handle as part of physics.
+        ignore_list = [ 
+            "+UpperArmTwistA02.L",
+            "+UpperArmTwistA01.L",
+            "+UpperArmTwistA01.R",
+            "+UpperArmTwistA02.R",
+            "eye.R",
+            "eye.L",
+            "+ToothBone D A01",
+            "+ToothBone U A01",
+            "+ToothBone A A01",
+            "+EyeBone L A01",
+            "+EyeBoneA02.L",
+            "+EyeBone R A01",
+            "+EyeBoneA02.R",
+            "+EyeBone R A01.001",
+            "+EyeBone L A01.001",
+            "+PelvisTwist CF A01",
+            "+ForeArmTwistSA01.R",
+            "+ForeArmTwistSA01.L",
+            "+ShoulderSA01.L",
+            "+ShoulderSA01.R",
+            "+ElbowSA01.R",
+            "+ElbowSA01.L",
+            "+KneeFA01.R",
+            "+KneeFA01.L",
+            "+SkirtAllF CF A01",
+            "+ForearmTwistSA01.R",
+            "+ForearmTwistSA01.L",
+            "+ThighTwistSA01.R",
+            "+ThighTwistSA01.L"
+        ]
+
         if is_version_4:
             armature = bpy.context.object.data
             collections = armature.collections        
             
             for bone in armature.bones:
                 # The gods of the universe have blessed us with every physics bone starting with "+". We just do some extra filtering and we got what we need.
-                if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
+                if "+Hair" in bone.name:
+                    bone_to_layer(bone.name,20,"Hair")
+                elif bone.name[0] == "+" and bone.name not in ignore_list:
                     bone_to_layer(bone.name,22,"Clothes")
+                elif bone.name in ignore_list:
+                    bone_to_layer(bone.name,25,"Other")
         else:
             for bone in bpy.context.active_object.pose.bones:
-                if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
+                if "+Hair" in bone.name:
+                    bone_to_layer(bone.name,20,"Hair")
+                elif bone.name[0] == "+" and bone.name not in ignore_list:
                     bone_to_layer(bone.name,22,"Clothes")
+                elif bone.name in ignore_list:
+                    bone_to_layer(bone.name,25,"Other")
 
     loop_place_physics()
     
