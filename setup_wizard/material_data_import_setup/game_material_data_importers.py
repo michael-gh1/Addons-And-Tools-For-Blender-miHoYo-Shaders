@@ -7,6 +7,7 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
+from setup_wizard.logger import log_function
 from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
@@ -85,6 +86,7 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
+    @log_function()
     def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
