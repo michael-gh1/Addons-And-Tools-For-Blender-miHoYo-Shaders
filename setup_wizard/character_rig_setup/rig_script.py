@@ -1152,7 +1152,10 @@ def rig_character(
      
     # We want to save all the VG names here, perhaps we can use them to identify weighted def bones.  
     bpy.context.view_layer.objects.active = bpy.data.objects.get("Body")    
-    vertex_groups_list = [vg.name for vg in bpy.context.object.vertex_groups]
+    try:
+        vertex_groups_list = [vg.name for vg in bpy.context.object.vertex_groups]
+    except:
+        vertex_groups_list = []
     bpy.context.view_layer.objects.active = head_bone_arm_target
     
     # Get the intersection point of a line with a perpendicular plane
