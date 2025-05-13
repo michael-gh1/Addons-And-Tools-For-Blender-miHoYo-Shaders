@@ -2035,6 +2035,10 @@ def rig_character(
     except:
         pass
     try:
+        setup_viewport_outlines(bpy.data.objects["Hair.001"].modifiers["Outlines Hair.001"]) # Escoffier? Who else  
+    except:
+        pass
+    try:
         setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
     except:
         pass
