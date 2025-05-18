@@ -78,6 +78,8 @@ class TestDriver:
                             '--python',
                             test_file,
                             '-noaudio',
+                            '--python-use-system-env',
+                            ''
                             '--',
                             f'{self.logs_directory_path}',
                             f'{environment_config_str}',
@@ -97,6 +99,7 @@ class TestDriver:
                         '--python',
                         test_file,
                         '-noaudio',
+                        '--python-use-system-env',
                         '--',
                         f'{self.logs_directory_path}',
                         f'{environment_config_str}',
