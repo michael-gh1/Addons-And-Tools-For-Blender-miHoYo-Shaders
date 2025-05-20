@@ -5,7 +5,8 @@ import bpy
 import os
 from mathutils import Color, Vector
 from math import pi
-import addon_utils                  
+import addon_utils   
+import re             
 
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
@@ -870,6 +871,19 @@ def rig_character(
                     for coll in child_obj.users_collection:
                         coll.objects.unlink(child_obj)
                     this_coll.objects.link(child_obj)
+
+    # Automatic code to just loop through and delete excess collections on append - thanks cgpt for regeex
+    def merge_duplicate_collections(base_name):
+        pattern = re.compile(rf"{re.escape(base_name)}\.\d{{3}}$")  # Matches "base_name.001", "base_name.002", etc.
+
+        # Iterate through collections and find matching ones
+        for coll in list(bpy.data.collections):
+            if pattern.match(coll.name):
+                for obj in list(coll.objects):
+                    move_into_collection(obj.name, base_name)
+
+                # Remove the now-empty collection
+                bpy.data.collections.remove(coll)
                 
     # Move the rig into the char name's collection                        
     move_into_collection(char_name+"Rig",char_name)
@@ -1138,7 +1152,10 @@ def rig_character(
      
     # We want to save all the VG names here, perhaps we can use them to identify weighted def bones.  
     bpy.context.view_layer.objects.active = bpy.data.objects.get("Body")    
-    vertex_groups_list = [vg.name for vg in bpy.context.object.vertex_groups]
+    try:
+        vertex_groups_list = [vg.name for vg in bpy.context.object.vertex_groups]
+    except:
+        vertex_groups_list = []
     bpy.context.view_layer.objects.active = head_bone_arm_target
     
     # Get the intersection point of a line with a perpendicular plane
@@ -1991,6 +2008,150 @@ def rig_character(
     bpy.data.objects["Head_Pole"].parent_type = "BONE"
     bpy.data.objects["Head_Pole"].parent_bone = "neck"
 
+
+    # In object mode, let's take the time to add drivers for viewport outlines (Based on a toggle, optionally to see them before rendering)
+    def setup_viewport_outlines(prop):
+        driver = prop.driver_add("show_viewport").driver
+        driver.type = 'SCRIPTED'
+        driver.expression = 'var'
+
+        var = driver.variables.new()
+        var.name = "var"
+        var.type = 'SINGLE_PROP'
+        var.targets[0].id = bpy.data.objects.get(ourRig)
+        var.targets[0].data_path = "pose.bones[\"plate-settings\"][\"Viewport Outlines\"]"
+        
+        # Update the dependencies
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        depsgraph.update()
+
+
+    try:
+        setup_viewport_outlines(bpy.data.objects["Body"].modifiers["Outlines Body"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Hair"].modifiers["Outlines Hair"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Hair.001"].modifiers["Outlines Hair.001"]) # Escoffier? Who else  
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
+    except:
+        pass
+    try:
+        setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
+    except:
+        pass
+
+    # handled list of face SK
+    handled_sks = ['Basis', 'Mouth_Default', 'Mouth_A01', 'Mouth_Open01', 'Mouth_Smile01', 'Mouth_Smile02', 'Mouth_Angry01', 'Mouth_Angry02',
+    'Mouth_Angry03', 'Mouth_Fury01', 'Mouth_Doya01', 'Mouth_Doya02', 'Mouth_Neko01', 'Mouth_Pero01', 'Mouth_Pero02', 'Mouth_Line01', 'Mouth_Line02',
+    'Mouth_BigTongue01', 'Brow_Default', 'Brow_Trouble_L', 'Brow_Trouble_R', 'Brow_Smily_L', 'Brow_Smily_R',
+    'Brow_Angry_L', 'Brow_Angry_R', 'Brow_Shy_L', 'Brow_Shy_R', 'Brow_Up_L', 'Brow_Up_R', 'Brow_Down_L', 'Brow_Down_R', 'Brow_Squeeze_L', 'Brow_Squeeze_R', 
+    'Eye_Default', 'Eye_WinkA_L', 'Eye_WinkA_R', 'Eye_WinkB_L', 'Eye_WinkB_R', 'Eye_WinkC_L', 'Eye_WinkC_R', 'Eye_Ha', 'Eye_Jito', 'Eye_Wail', 
+    'Eye_Hostility', 'Eye_Tired', 'Eye_WUp', 'Eye_WDown', 'Eye_Lowereyelid']
+
+
+    def get_shape_keys(obj_name, handled_sks):
+        obj = bpy.data.objects.get(obj_name)
+        if obj and obj.data.shape_keys:
+            return [shape_key.name for shape_key in obj.data.shape_keys.key_blocks if shape_key.name not in handled_sks]
+        return []
+
+    # Get shape keys for the face. We can dynamically make SK sliders for shapekeys we do not handle in the face panel
+    face_shape_keys = get_shape_keys("Face", handled_sks)
+
+    # We have existing SK's we need to support, bring in the 'extras' header and do the work
+    if len(face_shape_keys) > 0:
+        bpy.ops.wm.append(filename='append_extras', directory=path_to_file)
+
+        # Select the rigs in question
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.data.objects["extras"].select_set(True) # select the extras
+        bpy.data.objects[char_name+"Rig"].select_set(True) # select the char rig
+        bpy.context.view_layer.objects.active = bpy.data.objects[char_name+"Rig"] # ensure the rig is the active object
+        bpy.ops.object.join() # join them
+        bpy.ops.object.mode_set(mode='EDIT')
+        armature.edit_bones['extras-panel'].parent = armature.edit_bones['plate-border']
+        armature.edit_bones['extras-panel'].head = armature.edit_bones['plate-settings'].head
+        armature.edit_bones['extras-panel'].head.x += 0.723336
+        armature.edit_bones['extras-panel'].tail.x = armature.edit_bones['extras-panel'].head.x
+        armature.edit_bones['extras-panel'].head.z -= 0.01397
+        armature.edit_bones['extras-panel'].tail.z = armature.edit_bones['extras-panel'].head.z + 1
+
+        extras_position = armature.edit_bones['extras-panel'].head
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        to_del_coll = bpy.data.collections.get("wgt.008") # note to future self, at some point, we can switch to a single mechanism that identifies wgt.00X and moves into wgt
+        for obj in to_del_coll.objects:
+            move_into_collection(obj.name,"wgt")
+
+        bpy.data.collections.remove(bpy.data.collections.get("append_extras"),do_unlink=True)
+
+        # From extra header's position, we can setup the first position to use
+        slider_starting_position = extras_position.copy()
+        slider_starting_position[0] -= 0.058497
+        slider_starting_position[1] = slider_starting_position[2] - 0.04631
+        slider_starting_position[2] = 0
+
+        count = 0
+
+        # For each shapekey, we can append a copy of the slider needed to support it.
+        for sk in face_shape_keys:
+            bpy.ops.wm.append(filename='append_slider', directory=path_to_file)
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.select_all(action='DESELECT')
+
+            # Select custom face armature
+            bpy.data.objects["slider_rig"].select_set(True)
+
+            bpy.data.objects[char_name+"Rig"].select_set(True)
+            
+            bpy.context.view_layer.objects.active = bpy.data.objects[char_name+"Rig"]
+
+            bpy.ops.object.join()
+
+            bpy.ops.object.mode_set(mode='EDIT')
+            # Position the Slider Frame
+            armature.edit_bones['slider-frame'].parent = armature.edit_bones['extras-panel']
+            armature.edit_bones['slider-frame'].head = armature.edit_bones['extras-panel'].head
+            armature.edit_bones['slider-frame'].head.x -= 0.058479
+            armature.edit_bones['slider-frame'].tail.x = armature.edit_bones['slider-frame'].head.x
+            armature.edit_bones['slider-frame'].head.z -= (0.0466 + (count*0.03042)) 
+            armature.edit_bones['slider-frame'].tail.z = armature.edit_bones['slider-frame'].head.z + 1
+
+            # Position the slider itself
+            armature.edit_bones['slider'].head = armature.edit_bones['slider-frame'].head
+            armature.edit_bones['slider'].tail = armature.edit_bones['slider-frame'].tail
+            armature.edit_bones['slider'].head.x -= 0.030134
+            armature.edit_bones['slider'].tail.x = armature.edit_bones['slider'].head.x
+
+            count += 1
+            
+            bpy.ops.object.mode_set(mode='POSE')
+
+            bpy.context.object.pose.bones.get('slider-frame').name = f'slider-frame-{sk}'
+            bpy.context.object.pose.bones.get('slider').name = f'slider-{sk}'
+
+            this_obj.pose.bones[f"slider-frame-{sk}"].bone.hide_select = True
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+
+            bpy.data.objects.get("Face")
+
+            obj = bpy.data.objects.get("Face")
+            makeCon(sk,f"slider-{sk}","bone * 16.7","LOC_X")
+            merge_duplicate_collections("wgt")
+            merge_duplicate_collections("append_slider")
+            bpy.data.collections.remove(bpy.data.collections.get("append_slider"),do_unlink=True)
+
+
     # Let's go into object mode and select the body for the pupil shape keys, and to control our glow sliders.
     bpy.ops.object.select_all(action='DESELECT')
     obj = bpy.data.objects.get("Body")  
@@ -2609,14 +2770,20 @@ def rig_character(
         collections.new("Leg.L (FK)")
         collections.new("Leg.R (FK)")
         collections.new("Root")
-        collections.new("Physics")
+        collections.new("Hair")
+        collections.new("Clothes")
         collections.new("Cage")
         if lighting_panel_rig_obj:
             collections.new("Lighting")
         collections.new("Other")
         
         for bone in armature.bones:
-            collections["Other"].assign(bone)
+            if 'slider-' in bone.name:
+                collections["Face"].assign(bone)
+                if 'frame-' not in bone.name:
+                    assign_bone_to_group(bone.name, "Face")
+            else:    
+                collections["Other"].assign(bone)
           
     #Thanks Enthralpy for the code to ensure that the arm/leg "gears" are moveable.
     for bone in ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']:
@@ -2692,39 +2859,277 @@ def rig_character(
     # for debugging & helping purposes, we can display the version of the setup addon used to generate this character.
     setup_version_tuple = [mod.bl_info for mod in addon_utils.modules() if mod.bl_info.get('name') == 'HoYoverse Setup Wizard'][0].get('version')
     setup_version = "v" + str(setup_version_tuple[0]) + "." + str(setup_version_tuple[1]) + "." + str(setup_version_tuple[2])
+
                                                                                                                                                                                                                                                     
-    def make_layer_str(text, layer, version):
-        string3 = "row.prop(context.active_object.data, 'layers', index="+str(layer)+", toggle=True, text='"+text+"')"
-        string4 = "row.prop(collection[\""+text+"\"], 'is_visible', toggle=True, text='"+text+"')"
+    def make_layer_str(text, layer, version, title=""):
+        string3 = "row.prop(context.active_object.data, 'layers', index=" + str(layer) + ", toggle=True, text='" + text + "')"
+        string4 = "row.prop(collection[\"" + text + "\"], 'is_visible', toggle=True, text='" + text + "')"
         
         if version == 4:
-            return string4
+            return string4 if title == "" else string4.replace("row.","row_"+title+".")
         else:
-            return string3
-    
+            return string3 if title == "" else string3.replace("row.","row_"+title+".")
+
+    def make_solo_str(text, title=""):
+        solo_str = "row.prop(collection[\"" + text + "\"], 'is_solo', toggle=True, text='★')"
+        return solo_str if title == "" else solo_str.replace("row.","row_"+title+".")
+
     # String object of the actual layers
     def layers_to_generate(vers):
-        str = "\n            row=col.row()\n            "+make_layer_str("Tweaks", 2, vers)+"\n            row=col.row()\n            "+make_layer_str("Pivots & Pins", 19, vers)+"\n            row = col.row()\n            "+make_layer_str("Offsets", 26, vers)+"\n            row = col.row()\n            "+make_layer_str("Props", 21, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Face", 0, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (IK)", 3, vers)+"\n            row = col.row()\n            "+make_layer_str("Torso (FK)",4,vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers", 5, vers)+"\n            row = col.row()\n            "+make_layer_str("Fingers (Detail)", 6, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (IK)", 7, vers)+"\n            "+make_layer_str("Arm.R (IK)", 10, vers)+"\n            row = col.row()\n            "+make_layer_str("Arm.L (FK)", 8, vers)+"\n            "+make_layer_str("Arm.R (FK)", 11, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (IK)", 13, vers)+"\n            "+make_layer_str("Leg.R (IK)", 16, vers)+"\n            row = col.row()\n            "+make_layer_str("Leg.L (FK)", 14, vers)+"\n            "+make_layer_str("Leg.R (FK)", 17, vers)+"\n            row = col.row()\n            row.separator()\n            row = col.row()\n            row.separator()\n            row = col.row()\n            "+make_layer_str("Root", 28, vers)
-        
-        if lighting_panel_rig_obj:
-            str+="\n            row = col.row()\n            "+make_layer_str("Lighting", 1, vers)
-        
-        str+="\n            row = col.row()\n            "+make_layer_str("Physics", 20, vers)+"\n            row = col.row()\n            "+make_layer_str("Cage", 24, vers)+"\n            "+make_layer_str("Other", 25, vers)
-                
-        return str
-        
-    # Function to add layer to rigUI. This should add it to both 3.6 and 4.0 versions of the UI.
+        if vers == 3:
+            str = (
+                "\n            row=col.row()\n            " + make_layer_str("Tweaks", 2, vers) +
+                "\n            row=col.row()\n            " + make_layer_str("Pivots & Pins", 19, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Offsets", 26, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Props", 21, vers) +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            " + make_layer_str("Face", 0, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Torso (IK)", 3, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Torso (FK)", 4, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Fingers", 5, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Fingers (Detail)", 6, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Arm.L (IK)", 7, vers) +
+                "\n            " + make_layer_str("Arm.R (IK)", 10, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Arm.L (FK)", 8, vers) +
+                "\n            " + make_layer_str("Arm.R (FK)", 11, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Leg.L (IK)", 13, vers) +
+                "\n            " + make_layer_str("Leg.R (IK)", 16, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Leg.L (FK)", 14, vers) +
+                "\n            " + make_layer_str("Leg.R (FK)", 17, vers) +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            row.separator()" +
+                "\n            row = col.row()\n            " + make_layer_str("Root", 28, vers) +
+                "\n            row = col.row()\n            " + make_layer_str("Lighting", 1, vers) +
+                "\n            " + make_layer_str("Hair", 20, vers) +
+                "\n            " + make_layer_str("Clothes", 22, vers) +
+                "\n            " + make_layer_str("Cage", 24, vers) +
+                "\n            " + make_layer_str("Other", 25, vers)
+            )
+            return str
+        elif vers == 4:
+            str = (
+                # Initial setup for split layout
+                "\n            layout = self.layout" +
+                "\n            split_size = 0.9" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            split_small = 0.8" +
+                "\n            split_tri = 0.78" +
+                # Lighting (single row with solo)
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Lighting", 1, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Lighting") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Tweaks and Pivots & Pins
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Tweaks", 2, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Tweaks", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Pivots & Pins", 19, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Pivots & Pins", "pivots") +
+                "\n            row = col.row()" +
+                # Offsets and Props
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Offsets", 26, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Offsets", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Props", 21, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Props", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Face
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Face", 0, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Face") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Torso
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Torso (IK)", 3, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Torso (IK)") +
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Torso (FK)", 4, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Torso (FK)") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Fingers
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Fingers", 5, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Fingers") +
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Fingers (Detail)", 6, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Fingers (Detail)") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Arms IK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.L (IK)", 7, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.L (IK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.R (IK)", 10, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.R (IK)", "pivots") +
+                "\n            row = col.row()" +
+                # Arms FK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.L (FK)", 8, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.L (FK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Arm.R (FK)", 11, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Arm.R (FK)", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Legs IK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.L (IK)", 13, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.L (IK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.R (IK)", 16, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.R (IK)", "pivots") +
+                "\n            row = col.row()" +
+                # Legs FK
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.L (FK)", 14, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.L (FK)", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Leg.R (FK)", 17, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Leg.R (FK)", "pivots") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Root
+                "\n            row = col.row()" +
+                "\n            split = row.split(align=True, factor=split_size)" +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_layer_str("Root", 28, vers) +
+                "\n            row = split.row(align=True)" +
+                "\n            " + make_solo_str("Root") +
+                # Spacer rows
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                "\n            row = col.row()" +
+                # Hair and Clothes
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Hair", 20, vers, "tweaks") + 
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Hair", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Clothes", 21, vers, "pivots") + 
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Clothes", "pivots") +
+                "\n            row = col.row()" +
+                # Cage and Other
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_layer_str("Cage", 24, vers, "tweaks") +
+                "\n            row_tweaks = split.row(align=True)" +
+                "\n            " + make_solo_str("Cage", "tweaks") +
+                "\n            split = row.split(factor=split_small, align=True)" +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_layer_str("Other", 25, vers, "pivots") +
+                "\n            row_pivots = split.row(align=True)" +
+                "\n            " + make_solo_str("Other", "pivots")
+            )
+            return str
+
+    # Function to add layer to rigUI
     def generate_rig_layers():
-        # Add the physics button to the UI # text=v_str+" rig for " + char_name
-        rig_add_layer_code = "\n        layout = self.layout\n        col = layout.column()\n        row = col.row()\n        setup_vers=\""+setup_version+"\"\n        v_str = \""+bpy.app.version_string+"\"\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":\n            "+layers_to_generate(3)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":\n            # If you have duplicate armatures of the same character (if you see .001 or similar) in one scene,\n            # Please change the name below to what it is in the Outliner so that you can rig all your characters :)\n            # (It's the green person symbol in your rig)\n            collection = bpy.data.armatures[\""+original_name+"\"].collections\n            "+layers_to_generate(4)+"\n            row = col.row()\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)\n        else:\n            row.label(text=\"ERROR: Version mismatch!\")\n            row = col.row()\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")\n            row = col.row()\n            row.label(text=\"Please remake your rig for this version!\")"
+        rig_add_layer_code = (
+            "\n        layout = self.layout" +
+            "\n        col = layout.column()" +
+            "\n        row = col.row()" +
+            "\n        setup_vers=\"" + setup_version + "\"" +
+            "\n        v_str = \"" + bpy.app.version_string + "\"" +
+            "\n        if not v_str[0] == \"4\" and bpy.app.version_string[0] == \"3\":" +
+            layers_to_generate(3) +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)" +
+            "\n        elif v_str[0] == \"4\" and bpy.app.version_string[0] == \"4\":" +
+            "\n            # If you want to use duplicated armatures for the same character, you'd have to change the rig_id for each so that they all have their own rig layers. " +
+            "\n            collection = bpy.data.armatures[\"" + original_name + "\"].collections" +
+            layers_to_generate(4) +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Rig: \" + setup_vers + \" | \" + v_str)" +
+            "\n        else:" +
+            "\n            row.label(text=\"ERROR: Version mismatch!\")" +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Your rig was made in a version of Blender/Goo Engine that is not compatible!\")" +
+            "\n            row = col.row()" +
+            "\n            row.label(text=\"Please remake your rig for this version!\")"
+        )
         cut_rig_layer = rig_text.split("class RigLayers(bpy.types.Panel):")
         separate_draw_func = cut_rig_layer[1].split("def draw(self, context):")
         separate_draw_end = separate_draw_func[1].split("def register():")
         
-        merged_layer_code = cut_rig_layer[0]+"class RigLayers(bpy.types.Panel):"+separate_draw_func[0]+"def draw(self, context):"+rig_add_layer_code+"\ndef register():"+separate_draw_end[1]
+        merged_layer_code = (
+            cut_rig_layer[0] +
+            "class RigLayers(bpy.types.Panel):" +
+            separate_draw_func[0] +
+            "def draw(self, context):" +
+            rig_add_layer_code +
+            "\ndef register():" +
+            separate_draw_end[1]
+        )
         
         return merged_layer_code
-    
+
     complete_rig_text = generate_rig_layers()
 
     # These functions make it easy to quickly write to the text file. Use as needed.
@@ -2741,7 +3146,7 @@ def rig_character(
         return str
         
     def generate_string_for_settings_slider():
-        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
+        str = '\n        if is_selected({"plate-settings"}):\n            layout.prop(pose_bones["plate-settings"], \'["Viewport Outlines"]\', text="Show Viewport Outlines", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Use Head Controller"]\', text="Use Head Tracker Controller", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Head Follow"]\', text="Head Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Neck Follow"]\', text="Neck Follow", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Eyelid Constraints"]\', text="Auto Eyelid Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Shoulder Constraints"]\', text="Auto Shoulder Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["Toggle Skirt Constraints"]\', text="Auto Skirt Constraints", slider=True)\n            layout.prop(pose_bones["plate-settings"], \'["EyeCorrection"]\', text="Adjust Pupil Wink Distance", slider=True)'
         return str
 
     def generate_string_for_head_controller_slider():
@@ -2868,11 +3273,14 @@ def rig_character(
         bpy.context.object.data.layers[14] = False
         bpy.context.object.data.layers[16] = True
         bpy.context.object.data.layers[17] = False
+        bpy.context.object.data.layers[20] = False
         bpy.context.object.data.layers[21] = True
+        bpy.context.object.data.layers[22] = False
         bpy.context.object.data.layers[28] = True
         bpy.context.object.data.layers[26] = False
     else:            
         bpy.context.object.data.collections["Tweaks"].is_visible = False
+        bpy.context.object.data.collections["Props"].is_visible = False
         bpy.context.object.data.collections["Pivots & Pins"].is_visible = False
         bpy.context.object.data.collections["Offsets"].is_visible = False
         bpy.context.object.data.collections["Torso (FK)"].is_visible = False
@@ -2881,9 +3289,12 @@ def rig_character(
         bpy.context.object.data.collections["Arm.R (FK)"].is_visible = False
         bpy.context.object.data.collections["Leg.L (FK)"].is_visible = False
         bpy.context.object.data.collections["Leg.R (FK)"].is_visible = False
-        bpy.context.object.data.collections["Physics"].is_visible = False
+        bpy.context.object.data.collections["Hair"].is_visible = False
+        bpy.context.object.data.collections["Clothes"].is_visible = False
         bpy.context.object.data.collections["Cage"].is_visible = False
         bpy.context.object.data.collections["Other"].is_visible = False
+        if lighting_panel_rig_obj:
+            bpy.context.object.data.collections["Lighting"].is_visible = False
     
     # Send the given bone to its new location for either version. Adjusted for actual layer num.
     # MOVING OF BONES BELOW -------------------------------
@@ -2951,7 +3362,8 @@ def rig_character(
     bone_to_layer("Brow-Smily-R-Control", 0, "Face")        
     bone_to_layer("Brow-Smily-L-Control", 0, "Face")        
     bone_to_layer("Brow-R-Control", 0, "Face")        
-    bone_to_layer("Brow-L-Control", 0, "Face")        
+    bone_to_layer("Brow-L-Control", 0, "Face")  
+    bone_to_layer("extras-panel", 0, "Face")      
     
     bone_to_layer("Eye-Up-Control", 0, "Face")        
     bone_to_layer("Eye-Tired-Control", 0, "Face")        
@@ -3186,25 +3598,69 @@ def rig_character(
     bone_to_layer("foot_fk.R",17,"Leg.R (FK)")
     bone_to_layer("toe_fk.R",17,"Leg.R (FK)")
     
-    bone_to_layer("breast.L",20,"Physics")
-    bone_to_layer("breast.R",20,"Physics")
+    bone_to_layer("breast.L",22,"Clothes")
+    bone_to_layer("breast.R",22,"Clothes")
     
     bone_to_layer("prop.L",21,"Props")
     bone_to_layer("prop.R",21,"Props")
+
+    print("Done.")
     
     def loop_place_physics():
+
+        # This list contains every bone that we should simply not handle as part of physics.
+        ignore_list = [ 
+            "+UpperArmTwistA02.L",
+            "+UpperArmTwistA01.L",
+            "+UpperArmTwistA01.R",
+            "+UpperArmTwistA02.R",
+            "eye.R",
+            "eye.L",
+            "+ToothBone D A01",
+            "+ToothBone U A01",
+            "+ToothBone A A01",
+            "+EyeBone L A01",
+            "+EyeBoneA02.L",
+            "+EyeBone R A01",
+            "+EyeBoneA02.R",
+            "+EyeBone R A01.001",
+            "+EyeBone L A01.001",
+            "+PelvisTwist CF A01",
+            "+ForeArmTwistSA01.R",
+            "+ForeArmTwistSA01.L",
+            "+ShoulderSA01.L",
+            "+ShoulderSA01.R",
+            "+ElbowSA01.R",
+            "+ElbowSA01.L",
+            "+KneeFA01.R",
+            "+KneeFA01.L",
+            "+SkirtAllF CF A01",
+            "+ForearmTwistSA01.R",
+            "+ForearmTwistSA01.L",
+            "+ThighTwistSA01.R",
+            "+ThighTwistSA01.L"
+        ]
+
         if is_version_4:
             armature = bpy.context.object.data
             collections = armature.collections        
             
             for bone in armature.bones:
                 # The gods of the universe have blessed us with every physics bone starting with "+". We just do some extra filtering and we got what we need.
-                if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
-                    bone_to_layer(bone.name,20,"Physics")
+                if "+Hair" in bone.name:
+                    bone_to_layer(bone.name,20,"Hair")
+                elif bone.name[0] == "+" and bone.name not in ignore_list:
+                    bone_to_layer(bone.name,22,"Clothes")
+                elif bone.name in ignore_list:
+                    bone_to_layer(bone.name,25,"Other")
         else:
             for bone in bpy.context.active_object.pose.bones:
-                if bone.name[0] == "+" and "Twist" not in bone.name and "ToothBone" not in bone.name and "EyeBone" not in bone.name:
-                    bone_to_layer(bone.name,20,"Physics")
+                if "+Hair" in bone.name:
+                    bone_to_layer(bone.name,20,"Hair")
+                elif bone.name[0] == "+" and bone.name not in ignore_list:
+                    bone_to_layer(bone.name,22,"Clothes")
+                elif bone.name in ignore_list:
+                    bone_to_layer(bone.name,25,"Other")
 
     loop_place_physics()
     
