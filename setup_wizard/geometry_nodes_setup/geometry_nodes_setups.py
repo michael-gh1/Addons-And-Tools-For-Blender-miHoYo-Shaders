@@ -678,7 +678,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                     modifier[self.TOGGLE_OUTLINES_SOCKET] = False
 
     def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
-        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER} - Main Shader'
+        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER}.001'
         MAIN_SHADER_OUTPUT_NAME = self.shader_node_names.BODY_SHADER_OUTPUT
         VFX_SHADER_NODE_NAME = self.shader_node_names.VFX_SHADER
         VFX_SHADER_INPUT_NAME = self.shader_node_names.VFX_SHADER_INPUT
@@ -686,15 +686,9 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         vfx_shader_node = material.node_tree.nodes.get(VFX_SHADER_NODE_NAME)
         for starcloak_type in starcloak_types:
             if vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value == starcloak_type.value:
-                node_tree = material.node_tree
-                node_type = 'ShaderNodeGroup'
-                node = node_tree.nodes.new(
-                    type=node_type
-                )
-                node.node_tree = bpy.data.node_groups.get(ShaderNodeGroupNames.MAIN_SHADER)
-                node.name = MAIN_SHADER_NODE_NAME
-
                 self.__connect_main_shader_to_vfx_shader(material, MAIN_SHADER_NODE_NAME, MAIN_SHADER_OUTPUT_NAME, VFX_SHADER_NODE_NAME, VFX_SHADER_INPUT_NAME)
+                vfx_main_shader = material.node_tree.nodes.get(MAIN_SHADER_NODE_NAME)
+                vfx_main_shader.mute = False
 
     def __connect_main_shader_to_vfx_shader(self, 
                                             material, 
