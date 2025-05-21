@@ -8,6 +8,7 @@ import bpy
 from bpy.types import Operator, Context, Material
 
 from setup_wizard.logger import log_function
+from setup_wizard.domain.material_data_body_part_to_version_map import body_part_based_on_version_map
 from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
 from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
@@ -276,7 +277,8 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
 
             # Skirk's Dress2 material data JSON is for her StarCloak
             if body_part == 'Dress2' and 'Skirk' in file.name:
-                self.__customized_skirk_starcloak_material_data_setup(material_data_parser, character_type, file)
+                body_part_based_on_version = body_part_based_on_version_map.get(self.material_names, 'StarCloak')
+                self.__customized_skirk_starcloak_material_data_setup(material_data_parser, character_type, file, body_part_based_on_version)
 
             if not material or not outlines_material:
                 self.blender_operator.report({'WARNING'}, \
@@ -298,8 +300,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
 
-    def __customized_skirk_starcloak_material_data_setup(self, material_data_parser, character_type, file):
-        body_part = 'StarCloak'
+    def __customized_skirk_starcloak_material_data_setup(self, material_data_parser, character_type, file, body_part):
         material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
         outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
 
