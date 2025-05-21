@@ -1,26 +1,26 @@
 import os
 
+bl_info = {
+    "name": "HoYoverse Setup Wizard",
+    "author": "Mken, OctavoPE, Enthralpy",
+    "version": (2, 6, 4),
+    "blender": (3, 3, 0),
+    "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail / Punishing Gray Raven",
+    "description": "An addon to streamline the character model setup process when using Festivity, Nya222's or JaredNyts' Shaders",
+    "warning": "",
+    "doc_url": "",
+    "support": 'COMMUNITY',
+    "category": "HoYoverse",
+    "tracker_url": "",
+    "doc_url": ""
+}
+
 is_test_env = os.environ.get("PYTEST_VERSION") is not None  # This environ variable gets set when pytest is run
 
 if is_test_env:
     pytest_version = os.environ.get("PYTEST_VERSION")
     print(f"Pytest version: {pytest_version}")
 else:
-    bl_info = {
-        "name": "HoYoverse Setup Wizard",
-        "author": "Mken, OctavoPE, Enthralpy",
-        "version": (2, 6, 4),
-        "blender": (3, 3, 0),
-        "location": "3D View > Sidebar > Genshin Impact / Honkai Star Rail / Punishing Gray Raven",
-        "description": "An addon to streamline the character model setup process when using Festivity, Nya222's or JaredNyts' Shaders",
-        "warning": "",
-        "doc_url": "",
-        "support": 'COMMUNITY',
-        "category": "HoYoverse",
-        "tracker_url": "",
-        "doc_url": ""
-    }
-
     import bpy
     import importlib
     import os
