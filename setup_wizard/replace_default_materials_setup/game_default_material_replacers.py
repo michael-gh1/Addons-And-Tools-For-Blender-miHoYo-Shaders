@@ -108,7 +108,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         if bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}VFX'):
                             actual_material_for_dress = 'VFX'
                             mesh_body_part_name = 'StarCloak'
-                        elif mesh_body_part_name == 'Cloak':
+                        elif mesh_body_part_name == 'Cloak' and character_type == TextureImporterType.AVATAR:
                             pass  # Give Dainslief basic body shader (backwards compatibility)
                         else:
                             # short-circuit, no shader available for 'Cloak' so do nothing (Paimon)
