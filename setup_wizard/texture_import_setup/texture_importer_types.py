@@ -267,9 +267,13 @@ class GenshinTextureImporter:
             bpy.data.node_groups['Metallic Matcap'].nodes['MetalMap'].image = img
 
     def set_glass_diffuse_texture(self, material, img):
-        diffuse_node = material.node_tree.nodes.get('Main_Diffuse') or material.node_tree.nodes.get('Glass_Diffuse')
-        if material and diffuse_node:
-            diffuse_node.image = img
+        diffuse_node = material.node_tree.nodes.get('Main_Diffuse') 
+        vfx_node = material.node_tree.nodes.get(V4_GenshinImpactTextureNodeNames.VFX_DIFFUSE)
+
+        nodes = [diffuse_node, vfx_node]
+        for node in nodes:
+            if material and node:
+                node.image = img
 
     def set_nyx_color_ramp_texture(self, img):
         possible_nyx_color_ramp_node_group_names = [

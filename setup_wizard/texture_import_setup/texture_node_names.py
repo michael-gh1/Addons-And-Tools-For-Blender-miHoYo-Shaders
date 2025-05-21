@@ -83,7 +83,7 @@ class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     NYX_COLOR_RAMP = 'NYX_Color_Ramp'
     NIGHT_SOUL_MASK = 'Main_NYXmask'
     FACE_NIGHT_SOUL_MASK = 'Face_NYXmask'
-    VFX_DIFFUSE = 'Glass_Diffuse'
+    VFX_DIFFUSE = 'VFX_Diffuse'
 
 
 class Nya222HonkaiStarRailTextureNodeNames(TextureNodeNames):
