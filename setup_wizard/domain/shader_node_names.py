@@ -74,6 +74,8 @@ class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     MATERIAL_OUTPUT_NODE = 'Material Output'
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'
 
+    BODY_HAIR_RAMP_SWITCH = 'Body / Body 2 / Hair'
+
 class StellarToonShaderNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.006'
     BODY_SHADER = 'Group.006'
