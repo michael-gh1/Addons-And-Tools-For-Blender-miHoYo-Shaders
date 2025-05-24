@@ -29,6 +29,7 @@ class TextureImporterType(Enum):
 class TextureType(Enum):
     HAIR = 'Hair'
     BODY = 'Body'
+    BODY2 = 'Body2'
     FACE = 'Face'
     WEAPON = 'Weapon'
 
@@ -492,6 +493,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
+                body1_material = bpy.data.materials.get(f'{self.material_names.BODY1}')
+                body2_material = bpy.data.materials.get(f'{self.material_names.BODY2}')
                 dress2_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Dress2')
                 gauntlet_material = bpy.data.materials.get(f'{self.material_names.GAUNTLET}')
                 glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
@@ -519,8 +522,17 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
                 elif "Hair_Shadow_Ramp" in file:
                     self.set_shadow_ramp_texture(TextureType.HAIR, img)
-                elif "Body_Diffuse" in file:
-                    self.set_diffuse_texture(TextureType.BODY, body_material, img)
+                elif self.is_one_texture_identifier_in_texture_name(
+                    [
+                        ShaderMaterialNameKeywords.BODY_DIFFUSE, 
+                        ShaderMaterialNameKeywords.BODY1_DIFFUSE, 
+                        ShaderMaterialNameKeywords.BODY2_DIFFUSE, 
+                    ], file):
+                    selected_body_material = \
+                        body_material if ShaderMaterialNameKeywords.BODY_DIFFUSE in file else \
+                        body1_material if ShaderMaterialNameKeywords.BODY1_DIFFUSE in file else \
+                        body2_material if ShaderMaterialNameKeywords.BODY2_DIFFUSE in file else body_material
+                    self.set_diffuse_texture(TextureType.BODY, selected_body_material, img)
                     # Set Face Id in Body_Diffuse because not all Face Diffuse filenames have the full costume name
                     # Ex. Diluc's costume does not have DilucCostumeFlamme, but just Diluc
                     self.set_face_material_id(face_material, img)
@@ -528,14 +540,31 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
                     if star_cloak_material and self.star_cloak_uses_body_texture(file):
                         self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
-                elif "Body_Lightmap" in file:
-                    self.set_lightmap_texture(TextureType.BODY, body_material, img)
+                elif self.is_one_texture_identifier_in_texture_name(
+                    [
+                        ShaderMaterialNameKeywords.BODY_LIGHTMAP, 
+                        ShaderMaterialNameKeywords.BODY1_LIGHTMAP, 
+                        ShaderMaterialNameKeywords.BODY2_LIGHTMAP, 
+                    ], file):
+                    selected_body_material = \
+                        body_material if ShaderMaterialNameKeywords.BODY_LIGHTMAP in file else \
+                        body1_material if ShaderMaterialNameKeywords.BODY1_LIGHTMAP in file else \
+                        body2_material if ShaderMaterialNameKeywords.BODY2_LIGHTMAP in file else body_material
+                    self.set_lightmap_texture(TextureType.BODY, selected_body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.BODY, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
                     self.set_normalmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
-                elif "Body_Shadow_Ramp" in file:
-                    self.set_shadow_ramp_texture(TextureType.BODY, img)
+                elif self.is_one_texture_identifier_in_texture_name(
+                    [
+                        ShaderMaterialNameKeywords.BODY_SHADOW_RAMP,
+                        ShaderMaterialNameKeywords.BODY1_SHADOW_RAMP,
+                        ShaderMaterialNameKeywords.BODY2_SHADOW_RAMP,
+                    ], file):
+                    if ShaderMaterialNameKeywords.BODY2_SHADOW_RAMP in file:
+                        self.set_shadow_ramp_texture(TextureType.BODY2, img)
+                    else:  # Body/Body1
+                        self.set_shadow_ramp_texture(TextureType.BODY, img)
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
                     self.set_specular_ramp_texture(TextureType.BODY, img)
                 elif "Face_Diffuse" in file:
