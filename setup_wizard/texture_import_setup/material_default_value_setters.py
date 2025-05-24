@@ -84,13 +84,8 @@ class MaterialDefaultValueSetter:
                 shader_use_lightmap_ao_input.default_value = default_value
 
     def set_up_hair_material(self, material):
-        material.name = self.material_names.HAIR
-        material.use_fake_user = True
+        raise NotImplementedError("This method should be implemented in subclasses that require hair material setup.")
 
-        body_shader = material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
-        body_hair_ramp_switch = body_shader.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH)
-        if body_hair_ramp_switch:
-            body_hair_ramp_switch.default_value = 1
 
 class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
     def __init__(self, material_names: ShaderMaterialNames, shader_node_names: ShaderNodeNames) -> None:
@@ -108,6 +103,15 @@ class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
 
             self.set_up_lightmap_ao_default_value('Body', material)
             self.set_up_lightmap_ao_default_value('Hair', material)
+
+    def set_up_hair_material(self, material):
+        material.name = self.material_names.HAIR
+        material.use_fake_user = True
+
+        body_shader = material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
+        body_hair_ramp_switch = body_shader.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH)
+        if body_hair_ramp_switch:
+            body_hair_ramp_switch.default_value = 1
 
 
 class HonkaiStarRailMaterialDefaultValueSetter(MaterialDefaultValueSetter):
