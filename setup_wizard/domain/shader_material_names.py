@@ -91,6 +91,8 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
 class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
     GLASS = f'{MATERIAL_PREFIX}Glass'
     GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
     LEATHER = f'{MATERIAL_PREFIX}Leather'

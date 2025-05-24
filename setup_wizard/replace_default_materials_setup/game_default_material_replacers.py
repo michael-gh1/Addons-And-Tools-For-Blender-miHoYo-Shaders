@@ -152,7 +152,13 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         self.blender_operator.report({'INFO'}, 'Replaced default materials with Genshin shader materials...')
 
     def create_shader_material_if_unique_mesh(self, mesh, mesh_body_part_name, material_name):
-        if mesh_body_part_name == 'EffectHair':  # Furina
+        if mesh_body_part_name == 'Body1':  # >= GI v5.7
+            body_material = self.create_body_material(self.material_names, self.material_names.BODY1)
+            material_name = body_material.name
+        elif mesh_body_part_name == 'Body2':  # >= GI v5.7
+            body_material = self.create_body_material(self.material_names, self.material_names.BODY2)
+            material_name = body_material.name
+        elif mesh_body_part_name == 'EffectHair':  # Furina
             hair_material = self.create_hair_material(self.material_names, self.material_names.EFFECT_HAIR)
             material_name = hair_material.name
         elif mesh_body_part_name == 'Effect':  # Furina (Default)
