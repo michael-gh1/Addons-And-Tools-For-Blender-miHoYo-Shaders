@@ -104,6 +104,19 @@ class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
 
             self.set_up_lightmap_ao_default_value('Body', material)
             self.set_up_lightmap_ao_default_value('Hair', material)
+        
+        body2_material = bpy.data.materials.get(self.material_names.BODY2)
+        if body2_material:
+            self.set_up_body2_material(body2_material)
+
+    def set_up_body2_material(self, material):
+        material.name = self.material_names.BODY2
+
+        body_shader = material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
+        body_hair_ramp_switch = body_shader.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH)
+        if body_hair_ramp_switch:
+            body_hair_ramp_switch_values: BodyHairRampSwitchValues = BodyHairRampSwitchValues(self.shader_node_names)
+            body_hair_ramp_switch.default_value = body_hair_ramp_switch_values.BODY2
 
     def set_up_hair_material(self, material):
         material.name = self.material_names.HAIR
