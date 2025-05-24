@@ -4,6 +4,7 @@ import bpy
 
 from abc import abstractmethod
 
+from setup_wizard.domain.body_hair_ramp_switch_values import BodyHairRampSwitchValues
 from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
@@ -111,7 +112,8 @@ class GenshinImpactMaterialDefaultValueSetter(MaterialDefaultValueSetter):
         body_shader = material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
         body_hair_ramp_switch = body_shader.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH)
         if body_hair_ramp_switch:
-            body_hair_ramp_switch.default_value = 1
+            body_hair_ramp_switch_values: BodyHairRampSwitchValues = BodyHairRampSwitchValues(self.shader_node_names)
+            body_hair_ramp_switch.default_value = body_hair_ramp_switch_values.HAIR
 
 
 class HonkaiStarRailMaterialDefaultValueSetter(MaterialDefaultValueSetter):

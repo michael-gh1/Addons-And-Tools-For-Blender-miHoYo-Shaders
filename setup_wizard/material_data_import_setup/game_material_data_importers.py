@@ -7,6 +7,7 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
+from setup_wizard.domain.body_hair_ramp_switch_values import BodyHairRampSwitchValues
 from setup_wizard.logger import log_function
 from setup_wizard.domain.material_data_body_part_to_version_map import body_part_based_on_version_map
 from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
@@ -352,12 +353,15 @@ class ShadowRampTypeSetter:
         body_hair_ramp_switch_input = body_shader_node.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH) if body_shader_node else None
 
         if body_hair_ramp_switch_input:
-            if shadow_ramp_type == 'Hair':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
-                body_hair_ramp_switch_input.default_value = 1
-            elif shadow_ramp_type == 'Body':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
-                body_hair_ramp_switch_input.default_value = 0
-            else:
-                pass  # Intentionally do nothing.
+            body_hair_ramp_switch_values: BodyHairRampSwitchValues = BodyHairRampSwitchValues(self.shader_node_names)
+            self.__set_up_body_hair_ramp_switch_value(body_hair_ramp_switch_input, shadow_ramp_type, body_hair_ramp_switch_values)
+
+    def __set_up_body_hair_ramp_switch_value(self, switch_input, shadow_ramp_type, switch_values: BodyHairRampSwitchValues):
+        if shadow_ramp_type == 'Hair':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+            switch_input.default_value = switch_values.HAIR
+        elif shadow_ramp_type == 'Body':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+            switch_input.default_value = switch_values.BODY
+
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
     def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names: ShaderNodeNames):
