@@ -195,8 +195,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         if status == {'FINISHED'}:
             return status
 
-        if bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY) and \
-            not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v4.0
+        if self.is_create_hair_material_from_body():  # Genshin Shader >= v4.0
             self.create_hair_material()
 
         cache_enabled = self.context.window_manager.cache_enabled
@@ -211,7 +210,12 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
             high_level_step_name=self.blender_operator.high_level_step_name,
             game_type=self.blender_operator.game_type,
         )
-    
+
+    def is_create_hair_material_from_body(self):
+        body_material_exists = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
+        hair_material_missing = not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR)
+        return body_material_exists and hair_material_missing
+
     def create_hair_material(self):
         body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
         hair_material = body_material.copy()
