@@ -13,7 +13,7 @@ from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, NextSte
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
-from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetterFactory
+from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetter, MaterialDefaultValueSetterFactory
 
 
 class GameMaterialImporterFactory:
@@ -195,8 +195,8 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         if status == {'FINISHED'}:
             return status
 
-        if bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.BODY) and \
-            not bpy.data.materials.get(V3_BonnyFestivityGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v4.0
+        if bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY) and \
+            not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR):  # Genshin Shader >= v4.0
             self.create_hair_material()
 
         cache_enabled = self.context.window_manager.cache_enabled
@@ -215,7 +215,8 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     def create_hair_material(self):
         body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
         hair_material = body_material.copy()
-        MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type).set_up_hair_material(hair_material)
+        material_default_value_setter: MaterialDefaultValueSetter = MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type)
+        material_default_value_setter.set_up_hair_material(hair_material)
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):
