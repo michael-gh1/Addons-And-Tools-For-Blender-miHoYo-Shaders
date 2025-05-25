@@ -191,6 +191,12 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
             skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
             material_name = skillobj_material.name
+        elif mesh_body_part_name == 'Skirt':
+            skirt_material = self.create_body_material(self.material_names, self.material_names.SKIRT)
+            material_name = skirt_material.name
+        elif mesh_body_part_name == 'Pupil':
+            pupil_material = self.create_body_material(self.material_names, self.material_names.PUPIL)
+            material_name = pupil_material.name
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name

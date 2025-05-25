@@ -124,6 +124,7 @@ meshes_to_create_light_vectors_on = meshes_to_create_outlines_on + [
 
 material_keywords_to_not_create_outlines_on = [
     'Eff',
+    'Pupil',
 ]
 
 

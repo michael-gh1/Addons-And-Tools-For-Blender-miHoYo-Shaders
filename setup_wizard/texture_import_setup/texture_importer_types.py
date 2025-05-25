@@ -500,6 +500,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_material = bpy.data.materials.get(f'{self.material_names.GLASS}')
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
+                pupil_material = bpy.data.materials.get(f'{self.material_names.PUPIL}')
+                skirt_material = bpy.data.materials.get(f'{self.material_names.SKIRT}')
                 star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
 
                 # Implement the texture in the correct node
@@ -538,6 +540,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_face_material_id(face_material, img)
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
+                    self.set_diffuse_texture(TextureType.BODY, pupil_material, img) if pupil_material and selected_body_material is body1_material else None
                     if star_cloak_material and self.star_cloak_uses_body_texture(file):
                         self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
                 elif self.is_one_texture_identifier_in_texture_name(
@@ -552,6 +555,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                         body2_material if ShaderMaterialNameKeywords.BODY2_LIGHTMAP in file else body_material
                     self.set_lightmap_texture(TextureType.BODY, selected_body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
+                    self.set_lightmap_texture(TextureType.BODY, pupil_material, img) if pupil_material and selected_body_material is body1_material else None
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.BODY, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
                     self.set_normalmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
@@ -591,6 +595,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_lightmap_texture(TextureType.BODY, gauntlet_material, img)
                 elif "Gauntlet_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, gauntlet_material, img)
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.TAIL, 'Diffuse'], file):
+                    self.set_diffuse_texture(TextureType.BODY, skirt_material, img)
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.SKILLOBJ, 'Diffuse'], file):
                     expected_skillobj_identifier = file.split('_')[2]
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
