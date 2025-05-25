@@ -97,13 +97,9 @@ def process_multiple_log_files(file_paths):
         unique_values = unique_return_values_by_part[body_part]
         print(f"  {body_part}: {len(unique_values)} unique return values")
 
-        # Show the actual values (first 3 to keep output manageable)
+        # Show the actual values
         for i, value in enumerate(sorted(unique_values)):
-            if i < 3:  # Only show first 3 to avoid excessive output
-                print(f"    - {value}")
-            elif i == 3:
-                print(f"    - ... ({len(unique_values) - 3} more)")
-                break
+            print(f"    - {value}")
 
     return all_json_objects, all_body_part_mappings, unique_return_values_by_part
 
