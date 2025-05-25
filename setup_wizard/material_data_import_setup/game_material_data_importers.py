@@ -127,9 +127,9 @@ class GameMaterialDataImporter(ABC):
         searched_outlines_material = next(
             (material for material in searched_outlines_materials if is_outlines_material(material)), None
         )
-        is_night_soul_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_outlines_material()
+        is_night_soul_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_night_soul_outlines_material()
         if not searched_night_soul_outlines_materials:
-            searched_night_soul_outlines_materials = [material for material in searched_materials if is_outlines_material(material)] or []
+            searched_night_soul_outlines_materials = [material for material in searched_materials if is_night_soul_outlines_material(material)] or []
             searched_night_soul_outlines_material = next(
                 (material for material in searched_outlines_materials if is_night_soul_outlines_material(material)), None
             )
