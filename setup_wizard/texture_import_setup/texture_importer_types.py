@@ -596,7 +596,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "Gauntlet_Normalmap" in file:
                     self.set_normalmap_texture(TextureType.BODY, gauntlet_material, img)
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.TAIL, 'Diffuse'], file):
-                    self.set_diffuse_texture(TextureType.BODY, skirt_material, img)
+                    if skirt_material:
+                        self.set_diffuse_texture(TextureType.BODY, skirt_material, img)
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.SKILLOBJ, 'Diffuse'], file):
                     expected_skillobj_identifier = file.split('_')[2]
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
