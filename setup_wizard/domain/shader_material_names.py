@@ -60,6 +60,8 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'miHoYo - '
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
@@ -70,13 +72,17 @@ class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    PUPIL = f'{MATERIAL_PREFIX}Pupil'
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
@@ -87,14 +93,14 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    PUPIL = f'{MATERIAL_PREFIX}Pupil'
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
 
 class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
-    BODY1 = f'{MATERIAL_PREFIX}Body1'
-    BODY2 = f'{MATERIAL_PREFIX}Body2'
     GLASS = f'{MATERIAL_PREFIX}Glass'
     GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
     LEATHER = f'{MATERIAL_PREFIX}Leather'
@@ -102,10 +108,7 @@ class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMater
     VFX = f'{MATERIAL_PREFIX}VFX'
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX}{NIGHT_SOUL_OUTLINES_SUFFIX}'
-    PUPIL = f'{MATERIAL_PREFIX}Pupil'
-    SKIRT = f'{MATERIAL_PREFIX}Skirt'
     STAR_CLOAK = f'{MATERIAL_PREFIX}StarCloak'
-
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
