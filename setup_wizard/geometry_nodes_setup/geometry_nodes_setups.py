@@ -72,7 +72,10 @@ available_outline_mask_to_material_mapping = {
 }  # For smart assignment
 
 gi_meshes_to_create_outlines_on = [
+    'Bang',
     'Body',
+    'Body1',
+    'Body2',
     'Dress',
     'Dress1',
     'Dress2',
@@ -87,11 +90,13 @@ gi_meshes_to_create_outlines_on = [
     'Hat',
     'Helmet',
     'SkillObj_Mavuika_Glass_Model',
+    'Skirt',
     'Wriothesley_Gauntlet_L_Model',
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
     'StarCloak',
+    'Tail',
 ]
 
 hsr_meshes_to_create_outlines_on = [
