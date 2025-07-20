@@ -18,4 +18,6 @@ class ShaderMaterialNameKeywords:
     SKILLOBJ = 'SkillObj'
     NIGHT_SOUL_MASK_IDENTIFIERS = ['Tex', 'Mask']
 
+    STOCKINGS_DETAILMAP = 'Stockings_Detailmap'
+
     TAIL = 'Tail'

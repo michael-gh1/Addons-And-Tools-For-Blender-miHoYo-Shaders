@@ -468,6 +468,17 @@ class GenshinTextureImporter:
                     normal_map_input
                 )
 
+    def set_stocking_texture(self, img):
+        possible_shadow_ramp_node_group_names = [
+            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
+        ]
+        for shadow_ramp_node_name in possible_shadow_ramp_node_group_names:
+            shadow_ramp_node_group = bpy.data.node_groups.get(shadow_ramp_node_name)
+            if shadow_ramp_node_group:
+                shader_node_names = self.shader_identifier_service.get_shader_node_names(self.genshin_shader_version)
+                img.colorspace_settings.name='Non-Color'
+                shadow_ramp_node_group.nodes[shader_node_names.STOCKINGS_DETAIL].image = img
+
 
 class GenshinAvatarTextureImporter(GenshinTextureImporter):
     def __init__(self, material_names: ShaderMaterialNames):
@@ -628,6 +639,8 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif self.is_texture_identifiers_in_texture_name(ShaderMaterialNameKeywords.NIGHT_SOUL_MASK_IDENTIFIERS, file):
                     for material in bpy.data.materials.values():
                         self.set_up_night_soul_mask_texture(material, img)
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.STOCKINGS_DETAILMAP], file):
+                    self.set_stocking_texture(img)
                 else:
                     print(f'WARN: Ignoring texture {file}')
             break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files

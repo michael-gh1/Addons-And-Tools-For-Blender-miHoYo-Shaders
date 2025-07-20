@@ -15,6 +15,7 @@ class ShaderNodeNames:
     USE_LIGHTMAP_AO = ''
     DEPTH_BASED_RIM = ''
     BODY_HAIR_RAMP_SWITCH = ''
+    STOCKINGS_DETAIL = ''
     OUTLINES = 'Outlines'  # Outlines material node OUTPUT
     EXTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
     INTERNAL_GLOBAL_PROPERTIES = 'Global Properties'
@@ -75,6 +76,9 @@ class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'
 
     BODY_HAIR_RAMP_SWITCH = 'Body / Body 2 / Hair'
+
+    STOCKINGS_DETAIL = 'Stocking_Detail'
+
 
 class StellarToonShaderNodeNames(ShaderNodeNames):
     MAIN_SHADER = 'Group.006'
