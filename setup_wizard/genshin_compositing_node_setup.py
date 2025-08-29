@@ -27,6 +27,7 @@ NAME_OF_VIEWER_NODE_TYPE = 'CompositorNodeViewer'
 NAME_OF_IMAGE_IO = 'Image'
 NAME_OF_GT_COMPOSITE_NODE_OUTPUT = 'Result'
 NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT = 'Image'
+NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT_V2 = 'Combined'
 
 
 class GI_OT_PostProcessingCompositingSetup(Operator, BasicSetupUIOperator):
@@ -77,6 +78,7 @@ class GI_OT_CompositingNodeSetup(Operator, ImportHelper, CustomOperatorPropertie
     names_of_composite_node_outputs = [
         NAME_OF_GT_COMPOSITE_NODE_OUTPUT,
         NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT,
+        NAME_OF_HYV_PP_COMPOSITE_NODE_OUTPUT_V2,
     ]
 
     def execute(self, context):
