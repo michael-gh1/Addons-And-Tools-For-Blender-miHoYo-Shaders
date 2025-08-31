@@ -339,15 +339,20 @@ def rig_character(
         '+EyeBone L A01': 'eye.L', 
         '+Breast L A01': 'breast.L',
         '+Breast R A01': 'breast.R', 
-        '+ThumbS L A01': 'thumb.01.L',  # Kachina
-        '+ThumbS L A02': 'thumb.02.L',
-        '+ThumbS R A01': 'thumb.01.R',
-        '+ThumbS R A02': 'thumb.02.R',
-        '+GlovesS L A01': 'f_middle.01.L',
-        '+GlovesS L A02': 'f_middle.02.L',
-        '+GlovesS R A01': 'f_middle.01.R',
-        '+GlovesS R A02': 'f_middle.02.R',    
     }
+    if kachina:
+        # Only add Kachina thumb/fingers if it's Kachina
+        # There is the potential to clash and have duplicate bone names with other characters (like Wriotheseley)
+        abadidea = abadidea | {
+            '+ThumbS L A01': 'thumb.01.L',
+            '+ThumbS L A02': 'thumb.02.L',
+            '+ThumbS R A01': 'thumb.01.R',
+            '+ThumbS R A02': 'thumb.02.R',
+            '+GlovesS L A01': 'f_middle.01.L',
+            '+GlovesS L A02': 'f_middle.02.L',
+            '+GlovesS R A01': 'f_middle.01.R',
+            '+GlovesS R A02': 'f_middle.02.R',
+        }
 
     if not toe_bones_exist:
         del abadidea['Bip001 L Toe0']
