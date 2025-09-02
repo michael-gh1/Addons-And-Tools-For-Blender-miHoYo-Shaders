@@ -71,7 +71,11 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         filepath = get_cache(cache_enabled).get(self.rigify_bone_shapes_file_path) or self.blender_operator.filepath
 
         if not filepath:
-            filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
+            blender_version = bpy.app.version
+            if blender_version[0] < 4:  # for backwards compatibility
+                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape_3_6.blend')
+            else:
+                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
 
         light_vectors_modifiers = [modifier for obj in bpy.data.objects.values() if 
                                    obj.type == 'MESH' for modifier in obj.modifiers if 

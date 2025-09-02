@@ -23,7 +23,12 @@ class LightingPanel:
                     pass  # Skip if modifier input name does not exist, must do try-except because it may not have a value yet
 
     def import_lighting_panel(self):
-        lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
+        blender_version = bpy.app.version
+        if blender_version[0] < 4:  # for backwards compatibility
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LightingPanel_3_6.blend')
+        else:
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
+
         inner_path = 'Collection'
         bpy.ops.wm.append(
             filepath=os.path.join(lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
