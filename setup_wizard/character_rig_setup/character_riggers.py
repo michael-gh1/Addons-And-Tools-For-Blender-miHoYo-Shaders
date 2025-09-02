@@ -6,11 +6,10 @@ import os
 
 from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel
+from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel, LightingPanelFileNames, LightingPanelFileNamesFactory
 from setup_wizard.character_rig_setup.rig_script import rig_character
 from setup_wizard.character_rig_setup.npc_rig_script import rig_character as rig_npc
 from setup_wizard.character_rig_setup.hsr_rig_script import rig_character as hsr_rig_character
-from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 from abc import ABC, abstractmethod
 from bpy.types import Armature, Operator, Context
@@ -40,7 +39,7 @@ class CharacterRiggerFactory:
             else:
                 material_names = V4_PrimoToonGenshinImpactMaterialNames
                 texture_node_names = V4_GenshinImpactTextureNodeNames
-            return GenshinImpactCharacterRigger(blender_operator, context, material_names, texture_node_names)
+            return GenshinImpactCharacterRigger(blender_operator, context, material_names, texture_node_names, shader)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailCharacterRigger(blender_operator, context)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
@@ -59,22 +58,20 @@ class CharacterRigger(ABC):
 
 
 class GenshinImpactCharacterRigger(CharacterRigger):
-    def __init__(self, blender_operator, context, material_names, texture_node_names):
+    def __init__(self, blender_operator, context, material_names, texture_node_names, shader):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.rigify_bone_shapes_file_path = GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH
         self.material_names: ShaderMaterialNames = material_names
         self.texture_node_names: TextureNodeNames = texture_node_names
+        self.lighting_panel_file_names: LightingPanelFileNames = LightingPanelFileNamesFactory.create(shader)
 
     def rig_character(self):
         cache_enabled = self.context.window_manager.cache_enabled
         filepath = get_cache(cache_enabled).get(self.rigify_bone_shapes_file_path) or self.blender_operator.filepath
 
         if not filepath:
-            if self.material_names is V4_PrimoToonGenshinImpactMaterialNames:
-                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
-            else:  # for backwards compatibility
-                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape_Shader_v3_4.blend')
+            filepath = self.lighting_panel_file_names.ROOT_SHAPE_FILEPATH
 
         light_vectors_modifiers = [modifier for obj in bpy.data.objects.values() if 
                                    obj.type == 'MESH' for modifier in obj.modifiers if 
@@ -93,7 +90,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         # Genshin Shader >= v3.4
         if character_rigger_props.set_up_lighting_panel:
             for modifier in light_vectors_modifiers:
-                LightingPanel(self.material_names).set_up_lighting_panel(modifier)
+                LightingPanel(self.lighting_panel_file_names.LIGHTING_PANEL_FILEPATH).set_up_lighting_panel(modifier)
 
         # Important that the Armature is selected before performing rigging operations
         bpy.ops.object.select_all(action='DESELECT')

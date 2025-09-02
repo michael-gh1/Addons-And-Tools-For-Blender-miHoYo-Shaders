@@ -71,7 +71,6 @@ class LightingPanelNames:
         SHADOW_OFFSET_ORIGIN = 'Socket_28'  # v4
         SHADOW_OFFSET_SLIDER = 'Socket_29'  # v4
 
-    FILENAME = 'LightingPanel.blend'
     LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME = [
         (GeometryNodeInputs.AMBIENT_COLOR_WHEEL, Objects.AMBIENT_COLOR_WHEEL),
         (GeometryNodeInputs.AMBIENT_COLOR_PICKER, Objects.AMBIENT_COLOR_PICKER),

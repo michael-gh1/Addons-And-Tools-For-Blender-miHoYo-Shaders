@@ -1,17 +1,38 @@
 import bpy
 import os
 
-from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
+
+
+class LightingPanelFileNames:
+    LIGHTING_PANEL_FILENAME = 'LightingPanel.blend'
+    LIGHTING_PANEL_V3_4_FILENAME = 'LightingPanel_Shader_v3_4.blend'
+    ROOT_SHAPE_FILENAME = 'RootShape.blend'
+    ROOT_SHAPE_V3_4_FILENAME = 'RootShape_Shader_v3_4.blend'
+
+    def __init__(self, lighting_panel_filepath, root_shape_filepath):
+        self.LIGHTING_PANEL_FILEPATH = lighting_panel_filepath
+        self.ROOT_SHAPE_FILEPATH = root_shape_filepath
+
+
+class LightingPanelFileNamesFactory:
+    @staticmethod
+    def create(shader: GenshinImpactShaders):
+        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_FILENAME)
+            root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_FILENAME)
+        else:  # for backwards compatibility
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_V3_4_FILENAME)
+            root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_V3_4_FILENAME)
+
+        return LightingPanelFileNames(lighting_panel_filepath, root_shape_filepath)
 
 
 # Genshin Shader >= v3.4
 class LightingPanel:
-    def __init__(self, material_names: ShaderMaterialNames):
-        if material_names is V4_PrimoToonGenshinImpactMaterialNames:
-            self.lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
-        else:  # for backwards compatibility
-            self.lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LightingPanel_Shader_v3_4.blend')
+    def __init__(self, lighting_panel_filepath):
+        self.lighting_panel_filepath = lighting_panel_filepath
 
     def set_up_lighting_panel(self, light_vectors_modifier):
         lighting_panel_attributes_exist = LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier
