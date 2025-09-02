@@ -1,13 +1,17 @@
 import bpy
 import os
 
+from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 
 # Genshin Shader >= v3.4
 class LightingPanel:
-    def __init__(self):
-        pass
+    def __init__(self, material_names: ShaderMaterialNames):
+        if material_names is V4_PrimoToonGenshinImpactMaterialNames:
+            self.lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
+        else:  # for backwards compatibility
+            self.lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LightingPanel_Shader_v3_4.blend')
 
     def set_up_lighting_panel(self, light_vectors_modifier):
         lighting_panel_attributes_exist = LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier
@@ -23,16 +27,10 @@ class LightingPanel:
                     pass  # Skip if modifier input name does not exist, must do try-except because it may not have a value yet
 
     def import_lighting_panel(self):
-        blender_version = bpy.app.version
-        if blender_version[0] < 4:  # for backwards compatibility
-            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'LightingPanel_3_6.blend')
-        else:
-            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
-
         inner_path = 'Collection'
         bpy.ops.wm.append(
-            filepath=os.path.join(lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
-            directory=os.path.join(lighting_panel_filepath, inner_path),
+            filepath=os.path.join(self.lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
+            directory=os.path.join(self.lighting_panel_filepath, inner_path),
             files=[
                 {'name': LightingPanelNames.Collections.LIGHTING_PANEL},
             ],

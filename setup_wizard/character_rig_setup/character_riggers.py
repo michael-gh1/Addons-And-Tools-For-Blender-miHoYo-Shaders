@@ -71,11 +71,10 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         filepath = get_cache(cache_enabled).get(self.rigify_bone_shapes_file_path) or self.blender_operator.filepath
 
         if not filepath:
-            blender_version = bpy.app.version
-            if blender_version[0] < 4:  # for backwards compatibility
-                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape_3_6.blend')
-            else:
+            if self.material_names is V4_PrimoToonGenshinImpactMaterialNames:
                 filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape.blend')
+            else:  # for backwards compatibility
+                filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'RootShape_Shader_v3_4.blend')
 
         light_vectors_modifiers = [modifier for obj in bpy.data.objects.values() if 
                                    obj.type == 'MESH' for modifier in obj.modifiers if 
@@ -94,7 +93,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         # Genshin Shader >= v3.4
         if character_rigger_props.set_up_lighting_panel:
             for modifier in light_vectors_modifiers:
-                LightingPanel().set_up_lighting_panel(modifier)
+                LightingPanel(self.material_names).set_up_lighting_panel(modifier)
 
         # Important that the Armature is selected before performing rigging operations
         bpy.ops.object.select_all(action='DESELECT')
