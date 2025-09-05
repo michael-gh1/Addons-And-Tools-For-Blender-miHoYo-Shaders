@@ -11,7 +11,8 @@ import re
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
 
 def rig_character(
-        file_path, 
+        file_path,
+        lighting_panel_version, 
         disallow_arm_ik_stretch, 
         disallow_leg_ik_stretch,
         use_arm_ik_poles,
@@ -2071,7 +2072,7 @@ def rig_character(
     face_shape_keys = get_shape_keys("Face", handled_sks)
 
     # We have existing SK's we need to support, bring in the 'extras' header and do the work
-    if len(face_shape_keys) > 0:
+    if lighting_panel_version >= 4 and len(face_shape_keys) > 0:
         bpy.ops.wm.append(filename='append_extras', directory=path_to_file)
 
         # Select the rigs in question

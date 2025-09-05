@@ -121,6 +121,7 @@ class GenshinImpactCharacterRigger(CharacterRigger):
         else:
             rig_character(
                 filepath,
+                self.lighting_panel_file_names.VERSION,
                 not character_rigger_props.allow_arm_ik_stretch,
                 not character_rigger_props.allow_leg_ik_stretch,
                 character_rigger_props.use_arm_ik_poles,

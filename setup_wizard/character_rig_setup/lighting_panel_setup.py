@@ -12,6 +12,7 @@ class LightingPanelFileNames:
     ROOT_SHAPE_V3_4_FILENAME = 'RootShape_Shader_v3_4.blend'
 
     def __init__(self, lighting_panel_filepath, root_shape_filepath):
+        self.VERSION = 3 if self.LIGHTING_PANEL_V3_4_FILENAME in lighting_panel_filepath else 4
         self.LIGHTING_PANEL_FILEPATH = lighting_panel_filepath
         self.ROOT_SHAPE_FILEPATH = root_shape_filepath
 
