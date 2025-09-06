@@ -7,12 +7,13 @@ from bpy.types import Operator, Context
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
-    JaredNytsPunishingGrayRavenShaderMaterialNames
-from setup_wizard.import_order import NextStepInvoker, cache_using_cache_key, get_cache, \
+    JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache, \
     GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
+from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetter, MaterialDefaultValueSetterFactory
 
 
 class GameMaterialImporterFactory:
@@ -31,6 +32,7 @@ class GameMaterialImporter:
     MATERIAL_PATH_INSIDE_BLEND_FILE = 'Material'
     NODE_TREE_PATH_INSIDE_BLEND_FILE = 'NodeTree'
     OBJECT_PATH_INSIDE_BLEND_FILE = 'Object'
+    OUTLINES_FILE_PATH = None
 
     def __init__(self, 
                  blender_operator: Operator, 
@@ -123,6 +125,11 @@ class GameMaterialImporter:
         if cache_enabled and (user_selected_shader_blend_file_path or project_root_directory_file_path):
             if user_selected_shader_blend_file_path:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_file_path, user_selected_shader_blend_file_path)
+
+                outlines_in_shader_blend_file = self.__get_outlines_node_group_from_shader_blend_file(
+                    user_selected_shader_blend_file_path)
+                if outlines_in_shader_blend_file:
+                    self.__set_outlines_cache(cache_enabled, user_selected_shader_blend_file_path)
             else:
                 cache_using_cache_key(get_cache(cache_enabled), self.game_shader_folder_path, project_root_directory_file_path)
 
@@ -144,6 +151,19 @@ class GameMaterialImporter:
             files=light_direction_empties_to_append
         )
 
+    def __get_outlines_node_group_from_shader_blend_file(self, shader_blend_file_path):
+        with bpy.data.libraries.load(shader_blend_file_path) as (data_from, data_to):
+            outlines_in_shader_blend_file = [node_group for node_group in data_from.node_groups if
+                                                node_group in [
+                                                    node_group_name for node_group_name in OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
+                                                ]
+                                            ]
+        return outlines_in_shader_blend_file
+
+    def __set_outlines_cache(self, cache_enabled, shader_file_path):
+        if self.OUTLINES_FILE_PATH and cache_enabled and shader_file_path:
+            cache_using_cache_key(get_cache(cache_enabled), self.OUTLINES_FILE_PATH, shader_file_path)
+
 class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
     DEFAULT_BLEND_FILE_WITH_GENSHIN_MATERIALS = 'HoYoverse - Genshin Impact - Goo Engine v3.blend'
     NAMES_OF_GENSHIN_MATERIALS = [
@@ -154,8 +174,10 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.BODY},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
-        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES}
+        {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES},
+        {'name': V4_PrimoToonGenshinImpactMaterialNames.VFX},
     ]
+    OUTLINES_FILE_PATH = GENSHIN_IMPACT_OUTLINES_FILE_PATH
 
     def __init__(self, blender_operator, context):
         super().__init__(
@@ -173,6 +195,8 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         if status == {'FINISHED'}:
             return status
 
+        if self.is_create_hair_material_from_body():  # Genshin Shader >= v4.0
+            self.create_hair_material()
 
         cache_enabled = self.context.window_manager.cache_enabled
         project_root_directory_file_path = self.blender_operator.file_directory \
@@ -186,6 +210,17 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
             high_level_step_name=self.blender_operator.high_level_step_name,
             game_type=self.blender_operator.game_type,
         )
+
+    def is_create_hair_material_from_body(self):
+        body_material_exists = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
+        hair_material_missing = not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR)
+        return body_material_exists and hair_material_missing
+
+    def create_hair_material(self):
+        body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
+        hair_material = body_material.copy()
+        material_default_value_setter: MaterialDefaultValueSetter = MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type)
+        material_default_value_setter.set_up_hair_material(hair_material)
 
 
 class HonkaiStarRailMaterialImporterFacade(GameMaterialImporter):

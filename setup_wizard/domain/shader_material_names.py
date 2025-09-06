@@ -4,6 +4,7 @@
 class ShaderMaterialNames:
     EMISSIVE_TEMPLATE_MATERIAL_NAME = 'HoYoverse - HELPER Template'
     MATERIAL_PREFIX = ''
+    MATERIAL_PREFIX_AFTER_RENAME = ''
     BODY = ''
     BODY1 = ''
     BODY2 = ''
@@ -14,12 +15,22 @@ class ShaderMaterialNames:
     EFFECT = ''
     EFFECT_HAIR = ''
     GAUNTLET = ''
+    GLASS = ''
+    GLASS_EFF = ''
     HELMET = ''
     HELMET_EMO = ''
+    LEATHER = ''
     HAIR = ''
     FACE = ''
     EYESHADOW = ''
     OUTLINES = ''
+    NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
+    NIGHT_SOUL_OUTLINES = ''
+    PUPIL = ''
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    SKIRT = ''
+    STAR_CLOAK = ''
+    VFX = ''
     # HSR
     WEAPON = ''
     WEAPON01 = ''
@@ -47,35 +58,62 @@ class ShaderMaterialNames:
 
 class V2_FestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'miHoYo - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'miHoYo - '
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     GAUNTLET = f'{MATERIAL_PREFIX}Gauntlet'
+    GLASS = f'{MATERIAL_PREFIX}Glass'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     HELMET = f'{MATERIAL_PREFIX}Helmet'
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    PUPIL = f'{MATERIAL_PREFIX}Pupil'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
 
 class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body1'
+    BODY2 = f'{MATERIAL_PREFIX}Body2'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
     GAUNTLET = f'{MATERIAL_PREFIX}Gauntlet'
+    GLASS = f'{MATERIAL_PREFIX}Glass'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     HELMET = f'{MATERIAL_PREFIX}Helmet'
     HELMET_EMO = f'{MATERIAL_PREFIX}HelmetEmo'
     FACE = f'{MATERIAL_PREFIX}Face'
     OUTLINES = f'{MATERIAL_PREFIX}Outlines'
+    PUPIL = f'{MATERIAL_PREFIX}Pupil'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
+
+class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
+    MATERIAL_PREFIX = 'HoYoverse - Genshin '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
+    GLASS = f'{MATERIAL_PREFIX}Glass'
+    GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
+    LEATHER = f'{MATERIAL_PREFIX}Leather'
+    SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    VFX = f'{MATERIAL_PREFIX}VFX'
+    NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
+    NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX}{NIGHT_SOUL_OUTLINES_SUFFIX}'
+    STAR_CLOAK = f'{MATERIAL_PREFIX}StarCloak'
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'HSR - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'HSR - '
     BODY = f'{MATERIAL_PREFIX}Body'
     BODY1 = f'{MATERIAL_PREFIX}Body1'
     BODY2 = f'{MATERIAL_PREFIX}Body2'
@@ -98,6 +136,7 @@ class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):
 class StellarToonShaderMaterialNames(ShaderMaterialNames):
     # Shader Materials
     MATERIAL_PREFIX = 'StellarToon - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'StellarToon - '
     BASE = f'{MATERIAL_PREFIX}Base'
     HAIR = f'{MATERIAL_PREFIX}Hair'
     FACE = f'{MATERIAL_PREFIX}Face'
@@ -130,6 +169,7 @@ class StellarToonShaderMaterialNames(ShaderMaterialNames):
 
 class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
     MATERIAL_PREFIX = 'PGR - '
+    MATERIAL_PREFIX_AFTER_RENAME = 'PGR - '
     ALPHA = f'{MATERIAL_PREFIX}Alpha'
     EYE = f'{MATERIAL_PREFIX}Eye'
     FACE = f'{MATERIAL_PREFIX}Face'
@@ -139,5 +179,6 @@ class JaredNytsPunishingGrayRavenShaderMaterialNames(ShaderMaterialNames):
 
     # Custom
     BODY = f'{MATERIAL_PREFIX}Body'
+    BODY1 = f'{MATERIAL_PREFIX}Body01'
     XDEFAULTMATERIAL = f'{MATERIAL_PREFIX}XDefaultMaterial'  # Chibi Body
     CHIBIFACE = 'ChibiFace'  # Chibi Face

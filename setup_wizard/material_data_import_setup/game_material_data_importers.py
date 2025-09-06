@@ -7,11 +7,17 @@ from typing import List, Union
 import bpy
 from bpy.types import Operator, Context, Material
 
+from setup_wizard.domain.body_hair_ramp_switch_values import BodyHairRampSwitchValues
+from setup_wizard.logger import log_function
+from setup_wizard.domain.material_data_body_part_to_version_map import body_part_based_on_version_map
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames
+from setup_wizard.domain.shader_material import ShaderMaterial
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, ShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
     Nya222HonkaiStarRailShaderMaterialNames
 from setup_wizard.domain.character_types import CharacterType
+from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
@@ -20,7 +26,8 @@ from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, get_cach
 from setup_wizard.material_data_import_setup.material_data_applier import MaterialDataApplier, MaterialDataAppliersFactory
 from setup_wizard.parsers.material_data_json_parsers import MaterialDataJsonParser, HoyoStudioMaterialDataJsonParser, \
     UABEMaterialDataJsonParser, UnknownHoyoStudioMaterialDataJsonParser
-from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name
+from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, get_npc_mesh_body_part_name, \
+    get_body_part
 
 
 class MaterialDataFile:
@@ -36,22 +43,27 @@ class MaterialDataDirectory:
 
 
 class GameMaterialDataImporter(ABC):
+    shader_node_names: ShaderNodeNames
+    material_names: ShaderMaterialNames
+
     @abstractmethod
     def import_material_data(self):
         raise NotImplementedError
 
-    def apply_material_data(self, body_part: str, material_data_appliers: List[MaterialDataApplier]):
+    def apply_material_data(self, body_part: str, material_data_appliers: List[MaterialDataApplier], file):
         for material_data_applier in material_data_appliers:
             try:
                 material_data_applier.set_up_mesh_material_data()
+                material_data_applier.set_up_outline_material_data(body_part, file)
                 material_data_applier.set_up_outline_colors()
+                print(f'INFO: Successfully applied material data on {material_data_applier.__class__}')
                 break  # Important! If a MaterialDataApplier runs successfully, we don't need to try the next version
             except AttributeError as err:
-                print(err)
+                print(f'WARNING: {err} on {material_data_applier.__class__}')
                 print('WARNING: Falling back and trying next version')
                 continue # fallback and try next version
             except KeyError as err:
-                print(err)
+                print(f'WARNING: {err} on {material_data_applier.__class__}')
                 print('WARNING: Falling back and trying next version')
                 continue # fallback and try next version
 
@@ -66,7 +78,9 @@ class GameMaterialDataImporter(ABC):
                 if index == len(self.parsers) - 1:
                     raise UnsupportedMaterialDataJsonFormatException(self.parsers)
 
-    def open_and_load_json_data(self, directory_file_path, file):
+    # TOOD: Refactor into own class?
+    @staticmethod
+    def open_and_load_json_data(directory_file_path, file):
         with open(f'{directory_file_path}/{file.name}') as fp:
             try:
                 json_material_data = json.load(fp)
@@ -74,17 +88,19 @@ class GameMaterialDataImporter(ABC):
             except UnicodeDecodeError:
                 raise Exception(f'Failed to load JSON. Did you select a different type of file? \nFile Selected: "{file.name}"')
 
-    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material]:
+    @log_function()
+    def find_material_and_outline_material_for_body_part(self, body_part) -> Union[Material, Material, Material]:
         # Order of Selection
         # 1. Target Material selected.
         # 2. Shader Materials not renamed (regular setup).
         # 3. Shader Materials renamed. Search for material.
         searched_materials = [material for material in bpy.data.materials.values() if 
                               body_part in material.name and 
-                              self.material_names.MATERIAL_PREFIX in material.name and
+                              self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
                               'Outlines' not in material.name
         ] if body_part else []
-        searched_material = searched_materials[0] if searched_materials else None
+        is_not_outlines_material = lambda material: not ShaderMaterial(material, self.shader_node_names).is_outlines_material()
+        searched_material = next((material for material in searched_materials if is_not_outlines_material(material)), None)
         material: Material = self.material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part}') or searched_material
 
         # Order of Selection
@@ -93,13 +109,39 @@ class GameMaterialDataImporter(ABC):
         # 3. Shader Materials renamed. Search for material.
         searched_outlines_materials = [material for material in bpy.data.materials.values() if 
                                        body_part in material.name and 
-                                       self.material_names.MATERIAL_PREFIX in material.name and
-                                       ' Outlines' in material.name
+                                       self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
+                                       ' Outlines' in material.name and
+                                       not self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX in material.name
         ] if body_part else []
-        searched_outlines_material = searched_outlines_materials[0] if searched_outlines_materials else None
-        outlines_material: Material = self.outlines_material or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or searched_outlines_material
+        searched_night_soul_outlines_materials = [material for material in bpy.data.materials.values() if 
+                                       body_part in material.name and 
+                                       self.material_names.MATERIAL_PREFIX_AFTER_RENAME in material.name and
+                                       self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX in material.name
+        ] if body_part else []
 
-        return (material, outlines_material)
+        # If outlines could not be found, the material name may be too long.
+        # Try searching for the outlines material by specific settings in it.
+        is_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_outlines_material()
+        if not searched_outlines_materials:
+            searched_outlines_materials = [material for material in searched_materials if is_outlines_material(material)] or []
+        searched_outlines_material = next(
+            (material for material in searched_outlines_materials if is_outlines_material(material)), None
+        )
+        is_night_soul_outlines_material = lambda material: ShaderMaterial(material, self.shader_node_names).is_night_soul_outlines_material()
+        if not searched_night_soul_outlines_materials:
+            searched_night_soul_outlines_materials = [material for material in searched_materials if is_night_soul_outlines_material(material)] or []
+            searched_night_soul_outlines_material = next(
+                (material for material in searched_outlines_materials if is_night_soul_outlines_material(material)), None
+            )
+
+        outlines_material: Material = self.outlines_material or \
+            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} Outlines') or \
+            searched_outlines_material
+        night_soul_outlines_material: Material = self.outlines_material or \
+            bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{body_part} {self.material_names.NIGHT_SOUL_OUTLINES_SUFFIX}') or \
+            searched_night_soul_outlines_material
+
+        return (material, outlines_material, night_soul_outlines_material)
 
     def get_material_data_files(self):
         # Attempt to use the Material or Materials folder in the cached character folder to import material data json
@@ -151,23 +193,16 @@ class GameMaterialDataImporterFactory:
     def create(game_type: GameType, blender_operator: Operator, context: Context, outline_material_group: OutlineMaterialGroup):
         shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(game_type)
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+        material_names = shader_identifier_service.get_shader_material_names(game_type, bpy.data.materials, bpy.data.node_groups)
+        shader_node_names = shader_identifier_service.get_shader_node_names(shader)
 
         # Because we inject the GameType via StringProperty, we need to compare using the Enum's name (a string)
         if game_type == GameType.GENSHIN_IMPACT.name:
-            if shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
-                material_names = V3_BonnyFestivityGenshinImpactMaterialNames
-            else:
-                material_names = V2_FestivityGenshinImpactMaterialNames
-            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+            return GenshinImpactMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
-            if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
-                material_names = Nya222HonkaiStarRailShaderMaterialNames
-            else:
-                material_names = StellarToonShaderMaterialNames
-            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+            return HonkaiStarRailMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
-            material_names = JaredNytsPunishingGrayRavenShaderMaterialNames
-            return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names)
+            return PunishingGrayRavenMaterialDataImporter(blender_operator, context, outline_material_group, material_names, shader_node_names)
         else:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
@@ -175,7 +210,7 @@ class GameMaterialDataImporterFactory:
 class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
     WEAPON_NAME_IDENTIFIER = 'Mat'
 
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -186,6 +221,7 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names: ShaderNodeNames = shader_node_names
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
@@ -220,14 +256,30 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
             elif 'Equip' in file.name:
                 body_part = 'Body'
                 character_type = CharacterType.GI_EQUIPMENT
+            elif file.name.endswith('Glass_Mat.json'):
+                body_part = 'Glass'
+                character_type = CharacterType.UNKNOWN
+            elif file.name.endswith('Glass_Eff_Mat.json'):
+                body_part = 'Glass_Eff'
+                character_type = CharacterType.UNKNOWN
+            elif file.name.startswith(ShaderMaterialNameKeywords.SKILLOBJ):
+                skillobj_identifier = file.name.split('_')[2]  # WARNING: This is a brittle way to get the identifier
+                body_part = f'{ShaderMaterialNameKeywords.SKILLOBJ} {skillobj_identifier}'
+                character_type = CharacterType.UNKNOWN
             else:
                 body_part = PurePosixPath(file.name).stem.split('_')[-1]
                 character_type = CharacterType.UNKNOWN  # catch-all, tries default material applying behavior
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
+            material_data_parser = self.get_material_data_json_parser(json_material_data)
 
-            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
-            outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
+            material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+            outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
+
+            # Skirk's Dress2 material data JSON is for her StarCloak
+            if body_part == 'Dress2' and 'Skirk' in file.name:
+                body_part_based_on_version = body_part_based_on_version_map.get(self.material_names, 'StarCloak')
+                self.__customized_skirk_starcloak_material_data_setup(material_data_parser, character_type, file, body_part_based_on_version)
 
             if not material or not outlines_material:
                 self.blender_operator.report({'WARNING'}, \
@@ -237,19 +289,82 @@ class GenshinImpactMaterialDataImporter(GameMaterialDataImporter):
                     f'* Expected Materials "{self.material_names.MATERIAL_PREFIX}{body_part}" and "{self.material_names.MATERIAL_PREFIX}{body_part} Outlines"')
                 continue
 
-            material_data_parser = self.get_material_data_json_parser(json_material_data)
+            shadow_ramp_type_setter = ShadowRampTypeSetter(file, material_data_directory, self.shader_node_names)
+            shadow_ramp_type_setter.set_shadow_ramp_type(material)
+
             material_data_appliers = MaterialDataAppliersFactory.create(
                 self.blender_operator.game_type,
                 material_data_parser,
                 outline_material_group,
                 character_type
             )
-            self.apply_material_data(body_part, material_data_appliers)
+            self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
+
+    def __customized_skirk_starcloak_material_data_setup(self, material_data_parser, character_type, file, body_part):
+        material, outlines_material, night_soul_outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+        outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material, night_soul_outlines_material)
+
+        material_data_appliers = MaterialDataAppliersFactory.create(
+            self.blender_operator.game_type,
+            material_data_parser,
+            outline_material_group,
+            character_type
+        )
+        self.apply_material_data(body_part, material_data_appliers, file)
+
+class ShadowRampTypeSetter:
+    def __init__(self, target_file, material_data_directory: MaterialDataDirectory, shader_node_names: ShaderNodeNames):
+        self.target_file = target_file
+        self.material_data_directory = material_data_directory
+        self.shader_node_names = shader_node_names
+
+    def set_shadow_ramp_type(self, shader_material):
+        shadow_ramp_type = self.__get_shadow_ramp_type_by_PackedShadowRampTex()
+        self.__set_shadow_ramp_type_on_shader_material(shader_material, shadow_ramp_type)
+
+    def __get_shadow_ramp_type_by_PackedShadowRampTex(self):
+        material_data_files = [mat_file for mat_file in self.material_data_directory.files if mat_file.name.lower() != self.target_file.name.lower()]
+
+        target_file_json = GenshinImpactMaterialDataImporter.open_and_load_json_data(
+            self.material_data_directory.file_path, 
+            self.target_file
+        )
+        target_file_shadow_ramp_pathID = self.__get_shadow_ramp_pathID(target_file_json)
+
+        for material_data_file in material_data_files:
+            material_data_json = GenshinImpactMaterialDataImporter.open_and_load_json_data(
+                self.material_data_directory.file_path, 
+                material_data_file
+            )
+            shadow_ramp_pathID = self.__get_shadow_ramp_pathID(material_data_json)
+
+            if shadow_ramp_pathID and target_file_shadow_ramp_pathID and shadow_ramp_pathID == target_file_shadow_ramp_pathID:
+                return get_body_part(material_data_file)
+
+    def __get_shadow_ramp_pathID(self, material_data_json):
+        try:
+            return material_data_json.get('m_SavedProperties').get('m_TexEnvs').get('_PackedShadowRampTex').get('m_Texture').get('m_PathID')
+        except AttributeError:
+            return None
+
+    def __set_shadow_ramp_type_on_shader_material(self, shader_material, shadow_ramp_type):
+        body_shader_node = shader_material.node_tree.nodes.get(self.shader_node_names.BODY_SHADER)
+        body_hair_ramp_switch_input = body_shader_node.inputs.get(self.shader_node_names.BODY_HAIR_RAMP_SWITCH) if body_shader_node else None
+
+        if body_hair_ramp_switch_input:
+            body_hair_ramp_switch_values: BodyHairRampSwitchValues = BodyHairRampSwitchValues(self.shader_node_names)
+            self.__set_up_body_hair_ramp_switch_value(body_hair_ramp_switch_input, shadow_ramp_type, body_hair_ramp_switch_values)
+
+    def __set_up_body_hair_ramp_switch_value(self, switch_input, shadow_ramp_type, switch_values: BodyHairRampSwitchValues):
+        if shadow_ramp_type == 'Hair':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+            switch_input.default_value = switch_values.HAIR
+        elif shadow_ramp_type == 'Body':  # TODO: Refactor into Enum along side genshin_body_part_deducer.py
+            switch_input.default_value = switch_values.BODY
 
 
 class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -260,6 +375,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     def import_material_data(self):
         self.validate_UI_inputs_for_targeted_material_data_import()
@@ -291,7 +407,7 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
 
             json_material_data = self.open_and_load_json_data(material_data_directory.file_path, file)
 
-            material, outlines_material = self.find_material_and_outline_material_for_body_part(body_part)
+            material, outlines_material, __ = self.find_material_and_outline_material_for_body_part(body_part)
             outline_material_group: OutlineMaterialGroup = OutlineMaterialGroup(material, outlines_material)
 
             if not material or not outlines_material:
@@ -309,13 +425,13 @@ class HonkaiStarRailMaterialDataImporter(GameMaterialDataImporter):
                 outline_material_group,
                 character_type
             )
-            self.apply_material_data(body_part, material_data_appliers)
+            self.apply_material_data(body_part, material_data_appliers, file)
         return {'FINISHED'}
 
 
 # Unused.
 class PunishingGrayRavenMaterialDataImporter(GameMaterialDataImporter):
-    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names):
+    def __init__(self, blender_operator, context, outline_material_group: OutlineMaterialGroup, material_names, shader_node_names: ShaderNodeNames):
         self.blender_operator: Operator = blender_operator
         self.context: Context = context
         self.parsers = [
@@ -326,6 +442,7 @@ class PunishingGrayRavenMaterialDataImporter(GameMaterialDataImporter):
         self.material = outline_material_group.material
         self.outlines_material = outline_material_group.outlines_material
         self.material_names = material_names
+        self.shader_node_names = shader_node_names
 
     def import_material_data(self):
         return {'FINISHED'}

@@ -9,7 +9,7 @@ import pathlib
 # ImportHelper is a helper class, defines filename and
 # invoke() function which calls the file selector.
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import StringProperty
+from bpy.props import BoolProperty, StringProperty
 from bpy.types import Operator
 import os
 
@@ -56,6 +56,18 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
 
+    use_auto_bone_orientation: BoolProperty(
+        name="Automatic Bone Orientation",
+        description="Automatically sort bones orientations, if you want to preserve the original armature, please disable the option",
+        default=True,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        box = layout.box()
+        box.label(text="BetterFBX Bone Options:")
+        box.prop(self, 'use_auto_bone_orientation')
+
     def execute(self, context):
         is_character_model_file = not os.path.isdir(self.filepath) and self.filepath
         character_model_directory = os.path.dirname(self.filepath) or self.file_directory
@@ -83,24 +95,24 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             self.import_character_model(character_model_file_path_or_directory, is_character_model_file)
             self.reset_pose_location_and_rotation()
             self.rename_mesh_color_attribute_name(SHADER_COLOR_ATTRIBUTE_NAME)  # Blender 3.4 changed default name to 'Attribute', revert it
+
+            if context.window_manager.cache_enabled and character_model_directory:
+                cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_directory)
+
+            # Add fake user to all materials that were added when importing character model (to prevent unused materials from being cleaned up)
+            materials_imported_from_character_model = [material for material in bpy.data.materials.values() if material not in existing_materials]
+            material_utils.add_fake_user_to_materials(materials_imported_from_character_model)
+
+            NextStepInvoker().invoke(
+                self.next_step_idx, 
+                self.invoker_type, 
+                file_path_to_cache=character_model_directory,
+                high_level_step_name=self.high_level_step_name,
+                game_type=self.game_type,
+            )
         finally:
             bpy.context.preferences.view.language = original_language
-
-        if context.window_manager.cache_enabled and character_model_directory:
-            cache_using_cache_key(get_cache(), CHARACTER_MODEL_FOLDER_FILE_PATH, character_model_directory)
-
-        # Add fake user to all materials that were added when importing character model (to prevent unused materials from being cleaned up)
-        materials_imported_from_character_model = [material for material in bpy.data.materials.values() if material not in existing_materials]
-        material_utils.add_fake_user_to_materials(materials_imported_from_character_model)
-
-        NextStepInvoker().invoke(
-            self.next_step_idx, 
-            self.invoker_type, 
-            file_path_to_cache=character_model_directory,
-            high_level_step_name=self.high_level_step_name,
-            game_type=self.game_type,
-        )
-        super().clear_custom_properties()
+            super().clear_custom_properties()
         return {'FINISHED'}
 
     def import_character_model(self, character_model_file_path_or_directory, is_character_model_file):
@@ -115,6 +127,7 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             bpy.ops.better_import.fbx(
                 'EXEC_DEFAULT',
                 filepath=character_model_file_path,
+                use_auto_bone_orientation=self.use_auto_bone_orientation,
             )
             self.report({'INFO'}, 'Imported character model using BetterFBX')
         else:

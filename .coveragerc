@@ -1,0 +1,15 @@
+[run]
+source = 
+    setup_wizard
+
+omit = 
+    */tests/*
+    */test_*.py
+    setup_wizard/tests/*
+    */.venv/*
+
+[report]
+# Report on modules even if they weren't executed during testing
+include_namespace_packages = True
+skip_empty = False
+skip_covered = False

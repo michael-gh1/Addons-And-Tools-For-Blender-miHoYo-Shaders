@@ -1,13 +1,39 @@
 import bpy
 import os
 
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
+
+
+class LightingPanelFileNames:
+    LIGHTING_PANEL_FILENAME = 'LightingPanel.blend'
+    LIGHTING_PANEL_V3_4_FILENAME = 'LightingPanel_Shader_v3_4.blend'
+    ROOT_SHAPE_FILENAME = 'RootShape.blend'
+    ROOT_SHAPE_V3_4_FILENAME = 'RootShape_Shader_v3_4.blend'
+
+    def __init__(self, lighting_panel_filepath, root_shape_filepath):
+        self.VERSION = 3 if self.LIGHTING_PANEL_V3_4_FILENAME in lighting_panel_filepath else 4
+        self.LIGHTING_PANEL_FILEPATH = lighting_panel_filepath
+        self.ROOT_SHAPE_FILEPATH = root_shape_filepath
+
+
+class LightingPanelFileNamesFactory:
+    @staticmethod
+    def create(shader: GenshinImpactShaders):
+        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_FILENAME)
+            root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_FILENAME)
+        else:  # for backwards compatibility
+            lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_V3_4_FILENAME)
+            root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_V3_4_FILENAME)
+
+        return LightingPanelFileNames(lighting_panel_filepath, root_shape_filepath)
 
 
 # Genshin Shader >= v3.4
 class LightingPanel:
-    def __init__(self):
-        pass
+    def __init__(self, lighting_panel_filepath):
+        self.lighting_panel_filepath = lighting_panel_filepath
 
     def set_up_lighting_panel(self, light_vectors_modifier):
         lighting_panel_attributes_exist = LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME[0][0] in light_vectors_modifier
@@ -17,14 +43,16 @@ class LightingPanel:
             self.connect_lighting_panel_nodes_to_global_material_properties()
 
             for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
-                light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
+                try:
+                    light_vectors_modifier[modifier_input_name] = light_vectors_modifier[modifier_input_name] or bpy.data.objects.get(object_name)
+                except KeyError:
+                    pass  # Skip if modifier input name does not exist, must do try-except because it may not have a value yet
 
     def import_lighting_panel(self):
-        lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelNames.FILENAME)
         inner_path = 'Collection'
         bpy.ops.wm.append(
-            filepath=os.path.join(lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
-            directory=os.path.join(lighting_panel_filepath, inner_path),
+            filepath=os.path.join(self.lighting_panel_filepath, inner_path, LightingPanelNames.Collections.LIGHTING_PANEL),
+            directory=os.path.join(self.lighting_panel_filepath, inner_path),
             files=[
                 {'name': LightingPanelNames.Collections.LIGHTING_PANEL},
             ],
@@ -41,7 +69,8 @@ class LightingPanel:
             global_properties_internal_nodes = global_properties_external_node.node_tree.nodes
 
             for node_name, input_output_names in GlobalPropertiesNames.NODES_TO_GLOBAL_PROPERTIES.items():
-                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output'])
+                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output']) or \
+                    global_properties_internal_nodes[node_name].outputs.get(input_output_names['old_output_name'])
                 input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
                 global_properties_external_node.node_tree.links.new(output, input)
 
@@ -82,23 +111,28 @@ class GlobalPropertiesNames:
         },
         LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
             'input': Inputs.AMBIENT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
             'input': Inputs.SHARP_LIT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
             'input': Inputs.SOFT_LIT_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
             'input': Inputs.SHARP_SHADOW_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
             'input': Inputs.SOFT_SHADOW_COLOUR,
-            'output': 'Color',
+            'output': 'Output',
+            'old_output_name': 'Color',
         },
         LightingPanelNodeNames.RIM_LIT_NODE: {
             'input': Inputs.RIM_LIT,

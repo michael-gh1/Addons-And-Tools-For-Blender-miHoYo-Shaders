@@ -3,8 +3,8 @@
 import bpy
 from bpy.types import Panel, UILayout
 
-from setup_wizard import bl_info
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.ui.ui_render_checker import PunishingGrayRavenUIRenderChecker
 
 rigging_global_settings_feature_flag = False
 
@@ -17,11 +17,6 @@ class UI_Properties:
                 default = True
             )
 
-        # bpy.types.WindowManager.setup_wizard_join_meshes_enabled = bpy.props.BoolProperty(
-        #     name = " Join Meshes Enabled",
-        #     default = True
-        # )
-
         bpy.types.WindowManager.cache_enabled = bpy.props.BoolProperty(
             name = "Cache Enabled",
             default = True
@@ -33,19 +28,16 @@ class UI_Properties:
         )
 
 
-class PGR_PT_Setup_Wizard_UI_Layout(Panel):
+class PGR_PT_Setup_Wizard_UI_Layout(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = "Punishing Gray Raven Setup Wizard"
     bl_idname = "PGR_PT_Setup_Wizard_UI_Layout"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Punishing Gray Raven"
+    bl_category = "Character Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
         window_manager = context.window_manager
-
-        version_text = layout.row()
-        version_text.label(text='v' + '.'.join([str(version_num) for version_num in bl_info.get('version')]))
 
         sub_layout = layout.box()
         OperatorFactory.create(
@@ -80,16 +72,15 @@ class PGR_PT_Setup_Wizard_UI_Layout(Panel):
             row2 = settings_box.row()
             row2.prop(window_manager, 'setup_wizard_betterfbx_enabled')
 
-        # settings_box.prop(window_manager, 'setup_wizard_join_meshes_enabled')
         if rigging_global_settings_feature_flag:
             settings_box.prop(window_manager, 'setup_wizard_full_run_rigging_enabled')
 
-class PGR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
+class PGR_PT_Basic_Setup_Wizard_UI_Layout(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Basic Setup'
     bl_idname = 'PGR_PT_UI_Basic_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Punishing Gray Raven"
+    bl_category = "Character Setup Wizard"
 
     def draw(self, context):
         layout = self.layout
@@ -169,19 +160,19 @@ class PGR_PT_Basic_Setup_Wizard_UI_Layout(Panel):
         )
 
 
-class PGR_PT_Advanced_Setup_Wizard_UI_Layout(Panel):
+class PGR_PT_Advanced_Setup_Wizard_UI_Layout(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Advanced Setup'
     bl_idname = 'PGR_PT_UI_Advanced_Setup_Layout'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Punishing Gray Raven"
+    bl_category = "Character Setup Wizard"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
 
 
-class PGR_PT_UI_Character_Model_Menu(Panel):
+class PGR_PT_UI_Character_Model_Menu(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Set Up Character Menu'
     bl_idname = 'PGR_PT_UI_Character_Model_Menu'
     bl_space_type = 'VIEW_3D'
@@ -206,7 +197,7 @@ class PGR_PT_UI_Character_Model_Menu(Panel):
         )
 
 
-class PGR_PT_UI_Materials_Menu(Panel):
+class PGR_PT_UI_Materials_Menu(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Set Up Materials Menu'
     bl_idname = 'PGR_PT_UI_Materials_Menu'
     bl_space_type = 'VIEW_3D'
@@ -240,7 +231,7 @@ class PGR_PT_UI_Materials_Menu(Panel):
         )
 
 
-class PGR_PT_UI_Outlines_Menu(Panel):
+class PGR_PT_UI_Outlines_Menu(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Set Up Outlines Menu'
     bl_idname = 'PGR_PT_UI_Outlines_Menu'
     bl_space_type = 'VIEW_3D'
@@ -290,7 +281,7 @@ class PGR_PT_UI_Outlines_Menu(Panel):
             layout.label(text='(Outlines Disabled < v3.3.0)')
 
 
-class PGR_PT_UI_Finish_Setup_Menu(Panel):
+class PGR_PT_UI_Finish_Setup_Menu(Panel, PunishingGrayRavenUIRenderChecker):
     bl_label = 'Finish Setup Menu'
     bl_idname = 'PGR_PT_UI_Misc_Setup_Menu'
     bl_space_type = 'VIEW_3D'

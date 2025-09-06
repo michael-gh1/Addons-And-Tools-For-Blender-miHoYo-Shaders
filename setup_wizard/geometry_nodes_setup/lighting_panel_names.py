@@ -31,6 +31,16 @@ class LightingPanelNames:
         RIM_Y_SIZE_ORIGIN = 'Origin-RimY'
         RIM_Y_SIZE_SLIDER = 'Slider-RimY'
 
+        # v4
+        ORIGIN_FRESNEL_SIZE = 'Origin-FresnelSize'
+        ORIGIN_FRESNEL_TOGGLE = 'Origin-FresnelToggle'
+        ORIGIN_RIM_SIZE = 'Origin-RimSize'
+        ORIGIN_SHADOW_OFFSET = 'Origin-ShadowOffset'
+        SLIDER_FRESNEL_SIZE = 'Slider-FresnelSize'
+        SLIDER_FRESNEL_TOGGLE = 'Slider-FresnelToggle'
+        SLIDER_RIM_SIZE = 'Slider-RimSize'
+        SLIDER_SHADOW_OFFSET = 'Slider-ShadowOffset'
+
     class GeometryNodeInputs:
         AMBIENT_COLOR_WHEEL = 'Socket_0'
         AMBIENT_COLOR_PICKER = 'Socket_1'
@@ -38,10 +48,14 @@ class LightingPanelNames:
         LIT_COLOR_PICKER = 'Socket_3'
         SHADOW_COLOR_WHEEL = 'Socket_4'
         SHADOW_COLOR_PICKER = 'Socket_5'
+        FRESNEL_TOGGLE_ORIGIN = 'Socket_38'  # v4
+        FRESNEL_TOGGLE_SLIDER = 'Socket_37'  # v4
         RIM_LIT_COLOR_WHEEL = 'Socket_6'
         RIM_LIT_COLOR_PICKER = 'Socket_7'
         FRESNEL_COLOR_WHEEL = 'Socket_15'
         FRESNEL_COLOR_PICKER = 'Socket_16'
+        FRESNEL_SIZE_ORIGIN = 'Socket_35'  # v4
+        FRESNEL_SIZE_SLIDER = 'Socket_36'  # v4
         SOFT_LIT_COLOR_WHEEL = 'Socket_17'
         SOFT_LIT_COLOR_PICKER = 'Socket_18'
         SOFT_SHADOW_COLOR_WHEEL = 'Socket_19'
@@ -50,10 +64,13 @@ class LightingPanelNames:
         RIM_SHADOW_COLOR_PICKER = 'Socket_9'
         RIM_X_SIZE_ORIGIN = 'Socket_26'
         RIM_X_SIZE_SLIDER = 'Socket_27'
+        RIM_SIZE_ORIGIN = 'Socket_26'  # v4
+        RIM_SIZE_SLIDER = 'Socket_27'  # v4
         RIM_Y_SIZE_ORIGIN = 'Socket_28'
         RIM_Y_SIZE_SLIDER = 'Socket_29'
+        SHADOW_OFFSET_ORIGIN = 'Socket_28'  # v4
+        SHADOW_OFFSET_SLIDER = 'Socket_29'  # v4
 
-    FILENAME = 'LightingPanel.blend'
     LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME = [
         (GeometryNodeInputs.AMBIENT_COLOR_WHEEL, Objects.AMBIENT_COLOR_WHEEL),
         (GeometryNodeInputs.AMBIENT_COLOR_PICKER, Objects.AMBIENT_COLOR_PICKER),
@@ -75,4 +92,12 @@ class LightingPanelNames:
         (GeometryNodeInputs.RIM_X_SIZE_SLIDER, Objects.RIM_X_SIZE_SLIDER),
         (GeometryNodeInputs.RIM_Y_SIZE_ORIGIN, Objects.RIM_Y_SIZE_ORIGIN),
         (GeometryNodeInputs.RIM_Y_SIZE_SLIDER, Objects.RIM_Y_SIZE_SLIDER),
+        (GeometryNodeInputs.FRESNEL_TOGGLE_ORIGIN, Objects.ORIGIN_FRESNEL_TOGGLE),  # v4
+        (GeometryNodeInputs.FRESNEL_TOGGLE_SLIDER, Objects.SLIDER_FRESNEL_TOGGLE),  # v4
+        (GeometryNodeInputs.FRESNEL_SIZE_ORIGIN, Objects.ORIGIN_FRESNEL_SIZE),  # v4
+        (GeometryNodeInputs.FRESNEL_SIZE_SLIDER, Objects.SLIDER_FRESNEL_SIZE),  # v4
+        (GeometryNodeInputs.RIM_SIZE_ORIGIN, Objects.ORIGIN_RIM_SIZE),  # v4
+        (GeometryNodeInputs.RIM_SIZE_SLIDER, Objects.SLIDER_RIM_SIZE),  # v4
+        (GeometryNodeInputs.SHADOW_OFFSET_ORIGIN, Objects.ORIGIN_SHADOW_OFFSET),  # v4
+        (GeometryNodeInputs.SHADOW_OFFSET_SLIDER, Objects.SLIDER_SHADOW_OFFSET),  # v4
     ]

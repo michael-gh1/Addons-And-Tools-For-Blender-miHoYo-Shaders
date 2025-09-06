@@ -45,6 +45,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
         logger.info(f'Renaming {default_collection.name} to {character_name}...')
         default_collection.name = character_name
         logger.info(f'Successfully renamed Collection to: {bpy.data.collections.get(character_name).name}')
+    bpy.context.scene.character_setup_wizard_logging_enabled = True
 
     logger.info(f'{config.get("metadata")}')
 
@@ -137,8 +138,7 @@ def setup_character(config, character_name, character_folder_file_path, arg_mate
             logger.info(f'Saved file for {character_name} as: {filename}')
         logger.info(f'Quit Blender for {character_name}')
         bpy.ops.wm.quit_blender()
-    logger.info(f'Quit (2) Blender for {character_name}')
-    bpy.ops.wm.quit_blender()
+        sys.exit()
 
 
 setup_character(arg_config, arg_character_name, arg_character_folder_file_path, arg_material_data_folder)
