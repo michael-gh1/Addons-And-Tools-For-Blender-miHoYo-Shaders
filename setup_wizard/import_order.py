@@ -216,6 +216,7 @@ def get_actual_material_name_for_dress(material_name, character_type='AVATAR', i
                             else 'Body1' if 'Body1' in base_color_texture_image_name \
                             else 'Body2' if 'Body2' in base_color_texture_image_name \
                             else 'Body' if 'Body' in base_color_texture_image_name \
+                            else 'Body' if 'Dress' in base_color_texture_image_name \
                                 else actual_material_name  # fallback method to get mat name
                 except IndexError:
                     # ex. 'Diffuse Texture.001'
