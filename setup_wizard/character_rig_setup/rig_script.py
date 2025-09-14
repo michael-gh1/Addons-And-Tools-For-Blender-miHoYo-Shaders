@@ -2,15 +2,15 @@
 # Setup Wizard Integration by michael-gh1
 
 import bpy
-import os
-from mathutils import Color, Vector
-from math import pi
 import addon_utils   
 import re          
 
-from setup_wizard.domain.decorators import preserve_context
+from mathutils import Color, Vector
+from math import pi
 
+from setup_wizard.domain.decorators import preserve_context
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
+
 
 def rig_character(
         file_path,
