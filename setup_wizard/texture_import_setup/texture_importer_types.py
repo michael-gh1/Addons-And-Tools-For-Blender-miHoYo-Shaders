@@ -492,7 +492,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
         for folder_name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
-                if not file.endswith(('.png', '.jpg', '.jpeg')):
+                if not file.endswith(('.png', '.jpg', '.jpeg', '.tga')):
                     continue
                 # load the file with the correct alpha mode
                 img_path = folder_name + "/" + file
