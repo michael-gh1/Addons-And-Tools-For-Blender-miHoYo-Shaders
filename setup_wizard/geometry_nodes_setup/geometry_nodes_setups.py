@@ -144,7 +144,7 @@ class GameGeometryNodesSetupFactory:
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
             else:
-                return V4_GenshinImpactGeometryNodesSetup(blender_operator, context)
+                return V1_HoYoToonGenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 return HonkaiStarRailGeometryNodesSetup(
@@ -472,7 +472,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                     modifier[outline_material_input_accessor] = outline_materials[0]
 
 
-class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
+class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
     BASE_GEOMETRY_INPUT = 'Input_12'
     USE_VERTEX_COLORS_INPUT = 'Input_13'
