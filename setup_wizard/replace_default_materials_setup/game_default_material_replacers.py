@@ -4,7 +4,7 @@ import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 
@@ -13,7 +13,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, \
@@ -39,8 +39,8 @@ class GameDefaultMaterialReplacerFactory:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
                 shader_node_names = V3_GenshinShaderNodeNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames 
-                shader_node_names = V4_PrimoToonShaderNodeNames
+                material_names = V1_HoYoToonGenshinImpactMaterialNames 
+                shader_node_names = V1_HoYoToonShaderNodeNames
             return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:

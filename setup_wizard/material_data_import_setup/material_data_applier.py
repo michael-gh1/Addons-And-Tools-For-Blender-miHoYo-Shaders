@@ -6,13 +6,13 @@ import bpy
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
-from setup_wizard.domain.shader_node_inputs import V4_PrimoToonShaderNodeInputNames
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_inputs import V1_HoYoToonShaderNodeInputNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -483,11 +483,11 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     local_material_mapping = {}
     additional_local_material_mapping = {}
 
-    body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
-    face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
-    vfx_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.VFX_SHADER
-    outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
-    shader_node_input_names = V4_PrimoToonShaderNodeInputNames
+    body_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.BODY_SHADER
+    face_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.FACE_SHADER
+    vfx_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.VFX_SHADER
+    outlines_node_tree_node_name = V1_HoYoToonShaderNodeNames.OUTLINES_SHADER
+    shader_node_input_names = V1_HoYoToonShaderNodeInputNames
 
     _MainTexAlphaUse_mapping = {
         0: {
@@ -562,7 +562,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                     print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
 
         # Transparency for Glasses
-        if is_outlines and self.outline_material.name == f'{V4_PrimoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
+        if is_outlines and self.outline_material.name == f'{V1_HoYoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
             toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
             transparency_clip_node = inputs_node.inputs.get(self.shader_node_input_names.TRANSPARENCY_CLIP_THRESHOLD)
 

@@ -11,14 +11,14 @@ from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
-from setup_wizard.texture_import_setup.texture_node_names import V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import V1_HoYoToonGenshinImpactTextureNodeNames
 
 
 # Constants
@@ -502,12 +502,12 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
 
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
-        self.material_names = V4_PrimoToonGenshinImpactMaterialNames
+        self.material_names = V1_HoYoToonGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
-        self.shader_node_names = V4_PrimoToonShaderNodeNames
-        self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
-        self.texture_node_names = V4_GenshinImpactTextureNodeNames
+        self.shader_node_names = V1_HoYoToonShaderNodeNames
+        self.outlines_shader_node_name = V1_HoYoToonShaderNodeNames.OUTLINES_SHADER
+        self.texture_node_names = V1_HoYoToonGenshinImpactTextureNodeNames
 
     def setup_geometry_nodes(self):
         for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:

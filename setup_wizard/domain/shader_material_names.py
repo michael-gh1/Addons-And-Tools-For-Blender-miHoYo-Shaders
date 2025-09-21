@@ -98,7 +98,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
 
-class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
+class V1_HoYoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
     GLASS = f'{MATERIAL_PREFIX}Glass'

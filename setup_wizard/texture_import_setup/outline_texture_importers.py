@@ -11,7 +11,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
@@ -110,7 +110,7 @@ class OutlineTextureImporterFactory:
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames
+                material_names = V1_HoYoToonGenshinImpactMaterialNames
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:

@@ -4,7 +4,7 @@ import re
 import bpy
 import os
 
-from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.character_rig_setup.lighting_panel_setup import LightingPanel, LightingPanelFileNames, LightingPanelFileNamesFactory
 from setup_wizard.character_rig_setup.rig_script import rig_character
@@ -19,7 +19,7 @@ from setup_wizard.import_order import GENSHIN_RIGIFY_BONE_SHAPES_FILE_PATH, Next
     get_cache
 
 from setup_wizard.character_rig_setup.character_rigger_props import CharacterRiggerPropertyGroup
-from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames, V1_GenshinImpactTextureNodeNames, V2_GenshinImpactTextureNodeNames, V3_GenshinImpactTextureNodeNames, V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import TextureNodeNames, V1_GenshinImpactTextureNodeNames, V2_GenshinImpactTextureNodeNames, V3_GenshinImpactTextureNodeNames, V1_HoYoToonGenshinImpactTextureNodeNames
 
 
 class CharacterRiggerFactory:
@@ -37,8 +37,8 @@ class CharacterRiggerFactory:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
                 texture_node_names = V3_GenshinImpactTextureNodeNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames
-                texture_node_names = V4_GenshinImpactTextureNodeNames
+                material_names = V1_HoYoToonGenshinImpactMaterialNames
+                texture_node_names = V1_HoYoToonGenshinImpactTextureNodeNames
             return GenshinImpactCharacterRigger(blender_operator, context, material_names, texture_node_names, shader)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailCharacterRigger(blender_operator, context)

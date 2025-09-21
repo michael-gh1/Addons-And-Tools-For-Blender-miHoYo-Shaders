@@ -5,14 +5,14 @@ import bpy
 from abc import abstractmethod
 
 from setup_wizard.domain.body_hair_ramp_switch_values import BodyHairRampSwitchValues
-from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import ShaderMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    V3_BonnyFestivityGenshinImpactMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_node_names import ShaderNodeNames
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.texture_import_setup.texture_node_names import V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import V1_HoYoToonGenshinImpactTextureNodeNames
 
 
 class MaterialDefaultValueSetterFactory:
@@ -26,7 +26,7 @@ class MaterialDefaultValueSetterFactory:
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return GenshinImpactMaterialDefaultValueSetter(V3_BonnyFestivityGenshinImpactMaterialNames, V3_GenshinShaderNodeNames)
             else:
-                return GenshinImpactMaterialDefaultValueSetter(V4_PrimoToonGenshinImpactMaterialNames, V4_PrimoToonShaderNodeNames)
+                return GenshinImpactMaterialDefaultValueSetter(V1_HoYoToonGenshinImpactMaterialNames, V1_HoYoToonShaderNodeNames)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return HonkaiStarRailMaterialDefaultValueSetter()
         elif game_type == GameType.PUNISHING_GRAY_RAVEN.name:
@@ -68,7 +68,7 @@ class MaterialDefaultValueSetter:
     def set_up_lightmap_ao_default_value(self, body_part, material, default_missing=0, default_exists=1):
         lightmap_uv0 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV0')
         lightmap_uv1 = material.node_tree.nodes.get(f'{body_part}_Lightmap_UV1')
-        lightmap_all = material.node_tree.nodes.get(V4_GenshinImpactTextureNodeNames.LIGHTMAP)  # >= v4.0 Body/Hair use same node name
+        lightmap_all = material.node_tree.nodes.get(V1_HoYoToonGenshinImpactTextureNodeNames.LIGHTMAP)  # >= v4.0 Body/Hair use same node name
 
         if (not lightmap_uv0 or not lightmap_uv1) and not lightmap_all:
             return

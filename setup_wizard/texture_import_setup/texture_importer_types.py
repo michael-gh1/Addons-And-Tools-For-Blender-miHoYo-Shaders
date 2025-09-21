@@ -8,12 +8,12 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_node_names import JaredNyts_PunishingGrayRavenNodeNames, ShaderNodeNames, StellarToonShaderNodeNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.import_order import get_actual_material_name_for_dress
-from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames, V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import JaredNytsPunishingGrayRavenTextureNodeNames, Nya222HonkaiStarRailTextureNodeNames, StellarToonTextureNodeNames, TextureNodeNames, V1_HoYoToonGenshinImpactTextureNodeNames
 from setup_wizard.texture_import_setup.original_texture_locator_utils import OriginalTextureLocatorUtils
 
 
@@ -48,7 +48,7 @@ class TextureImporterFactory:
                 # Not sure why IDE says code is unreachable, it is used
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames  
+                material_names = V1_HoYoToonGenshinImpactMaterialNames  
 
             if texture_importer_type == TextureImporterType.AVATAR:
                 return GenshinAvatarTextureImporter(material_names)
@@ -148,8 +148,8 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
-            V4_GenshinImpactTextureNodeNames.DIFFUSE,
-            V4_GenshinImpactTextureNodeNames.VFX_DIFFUSE,
+            V1_HoYoToonGenshinImpactTextureNodeNames.DIFFUSE,
+            V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE,
         ]
         
         for texture_node_name in possible_texture_node_names:
@@ -168,7 +168,7 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{texture_type.value}_Lightmap_UV0',
             f'{texture_type.value}_Lightmap_UV1',
-            V4_GenshinImpactTextureNodeNames.LIGHTMAP,
+            V1_HoYoToonGenshinImpactTextureNodeNames.LIGHTMAP,
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
@@ -185,7 +185,7 @@ class GenshinTextureImporter:
         possible_texture_node_names = [
             f'{type.value}_Normalmap_UV0',
             f'{type.value}_Normalmap_UV1',
-            V4_GenshinImpactTextureNodeNames.NORMALMAP,
+            V1_HoYoToonGenshinImpactTextureNodeNames.NORMALMAP,
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
@@ -203,7 +203,7 @@ class GenshinTextureImporter:
     def set_shadow_ramp_texture(self, type: TextureType, img):
         possible_shadow_ramp_node_group_names = [
             f'{type.value} Shadow Ramp',
-            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
+            V1_HoYoToonGenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
         ]
         for shadow_ramp_node_name in possible_shadow_ramp_node_group_names:
             shadow_ramp_node_group = bpy.data.node_groups.get(shadow_ramp_node_name)
@@ -275,7 +275,7 @@ class GenshinTextureImporter:
 
     def set_glass_diffuse_texture(self, material, img):
         diffuse_node = material.node_tree.nodes.get('Main_Diffuse') 
-        vfx_node = material.node_tree.nodes.get(V4_GenshinImpactTextureNodeNames.VFX_DIFFUSE)
+        vfx_node = material.node_tree.nodes.get(V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE)
 
         nodes = [diffuse_node, vfx_node]
         for node in nodes:
@@ -284,12 +284,12 @@ class GenshinTextureImporter:
 
     def set_nyx_color_ramp_texture(self, img):
         possible_nyx_color_ramp_node_group_names = [
-            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
+            V1_HoYoToonGenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
         ]
         for nyx_color_ramp_node_group_name in possible_nyx_color_ramp_node_group_names:
             nyx_color_ramp_node_group = bpy.data.node_groups.get(nyx_color_ramp_node_group_name)
             if nyx_color_ramp_node_group:
-                nyx_color_ramp_node = nyx_color_ramp_node_group.nodes.get(V4_GenshinImpactTextureNodeNames.NYX_COLOR_RAMP)
+                nyx_color_ramp_node = nyx_color_ramp_node_group.nodes.get(V1_HoYoToonGenshinImpactTextureNodeNames.NYX_COLOR_RAMP)
                 if nyx_color_ramp_node:
                     nyx_color_ramp_node.image = img
 
@@ -476,7 +476,7 @@ class GenshinTextureImporter:
 
     def set_stocking_texture(self, img):
         possible_shadow_ramp_node_group_names = [
-            V4_GenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
+            V1_HoYoToonGenshinImpactTextureNodeNames.SHADER_TEXTURES_NODE_GROUP,
         ]
         for shadow_ramp_node_name in possible_shadow_ramp_node_group_names:
             shadow_ramp_node_group = bpy.data.node_groups.get(shadow_ramp_node_name)

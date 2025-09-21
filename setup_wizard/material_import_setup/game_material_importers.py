@@ -7,7 +7,7 @@ from bpy.types import Operator, Context
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
-    JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    JaredNytsPunishingGrayRavenShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache, \
     GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
@@ -175,7 +175,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES},
-        {'name': V4_PrimoToonGenshinImpactMaterialNames.VFX},
+        {'name': V1_HoYoToonGenshinImpactMaterialNames.VFX},
     ]
     OUTLINES_FILE_PATH = GENSHIN_IMPACT_OUTLINES_FILE_PATH
 
@@ -212,12 +212,12 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
 
     def is_create_hair_material_from_body(self):
-        body_material_exists = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
-        hair_material_missing = not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR)
+        body_material_exists = bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.BODY)
+        hair_material_missing = not bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.HAIR)
         return body_material_exists and hair_material_missing
 
     def create_hair_material(self):
-        body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
+        body_material = bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.BODY)
         hair_material = body_material.copy()
         material_default_value_setter: MaterialDefaultValueSetter = MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type)
         material_default_value_setter.set_up_hair_material(hair_material)
