@@ -83,6 +83,8 @@ class TextureImporterFactory:
 
 
 class GenshinTextureImporter:
+    SUPPORTED_TEXTURE_FILE_EXTENSIONS: tuple[str, ...] = ('.jpg', '.jpeg', '.png','.tga')
+
     def __init__(self, game_type: GameType, character_type: TextureImporterType):
         self.game_type = game_type
         self.character_type = character_type
@@ -91,6 +93,10 @@ class GenshinTextureImporter:
 
     def import_textures(self, directory):
         raise NotImplementedError()
+
+
+    def is_supported_texture(self, file: str):
+        return file.endswith(self.SUPPORTED_TEXTURE_FILE_EXTENSIONS)
 
     '''
     Checks if all texture identifiers are in the texture name
@@ -492,7 +498,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
         for folder_name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
-                if not file.endswith(('.png', '.jpg', '.jpeg', '.tga')):
+                if not self.is_supported_texture(file):
                     continue
                 # load the file with the correct alpha mode
                 img_path = folder_name + "/" + file
@@ -670,6 +676,8 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
         for name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
+                if not self.is_supported_texture(file):
+                    continue
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
@@ -789,7 +797,7 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
 
                 else:
                     print(f'WARN: Ignoring texture {file}')
-            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+            # break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
 class GenshinMonsterTextureImporter(GenshinTextureImporter):
@@ -804,6 +812,8 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
         for name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
+                if not self.is_supported_texture(file):
+                    continue
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
@@ -865,7 +875,7 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
 
                 else:
                     print(f'WARN: Ignoring texture {file}')
-            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+            # break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
 class HonkaiStarRailTextureImporter(GenshinTextureImporter):
@@ -998,6 +1008,8 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
     def import_textures(self, directory):
         for name, folder, files in os.walk(directory):
             for file in files:
+                if not self.is_supported_texture(file):
+                    continue
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
@@ -1191,7 +1203,7 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
 
                 else:
                     print(f'WARN: Ignoring texture {file}')
-            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+            # break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
 
 class PunishingGrayRavenTextureImporter(GenshinTextureImporter):
@@ -1282,6 +1294,8 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
         for name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
+                if not self.is_supported_texture(file):
+                    continue
                 # load the file with the correct alpha mode
                 img_path = directory + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
@@ -1370,7 +1384,7 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
                                 except:
                                     pass  # Unexpected or unused textures hit here!
 
-            break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
+            # break  # IMPORTANT: We os.walk which also traverses through folders...we just want the files
 
     # Fix characters with blank textures in their original material texture
     # We do this by deleting the original texture and loading the new texture
