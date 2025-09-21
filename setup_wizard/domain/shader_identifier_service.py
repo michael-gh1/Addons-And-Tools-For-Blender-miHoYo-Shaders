@@ -14,7 +14,7 @@ class GenshinImpactShaders(Enum):
     V1_GENSHIN_IMPACT_SHADER = auto()
     V2_GENSHIN_IMPACT_SHADER = auto()
     V3_GENSHIN_IMPACT_SHADER = auto()
-    V4_GENSHIN_IMPACT_SHADER = auto()
+    V1_HOYOTOON_GENSHIN_IMPACT_SHADER = auto()
 
 
 class HonkaiStarRailShaders(Enum):
@@ -110,7 +110,7 @@ class ShaderIdentifierService:
             raise Exception(f'Unknown {GameType}: {game_type}')
 
     def get_shader_material_names_using_shader(self, shader: GenshinImpactShaders):
-        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER:
             return V1_HoYoToonGenshinImpactMaterialNames
         elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
             return V3_BonnyFestivityGenshinImpactMaterialNames
@@ -127,7 +127,7 @@ class ShaderIdentifierService:
             raise Exception(f'Unknown Shader: {shader}')
 
     def get_shader_texture_node_names(self, shader):
-        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER:
             return V1_HoYoToonGenshinImpactTextureNodeNames
         elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
             return V3_GenshinImpactTextureNodeNames
@@ -145,7 +145,7 @@ class ShaderIdentifierService:
             raise Exception(f'Unknown Shader: {shader}')
 
     def get_shader_node_names(self, shader):
-        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER:
             return V1_HoYoToonShaderNodeNames
         elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
             return V3_GenshinShaderNodeNames
@@ -180,7 +180,7 @@ class GenshinImpactShaderIdentifierService(ShaderIdentifierService):
     }
 
     shader_labels_to_search_through = {
-        GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER: ShaderIdentifier(
+        GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER: ShaderIdentifier(
             material_name=V1_HoYoToonGenshinImpactMaterialNames.BODY,
             shader_node_name=V1_HoYoToonShaderNodeNames.BODY_SHADER,
             shader_label_name=V1_HoYoToonShaderNodeNames.BODY_SHADER_LABEL,

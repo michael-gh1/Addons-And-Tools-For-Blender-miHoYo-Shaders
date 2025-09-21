@@ -20,7 +20,7 @@ class LightingPanelFileNames:
 class LightingPanelFileNamesFactory:
     @staticmethod
     def create(shader: GenshinImpactShaders):
-        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER:
             lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_FILENAME)
             root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_FILENAME)
         else:  # for backwards compatibility
