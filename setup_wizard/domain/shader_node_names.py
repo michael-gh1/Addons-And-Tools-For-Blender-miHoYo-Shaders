@@ -65,7 +65,7 @@ class V1_HoYoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
-    VFX_SHADER = BODY_SHADER
+    VFX_SHADER = f'{BODY_SHADER} VFX'
     VFX_SHADER_INPUT = 'HoYoToon'
     STAR_CLOAK_TYPE = '[Paimon / Dainslief / Skirk / Asmoday] - Star Cloak'
     TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
