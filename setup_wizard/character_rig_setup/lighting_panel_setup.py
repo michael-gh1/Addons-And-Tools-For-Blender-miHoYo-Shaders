@@ -69,10 +69,12 @@ class LightingPanel:
             global_properties_internal_nodes = global_properties_external_node.node_tree.nodes
 
             for node_name, input_output_names in GlobalPropertiesNames.NODES_TO_GLOBAL_PROPERTIES.items():
-                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output']) or \
-                    global_properties_internal_nodes[node_name].outputs.get(input_output_names['old_output_name'])
-                input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
-                global_properties_external_node.node_tree.links.new(output, input)
+                global_properties_internal_node_lighting_property_node = global_properties_internal_nodes.get(node_name)
+                if global_properties_internal_node_lighting_property_node:
+                    output = global_properties_internal_node_lighting_property_node.outputs.get(input_output_names['output']) or \
+                        global_properties_internal_node_lighting_property_node.outputs.get(input_output_names['old_output_name'])
+                    input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
+                    global_properties_external_node.node_tree.links.new(output, input)
 
 
 class GlobalPropertiesNames:
