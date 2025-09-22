@@ -508,7 +508,7 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
         outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
-        vfx_shader_node = self.material.node_tree.nodes[self.vfx_shader_node_tree_node_name]
+        vfx_shader_node = self.material.node_tree.nodes.get(self.vfx_shader_node_tree_node_name)
         night_soul_outlines_shader_node = self.night_soul_outlines_material.node_tree.nodes[self.outlines_node_tree_node_name] if self.night_soul_outlines_material else None
         global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
         global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
@@ -517,7 +517,8 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
         self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
         if night_soul_outlines_shader_node:
             self.set_up_mesh_material_data_with_tooltips(night_soul_outlines_shader_node, night_soul_outlines_shader_node, is_outlines=True)
-        self.set_up_mesh_material_data_with_tooltips(vfx_shader_node, vfx_shader_node)
+        if vfx_shader_node:
+            self.set_up_mesh_material_data_with_tooltips(vfx_shader_node, vfx_shader_node)
         self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
 
     def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):
