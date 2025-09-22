@@ -72,7 +72,7 @@ class V1_HoYoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak]'
     OUTLINES_OUTPUT = 'HoYoToon (Outlines)'
     NIGHT_SOUL_OUTPUT = 'HoYoToon (Night Soul)'
-    MATERIAL_OUTPUT_NODE = 'Material Output'
+    MATERIAL_OUTPUT_NODE = 'HoYoToon Output'
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'
 
     BODY_HAIR_RAMP_SWITCH = 'Ramps Selector'
