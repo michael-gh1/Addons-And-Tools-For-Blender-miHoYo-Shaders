@@ -208,6 +208,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         if self.shader in [GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER]:
             self.move_required_scene_objects(starting_scene_names, active_scene_name)
             self.update_vfx_shader_scene_dependency(active_scene_name)
+            self.clean_up_unused_objects()
 
         if self.is_create_hair_material_from_body():  # Genshin Shader >= v4.0
             self.create_hair_material()
@@ -256,6 +257,16 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
                 for driver_variable_target in driver_variable.targets.values():
                     if driver_variable_target.data_path in DRIVER_VARIABLE_TARGET_DATA_PATHS:
                         driver_variable_target.id = bpy.data.scenes[active_scene_name]
+
+    def clean_up_unused_objects(self):
+        OBJECTS_TO_CLEAN_UP = [
+            'Preview',
+        ]
+        for obj in bpy.data.objects:
+            if obj.name in OBJECTS_TO_CLEAN_UP:
+                obj_data = obj.data
+                bpy.data.objects.remove(obj)
+                bpy.data.meshes.remove(obj_data)
 
     def is_create_hair_material_from_body(self):
         body_material_exists = bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.BODY)
