@@ -37,7 +37,7 @@ class MaterialDataAppliersFactory:
                     ]
                 else:
                     return [
-                        V4_MaterialDataApplier(material_data_parser, outline_material_group),
+                        V1_HoYoToonMaterialDataApplier(material_data_parser, outline_material_group),
                     ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
@@ -474,7 +474,7 @@ class mTexEnvsKeys:
         self.key = key
         self.m_TexEnvs_key = m_TexEnvs_key
 
-class V4_MaterialDataApplier(V3_MaterialDataApplier):
+class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
     class ShaderNodeType:
         INPUT = auto()
         OUTPUT = auto()
