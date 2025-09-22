@@ -61,6 +61,7 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
 class V1_HoYoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     BODY_SHADER = 'HoYoToon'
     BODY_SHADER_LABEL = 'HoYoToon v1.0'
+    BODY_SHADER_FOR_VFX = 'HoYoToon v1.0'
     BODY_SHADER_OUTPUT = 'HoYoToon'
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER

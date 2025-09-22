@@ -684,7 +684,7 @@ class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSe
                     modifier[self.TOGGLE_OUTLINES_SOCKET] = False
 
     def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
-        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER}.001'
+        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER_FOR_VFX}'
         MAIN_SHADER_OUTPUT_NAME = self.shader_node_names.BODY_SHADER_OUTPUT
         VFX_SHADER_NODE_NAME = self.shader_node_names.VFX_SHADER
         VFX_SHADER_INPUT_NAME = self.shader_node_names.VFX_SHADER_INPUT
