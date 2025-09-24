@@ -93,6 +93,10 @@ class GlobalPropertiesNames:
         RIM_LIT_NODE = 'RimLit'
         RIM_SHADOW_NODE = 'RimShadow'
         RIM_SCALE_NODE = 'Rim Scale'
+        TOGGLE_FRESNEL_NODE = 'ToggleFresnel'
+        FRESNEL_POWER_NODE = 'FresnelPower'
+        SHADOW_POSITION_NODE = 'ShadowPos'
+
 
     class Inputs:
         FRESNEL_COLOR = 'Fresnel Color'
@@ -105,6 +109,9 @@ class GlobalPropertiesNames:
         RIM_LIT = 'Rim Lit'
         RIM_SHADOW = 'Rim Shadow'
         RIM_SCALE = 'Rim Scale'
+        TOGGLE_FRESNEL = 'Toggle Fresnel'
+        FRESNEL_POWER = 'Fresnel Power'
+        SHADOW_POSITION = 'Shadow Position Offset'
 
     NODES_TO_GLOBAL_PROPERTIES = {
         LightingPanelNodeNames.FRESNEL_COLOR_NODE: {
@@ -146,5 +153,17 @@ class GlobalPropertiesNames:
         LightingPanelNodeNames.RIM_SCALE_NODE: {
             'input': Inputs.RIM_SCALE,
             'valid_output_names': ['Vector',],
+        },
+        LightingPanelNodeNames.TOGGLE_FRESNEL_NODE: {
+            'input': Inputs.TOGGLE_FRESNEL,
+            'valid_output_names': ['Value',],
+        },
+        LightingPanelNodeNames.FRESNEL_POWER_NODE: {
+            'input': Inputs.FRESNEL_POWER,
+            'valid_output_names': ['Color',],
+        },
+        LightingPanelNodeNames.SHADOW_POSITION_NODE: {
+            'input': Inputs.SHADOW_POSITION,
+            'valid_output_names': ['Value',],
         },
     }
