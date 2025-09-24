@@ -71,8 +71,11 @@ class LightingPanel:
             for node_name, input_output_names in GlobalPropertiesNames.NODES_TO_GLOBAL_PROPERTIES.items():
                 global_properties_internal_node_lighting_property_node = global_properties_internal_nodes.get(node_name)
                 if global_properties_internal_node_lighting_property_node:
-                    output = global_properties_internal_node_lighting_property_node.outputs.get(input_output_names['output']) or \
-                        global_properties_internal_node_lighting_property_node.outputs.get(input_output_names['old_output_name'])
+                    output = None
+                    for output_name in input_output_names['valid_output_names']:
+                        output = global_properties_internal_node_lighting_property_node.outputs.get(output_name)
+                        if output:
+                            break
                     input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
                     global_properties_external_node.node_tree.links.new(output, input)
 
@@ -86,8 +89,8 @@ class GlobalPropertiesNames:
         SOFT_LIFT_COLOUR_NODE = 'SoftLit'
         SHARP_SHADOW_COLOUR_NODE = 'SharpShadow'
         SOFT_SHADOW_COLOUR_NODE = 'SoftShadow'
-        RIM_LIT_NODE = 'RimLitMult'
-        RIM_SHADOW_NODE = 'RimShadowMult'
+        RIM_LIT_NODE = 'RimLit'
+        RIM_SHADOW_NODE = 'RimShadow'
         RIM_SCALE_NODE = 'Rim Scale'
 
     class Inputs:
@@ -105,47 +108,42 @@ class GlobalPropertiesNames:
     NODES_TO_GLOBAL_PROPERTIES = {
         LightingPanelNodeNames.FRESNEL_COLOR_NODE: {
             'input': Inputs.FRESNEL_COLOR,
-            'output': 'Color',
+            'valid_output_names': ['Color',],
         },
         LightingPanelNodeNames.FRESNEL_SCALER_NODE: {
             'input': Inputs.FRESNEL_SCALER,
-            'output': 'Blue',  # 'Value'
+            'valid_output_names': ['Blue',],  # 'Value'
         },
         LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
             'input': Inputs.AMBIENT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
             'input': Inputs.SHARP_LIT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
             'input': Inputs.SOFT_LIT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
             'input': Inputs.SHARP_SHADOW_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
             'input': Inputs.SOFT_SHADOW_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.RIM_LIT_NODE: {
             'input': Inputs.RIM_LIT,
-            'output': 'Result',
+            'valid_output_names': ['Output',],
         },
         LightingPanelNodeNames.RIM_SHADOW_NODE: {
             'input': Inputs.RIM_SHADOW,
-            'output': 'Result',
+            'valid_output_names': ['Output',],
         },
         LightingPanelNodeNames.RIM_SCALE_NODE: {
             'input': Inputs.RIM_SCALE,
-            'output': 'Vector',
+            'valid_output_names': ['Vector',],
         },
     }
