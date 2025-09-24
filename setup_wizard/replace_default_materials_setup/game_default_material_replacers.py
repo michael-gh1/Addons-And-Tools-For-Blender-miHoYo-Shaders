@@ -96,8 +96,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 material_name = self.create_shader_material_if_unique_mesh(mesh, mesh_body_part_name, material_name)
                 genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
+                armatures =  [obj for obj in bpy.data.objects if obj.type == 'ARMATURE']
+                armature  = armatures[0] if armatures else None
+                character_name = armature.name.split('_')[-1] if armature else 'Character Light Group'
+                character_name = character_name.split('.')[0]  # in case armature name has a suffix like .001
+
                 if genshin_material:
                     material_slot.material = genshin_material
+                    self.add_light_group_to_material(genshin_material, character_name)
                 elif mesh_body_part_name and ('Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name):
                     # Xiao is the only character with an Arm material
                     # Dainsleif and Paimon are the only characters with Cloak materials
@@ -136,9 +142,12 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     if genshin_material.name == f'{self.material_names.STAR_CLOAK}':
                         self.__set_glass_star_cloak_toggle(genshin_material, True)
                         self.__set_star_cloak_type(genshin_material, material_name)  # original material name, which contains character name
+                    self.add_light_group_to_material(genshin_material, character_name)
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(self.material_names.BODY)
+                    body_material = bpy.data.materials.get(self.material_names.BODY)
+                    material_slot.material = body_material
+                    self.add_light_group_to_material(body_material, character_name)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
@@ -207,6 +216,15 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = new_material.name
         return material_name
+
+    def add_light_group_to_material(self, material, character_name):
+        light_group = material.light_groups.groups.get(character_name)
+
+        if not light_group:
+            light_group = material.light_groups.groups.add()
+            light_group.name = character_name
+        material.light_groups.use_default = False
+        return light_group
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
