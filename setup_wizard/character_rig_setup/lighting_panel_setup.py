@@ -40,6 +40,8 @@ class LightingPanel:
         if lighting_panel_attributes_exist:
             if not bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL):
                 self.import_lighting_panel()
+                lighting_panel = bpy.data.objects.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+                self.prevent_lighting_issues_when_scaling_character(lighting_panel)
             self.connect_lighting_panel_nodes_to_global_material_properties()
 
             for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
@@ -57,6 +59,18 @@ class LightingPanel:
                 {'name': LightingPanelNames.Collections.LIGHTING_PANEL},
             ],
         )
+
+    def prevent_lighting_issues_when_scaling_character(self, lighting_panel_armature):
+        if not lighting_panel_armature:
+            return
+
+        lighting_panel_pose_bone = lighting_panel_armature.pose.bones.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+        lighting_panel_bone_data = lighting_panel_armature.data.bones.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+
+        if lighting_panel_pose_bone:
+            lighting_panel_pose_bone.lock_scale = (True, True, True)
+        if lighting_panel_bone_data:
+            lighting_panel_bone_data.inherit_scale = 'NONE'
 
     def connect_lighting_panel_nodes_to_global_material_properties(self):
         EXTERNAL_GLOBAL_PROPERTIES_NODE_NAME = 'Global Properties'  # At shader level
