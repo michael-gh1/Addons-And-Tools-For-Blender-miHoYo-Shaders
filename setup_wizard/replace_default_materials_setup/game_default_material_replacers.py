@@ -206,6 +206,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Pupil':
             pupil_material = self.create_body_material(self.material_names, self.material_names.PUPIL)
             material_name = pupil_material.name
+        elif mesh_body_part_name == 'Brow':
+            brow_material = self.create_face_material(self.material_names, self.material_names.BROW)
+            material_name = brow_material.name
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name
@@ -259,6 +262,14 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             hair_material.name = material_name
             hair_material.use_fake_user = True
         return hair_material
+
+    def create_face_material(self, shader_material_names: ShaderMaterialNames, material_name):
+        body_material = bpy.data.materials.get(material_name)
+        if not body_material:
+            body_material = bpy.data.materials.get(shader_material_names.FACE).copy()
+            body_material.name = material_name
+            body_material.use_fake_user = True
+        return body_material
 
     def create_glass_material(self, shader_material_names: ShaderMaterialNames, material_name):
         glass_material = bpy.data.materials.get(material_name)

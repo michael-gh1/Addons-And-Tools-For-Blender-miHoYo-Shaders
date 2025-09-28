@@ -510,6 +510,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 hair_material = bpy.data.materials.get(f'{self.material_names.HAIR}')
                 helmet_material = bpy.data.materials.get(f'{self.material_names.HELMET}')
                 helmet_emotion_material = bpy.data.materials.get(f'{self.material_names.HELMET_EMO}')
+                brow_material = bpy.data.materials.get(f'{self.material_names.BROW}')
                 face_material = bpy.data.materials.get(f'{self.material_names.FACE}')
                 body_material = bpy.data.materials.get(f'{self.material_names.BODY}')
                 body1_material = bpy.data.materials.get(f'{self.material_names.BODY1}')
@@ -592,6 +593,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 elif "Body_Specular_Ramp" in file or "Tex_Specular_Ramp" in file:
                     self.set_specular_ramp_texture(TextureType.BODY, img)
                 elif "Face_Diffuse" in file:
+                    self.set_face_diffuse_texture(brow_material, img) if brow_material else None
                     self.set_face_diffuse_texture(face_material, img)
                 elif self.is_texture_identifiers_in_texture_name(['Face', 'Shadow'], file):
                     self.set_face_shadow_texture(face_material, img)
