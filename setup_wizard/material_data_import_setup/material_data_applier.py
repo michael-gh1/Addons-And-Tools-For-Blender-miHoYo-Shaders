@@ -555,6 +555,10 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                         )
                     else:
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
+
+                        if self.is_old_stocking_shading(material_data_key, material_json_value):  # Hu Tao Cherry Snow-Laden and Escoffier
+                            toggle_old_stocking_shading_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_OLD_STOCKING_SHADING)
+                            self.set_old_stocking_shading(toggle_old_stocking_shading_input, True)
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
                         Falling back to next MaterialDataApplier version')
@@ -602,6 +606,25 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
         elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
+
+    def is_old_stocking_shading(self, material_data_key, material_data_value) -> bool:
+        """
+        Check if old stocking shading should be enabled.
+        Only applicable for Hu Tao Cherry Snow-Laden and Escoffier.
+        """
+        TOGGLE_STOCKING_MATERIAL_DATA_KEY = '_UseCharacterStockings'
+        if material_data_key != TOGGLE_STOCKING_MATERIAL_DATA_KEY or material_data_value != 1:
+            return False
+
+        try:
+            VALID_CHARACTERS = ['HutaoCostumeWinter', 'Escoffier']
+            diffuse_texture_name = self.material_data_parser.m_texEnvs._MainTex.get('m_Texture').get('Name')
+            return any(character_name in diffuse_texture_name for character_name in VALID_CHARACTERS)
+        except Exception:
+            return False
+
+    def set_old_stocking_shading(self, toggle_old_stocking_shading_input, value: bool) -> None:
+        toggle_old_stocking_shading_input.default_value = value
 
     def set_up_outline_material_data(self, body_part, file):
         self.set_up_outline_material_data_with_tooltips(body_part, file)
