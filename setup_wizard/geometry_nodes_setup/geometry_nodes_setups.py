@@ -98,6 +98,7 @@ gi_meshes_to_create_outlines_on = [
     'Screw',  # Aranara
     'Hat',  # Aranara
     'StarCloak',
+    'Stockings',
     'Tail',
 ]
 

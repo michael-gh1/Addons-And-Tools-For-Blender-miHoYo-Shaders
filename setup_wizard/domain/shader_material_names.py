@@ -31,6 +31,7 @@ class ShaderMaterialNames:
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
     SKIRT = ''
     STAR_CLOAK = ''
+    STOCKINGS = ''
     VFX = ''
     # HSR
     WEAPON = ''
@@ -111,6 +112,7 @@ class V1_HoYoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMateri
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX}{NIGHT_SOUL_OUTLINES_SUFFIX}'
     STAR_CLOAK = f'{MATERIAL_PREFIX}StarCloak'
+    STOCKINGS = f'{MATERIAL_PREFIX}Stockings'
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):

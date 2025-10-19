@@ -524,11 +524,14 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 pupil_material = bpy.data.materials.get(f'{self.material_names.PUPIL}')
                 skirt_material = bpy.data.materials.get(f'{self.material_names.SKIRT}')
                 star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
+                stockings_material = bpy.data.materials.get(f'{self.material_names.STOCKINGS}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
                 if "Hair_Diffuse" in file and "Eff" not in file:
                     self.set_diffuse_texture(TextureType.HAIR, hair_material, img)
+                    if stockings_material:
+                        self.set_diffuse_texture(TextureType.HAIR, stockings_material, img)
                 elif "EffectHair_Diffuse" in file:
                     self.set_diffuse_texture(TextureType.HAIR, effect_hair_material, img)
                 elif 'Helmet_Tex_Diffuse' in file:
@@ -537,12 +540,16 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.HAIR, helmet_emotion_material, img)
                 elif "Hair_Lightmap" in file and "Eff" not in file:
                     self.set_lightmap_texture(TextureType.HAIR, hair_material, img)
+                    if stockings_material:
+                        self.set_lightmap_texture(TextureType.HAIR, stockings_material, img)
                 elif "EffectHair_Lightmap" in file:
                     self.set_lightmap_texture(TextureType.HAIR, effect_hair_material, img)
                 elif 'Helmet_Tex_Lightmap' in file:
                     self.set_lightmap_texture(TextureType.HAIR, helmet_material, img)
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.HAIR, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.HAIR, hair_material, img)
+                    if stockings_material:
+                        self.set_normalmap_texture(TextureType.HAIR, stockings_material, img)
                 elif "Hair_Shadow_Ramp" in file:
                     self.set_shadow_ramp_texture(TextureType.HAIR, img)
                 elif self.is_one_texture_identifier_in_texture_name(

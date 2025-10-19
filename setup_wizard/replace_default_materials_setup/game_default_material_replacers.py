@@ -203,6 +203,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         elif mesh_body_part_name == 'Skirt':
             skirt_material = self.create_body_material(self.material_names, self.material_names.SKIRT)
             material_name = skirt_material.name
+        elif mesh_body_part_name == 'Stockings':
+            stockings_material = self.create_body_material(self.material_names, self.material_names.STOCKINGS)
+            material_name = stockings_material.name
         elif mesh_body_part_name == 'Pupil':
             pupil_material = self.create_body_material(self.material_names, self.material_names.PUPIL)
             material_name = pupil_material.name
