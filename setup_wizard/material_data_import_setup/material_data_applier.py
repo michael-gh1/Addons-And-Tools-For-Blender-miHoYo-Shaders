@@ -556,6 +556,11 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                     else:
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
 
+                        # Disable Toggle Stencil for older characters without Pupil materials
+                        if self.is_not_using_eye_stencil():
+                            use_eye_stencil_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_STENCIL)
+                            self.set_use_eye_stencil(use_eye_stencil_input, False)
+
                         if self.is_old_stocking_shading(material_data_key, material_json_value):  # Hu Tao Cherry Snow-Laden and Escoffier
                             toggle_old_stocking_shading_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_OLD_STOCKING_SHADING)
                             self.set_old_stocking_shading(toggle_old_stocking_shading_input, True)
@@ -606,6 +611,16 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
         elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
+
+    def is_not_using_eye_stencil(self) -> bool:
+        '''
+        Only characters with Pupil materials will use eye stencil
+        Expected material "Avatar_Type_Weapon_Name_Mat_Pupil"
+        '''
+        return not [material for material in bpy.data.materials if material.name.endswith('_Mat_Pupil')]
+
+    def set_use_eye_stencil(self, use_eye_stencil_input, value: bool) -> None:
+        use_eye_stencil_input.default_value = value
 
     def is_old_stocking_shading(self, material_data_key, material_data_value) -> bool:
         """
