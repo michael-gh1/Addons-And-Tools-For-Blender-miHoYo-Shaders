@@ -139,6 +139,8 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         f'{self.material_names.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
+
+                    # Post-Material Swap Setup (one-off configurations)
                     if genshin_material.name == f'{self.material_names.STAR_CLOAK}':
                         self.__set_glass_star_cloak_toggle(genshin_material, True)
                         self.__set_star_cloak_type(genshin_material, material_name)  # original material name, which contains character name
@@ -152,6 +154,15 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
+
+                # Post-Material Swap Setup (one-off configurations)
+                if genshin_material.name == self.material_names.PUPIL:
+                    # The pupil material is imported by default
+                    # So we check to set it up when swapping the Pupil mesh's default material for the shader material
+                    face_material = bpy.data.materials.get(self.material_names.FACE)
+                    pupil_material = genshin_material
+                    self.set_material_raytrace_refraction(face_material, True)
+                    self.set_material_raytrace_refraction(pupil_material, True)
 
                 # Deprecated: I don't think cloning and renaming groups is necessary? (original commit: 6a4772e)
                 # Don't need to duplicate multiple Face shader nodes
@@ -249,6 +260,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             if star_cloak_type.lower() in original_material_name.lower():
                 vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
                 vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value = getattr(StarCloakTypes, star_cloak_type).value
+
+    def set_material_raytrace_refraction(self, material, value: bool):
+        material.use_screen_refraction = value
 
     def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
