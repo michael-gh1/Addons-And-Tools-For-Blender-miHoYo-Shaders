@@ -70,7 +70,7 @@ class V1_HoYoToonShaderNodeNames(V3_GenshinShaderNodeNames):
     VFX_SHADER_INPUT = 'HoYoToon'
     STAR_CLOAK_TYPE = '[Paimon / Dainslief / Skirk / Asmoday] - Star Cloak'
     TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
-    TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak]'
+    TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak / Veil]'
     OUTLINES_OUTPUT = 'HoYoToon (Outlines)'
     NIGHT_SOUL_OUTPUT = 'HoYoToon (Night Soul)'
     MATERIAL_OUTPUT_NODE = 'HoYoToon Output'
