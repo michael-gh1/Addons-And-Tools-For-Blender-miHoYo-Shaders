@@ -561,7 +561,8 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                             use_eye_stencil_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_STENCIL)
                             self.set_use_eye_stencil(use_eye_stencil_input, False)
 
-                        if self.is_old_stocking_shading(material_data_key, material_json_value):  # Hu Tao Cherry Snow-Laden and Escoffier
+                        # Hu Tao Cherry Snow-Laden and Escoffier
+                        if self.is_old_stocking_shading(material_data_key, material_json_value):
                             toggle_old_stocking_shading_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_OLD_STOCKING_SHADING)
                             self.set_old_stocking_shading(toggle_old_stocking_shading_input, True)
                 except AttributeError as ex:
