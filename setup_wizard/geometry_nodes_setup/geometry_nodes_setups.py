@@ -97,9 +97,11 @@ gi_meshes_to_create_outlines_on = [
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
+    'Ribbon',
     'StarCloak',
     'Stockings',
     'Tail',
+    'Veil',
 ]
 
 hsr_meshes_to_create_outlines_on = [

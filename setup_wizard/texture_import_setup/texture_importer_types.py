@@ -522,9 +522,11 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
                 pupil_material = bpy.data.materials.get(f'{self.material_names.PUPIL}')
+                ribbon_material = bpy.data.materials.get(f'{self.material_names.RIBBON}')
                 skirt_material = bpy.data.materials.get(f'{self.material_names.SKIRT}')
                 star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
                 stockings_material = bpy.data.materials.get(f'{self.material_names.STOCKINGS}')
+                veil_material = bpy.data.materials.get(f'{self.material_names.VEILSHADOW}')
 
                 # Implement the texture in the correct node
                 print(f'Importing texture {file} using {self.__class__.__name__}')
@@ -637,6 +639,16 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     skillobj_material = bpy.data.materials.get(f'{self.material_names.SKILLOBJ} {expected_skillobj_identifier}')
                     if skillobj_material:
                         self.set_lightmap_texture(TextureType.BODY, skillobj_material, img)
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.VEIL, 'Diffuse'], file):
+                    if veil_material:
+                        self.set_diffuse_texture(TextureType.BODY, veil_material, img)
+                    if ribbon_material:
+                        self.set_diffuse_texture(TextureType.BODY, ribbon_material, img)
+                elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.VEIL, 'Lightmap'], file):
+                    if veil_material:
+                        self.set_lightmap_texture(TextureType.BODY, veil_material, img)
+                    if ribbon_material:
+                        self.set_lightmap_texture(TextureType.BODY, ribbon_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
                     if star_cloak_material:
                         self.set_diffuse_texture(TextureType.HAIR, star_cloak_material, img)
