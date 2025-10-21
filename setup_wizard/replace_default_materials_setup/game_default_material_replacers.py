@@ -9,7 +9,7 @@ from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.vfx_shader_types import VFXShaderTypes
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 
-from setup_wizard.import_order import get_actual_material_name_for_dress
+from setup_wizard.import_order import material_replacer_get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
@@ -110,7 +110,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.blender_operator.report({'INFO'}, 'Dress detected on character model!')
 
-                    actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type.name)
+                    actual_material_for_dress = material_replacer_get_actual_material_name_for_dress(material_name, character_type.name)
                     if actual_material_for_dress == 'Cloak' or mesh_body_part_name == 'Cloak':
                         if bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}VFX'):
                             actual_material_for_dress = 'VFX'

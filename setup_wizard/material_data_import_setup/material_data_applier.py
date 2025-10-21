@@ -572,6 +572,12 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                 except TypeError as ex:
                     print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
 
+        # Disable Toggle Normal Map if there is no Normal Map texture and the material data is incorrect
+        if not self.has_normal_map(self.material_data_parser):
+            toggle_normal_map_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_NORMAL_MAP)
+            if toggle_normal_map_input:
+                self.set_toggle_normal_map(toggle_normal_map_input, False)
+
         # Transparency for Glasses
         if is_outlines and self.outline_material.name == f'{V1_HoYoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
             toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
@@ -612,6 +618,18 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
         elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
+
+    def has_normal_map(self, material_data_parser) -> bool:
+        '''
+        Check if the material data has a texture assigned to the BumpMap (Normal Map)
+        '''
+        try:
+            return bool(material_data_parser.m_texEnvs._BumpMap.get('m_Texture').get('Name'))
+        except Exception:
+            return False
+
+    def set_toggle_normal_map(self, toggle_normal_map_input, value: bool) -> None:
+        toggle_normal_map_input.default_value = value
 
     def is_not_using_eye_stencil(self) -> bool:
         '''

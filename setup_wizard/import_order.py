@@ -191,6 +191,19 @@ def clear_cache(game_type: str):
     write_to_blender_cache(cache)
 
 
+def material_replacer_get_actual_material_name_for_dress(material_name, character_type='AVATAR'):
+    '''
+    A wrapper function around get_actual_material_name_for_dress()
+    The GameDefaultMaterialReplacer needs a template name to clone a material from the shader.
+    A real Dress material uses the body-type shader, so return 'Body' if the actual material is a Dress.
+    '''
+    deduced_material_name_for_dress = get_actual_material_name_for_dress(material_name, character_type)
+
+    if deduced_material_name_for_dress == 'Dress':
+        return 'Body'
+    return deduced_material_name_for_dress
+
+
 '''
 This method is a real mess, be prepared to spend some time if you're working with a Dress material!
 There are a few issues that cause this:
@@ -216,7 +229,6 @@ def get_actual_material_name_for_dress(material_name, character_type='AVATAR', i
                             else 'Body1' if 'Body1' in base_color_texture_image_name \
                             else 'Body2' if 'Body2' in base_color_texture_image_name \
                             else 'Body' if 'Body' in base_color_texture_image_name \
-                            else 'Body' if 'Dress' in base_color_texture_image_name \
                                 else actual_material_name  # fallback method to get mat name
                 except IndexError:
                     # ex. 'Diffuse Texture.001'
