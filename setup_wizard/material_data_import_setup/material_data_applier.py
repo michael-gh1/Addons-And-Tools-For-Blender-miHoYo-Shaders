@@ -629,7 +629,8 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
             return False
 
     def set_toggle_normal_map(self, toggle_normal_map_input, value: bool) -> None:
-        toggle_normal_map_input.default_value = value
+        if toggle_normal_map_input:
+            toggle_normal_map_input.default_value = value
 
     def is_not_using_eye_stencil(self) -> bool:
         '''
@@ -639,7 +640,8 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
         return not [material for material in bpy.data.materials if material.name.endswith('_Mat_Pupil')]
 
     def set_use_eye_stencil(self, use_eye_stencil_input, value: bool) -> None:
-        use_eye_stencil_input.default_value = value
+        if use_eye_stencil_input:
+            use_eye_stencil_input.default_value = value
 
     def is_old_stocking_shading(self, material_data_key, material_data_value) -> bool:
         """
@@ -658,7 +660,8 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
             return False
 
     def set_old_stocking_shading(self, toggle_old_stocking_shading_input, value: bool) -> None:
-        toggle_old_stocking_shading_input.default_value = value
+        if toggle_old_stocking_shading_input:
+            toggle_old_stocking_shading_input.default_value = value
 
     def set_up_outline_material_data(self, body_part, file):
         self.set_up_outline_material_data_with_tooltips(body_part, file)
