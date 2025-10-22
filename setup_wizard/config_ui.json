@@ -14,6 +14,7 @@
             "fix_transformations",
             "setup_head_driver",
             "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
             "delete_specific_objects",
             "rename_shader_materials",
             "join_meshes_on_armature",
@@ -31,6 +32,7 @@
             "fix_transformations",
             "setup_head_driver",
             "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
             "delete_specific_objects",
             "rename_shader_materials",
             "join_meshes_on_armature",
@@ -61,6 +63,7 @@
             "fix_transformations",
             "setup_head_driver",
             "set_color_management_to_standard",
+            "set_up_screen_space_reflections",
             "delete_specific_objects",
             "rename_shader_materials",
             "join_meshes_on_armature"

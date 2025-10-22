@@ -11,6 +11,9 @@ from setup_wizard.texture_import_setup.texture_node_names import GenshinImpactTe
 
 
 class GenshinImpactShaders(Enum):
+    '''
+    The order is important because it allows us to compare the enum values to determine which shader version is newer.
+    '''
     V1_GENSHIN_IMPACT_SHADER = auto()
     V2_GENSHIN_IMPACT_SHADER = auto()
     V3_GENSHIN_IMPACT_SHADER = auto()
