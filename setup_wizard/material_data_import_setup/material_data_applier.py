@@ -556,11 +556,6 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                     else:
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
 
-                        # Disable Toggle Stencil for older characters without Pupil materials
-                        if self.is_not_using_eye_stencil():
-                            use_eye_stencil_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_STENCIL)
-                            self.set_use_eye_stencil(use_eye_stencil_input, False)
-
                         # Hu Tao Cherry Snow-Laden and Escoffier
                         if self.is_old_stocking_shading(material_data_key, material_json_value):
                             toggle_old_stocking_shading_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_OLD_STOCKING_SHADING)
@@ -571,6 +566,11 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                     raise ex
                 except TypeError as ex:
                     print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
+
+        # Disable Toggle Stencil on Face material for older characters without Pupil materials
+        if self.material.name.endswith('Face') and self.is_not_using_eye_stencil():
+            use_eye_stencil_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_STENCIL)
+            self.set_use_eye_stencil(use_eye_stencil_input, False)
 
         # Disable Toggle Normal Map if there is no Normal Map texture and the material data is incorrect
         if not self.has_normal_map(self.material_data_parser):
