@@ -155,10 +155,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
-            face_material = bpy.data.materials.get(self.material_names.FACE)
-            pupil_material = bpy.data.materials.get(self.material_names.PUPIL)
-            self.set_material_raytrace_refraction(face_material, True)
-            self.set_material_raytrace_refraction(pupil_material, True)
+        face_material = bpy.data.materials.get(self.material_names.FACE)
+        pupil_material = bpy.data.materials.get(self.material_names.PUPIL)
+        self.set_material_raytrace_refraction(face_material, True)
+        self.set_material_raytrace_refraction(pupil_material, True)
 
                 # Deprecated: I don't think cloning and renaming groups is necessary? (original commit: 6a4772e)
                 # Don't need to duplicate multiple Face shader nodes
