@@ -20,6 +20,8 @@ from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNa
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 from setup_wizard.texture_import_setup.texture_node_names import V1_HoYoToonGenshinImpactTextureNodeNames
 
+from setup_wizard.utils.mesh_utils import remove_material_slots
+
 
 # Constants
 NAME_OF_GEOMETRY_NODES_MODIFIER = 'Outlines'
@@ -626,7 +628,7 @@ class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSe
             if len(separated_materials) == len(mesh.material_slots):
                 bpy.data.objects.remove(mesh)
             else:
-                self.__remove_material_slots(mesh, separated_materials)
+                remove_material_slots(mesh, separated_materials)
 
     def __separate_material_from_mesh(self, mesh, material_slot, new_mesh_name):
         print(f'Separating material for: {material_slot.material.name} from {mesh.name}')
@@ -648,7 +650,7 @@ class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSe
         new_mesh_name_mesh = bpy.data.objects.get(new_mesh_name)
 
         # Clean the separated mesh of any other materials
-        self.__remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
+        remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
 
         if not new_mesh_name_mesh:
             print(f'Renaming {new_separated_mesh.name} to {new_mesh_name}')
@@ -665,17 +667,6 @@ class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSe
             renamed_mesh_name = new_mesh_name_mesh.material_slots[0].material.name.split(' ')[-1]
             print(f'Renaming {new_mesh_name_mesh.name} to {renamed_mesh_name}')
             new_mesh_name_mesh.name = renamed_mesh_name
-
-
-    def __remove_material_slots(self, mesh, materials, exclude=False):
-        bpy.ops.object.mode_set(mode='OBJECT')
-        # Reversing is IMPORTANT in order to avoid index errors while removing during runtime
-        for material_slot_material in reversed(mesh.material_slots):
-            if (not exclude and material_slot_material.material in materials) or (exclude and material_slot_material.material not in materials):
-                mesh.active_material_index = mesh.material_slots.get(material_slot_material.material.name).slot_index
-                print(f'Removing material: {material_slot_material.material.name} from {mesh.name}')
-                bpy.context.view_layer.objects.active = mesh
-                bpy.ops.object.material_slot_remove()
 
     '''
     Very targeted method for disabling outlines on Paimon's cloak
