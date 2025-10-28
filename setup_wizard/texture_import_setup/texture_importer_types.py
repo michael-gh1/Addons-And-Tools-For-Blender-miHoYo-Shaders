@@ -144,8 +144,8 @@ class GenshinTextureImporter:
                     return False
         return True
 
-    def set_diffuse_texture(self, texture_type: TextureType, material, img, override=True):
-        possible_texture_node_names = [
+    def set_diffuse_texture(self, texture_type: TextureType, material, img, texture_node_names: List[str]=[], override=True):
+        possible_texture_node_names = texture_node_names if texture_node_names else [
             f'{texture_type.value}_Diffuse_UV0',
             f'{texture_type.value}_Diffuse_UV1',
             V1_HoYoToonGenshinImpactTextureNodeNames.DIFFUSE,
@@ -571,6 +571,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
                     self.set_diffuse_texture(TextureType.BODY, pupil_material, img) if pupil_material else None
+                    self.set_diffuse_texture(TextureType.BODY, ribbon_material, img, override=False) if ribbon_material else None
                     if star_cloak_material and self.star_cloak_uses_body_texture(file):
                         self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
                 elif self.is_one_texture_identifier_in_texture_name(
@@ -643,12 +644,10 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     if veil_material:
                         self.set_diffuse_texture(TextureType.BODY, veil_material, img)
                     if ribbon_material:
-                        self.set_diffuse_texture(TextureType.BODY, ribbon_material, img)
+                        self.set_diffuse_texture(TextureType.BODY, ribbon_material, img, texture_node_names=[V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE])
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.VEIL, 'Lightmap'], file):
                     if veil_material:
                         self.set_lightmap_texture(TextureType.BODY, veil_material, img)
-                    if ribbon_material:
-                        self.set_lightmap_texture(TextureType.BODY, ribbon_material, img)
                 elif "Effect_Diffuse" in file:  # keep at bottom as a last resort check (Skirk support)
                     if star_cloak_material:
                         self.set_diffuse_texture(TextureType.HAIR, star_cloak_material, img)
