@@ -220,6 +220,7 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             material_name = pupil_material.name
         elif mesh_body_part_name == 'VeilShadow':
             veil_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}VeilShadow', VFXShaderTypes.VEIL)
+            veil_material.blend_method = 'CLIP'
             material_name = veil_material.name
         elif mesh_body_part_name == 'Brow':
             brow_material = self.create_face_material(self.material_names, self.material_names.BROW)
