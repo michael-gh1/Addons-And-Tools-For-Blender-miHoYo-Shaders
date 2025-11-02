@@ -16,8 +16,8 @@
             "set_color_management_to_standard",
             "set_up_screen_space_reflections",
             "delete_specific_objects",
-            "rename_shader_materials",
             "join_meshes_on_armature",
+            "rename_shader_materials",
             "rig_character",
             "compositing_node_setup",
             "post_processing_default_settings"
@@ -34,8 +34,8 @@
             "set_color_management_to_standard",
             "set_up_screen_space_reflections",
             "delete_specific_objects",
-            "rename_shader_materials",
             "join_meshes_on_armature",
+            "rename_shader_materials",
             "rig_character",
             "compositing_node_setup",
             "post_processing_default_settings"
@@ -65,8 +65,8 @@
             "set_color_management_to_standard",
             "set_up_screen_space_reflections",
             "delete_specific_objects",
-            "rename_shader_materials",
-            "join_meshes_on_armature"
+            "join_meshes_on_armature",
+            "rename_shader_materials"
         ],
         "HOYOVERSE_OT_set_up_character_rig": [
             "IMPORTANT_PLACEHOLDER_VALUE_KEEP_INDEX_ABOVE_0_final_steps",
