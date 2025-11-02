@@ -1,5 +1,6 @@
 # Author: michael-gh1
 
+from collections import defaultdict
 from enum import auto
 import bpy
 
@@ -523,6 +524,9 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
 
     def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):
         shader_node_interface_input_items = interface_node.node_tree.interface.items_tree.values()
+        description_to_names = defaultdict(list)
+        for input in inputs_node.node_tree.interface.items_tree.values():
+            description_to_names[input.description].append(input.name)
         for node_interface_input in shader_node_interface_input_items:
             material_data_key = node_interface_input.description.strip()  # Tooltip
 
@@ -555,6 +559,10 @@ class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
                         )
                     else:
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
+
+                        if material_data_key == '_Color' and [inputs_node.inputs.get(input_name) for input_name in description_to_names.get('_ColorAlpha')]:
+                            _ColorAlpha_input_name = description_to_names.get('_ColorAlpha')[0]
+                            inputs_node.inputs.get(_ColorAlpha_input_name).default_value = material_json_value[3]
 
                         # Hu Tao Cherry Snow-Laden and Escoffier
                         if self.is_old_stocking_shading(material_data_key, material_json_value):
