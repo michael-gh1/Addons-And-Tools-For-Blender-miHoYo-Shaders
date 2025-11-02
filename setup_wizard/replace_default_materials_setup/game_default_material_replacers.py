@@ -193,7 +193,11 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             leather_material = self.create_body_material(self.material_names, self.material_names.LEATHER)
             material_name = leather_material.name
         elif mesh_body_part_name == 'Glass':
-            glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
+            if 'Mavuika' in material_name:  # Old Glass uses Body Shader
+                glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
+            else:
+                glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS, VFXShaderTypes.GLASS)
+            # bpy.context.object.active_material.use_backface_culling = True
             material_name = glass_material.name
         elif mesh_body_part_name == 'Glass_Eff':
             glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS_EFF, VFXShaderTypes.GLASS)
