@@ -572,6 +572,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
                     self.set_diffuse_texture(TextureType.BODY, pupil_material, img) if pupil_material else None
                     self.set_diffuse_texture(TextureType.BODY, ribbon_material, img, texture_node_names=[V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE]) if ribbon_material else None
+                    self.set_diffuse_texture(TextureType.BODY, glass_material, img, texture_node_names=[V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE]) if glass_material else None
                     if star_cloak_material and self.star_cloak_uses_body_texture(file):
                         self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
                 elif self.is_one_texture_identifier_in_texture_name(
