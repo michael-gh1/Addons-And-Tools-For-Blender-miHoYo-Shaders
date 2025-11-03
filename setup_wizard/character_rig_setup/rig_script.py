@@ -2038,26 +2038,14 @@ def rig_character(
         depsgraph.update()
 
 
-    try:
-        setup_viewport_outlines(bpy.data.objects["Body"].modifiers["Outlines Body"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Hair"].modifiers["Outlines Hair"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Hair.001"].modifiers["Outlines Hair.001"]) # Escoffier? Who else  
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
-    except:
-        pass
+    all_meshes = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+    for mesh in all_meshes:
+        outlines_geometry_node_modifiers = [modifier for modifier in mesh.modifiers if modifier.type == 'NODES' and "Outlines " in modifier.name]
+        for modifier in outlines_geometry_node_modifiers:
+            try:
+                setup_viewport_outlines(modifier)
+            except:
+                pass
 
     # handled list of face SK
     handled_sks = ['Basis', 'Mouth_Default', 'Mouth_A01', 'Mouth_Open01', 'Mouth_Smile01', 'Mouth_Smile02', 'Mouth_Angry01', 'Mouth_Angry02',
