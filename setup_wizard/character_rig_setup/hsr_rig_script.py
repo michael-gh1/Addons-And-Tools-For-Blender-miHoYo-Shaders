@@ -531,13 +531,13 @@ for obj in lis:
         pass
 
 
-def is_blender_version_4_0():
+def use_bone_collections():
     version_tuple = bpy.app.version
-    return version_tuple[0] == 4 and version_tuple[1] == 0
+    return version_tuple[0] >= 4
 
 
 def assign_bone_to_bone_collection(armature, armature_obj, bone, collection_name, collection_idx):
-    if is_blender_version_4_0():
+    if use_bone_collections():
         clothes_bone_collection = armature.collections.get(collection_name) if \
             armature.collections.get(collection_name) else armature.collections.new(collection_name)
         clothes_bone_collection.assign(bone)
@@ -547,7 +547,7 @@ def assign_bone_to_bone_collection(armature, armature_obj, bone, collection_name
 
 
 def unassign_bone_from_bone_collection(armature, armature_obj, bone, collection_name, collection_idx_range):
-    if is_blender_version_4_0():
+    if use_bone_collections():
         clothes_bone_collection = armature.collections.get(collection_name) if \
             armature.collections.get(collection_name) else armature.collections.new(collection_name)
         clothes_bone_collection.unassign(bone)
@@ -557,7 +557,7 @@ def unassign_bone_from_bone_collection(armature, armature_obj, bone, collection_
 
 
 def assign_root_bone_to_bone_collection(armature, bone, collection_name, collection_idx):
-    if is_blender_version_4_0():
+    if use_bone_collections():
         root_bone_collection = armature.collections.get(collection_name) if \
             armature.collections.get(collection_name) else armature.collections.new(collection_name)
         if root_bone_collection:
