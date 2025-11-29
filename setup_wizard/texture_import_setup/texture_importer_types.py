@@ -692,13 +692,13 @@ class GenshinNPCTextureImporter(GenshinTextureImporter):
         self.shader_material_names = self.shader_identifier_service.get_shader_material_names_using_shader(self.genshin_shader_version)
 
     def import_textures(self, directory):
-        for name, folder, files in os.walk(directory):
+        for folder_name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
                 if not self.is_supported_texture(file):
                     continue
                 # load the file with the correct alpha mode
-                img_path = directory + "/" + file
+                img_path = folder_name + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
@@ -828,13 +828,13 @@ class GenshinMonsterTextureImporter(GenshinTextureImporter):
         self.genshin_shader_version = self.shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
-        for name, folder, files in os.walk(directory):
+        for folder_name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
                 if not self.is_supported_texture(file):
                     continue
                 # load the file with the correct alpha mode
-                img_path = directory + "/" + file
+                img_path = folder_name + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
@@ -1025,12 +1025,12 @@ class HonkaiStarRailAvatarTextureImporter(HonkaiStarRailTextureImporter):
         self.material_names = material_names
 
     def import_textures(self, directory):
-        for name, folder, files in os.walk(directory):
+        for folder_name, folder, files in os.walk(directory):
             for file in files:
                 if not self.is_supported_texture(file):
                     continue
                 # load the file with the correct alpha mode
-                img_path = directory + "/" + file
+                img_path = folder_name + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
@@ -1310,13 +1310,13 @@ class PunishingGrayRavenAvatarTextureImporter(PunishingGrayRavenTextureImporter)
         self.genshin_shader_version = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
     def import_textures(self, directory):
-        for name, folder, files in os.walk(directory):
+        for folder_name, folder, files in os.walk(directory):
             self.files = files
             for file in files:
                 if not self.is_supported_texture(file):
                     continue
                 # load the file with the correct alpha mode
-                img_path = directory + "/" + file
+                img_path = folder_name + "/" + file
                 img = bpy.data.images.load(filepath = img_path, check_existing=True)
                 img.alpha_mode = 'CHANNEL_PACKED'
 
