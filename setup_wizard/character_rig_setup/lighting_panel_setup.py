@@ -92,7 +92,8 @@ class LightingPanel:
                         ), None
                     )
                     input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
-                    global_properties_external_node.node_tree.links.new(output, input)
+                    if input and output:
+                        global_properties_external_node.node_tree.links.new(output, input)
 
 
 class GlobalPropertiesNames:
@@ -106,6 +107,8 @@ class GlobalPropertiesNames:
         SOFT_SHADOW_COLOUR_NODE = 'SoftShadow'
         RIM_LIT_NODE = 'RimLit'
         RIM_SHADOW_NODE = 'RimShadow'
+        RIM_LIT_MULT_NODE = 'RimLitMult'  # Backwards compatibility, GI Shader v3.4
+        RIM_SHADOW_MULT_NODE = 'RimShadowMult'  # Backwards compatibility, GI Shader v3.4
         RIM_SCALE_NODE = 'Rim Scale'
         TOGGLE_FRESNEL_NODE = 'ToggleFresnel'
         FRESNEL_POWER_NODE = 'FresnelPower'
@@ -160,9 +163,17 @@ class GlobalPropertiesNames:
             'input': Inputs.RIM_LIT,
             'valid_output_names': ['Output',],
         },
+        LightingPanelNodeNames.RIM_LIT_MULT_NODE: {  # Backwards compatibility, GI Shader v3.4
+            'input': Inputs.RIM_LIT,
+            'valid_output_names': ['Result',],
+        },
         LightingPanelNodeNames.RIM_SHADOW_NODE: {
             'input': Inputs.RIM_SHADOW,
             'valid_output_names': ['Output',],
+        },
+        LightingPanelNodeNames.RIM_SHADOW_MULT_NODE: {  # Backwards compatibility, GI Shader v3.4
+            'input': Inputs.RIM_SHADOW,
+            'valid_output_names': ['Result',],
         },
         LightingPanelNodeNames.RIM_SCALE_NODE: {
             'input': Inputs.RIM_SCALE,
