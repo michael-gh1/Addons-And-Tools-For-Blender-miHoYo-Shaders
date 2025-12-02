@@ -199,8 +199,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
             else:
                 glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS, VFXShaderTypes.GLASS)
-                glass_material.use_backface_culling = True
-            material_name = glass_material.name
+                if glass_material:
+                    glass_material.use_backface_culling = True
+                    material_name = glass_material.name
         elif mesh_body_part_name == 'Glass_Eff':
             glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS_EFF, VFXShaderTypes.GLASS)
             if glass_material:
@@ -214,7 +215,8 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             material_name = skillobj_material.name
         elif mesh_body_part_name == 'Ribbon':
             ribbon_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}Ribbon', VFXShaderTypes.RIBBON)
-            material_name = ribbon_material.name
+            if ribbon_material:
+                material_name = ribbon_material.name
         elif mesh_body_part_name == 'Skirt':
             skirt_material = self.create_body_material(self.material_names, self.material_names.SKIRT)
             material_name = skirt_material.name
@@ -226,8 +228,9 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             material_name = pupil_material.name
         elif mesh_body_part_name == 'VeilShadow':
             veil_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}VeilShadow', VFXShaderTypes.VEIL)
-            veil_material.blend_method = 'CLIP'
-            material_name = veil_material.name
+            if veil_material:
+                veil_material.blend_method = 'CLIP'
+                material_name = veil_material.name
         elif mesh_body_part_name == 'Brow':
             brow_material = self.create_face_material(self.material_names, self.material_names.BROW)
             material_name = brow_material.name
