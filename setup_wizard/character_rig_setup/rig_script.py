@@ -2,13 +2,15 @@
 # Setup Wizard Integration by michael-gh1
 
 import bpy
-import os
+import addon_utils   
+import re          
+
 from mathutils import Color, Vector
 from math import pi
-import addon_utils   
-import re             
 
+from setup_wizard.domain.decorators import preserve_context
 from setup_wizard.geometry_nodes_setup.lighting_panel_names import LightingPanelNames
+
 
 def rig_character(
         file_path,
@@ -29,6 +31,8 @@ def rig_character(
                
     head_bone_arm_target = bpy.context.active_object
     temp_armature = head_bone_arm_target.data
+
+    armature_object = bpy.context.object
 
     bpy.ops.object.mode_set(mode='EDIT')
 
@@ -844,6 +848,8 @@ def rig_character(
         bpy.ops.constraint.childof_set_inverse(constraint="Child Of", owner='OBJECT')
     except:
         pass
+
+    fix_forearm_twist_bones(armature_object)
 
     # POST RIGIFY SCRIPT EXECUTION ----------------->
 
@@ -2032,26 +2038,14 @@ def rig_character(
         depsgraph.update()
 
 
-    try:
-        setup_viewport_outlines(bpy.data.objects["Body"].modifiers["Outlines Body"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Hair"].modifiers["Outlines Hair"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Hair.001"].modifiers["Outlines Hair.001"]) # Escoffier? Who else  
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
-    except:
-        pass
+    all_meshes = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+    for mesh in all_meshes:
+        outlines_geometry_node_modifiers = [modifier for modifier in mesh.modifiers if modifier.type == 'NODES' and "Outlines " in modifier.name]
+        for modifier in outlines_geometry_node_modifiers:
+            try:
+                setup_viewport_outlines(modifier)
+            except:
+                pass
 
     # handled list of face SK
     handled_sks = ['Basis', 'Mouth_Default', 'Mouth_A01', 'Mouth_Open01', 'Mouth_Smile01', 'Mouth_Smile02', 'Mouth_Angry01', 'Mouth_Angry02',
@@ -3741,3 +3735,35 @@ def disable_collection(collection_name):
 def move_collection_into_collection(source, destination, collection):  
     destination.children.link(collection)
     source.children.unlink(collection)
+
+
+# Original fix script from Poke/Enthralpy
+# https://discord.com/channels/1058394128171405312/1125469354436337755/1411816380164214865
+@preserve_context
+def fix_forearm_twist_bones(armature_object):
+    bpy.context.view_layer.objects.active = armature_object
+    bpy.ops.object.mode_set(mode='POSE')
+
+    arm_twists = {
+        "DEF-hand.L": "+ForearmArmTwistSA01.L", 
+        "DEF-hand.R": "+ForearmArmTwistSA01.R", 
+        "DEF-forearm.L": "+UpperArmTwistA02.L", 
+        "DEF-forearm.R": "+UpperArmTwistA02.R",
+    }
+
+    for rigify_bone in arm_twists:
+        try:
+            arm_twist_bone = armature_object.pose.bones[arm_twists[rigify_bone]]
+        except KeyError: # not every bone has twist bones
+            continue
+        con = arm_twist_bone.constraints.new('COPY_ROTATION')
+        con.target = armature_object
+        con.subtarget = rigify_bone
+
+        # Enable only Y axis
+        con.use_x = False
+        con.use_z = False
+
+        # Set spaces
+        con.target_space = 'LOCAL'
+        con.owner_space = 'LOCAL'

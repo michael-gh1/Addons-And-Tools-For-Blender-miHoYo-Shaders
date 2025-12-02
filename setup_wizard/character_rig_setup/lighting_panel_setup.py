@@ -20,7 +20,7 @@ class LightingPanelFileNames:
 class LightingPanelFileNamesFactory:
     @staticmethod
     def create(shader: GenshinImpactShaders):
-        if shader is GenshinImpactShaders.V4_GENSHIN_IMPACT_SHADER:
+        if shader is GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER:
             lighting_panel_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.LIGHTING_PANEL_FILENAME)
             root_shape_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), LightingPanelFileNames.ROOT_SHAPE_FILENAME)
         else:  # for backwards compatibility
@@ -40,6 +40,8 @@ class LightingPanel:
         if lighting_panel_attributes_exist:
             if not bpy.data.objects.get(LightingPanelNames.Objects.LIGHTING_PANEL):
                 self.import_lighting_panel()
+                lighting_panel = bpy.data.objects.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+                self.prevent_lighting_issues_when_scaling_character(lighting_panel)
             self.connect_lighting_panel_nodes_to_global_material_properties()
 
             for modifier_input_name, object_name in LightingPanelNames.LIGHT_VECTORS_MODIFIER_INPUT_NAME_TO_OBJECT_NAME:
@@ -58,6 +60,18 @@ class LightingPanel:
             ],
         )
 
+    def prevent_lighting_issues_when_scaling_character(self, lighting_panel_armature):
+        if not lighting_panel_armature:
+            return
+
+        lighting_panel_pose_bone = lighting_panel_armature.pose.bones.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+        lighting_panel_bone_data = lighting_panel_armature.data.bones.get(LightingPanelNames.Bones.LIGHTING_PANEL)
+
+        if lighting_panel_pose_bone:
+            lighting_panel_pose_bone.lock_scale = (True, True, True)
+        if lighting_panel_bone_data:
+            lighting_panel_bone_data.inherit_scale = 'NONE'
+
     def connect_lighting_panel_nodes_to_global_material_properties(self):
         EXTERNAL_GLOBAL_PROPERTIES_NODE_NAME = 'Global Properties'  # At shader level
         INTERNAL_GLOBAL_PROPERTIES_NODE_NAME = 'Global Properties'  # Inside node group
@@ -69,10 +83,17 @@ class LightingPanel:
             global_properties_internal_nodes = global_properties_external_node.node_tree.nodes
 
             for node_name, input_output_names in GlobalPropertiesNames.NODES_TO_GLOBAL_PROPERTIES.items():
-                output = global_properties_internal_nodes[node_name].outputs.get(input_output_names['output']) or \
-                    global_properties_internal_nodes[node_name].outputs.get(input_output_names['old_output_name'])
-                input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
-                global_properties_external_node.node_tree.links.new(output, input)
+                internal_lighting_property_node = global_properties_internal_nodes.get(node_name)
+                if internal_lighting_property_node:
+                    output = next(
+                        (internal_lighting_property_node.outputs.get(output_name) 
+                            for output_name in input_output_names['valid_output_names'] 
+                            if internal_lighting_property_node.outputs.get(output_name)
+                        ), None
+                    )
+                    input = global_properties_internal_nodes[INTERNAL_GLOBAL_PROPERTIES_NODE_NAME].inputs.get(input_output_names['input'])
+                    if input and output:
+                        global_properties_external_node.node_tree.links.new(output, input)
 
 
 class GlobalPropertiesNames:
@@ -84,9 +105,15 @@ class GlobalPropertiesNames:
         SOFT_LIFT_COLOUR_NODE = 'SoftLit'
         SHARP_SHADOW_COLOUR_NODE = 'SharpShadow'
         SOFT_SHADOW_COLOUR_NODE = 'SoftShadow'
-        RIM_LIT_NODE = 'RimLitMult'
-        RIM_SHADOW_NODE = 'RimShadowMult'
+        RIM_LIT_NODE = 'RimLit'
+        RIM_SHADOW_NODE = 'RimShadow'
+        RIM_LIT_MULT_NODE = 'RimLitMult'  # Backwards compatibility, GI Shader v3.4
+        RIM_SHADOW_MULT_NODE = 'RimShadowMult'  # Backwards compatibility, GI Shader v3.4
         RIM_SCALE_NODE = 'Rim Scale'
+        TOGGLE_FRESNEL_NODE = 'ToggleFresnel'
+        FRESNEL_POWER_NODE = 'FresnelPower'
+        SHADOW_POSITION_NODE = 'ShadowPos'
+
 
     class Inputs:
         FRESNEL_COLOR = 'Fresnel Color'
@@ -99,51 +126,69 @@ class GlobalPropertiesNames:
         RIM_LIT = 'Rim Lit'
         RIM_SHADOW = 'Rim Shadow'
         RIM_SCALE = 'Rim Scale'
+        TOGGLE_FRESNEL = 'Toggle Fresnel'
+        FRESNEL_POWER = 'Fresnel Power'
+        SHADOW_POSITION = 'Shadow Position Offset'
 
     NODES_TO_GLOBAL_PROPERTIES = {
         LightingPanelNodeNames.FRESNEL_COLOR_NODE: {
             'input': Inputs.FRESNEL_COLOR,
-            'output': 'Color',
+            'valid_output_names': ['Color',],
         },
         LightingPanelNodeNames.FRESNEL_SCALER_NODE: {
             'input': Inputs.FRESNEL_SCALER,
-            'output': 'Blue',  # 'Value'
+            'valid_output_names': ['Blue',],  # 'Value'
         },
         LightingPanelNodeNames.AMBIENT_COLOUR_NODE: {
             'input': Inputs.AMBIENT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SHARP_LIT_COLOUR_NODE: {
             'input': Inputs.SHARP_LIT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SOFT_LIFT_COLOUR_NODE: {
             'input': Inputs.SOFT_LIT_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SHARP_SHADOW_COLOUR_NODE: {
             'input': Inputs.SHARP_SHADOW_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.SOFT_SHADOW_COLOUR_NODE: {
             'input': Inputs.SOFT_SHADOW_COLOUR,
-            'output': 'Output',
-            'old_output_name': 'Color',
+            'valid_output_names': ['Output', 'Color',],
         },
         LightingPanelNodeNames.RIM_LIT_NODE: {
             'input': Inputs.RIM_LIT,
-            'output': 'Result',
+            'valid_output_names': ['Output',],
+        },
+        LightingPanelNodeNames.RIM_LIT_MULT_NODE: {  # Backwards compatibility, GI Shader v3.4
+            'input': Inputs.RIM_LIT,
+            'valid_output_names': ['Result',],
         },
         LightingPanelNodeNames.RIM_SHADOW_NODE: {
             'input': Inputs.RIM_SHADOW,
-            'output': 'Result',
+            'valid_output_names': ['Output',],
+        },
+        LightingPanelNodeNames.RIM_SHADOW_MULT_NODE: {  # Backwards compatibility, GI Shader v3.4
+            'input': Inputs.RIM_SHADOW,
+            'valid_output_names': ['Result',],
         },
         LightingPanelNodeNames.RIM_SCALE_NODE: {
             'input': Inputs.RIM_SCALE,
-            'output': 'Vector',
+            'valid_output_names': ['Vector',],
+        },
+        LightingPanelNodeNames.TOGGLE_FRESNEL_NODE: {
+            'input': Inputs.TOGGLE_FRESNEL,
+            'valid_output_names': ['Value',],
+        },
+        LightingPanelNodeNames.FRESNEL_POWER_NODE: {
+            'input': Inputs.FRESNEL_POWER,
+            'valid_output_names': ['Color',],
+        },
+        LightingPanelNodeNames.SHADOW_POSITION_NODE: {
+            'input': Inputs.SHADOW_POSITION,
+            'valid_output_names': ['Value',],
         },
     }

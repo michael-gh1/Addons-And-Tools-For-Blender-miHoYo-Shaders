@@ -32,8 +32,8 @@ setup_mock_bpy()
 import bpy
 
 from setup_wizard.replace_default_materials_setup.game_default_material_replacers import GenshinImpactDefaultMaterialReplacer
-from setup_wizard.domain.shader_node_names import V4_PrimoToonShaderNodeNames
-from setup_wizard.domain.shader_material_names import V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_node_names import V1_HoYoToonShaderNodeNames
+from setup_wizard.domain.shader_material_names import V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.star_cloak_types import StarCloakTypes
 
 class TestGenshinImpactDefaultMaterialReplacer:
@@ -49,11 +49,11 @@ class TestGenshinImpactDefaultMaterialReplacer:
     
     @pytest.fixture
     def material_names(self):
-        return V4_PrimoToonGenshinImpactMaterialNames
+        return V1_HoYoToonGenshinImpactMaterialNames
     
     @pytest.fixture
     def shader_node_names(self):
-        return V4_PrimoToonShaderNodeNames
+        return V1_HoYoToonShaderNodeNames
     
     @pytest.fixture
     def replacer(self, mock_blender_operator, mock_context, material_names, shader_node_names):

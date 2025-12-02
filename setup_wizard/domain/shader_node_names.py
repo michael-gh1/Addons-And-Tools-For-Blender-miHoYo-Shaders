@@ -58,24 +58,25 @@ class V3_GenshinShaderNodeNames(ShaderNodeNames):
     BODY_HAIR_RAMP_SWITCH = 'Body / Hair'
 
 
-class V4_PrimoToonShaderNodeNames(V3_GenshinShaderNodeNames):
-    BODY_SHADER = 'PrimoToon'
-    BODY_SHADER_LABEL = 'PrimoToon v4.0'
-    BODY_SHADER_OUTPUT = 'PrimoToon'
+class V1_HoYoToonShaderNodeNames(V3_GenshinShaderNodeNames):
+    BODY_SHADER = 'HoYoToon'
+    BODY_SHADER_LABEL = 'HoYoToon v1.0'
+    BODY_SHADER_FOR_VFX = 'HoYoToon v1.0'
+    BODY_SHADER_OUTPUT = 'HoYoToon'
     HAIR_SHADER = BODY_SHADER
     FACE_SHADER = BODY_SHADER
     OUTLINES_SHADER = BODY_SHADER
-    VFX_SHADER = BODY_SHADER
-    VFX_SHADER_INPUT = 'PrimoToon'
+    VFX_SHADER = f'{BODY_SHADER} VFX'
+    VFX_SHADER_INPUT = 'HoYoToon'
     STAR_CLOAK_TYPE = '[Paimon / Dainslief / Skirk / Asmoday] - Star Cloak'
     TOGGLE_FACE_OUTLINES = 'Toggle Face Outlines'
-    TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak]'
-    OUTLINES_OUTPUT = 'PrimoToon (Outlines)'
-    NIGHT_SOUL_OUTPUT = 'PrimoToon (Night Soul)'
-    MATERIAL_OUTPUT_NODE = 'Material Output'
+    TOGGLE_GLASS_STAR_CLOAK = '[Glass / Star Cloak / Veil]'
+    OUTLINES_OUTPUT = 'HoYoToon (Outlines)'
+    NIGHT_SOUL_OUTPUT = 'HoYoToon (Night Soul)'
+    MATERIAL_OUTPUT_NODE = 'HoYoToon Output'
     MATERIAL_OUTPUT_SHADER_INPUT = 'Surface'
 
-    BODY_HAIR_RAMP_SWITCH = 'Body / Body 2 / Hair'
+    BODY_HAIR_RAMP_SWITCH = 'Ramps Selector'
 
     STOCKINGS_DETAIL = 'Stocking_Detail'
 

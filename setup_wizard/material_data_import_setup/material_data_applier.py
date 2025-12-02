@@ -1,18 +1,19 @@
 # Author: michael-gh1
 
+from collections import defaultdict
 from enum import auto
 import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Material
 
-from setup_wizard.domain.shader_node_inputs import V4_PrimoToonShaderNodeInputNames
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_inputs import V1_HoYoToonShaderNodeInputNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierServiceFactory
 from setup_wizard.domain.character_types import CharacterType
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.outline_material_data import OutlineMaterialGroup
-from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import V3_BonnyFestivityGenshinImpactMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 
 
 class MaterialDataAppliersFactory:
@@ -37,7 +38,7 @@ class MaterialDataAppliersFactory:
                     ]
                 else:
                     return [
-                        V4_MaterialDataApplier(material_data_parser, outline_material_group),
+                        V1_HoYoToonMaterialDataApplier(material_data_parser, outline_material_group),
                     ]
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             return [
@@ -474,7 +475,7 @@ class mTexEnvsKeys:
         self.key = key
         self.m_TexEnvs_key = m_TexEnvs_key
 
-class V4_MaterialDataApplier(V3_MaterialDataApplier):
+class V1_HoYoToonMaterialDataApplier(V3_MaterialDataApplier):
     class ShaderNodeType:
         INPUT = auto()
         OUTPUT = auto()
@@ -483,11 +484,11 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     local_material_mapping = {}
     additional_local_material_mapping = {}
 
-    body_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.BODY_SHADER
-    face_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.FACE_SHADER
-    vfx_shader_node_tree_node_name = V4_PrimoToonShaderNodeNames.VFX_SHADER
-    outlines_node_tree_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
-    shader_node_input_names = V4_PrimoToonShaderNodeInputNames
+    body_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.BODY_SHADER
+    face_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.FACE_SHADER
+    vfx_shader_node_tree_node_name = V1_HoYoToonShaderNodeNames.VFX_SHADER
+    outlines_node_tree_node_name = V1_HoYoToonShaderNodeNames.OUTLINES_SHADER
+    shader_node_input_names = V1_HoYoToonShaderNodeInputNames
 
     _MainTexAlphaUse_mapping = {
         0: {
@@ -508,7 +509,7 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
     def set_up_mesh_material_data(self):
         shader_node = self.material.node_tree.nodes[self.shader_node_tree_node_name]
         outline_shader_node = self.outline_material.node_tree.nodes[self.outlines_node_tree_node_name]
-        vfx_shader_node = self.material.node_tree.nodes[self.vfx_shader_node_tree_node_name]
+        vfx_shader_node = self.material.node_tree.nodes.get(self.vfx_shader_node_tree_node_name)
         night_soul_outlines_shader_node = self.night_soul_outlines_material.node_tree.nodes[self.outlines_node_tree_node_name] if self.night_soul_outlines_material else None
         global_properties_interface_node = self.material.node_tree.nodes.get(ShaderNodeNames.EXTERNAL_GLOBAL_PROPERTIES)
         global_properties_inputs_node = global_properties_interface_node.node_tree.nodes.get(ShaderNodeNames.INTERNAL_GLOBAL_PROPERTIES)
@@ -517,11 +518,15 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         self.set_up_mesh_material_data_with_tooltips(outline_shader_node, outline_shader_node, is_outlines=True)
         if night_soul_outlines_shader_node:
             self.set_up_mesh_material_data_with_tooltips(night_soul_outlines_shader_node, night_soul_outlines_shader_node, is_outlines=True)
-        self.set_up_mesh_material_data_with_tooltips(vfx_shader_node, vfx_shader_node)
+        if vfx_shader_node:
+            self.set_up_mesh_material_data_with_tooltips(vfx_shader_node, vfx_shader_node)
         self.set_up_mesh_material_data_with_tooltips(global_properties_interface_node, global_properties_inputs_node)
 
     def set_up_mesh_material_data_with_tooltips(self, interface_node, inputs_node, is_outlines=False):
         shader_node_interface_input_items = interface_node.node_tree.interface.items_tree.values()
+        description_to_names = defaultdict(list)
+        for input in shader_node_interface_input_items:
+            description_to_names[input.description].append(input.name)
         for node_interface_input in shader_node_interface_input_items:
             material_data_key = node_interface_input.description.strip()  # Tooltip
 
@@ -554,6 +559,16 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                         )
                     else:
                         inputs_node.inputs.get(node_interface_input.name).default_value = material_json_value
+
+                        if material_data_key == '_Color' and description_to_names.get('_ColorAlpha') and \
+                            [inputs_node.inputs.get(input_name) for input_name in description_to_names.get('_ColorAlpha')]:
+                            _ColorAlpha_input_name = description_to_names.get('_ColorAlpha')[0]
+                            inputs_node.inputs.get(_ColorAlpha_input_name).default_value = material_json_value[3]
+
+                        # Hu Tao Cherry Snow-Laden and Escoffier
+                        if self.is_old_stocking_shading(material_data_key, material_json_value):
+                            toggle_old_stocking_shading_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_OLD_STOCKING_SHADING)
+                            self.set_old_stocking_shading(toggle_old_stocking_shading_input, True)
                 except AttributeError as ex:
                     print(f'Did not find {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} \
                         Falling back to next MaterialDataApplier version')
@@ -561,8 +576,19 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
                 except TypeError as ex:
                     print(f'ERROR: {ex} on {node_interface_input.name} in {self.material.name}/{self.outline_material.name} material using {self} for {material_json_value}')
 
+        # Disable Toggle Stencil on Face material for older characters without Pupil materials
+        if self.material.name.endswith('Face') and self.is_not_using_eye_stencil():
+            use_eye_stencil_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_STENCIL)
+            self.set_use_eye_stencil(use_eye_stencil_input, False)
+
+        # Disable Toggle Normal Map if there is no Normal Map texture and the material data is incorrect
+        if not self.has_normal_map(self.material_data_parser):
+            toggle_normal_map_input = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_NORMAL_MAP)
+            if toggle_normal_map_input:
+                self.set_toggle_normal_map(toggle_normal_map_input, False)
+
         # Transparency for Glasses
-        if is_outlines and self.outline_material.name == f'{V4_PrimoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
+        if is_outlines and self.outline_material.name == f'{V1_HoYoToonGenshinImpactMaterialNames.GLASS_EFF} Outlines':
             toggle_alpha_node = inputs_node.inputs.get(self.shader_node_input_names.TOGGLE_ALPHA)
             transparency_clip_node = inputs_node.inputs.get(self.shader_node_input_names.TRANSPARENCY_CLIP_THRESHOLD)
 
@@ -601,6 +627,50 @@ class V4_MaterialDataApplier(V3_MaterialDataApplier):
         elif self.is_number_of_values_mismatch(input_object, material_json_value):
             material_json_value = material_json_value[:3]
         return material_json_value
+
+    def has_normal_map(self, material_data_parser) -> bool:
+        '''
+        Check if the material data has a texture assigned to the BumpMap (Normal Map)
+        '''
+        try:
+            return bool(material_data_parser.m_texEnvs._BumpMap.get('m_Texture').get('Name'))
+        except Exception:
+            return False
+
+    def set_toggle_normal_map(self, toggle_normal_map_input, value: bool) -> None:
+        if toggle_normal_map_input:
+            toggle_normal_map_input.default_value = value
+
+    def is_not_using_eye_stencil(self) -> bool:
+        '''
+        Only characters with Pupil materials will use eye stencil
+        Expected material "Avatar_Type_Weapon_Name_Mat_Pupil"
+        '''
+        return not [material for material in bpy.data.materials if material.name.endswith('_Mat_Pupil')]
+
+    def set_use_eye_stencil(self, use_eye_stencil_input, value: bool) -> None:
+        if use_eye_stencil_input:
+            use_eye_stencil_input.default_value = value
+
+    def is_old_stocking_shading(self, material_data_key, material_data_value) -> bool:
+        """
+        Check if old stocking shading should be enabled.
+        Only applicable for Hu Tao Cherry Snow-Laden and Escoffier.
+        """
+        TOGGLE_STOCKING_MATERIAL_DATA_KEY = '_UseCharacterStockings'
+        if material_data_key != TOGGLE_STOCKING_MATERIAL_DATA_KEY or material_data_value != 1:
+            return False
+
+        try:
+            VALID_CHARACTERS = ['HutaoCostumeWinter', 'Escoffier']
+            diffuse_texture_name = self.material_data_parser.m_texEnvs._MainTex.get('m_Texture').get('Name')
+            return any(character_name in diffuse_texture_name for character_name in VALID_CHARACTERS)
+        except Exception:
+            return False
+
+    def set_old_stocking_shading(self, toggle_old_stocking_shading_input, value: bool) -> None:
+        if toggle_old_stocking_shading_input:
+            toggle_old_stocking_shading_input.default_value = value
 
     def set_up_outline_material_data(self, body_part, file):
         self.set_up_outline_material_data_with_tooltips(body_part, file)

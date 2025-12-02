@@ -69,6 +69,8 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
         box.prop(self, 'use_auto_bone_orientation')
 
     def execute(self, context):
+        self.clean_up_scene()
+
         is_character_model_file = not os.path.isdir(self.filepath) and self.filepath
         character_model_directory = os.path.dirname(self.filepath) or self.file_directory
         character_model_file_path_or_directory = self.filepath if is_character_model_file else \
@@ -114,6 +116,19 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             bpy.context.preferences.view.language = original_language
             super().clear_custom_properties()
         return {'FINISHED'}
+
+    '''
+        We need to clean up the scene to ensure no other objects will interfere the setup.
+        Flins has a Light mesh which creates a Light.001 on character import and causes issues later in the setup.
+    '''
+    def clean_up_scene(self):
+        OBJECTS_TO_CLEAN_UP = [
+            'Cube',
+            'Light',
+        ]
+        for obj in bpy.data.objects:
+            if obj.name in OBJECTS_TO_CLEAN_UP:
+                bpy.data.objects.remove(obj)
 
     def import_character_model(self, character_model_file_path_or_directory, is_character_model_file):
         character_model_file_path = character_model_file_path_or_directory if is_character_model_file else \

@@ -4,16 +4,17 @@ import bpy
 
 from abc import ABC, abstractmethod
 from bpy.types import Context, Operator
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V2_GenshinShaderNodeNames, V3_GenshinShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.star_cloak_types import StarCloakTypes
+from setup_wizard.domain.vfx_shader_types import VFXShaderTypes
 from setup_wizard.domain.material_identifier_service import PunishingGrayRavenMaterialIdentifierService
 
-from setup_wizard.import_order import get_actual_material_name_for_dress
+from setup_wizard.import_order import material_replacer_get_actual_material_name_for_dress
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, JaredNytsPunishingGrayRavenShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.texture_import_setup.texture_importer_types import TextureImporterType
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.utils.genshin_body_part_deducer import get_monster_body_part_name, \
@@ -39,8 +40,8 @@ class GameDefaultMaterialReplacerFactory:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
                 shader_node_names = V3_GenshinShaderNodeNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames 
-                shader_node_names = V4_PrimoToonShaderNodeNames
+                material_names = V1_HoYoToonGenshinImpactMaterialNames 
+                shader_node_names = V1_HoYoToonShaderNodeNames
             return GenshinImpactDefaultMaterialReplacer(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
@@ -91,19 +92,27 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                     mesh_body_part_name = f'{ShaderMaterialNameKeywords.SKILLOBJ} {skillobj_identifier}'
                 elif material_name.endswith('Hand_Eff_Mat'):  # Asmoday
                     mesh_body_part_name = 'StarCloak'
+                elif material_name.endswith('Mat_Eye'):  # Jahoda
+                    mesh_body_part_name = 'Face'
 
                 # If material_name is ever 'Dress', 'Arm' or 'Cloak', there could be issues with get_actual_material_name_for_dress()
                 material_name = self.create_shader_material_if_unique_mesh(mesh, mesh_body_part_name, material_name)
                 genshin_material = bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
 
+                armatures =  [obj for obj in bpy.data.objects if obj.type == 'ARMATURE']
+                armature  = armatures[0] if armatures else None
+                character_name = armature.name.split('_')[-1] if armature else 'Character Light Group'
+                character_name = character_name.split('.')[0]  # in case armature name has a suffix like .001
+
                 if genshin_material:
                     material_slot.material = genshin_material
+                    self.add_light_group_to_material(genshin_material, character_name)
                 elif mesh_body_part_name and ('Dress' in mesh_body_part_name or 'Arm' in mesh_body_part_name or 'Cloak' in mesh_body_part_name):
                     # Xiao is the only character with an Arm material
                     # Dainsleif and Paimon are the only characters with Cloak materials
                     self.blender_operator.report({'INFO'}, 'Dress detected on character model!')
 
-                    actual_material_for_dress = get_actual_material_name_for_dress(material_name, character_type.name)
+                    actual_material_for_dress = material_replacer_get_actual_material_name_for_dress(material_name, character_type.name)
                     if actual_material_for_dress == 'Cloak' or mesh_body_part_name == 'Cloak':
                         if bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}VFX'):
                             actual_material_for_dress = 'VFX'
@@ -133,16 +142,25 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                         f'{self.material_names.MATERIAL_PREFIX}{actual_material_for_dress}', 
                         mesh_body_part_name
                     )
+
+                    # Post-Material Swap Setup (one-off configurations)
                     if genshin_material.name == f'{self.material_names.STAR_CLOAK}':
-                        self.__set_glass_star_cloak_toggle(genshin_material, True)
+                        self.__set_glass_star_cloak_toggle(genshin_material, VFXShaderTypes.STARCLOAK.value)
                         self.__set_star_cloak_type(genshin_material, material_name)  # original material name, which contains character name
+                    self.add_light_group_to_material(genshin_material, character_name)
                     self.blender_operator.report({'INFO'}, f'Replaced material: "{material_name}" with "{actual_material_for_dress}"')
                 elif material_name == 'miHoYoDiffuse':
-                    material_slot.material = bpy.data.materials.get(self.material_names.BODY)
+                    body_material = bpy.data.materials.get(self.material_names.BODY)
+                    material_slot.material = body_material
+                    self.add_light_group_to_material(body_material, character_name)
                     continue
                 else:
                     self.blender_operator.report({'WARNING'}, f'Ignoring unknown mesh body part in character model: {mesh_body_part_name} / Material: {material_name}')
                     continue
+        face_material = bpy.data.materials.get(self.material_names.FACE)
+        pupil_material = bpy.data.materials.get(self.material_names.PUPIL)
+        self.set_material_raytrace_refraction(face_material, True)
+        self.set_material_raytrace_refraction(pupil_material, True)
 
                 # Deprecated: I don't think cloning and renaming groups is necessary? (original commit: 6a4772e)
                 # Don't need to duplicate multiple Face shader nodes
@@ -177,12 +195,16 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             leather_material = self.create_body_material(self.material_names, self.material_names.LEATHER)
             material_name = leather_material.name
         elif mesh_body_part_name == 'Glass':
-            glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
-            material_name = glass_material.name
+            if 'Mavuika' in material_name:  # Old Glass uses Body Shader
+                glass_material = self.create_body_material(self.material_names, self.material_names.GLASS)
+            else:
+                glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS, VFXShaderTypes.GLASS)
+                if glass_material:
+                    glass_material.use_backface_culling = True
+                    material_name = glass_material.name
         elif mesh_body_part_name == 'Glass_Eff':
-            glass_material = self.create_glass_material(self.material_names, self.material_names.GLASS_EFF)
+            glass_material = self.create_vfx_material(self.material_names, self.material_names.GLASS_EFF, VFXShaderTypes.GLASS)
             if glass_material:
-                self.__set_glass_star_cloak_toggle(glass_material, False)
                 glass_material.blend_method = 'BLEND'
                 glass_material.shadow_method = 'NONE'
                 glass_material.show_transparent_back = False
@@ -191,12 +213,27 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             skillobj_material = self.create_body_material(self.material_names, self.material_names.SKILLOBJ)
             skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
             material_name = skillobj_material.name
+        elif mesh_body_part_name == 'Ribbon':
+            ribbon_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}Ribbon', VFXShaderTypes.RIBBON)
+            if ribbon_material:
+                material_name = ribbon_material.name
         elif mesh_body_part_name == 'Skirt':
             skirt_material = self.create_body_material(self.material_names, self.material_names.SKIRT)
             material_name = skirt_material.name
+        elif mesh_body_part_name == 'Stockings':
+            stockings_material = self.create_body_material(self.material_names, self.material_names.STOCKINGS)
+            material_name = stockings_material.name
         elif mesh_body_part_name == 'Pupil':
             pupil_material = self.create_body_material(self.material_names, self.material_names.PUPIL)
             material_name = pupil_material.name
+        elif mesh_body_part_name == 'VeilShadow':
+            veil_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}VeilShadow', VFXShaderTypes.VEIL)
+            if veil_material:
+                veil_material.blend_method = 'CLIP'
+                material_name = veil_material.name
+        elif mesh_body_part_name == 'Brow':
+            brow_material = self.create_face_material(self.material_names, self.material_names.BROW)
+            material_name = brow_material.name
         elif mesh_body_part_name and 'Item' in mesh_body_part_name:  # NPCs
             item_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = item_material.name
@@ -207,6 +244,15 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             new_material = self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}{mesh_body_part_name}')
             material_name = new_material.name
         return material_name
+
+    def add_light_group_to_material(self, material, character_name):
+        light_group = material.light_groups.groups.get(character_name)
+
+        if not light_group:
+            light_group = material.light_groups.groups.add()
+            light_group.name = character_name
+        material.light_groups.use_default = False
+        return light_group
 
     def __clone_material_and_rename(self, material_slot, mesh_body_part_name_template, mesh_body_part_name):
         new_material = bpy.data.materials.get(mesh_body_part_name_template).copy()
@@ -226,6 +272,10 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
                 vfx_shader_node = material.node_tree.nodes.get(self.shader_node_names.VFX_SHADER)
                 vfx_shader_node.inputs.get(self.shader_node_names.STAR_CLOAK_TYPE).default_value = getattr(StarCloakTypes, star_cloak_type).value
 
+    def set_material_raytrace_refraction(self, material, value: bool):
+        if material:
+            material.use_screen_refraction = value
+
     def create_body_material(self, shader_material_names: ShaderMaterialNames, material_name):
         body_material = bpy.data.materials.get(material_name)
         if not body_material:
@@ -242,14 +292,23 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             hair_material.use_fake_user = True
         return hair_material
 
-    def create_glass_material(self, shader_material_names: ShaderMaterialNames, material_name):
-        glass_material = bpy.data.materials.get(material_name)
+    def create_face_material(self, shader_material_names: ShaderMaterialNames, material_name):
+        body_material = bpy.data.materials.get(material_name)
+        if not body_material:
+            body_material = bpy.data.materials.get(shader_material_names.FACE).copy()
+            body_material.name = material_name
+            body_material.use_fake_user = True
+        return body_material
+
+    def create_vfx_material(self, shader_material_names: ShaderMaterialNames, material_name, vfx_shader_type: VFXShaderTypes):
+        vfx_material = bpy.data.materials.get(material_name)
         vfx_template_material = bpy.data.materials.get(shader_material_names.VFX)
-        if vfx_template_material and not glass_material:
-            glass_material = vfx_template_material.copy()
-            glass_material.name = material_name
-            glass_material.use_fake_user = True
-        return glass_material
+        if vfx_template_material and not vfx_material:
+            vfx_material = vfx_template_material.copy()
+            vfx_material.name = material_name
+            vfx_material.use_fake_user = True
+            self.__set_glass_star_cloak_toggle(vfx_material, vfx_shader_type.value)
+        return vfx_material
 
     '''
     This method was used for V1 shader and should NOT be used for V2 shader because the group name is different.
