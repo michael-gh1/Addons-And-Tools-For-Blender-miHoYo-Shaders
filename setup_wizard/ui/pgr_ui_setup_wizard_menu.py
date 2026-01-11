@@ -138,7 +138,7 @@ class PGR_PT_Basic_Setup_Wizard_UI_Layout(Panel, PunishingGrayRavenUIRenderCheck
             paint_helpers,
             'punishing_gray_raven.paint_vertex_erase_face_alpha',
             'Erase Face Alpha',
-            'GPBRUSH_ERASE_HARD',
+            'BRUSH_DATA',
             game_type=GameType.PUNISHING_GRAY_RAVEN.name,
         )
 
