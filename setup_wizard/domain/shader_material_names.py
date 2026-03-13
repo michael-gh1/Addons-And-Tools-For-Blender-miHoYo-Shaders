@@ -11,6 +11,7 @@ class ShaderMaterialNames:
     BODY3 = ''
     BODY_TRANS = ''
     BODY2_TRANS = ''
+    BROW = ''
     DRESS = ''
     EFFECT = ''
     EFFECT_HAIR = ''
@@ -27,9 +28,12 @@ class ShaderMaterialNames:
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = ''
     PUPIL = ''
+    RIBBON = ''
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
     SKIRT = ''
     STAR_CLOAK = ''
+    STOCKINGS = ''
+    VEILSHADOW = ''
     VFX = ''
     # HSR
     WEAPON = ''
@@ -83,6 +87,7 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     BODY = f'{MATERIAL_PREFIX}Body'
     BODY1 = f'{MATERIAL_PREFIX}Body1'
     BODY2 = f'{MATERIAL_PREFIX}Body2'
+    BROW = f'{MATERIAL_PREFIX}Brow'
     DRESS = f'{MATERIAL_PREFIX}Dress'
     EFFECT = f'{MATERIAL_PREFIX}Effect'
     EFFECT_HAIR = f'{MATERIAL_PREFIX}EffectHair'
@@ -98,17 +103,20 @@ class V3_BonnyFestivityGenshinImpactMaterialNames(ShaderMaterialNames):
     SKIRT = f'{MATERIAL_PREFIX}Skirt'
 
 
-class V4_PrimoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
+class V1_HoYoToonGenshinImpactMaterialNames(V3_BonnyFestivityGenshinImpactMaterialNames):
     MATERIAL_PREFIX = 'HoYoverse - Genshin '
     MATERIAL_PREFIX_AFTER_RENAME = 'HoYoverse - '
     GLASS = f'{MATERIAL_PREFIX}Glass'
     GLASS_EFF = f'{MATERIAL_PREFIX}Glass_Eff'
     LEATHER = f'{MATERIAL_PREFIX}Leather'
+    RIBBON = f'{MATERIAL_PREFIX}Ribbon'
     SKILLOBJ = f'{MATERIAL_PREFIX}SkillObj'
+    VEILSHADOW = f'{MATERIAL_PREFIX}VeilShadow'
     VFX = f'{MATERIAL_PREFIX}VFX'
     NIGHT_SOUL_OUTLINES_SUFFIX = 'Night Soul Outlines'
     NIGHT_SOUL_OUTLINES = f'{MATERIAL_PREFIX}{NIGHT_SOUL_OUTLINES_SUFFIX}'
     STAR_CLOAK = f'{MATERIAL_PREFIX}StarCloak'
+    STOCKINGS = f'{MATERIAL_PREFIX}Stockings'
 
 
 class Nya222HonkaiStarRailShaderMaterialNames(ShaderMaterialNames):

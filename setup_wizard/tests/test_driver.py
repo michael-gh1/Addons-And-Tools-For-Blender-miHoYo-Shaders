@@ -48,6 +48,7 @@ class TestDriver:
                 for nested_character_folder_item in character_folder_items:  # is the item a directory?
                     if nested_character_folder_item.lower() == 'material' or \
                         nested_character_folder_item.lower() == 'materials' or \
+                        nested_character_folder_item.lower() == 'textures' or \
                         'effect' in nested_character_folder_item.lower() or \
                         'phone' in nested_character_folder_item.lower():  # Phone folder? Material Data folder?
                         

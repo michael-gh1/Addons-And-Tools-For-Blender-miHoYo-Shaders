@@ -11,7 +11,7 @@ from setup_wizard.domain.game_types import GameType
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, \
     ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, \
-    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 
 from setup_wizard.import_order import CHARACTER_MODEL_FOLDER_FILE_PATH, cache_using_cache_key, get_actual_material_name_for_dress, get_cache
@@ -45,7 +45,7 @@ class OutlineTextureImporter(ABC):
             lightmap_filenames = [file for file in lightmap_files if 'EffectHair' in file]
         else:
             lightmap_filenames = [file for file in lightmap_files if \
-                                 actual_material_part_name in file and 'EffectHair' not in file]
+                                 self.matches_material_part_name(file, actual_material_part_name) and 'EffectHair' not in file]
         if not lightmap_filenames:
             self.blender_operator.report({'WARNING'}, f'"{actual_material_part_name}" lightmap not found for material "{outline_material.name}"')
             return
@@ -74,7 +74,7 @@ class OutlineTextureImporter(ABC):
                 diffuse_filenames = [file for file in diffuse_files if 'EffectHair' in file]
             else:
                 diffuse_filenames = [file for file in diffuse_files if \
-                                    actual_material_part_name in file and 'EffectHair' not in file]
+                                    self.matches_material_part_name(file, actual_material_part_name) and 'EffectHair' not in file]
         if not diffuse_filenames:
             self.blender_operator.report({'INFO'}, f'"{actual_material_part_name}" diffuse not found for material "{outline_material.name}"')
             return
@@ -89,6 +89,30 @@ class OutlineTextureImporter(ABC):
         texture_img = bpy.data.images.load(filepath = texture_img_path, check_existing=True)
         texture_img.alpha_mode = 'CHANNEL_PACKED'
         node.image = texture_img
+
+    def matches_material_part_name(self, filename, part_name):
+        """
+        Check if the material part name matches exactly in the filename.
+        This prevents 'Body' from matching 'Body2', 'Body3', etc.
+        
+        The part name must be followed by an underscore to be considered an exact match.
+        
+        Examples:
+            - 'Body' matches '_Body_Diffuse.png' but NOT '_Body2_Diffuse.png'
+            - 'Body2' matches '_Body2_Diffuse.png' but NOT '_Body_Diffuse.png'
+            - 'Hair' matches '_Hair_Lightmap.png' but NOT '_Hair2_Lightmap.png'
+        """
+        if part_name not in filename:
+            return False
+        
+        idx = filename.find(part_name)
+        end_idx = idx + len(part_name)
+        
+        # Check that the character after part_name is an underscore
+        if end_idx < len(filename):
+            return filename[end_idx] == '_'
+        
+        return False
 
     def get_outline_material_fallback(self, body_part_material_name):
         # If outlines could not be found, the material name may be too long.
@@ -110,7 +134,7 @@ class OutlineTextureImporterFactory:
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 material_names = V3_BonnyFestivityGenshinImpactMaterialNames
             else:
-                material_names = V4_PrimoToonGenshinImpactMaterialNames
+                material_names = V1_HoYoToonGenshinImpactMaterialNames
             return GenshinImpactOutlineTextureImporter(blender_operator, context, material_names, shader_node_names)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:

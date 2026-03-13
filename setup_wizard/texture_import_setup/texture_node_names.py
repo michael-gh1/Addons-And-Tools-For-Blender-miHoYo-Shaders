@@ -71,7 +71,7 @@ class V3_GenshinImpactTextureNodeNames(V2_GenshinImpactTextureNodeNames):
     FACE_LIGHTMAP_NODE_GROUP = ''
     FACE_SHADOW_MAP = ''
 
-class V4_GenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
+class V1_HoYoToonGenshinImpactTextureNodeNames(V3_GenshinImpactTextureNodeNames):
     SHADER_TEXTURES_NODE_GROUP = 'Shader Textures'
     DIFFUSE = 'Main_Diffuse'
     MAIN_DIFFUSE = DIFFUSE  # For getting body shader name when renaming shader material names

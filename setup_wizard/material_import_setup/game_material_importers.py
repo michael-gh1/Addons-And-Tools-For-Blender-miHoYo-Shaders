@@ -4,16 +4,20 @@ import os
 
 from bpy.types import Operator, Context
 
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, ShaderIdentifierService, \
+    ShaderIdentifierServiceFactory
 from setup_wizard.domain.game_types import GameType
+from setup_wizard.domain.node_group_names import ShaderNodeGroupNames
 from setup_wizard.domain.shader_material_names import StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, \
     V2_FestivityGenshinImpactMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, \
-    JaredNytsPunishingGrayRavenShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+    JaredNytsPunishingGrayRavenShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 from setup_wizard.import_order import GENSHIN_IMPACT_OUTLINES_FILE_PATH, NextStepInvoker, cache_using_cache_key, get_cache, \
     GENSHIN_IMPACT_ROOT_FOLDER_FILE_PATH, GENSHIN_IMPACT_SHADER_FILE_PATH, HONKAI_STAR_RAIL_ROOT_FOLDER_FILE_PATH, \
     HONKAI_STAR_RAIL_SHADER_FILE_PATH, PUNISHING_GRAY_RAVEN_ROOT_FOLDER_FILE_PATH, PUNISHING_GRAY_RAVEN_SHADER_FILE_PATH
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
 from setup_wizard.texture_import_setup.material_default_value_setters import MaterialDefaultValueSetter, MaterialDefaultValueSetterFactory
+from setup_wizard.utils.scene_utils import move_objects_between_scenes
 
 
 class GameMaterialImporterFactory:
@@ -175,7 +179,7 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.FACE},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.HAIR},
         {'name': V3_BonnyFestivityGenshinImpactMaterialNames.OUTLINES},
-        {'name': V4_PrimoToonGenshinImpactMaterialNames.VFX},
+        {'name': V1_HoYoToonGenshinImpactMaterialNames.VFX},
     ]
     OUTLINES_FILE_PATH = GENSHIN_IMPACT_OUTLINES_FILE_PATH
 
@@ -190,10 +194,21 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
         )
 
     def import_materials(self):
+        starting_scene_names = bpy.data.scenes.keys()
+        active_scene_name = bpy.context.scene.name if bpy.context.scene else starting_scene_names[0]
         status = super().import_materials()  # Genshin Impact Material Importer
 
         if status == {'FINISHED'}:
             return status
+
+        # Identify shader here instead of in factory or earlier because we haven't imported materials yet
+        shader_identifier_service: ShaderIdentifierService = ShaderIdentifierServiceFactory.create(GameType.GENSHIN_IMPACT.name)
+        self.shader: GenshinImpactShaders = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
+
+        if self.shader in [GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER]:
+            self.move_required_scene_objects(starting_scene_names, active_scene_name)
+            self.update_vfx_shader_scene_dependency(active_scene_name)
+            self.clean_up_unused_objects()
 
         if self.is_create_hair_material_from_body():  # Genshin Shader >= v4.0
             self.create_hair_material()
@@ -211,13 +226,55 @@ class GenshinImpactMaterialImporterFacade(GameMaterialImporter):
             game_type=self.blender_operator.game_type,
         )
 
+    """
+        Starting in V1 HoYoToon GEnshin Impact Shader, Light Direction empties get imported into a new scene due to
+        the VFX shader having drivers that are connected to a scene.
+
+        Because of this, we need to move the empties to the active scene and then delete the new scene that was created.
+
+        Args:
+            starting_scene_names: List of scene names before import
+            active_scene_name: Name of the active scene
+    """
+    def move_required_scene_objects(self, starting_scene_names, active_scene_name):
+        new_scenes = list(set(bpy.data.scenes.keys()) - set(starting_scene_names))
+        if new_scenes:  # expected length 1
+            DEFAULT_COLLECTION_NAME = 'Collection'
+            move_objects_between_scenes(new_scenes[0], active_scene_name, LightDirectionEmptyNames.LIGHT_DIRECTION_EMPTIES, DEFAULT_COLLECTION_NAME)
+            bpy.data.scenes.remove(bpy.data.scenes[new_scenes[0]])
+
+    """
+        VFX Shader > Star Cloak node group has drivers that reference the active scene and need to be updated
+        to the current active scene after import
+
+        Args:
+            active_scene_name: Name of the active scene
+    """
+    def update_vfx_shader_scene_dependency(self, active_scene_name):
+        DRIVER_VARIABLE_TARGET_DATA_PATHS = ['render.resolution_x', 'render.resolution_y']
+        for animation_driver in bpy.data.node_groups[ShaderNodeGroupNames.VFX_SHADER_STAR_CLOAK].animation_data.drivers.values():
+            for driver_variable in animation_driver.driver.variables.values():
+                for driver_variable_target in driver_variable.targets.values():
+                    if driver_variable_target.data_path in DRIVER_VARIABLE_TARGET_DATA_PATHS:
+                        driver_variable_target.id = bpy.data.scenes[active_scene_name]
+
+    def clean_up_unused_objects(self):
+        OBJECTS_TO_CLEAN_UP = [
+            'Preview',
+        ]
+        for obj in bpy.data.objects:
+            if obj.name in OBJECTS_TO_CLEAN_UP:
+                obj_data = obj.data
+                bpy.data.objects.remove(obj)
+                bpy.data.meshes.remove(obj_data)
+
     def is_create_hair_material_from_body(self):
-        body_material_exists = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
-        hair_material_missing = not bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.HAIR)
+        body_material_exists = bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.BODY)
+        hair_material_missing = not bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.HAIR)
         return body_material_exists and hair_material_missing
 
     def create_hair_material(self):
-        body_material = bpy.data.materials.get(V4_PrimoToonGenshinImpactMaterialNames.BODY)
+        body_material = bpy.data.materials.get(V1_HoYoToonGenshinImpactMaterialNames.BODY)
         hair_material = body_material.copy()
         material_default_value_setter: MaterialDefaultValueSetter = MaterialDefaultValueSetterFactory.create(self.blender_operator.game_type)
         material_default_value_setter.set_up_hair_material(hair_material)

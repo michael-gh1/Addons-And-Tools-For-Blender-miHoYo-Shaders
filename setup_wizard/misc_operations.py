@@ -5,7 +5,7 @@ import bpy
 from bpy.types import Material, Operator
 
 from setup_wizard.domain.game_types import GameType
-from setup_wizard.domain.shader_identifier_service import HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
+from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
 from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, ShaderMaterialNames, StellarToonShaderMaterialNames
 from setup_wizard.import_order import NextStepInvoker
 from setup_wizard.setup_wizard_operator_base_classes import CustomOperatorProperties
@@ -39,7 +39,8 @@ class HYV_OT_SetUpScreenSpaceReflections(Operator, CustomOperatorProperties):
         shader_identifier_service = ShaderIdentifierServiceFactory.create(self.game_type)
         shader = shader_identifier_service.identify_shader(bpy.data.materials, bpy.data.node_groups)
 
-        if shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER:
+        if shader is HonkaiStarRailShaders.STELLARTOON_HONKAI_STAR_RAIL_SHADER or \
+            (self.game_type == GameType.GENSHIN_IMPACT.name and shader.value >= GenshinImpactShaders.V1_HOYOTOON_GENSHIN_IMPACT_SHADER.value):
             bpy.context.scene.eevee.use_ssr = True
             bpy.context.scene.eevee.use_ssr_refraction = True
 

@@ -416,12 +416,19 @@ class OperatorFactory:
         operator_context='EXEC_DEFAULT',
         **kwargs
     ):
-        ui_object.operator_context = operator_context
-        ui_object = ui_object.operator(
-            operator=operator,
-            text=text,
-            icon=icon,
-        )
+        try:
+            ui_object.operator_context = operator_context
+            ui_object = ui_object.operator(
+                operator=operator,
+                text=text,
+                icon=icon,
+            )
+        except TypeError:  # Icon not found, possibly added/removed depending on Blender version
+            ui_object.operator_context = operator_context
+            ui_object = ui_object.operator(
+                operator=operator,
+                text=text,
+            )
 
         for key, value in kwargs.items():
             setattr(ui_object, key, value)

@@ -20,4 +20,6 @@ class ShaderMaterialNameKeywords:
 
     STOCKINGS_DETAILMAP = 'Stockings_Detailmap'
 
+    RIBBON = 'Ribbon'
     TAIL = 'Tail'
+    VEIL = 'Veil'

@@ -11,14 +11,16 @@ from setup_wizard.domain.star_cloak_types import StarCloakTypes
 from setup_wizard.domain.mesh_names import MeshNames
 from setup_wizard.domain.shader_material_name_keywords import ShaderMaterialNameKeywords
 from setup_wizard.domain.shader_material import ShaderMaterial
-from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V4_PrimoToonShaderNodeNames
+from setup_wizard.domain.shader_node_names import ShaderNodeNames, StellarToonShaderNodeNames, V3_GenshinShaderNodeNames, V1_HoYoToonShaderNodeNames
 from setup_wizard.domain.shader_identifier_service import GenshinImpactShaders, HonkaiStarRailShaders, ShaderIdentifierService, ShaderIdentifierServiceFactory
-from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V4_PrimoToonGenshinImpactMaterialNames
+from setup_wizard.domain.shader_material_names import JaredNytsPunishingGrayRavenShaderMaterialNames, StellarToonShaderMaterialNames, V3_BonnyFestivityGenshinImpactMaterialNames, V2_FestivityGenshinImpactMaterialNames, ShaderMaterialNames, Nya222HonkaiStarRailShaderMaterialNames, V1_HoYoToonGenshinImpactMaterialNames
 
 from setup_wizard.domain.game_types import GameType
 from setup_wizard.material_import_setup.empty_names import LightDirectionEmptyNames
 from setup_wizard.outline_import_setup.outline_node_groups import OutlineNodeGroupNames
-from setup_wizard.texture_import_setup.texture_node_names import V4_GenshinImpactTextureNodeNames
+from setup_wizard.texture_import_setup.texture_node_names import V1_HoYoToonGenshinImpactTextureNodeNames
+
+from setup_wizard.utils.mesh_utils import remove_material_slots
 
 
 # Constants
@@ -35,6 +37,7 @@ NAME_OF_OUTLINE_4_MASK_INPUT = 'Input_18'  # Dress
 NAME_OF_DRESS2_MASK_INPUT = 'Input_24'  # Dress 2
 NAME_OF_LEATHER_MASK_INPUT = 'Socket_0'
 NAME_OF_OUTLINE_OTHER_MASK_INPUT = 'Input_26'
+NAME_OF_PUPIL_MASK_INPUT = 'Socket_32'  # Pupil
 NAME_OF_VFX_MASK_INPUT = 'Socket_1'
 
 # These are actually the Outlines
@@ -45,6 +48,7 @@ NAME_OF_OUTLINE_4_MATERIAL_INPUT = 'Input_19'  # Dress
 NAME_OF_DRESS2_MATERIAL_INPUT = 'Input_25'  # Dress 2
 NAME_OF_LEATHER_MATERIAL_INPUT = 'Socket_2'
 NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT = 'Input_27'
+NAME_OF_PUPIL_MATERIAL_INPUT = 'Socket_33'  # Pupil
 NAME_OF_VFX_MATERIAL_INPUT = 'Socket_3'
 
 LIGHT_VECTORS_LIGHT_DIRECTION = 'Input_3'
@@ -95,8 +99,11 @@ gi_meshes_to_create_outlines_on = [
     'Wriothesley_Gauntlet_R_Model',
     'Screw',  # Aranara
     'Hat',  # Aranara
+    'Ribbon',
     'StarCloak',
+    'Stockings',
     'Tail',
+    'Veil',
 ]
 
 hsr_meshes_to_create_outlines_on = [
@@ -144,7 +151,7 @@ class GameGeometryNodesSetupFactory:
             elif shader is GenshinImpactShaders.V3_GENSHIN_IMPACT_SHADER:
                 return V3_GenshinImpactGeometryNodesSetup(blender_operator, context)
             else:
-                return V4_GenshinImpactGeometryNodesSetup(blender_operator, context)
+                return V1_HoYoToonGenshinImpactGeometryNodesSetup(blender_operator, context)
         elif game_type == GameType.HONKAI_STAR_RAIL.name:
             if shader is HonkaiStarRailShaders.NYA222_HONKAI_STAR_RAIL_SHADER:
                 return HonkaiStarRailGeometryNodesSetup(
@@ -472,7 +479,7 @@ class V3_GenshinImpactGeometryNodesSetup(GameGeometryNodesSetup):
                     modifier[outline_material_input_accessor] = outline_materials[0]
 
 
-class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
+class V1_HoYoToonGenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
     GEOMETRY_NODES_MATERIAL_IGNORE_LIST = []
     BASE_GEOMETRY_INPUT = 'Input_12'
     USE_VERTEX_COLORS_INPUT = 'Input_13'
@@ -497,17 +504,18 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         'HelmetEmo': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass': (NAME_OF_OUTLINE_OTHER_MASK_INPUT, NAME_OF_OUTLINE_OTHER_MATERIAL_INPUT),
         'Glass_Eff': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
+        'Pupil': (NAME_OF_PUPIL_MASK_INPUT, NAME_OF_PUPIL_MATERIAL_INPUT),
         'StarCloak': (NAME_OF_VFX_MASK_INPUT, NAME_OF_VFX_MATERIAL_INPUT),
     }
 
     def __init__(self, blender_operator, context):
         super().__init__(blender_operator, context)
-        self.material_names = V4_PrimoToonGenshinImpactMaterialNames
+        self.material_names = V1_HoYoToonGenshinImpactMaterialNames
         self.outlines_node_group_names = OutlineNodeGroupNames.V3_BONNY_FESTIVITY_GENSHIN_OUTLINES
         self.light_vectors_node_group_names = OutlineNodeGroupNames.V3_LIGHT_VECTORS_GEOMETRY_NODES
-        self.shader_node_names = V4_PrimoToonShaderNodeNames
-        self.outlines_shader_node_name = V4_PrimoToonShaderNodeNames.OUTLINES_SHADER
-        self.texture_node_names = V4_GenshinImpactTextureNodeNames
+        self.shader_node_names = V1_HoYoToonShaderNodeNames
+        self.outlines_shader_node_name = V1_HoYoToonShaderNodeNames.OUTLINES_SHADER
+        self.texture_node_names = V1_HoYoToonGenshinImpactTextureNodeNames
 
     def setup_geometry_nodes(self):
         for mesh in [obj for obj in bpy.data.objects.values() if obj.type == 'MESH']:
@@ -620,7 +628,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             if len(separated_materials) == len(mesh.material_slots):
                 bpy.data.objects.remove(mesh)
             else:
-                self.__remove_material_slots(mesh, separated_materials)
+                remove_material_slots(mesh, separated_materials)
 
     def __separate_material_from_mesh(self, mesh, material_slot, new_mesh_name):
         print(f'Separating material for: {material_slot.material.name} from {mesh.name}')
@@ -642,7 +650,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
         new_mesh_name_mesh = bpy.data.objects.get(new_mesh_name)
 
         # Clean the separated mesh of any other materials
-        self.__remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
+        remove_material_slots(new_separated_mesh, [material_slot.material], exclude=True)
 
         if not new_mesh_name_mesh:
             print(f'Renaming {new_separated_mesh.name} to {new_mesh_name}')
@@ -660,17 +668,6 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
             print(f'Renaming {new_mesh_name_mesh.name} to {renamed_mesh_name}')
             new_mesh_name_mesh.name = renamed_mesh_name
 
-
-    def __remove_material_slots(self, mesh, materials, exclude=False):
-        bpy.ops.object.mode_set(mode='OBJECT')
-        # Reversing is IMPORTANT in order to avoid index errors while removing during runtime
-        for material_slot_material in reversed(mesh.material_slots):
-            if (not exclude and material_slot_material.material in materials) or (exclude and material_slot_material.material not in materials):
-                mesh.active_material_index = mesh.material_slots.get(material_slot_material.material.name).slot_index
-                print(f'Removing material: {material_slot_material.material.name} from {mesh.name}')
-                bpy.context.view_layer.objects.active = mesh
-                bpy.ops.object.material_slot_remove()
-
     '''
     Very targeted method for disabling outlines on Paimon's cloak
     May require refactoring if used for other purposes.
@@ -684,7 +681,7 @@ class V4_GenshinImpactGeometryNodesSetup(V3_GenshinImpactGeometryNodesSetup):
                     modifier[self.TOGGLE_OUTLINES_SOCKET] = False
 
     def __connect_shader_node_to_vfx_node(self, material, starcloak_types: List[StarCloakTypes]):
-        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER}.001'
+        MAIN_SHADER_NODE_NAME = f'{self.shader_node_names.BODY_SHADER_FOR_VFX}'
         MAIN_SHADER_OUTPUT_NAME = self.shader_node_names.BODY_SHADER_OUTPUT
         VFX_SHADER_NODE_NAME = self.shader_node_names.VFX_SHADER
         VFX_SHADER_INPUT_NAME = self.shader_node_names.VFX_SHADER_INPUT

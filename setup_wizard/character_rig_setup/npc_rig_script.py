@@ -1624,22 +1624,14 @@ def rig_character(
         depsgraph = bpy.context.evaluated_depsgraph_get()
         depsgraph.update()
 
-    try:
-        setup_viewport_outlines(bpy.data.objects["Body"].modifiers["Outlines Body"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Hair"].modifiers["Outlines Hair"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Face"].modifiers["Outlines Face"])
-    except:
-        pass
-    try:
-        setup_viewport_outlines(bpy.data.objects["Dress"].modifiers["Outlines Dress"])
-    except:
-        pass
+    all_meshes = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+    for mesh in all_meshes:
+        outlines_geometry_node_modifiers = [modifier for modifier in mesh.modifiers if modifier.type == 'NODES' and "Outlines " in modifier.name]
+        for modifier in outlines_geometry_node_modifiers:
+            try:
+                setup_viewport_outlines(modifier)
+            except:
+                pass
 
     # Let's go into object mode and select the body for the pupil shape keys, and to control our glow sliders.
     bpy.ops.object.select_all(action='DESELECT')
