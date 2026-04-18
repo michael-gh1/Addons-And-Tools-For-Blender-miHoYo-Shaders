@@ -246,6 +246,11 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         return material_name
 
     def add_light_group_to_material(self, material, character_name):
+        if not material or \
+                not hasattr(material, 'light_groups') or \
+                not hasattr(material.light_groups, 'groups'):
+            return None
+
         light_group = material.light_groups.groups.get(character_name)
 
         if not light_group:
