@@ -103,7 +103,7 @@ def register():
 def on_register():
     try:
         # Enable Rigify, BetterFBX and ExpyKit. If they don't exist, install them from dependencies folder
-        addons_to_enable = {'rigify': '', 'better_fbx': 'b_f-5.4.8.zip', 'Expy-Kit-main': 'Expy-Kit-v052.zip'}
+        addons_to_enable = {'rigify': '', 'better_fbx': 'b_f-6.3.3.zip', 'Expy-Kit-main': 'Expy-Kit-v052.zip'}
         for addon, filename in addons_to_enable.items():
             try:
                 print(f'Enabling addon: {addon}')
