@@ -132,6 +132,7 @@ meshes_to_create_outlines_on = \
 meshes_to_create_light_vectors_on = meshes_to_create_outlines_on + [
     'Brow',
     'EyeStar',
+    'Pupil',
 ]
 
 material_keywords_to_not_create_outlines_on = [
