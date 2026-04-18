@@ -4,6 +4,9 @@
 class TextureNodeNames:
     DIFFUSE = ''
     BODY_DIFFUSE_UV0 = ''
+    BODY_DIFFUSE_UV1 = ''
+    BODY_LIGHTMAP_UV0 = ''
+    BODY_LIGHTMAP_UV1 = ''
     MAIN_DIFFUSE = ''
     LIGHTMAP = ''
     SHADER_TEXTURES_NODE_GROUP = ''
@@ -55,6 +58,9 @@ class TextureNodeNames:
 
 class GenshinImpactTextureNodeNames(TextureNodeNames):
     BODY_DIFFUSE_UV0 = 'Body_Diffuse_UV0'  # For getting body shader name when renaming shader material names
+    BODY_DIFFUSE_UV1 = 'Body_Diffuse_UV1'
+    BODY_LIGHTMAP_UV0 = 'Body_Lightmap_UV0'
+    BODY_LIGHTMAP_UV1 = 'Body_Lightmap_UV1'
 
 class V1_GenshinImpactTextureNodeNames(GenshinImpactTextureNodeNames):
     LIGHTMAP = 'Image Texture'
