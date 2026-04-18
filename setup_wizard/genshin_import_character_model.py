@@ -139,11 +139,16 @@ class GI_OT_GenshinImportModel(Operator, ImportHelper, CustomOperatorProperties)
             bpy.context.window_manager.setup_wizard_betterfbx_enabled if betterfbx_installed else False
 
         if betterfbx_installed and betterfbx_enabled:
-            bpy.ops.better_import.fbx(
-                'EXEC_DEFAULT',
-                filepath=character_model_file_path,
-                use_auto_bone_orientation=self.use_auto_bone_orientation,
-            )
+            betterfbx_kwargs = {
+                'filepath': character_model_file_path,
+                'files': [{'name': os.path.basename(character_model_file_path)}],  # needed after upgrading BetterFBX to 6.3
+                'use_auto_bone_orientation': self.use_auto_bone_orientation,
+            }
+            # use_single_armature only exists in at least BetterFBX >= 6.3.3 (unsure when it was exactly introduced)
+            # keep imported model in the same format as when using BetterFBX 5.4.8
+            if bpy.ops.better_import.fbx.get_rna_type().properties.get('use_single_armature'):
+                betterfbx_kwargs['use_single_armature'] = False
+            bpy.ops.better_import.fbx('EXEC_DEFAULT', **betterfbx_kwargs)
             self.report({'INFO'}, 'Imported character model using BetterFBX')
         else:
             bpy.ops.import_scene.fbx(
