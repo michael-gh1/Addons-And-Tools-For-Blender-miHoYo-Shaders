@@ -214,7 +214,8 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
             skillobj_material.name = skillobj_material.name.replace(ShaderMaterialNameKeywords.SKILLOBJ, mesh_body_part_name)
             material_name = skillobj_material.name
         elif mesh_body_part_name == 'Ribbon':
-            ribbon_material = self.create_vfx_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}Ribbon', VFXShaderTypes.RIBBON)
+            ribbon_material = self.create_vfx_material(self.material_names, self.material_names.RIBBON, VFXShaderTypes.RIBBON) or \
+                self.create_body_material(self.material_names, f'{self.material_names.MATERIAL_PREFIX}Ribbon')
             if ribbon_material:
                 material_name = ribbon_material.name
         elif mesh_body_part_name == 'Skirt':
@@ -246,6 +247,11 @@ class GenshinImpactDefaultMaterialReplacer(GameDefaultMaterialReplacer):
         return material_name
 
     def add_light_group_to_material(self, material, character_name):
+        if not material or \
+                not hasattr(material, 'light_groups') or \
+                not hasattr(material.light_groups, 'groups'):
+            return None
+
         light_group = material.light_groups.groups.get(character_name)
 
         if not light_group:

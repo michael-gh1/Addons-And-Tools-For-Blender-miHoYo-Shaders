@@ -163,16 +163,17 @@ class GenshinTextureImporter:
                         type(self) is GenshinNPCTextureImporter:
                         self.setup_dress_textures(texture_node_name, img, self.character_type)
 
-    def set_lightmap_texture(self, texture_type: TextureType, material, img):
+    def set_lightmap_texture(self, texture_type: TextureType, material, img, texture_node_names: List[str]=[], override=True):
         img.colorspace_settings.name='Non-Color'
-        possible_texture_node_names = [
+        possible_texture_node_names = texture_node_names if texture_node_names else [
             f'{texture_type.value}_Lightmap_UV0',
             f'{texture_type.value}_Lightmap_UV1',
             V1_HoYoToonGenshinImpactTextureNodeNames.LIGHTMAP,
         ]
         for texture_node_name in possible_texture_node_names:
             if material.node_tree.nodes.get(texture_node_name):
-                material.node_tree.nodes[texture_node_name].image = img
+                if override or not material.node_tree.nodes[texture_node_name].image:
+                    material.node_tree.nodes[texture_node_name].image = img
         
                 if self.game_type == GameType.GENSHIN_IMPACT:
                     if not self.does_dress_texture_exist_in_directory_files() or \
@@ -522,7 +523,7 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                 glass_eff_material = bpy.data.materials.get(f'{self.material_names.GLASS_EFF}')
                 leather_material = bpy.data.materials.get(f'{self.material_names.LEATHER}')
                 pupil_material = bpy.data.materials.get(f'{self.material_names.PUPIL}')
-                ribbon_material = bpy.data.materials.get(f'{self.material_names.RIBBON}')
+                ribbon_material = bpy.data.materials.get(f'{self.material_names.RIBBON}') or bpy.data.materials.get(f'{self.material_names.MATERIAL_PREFIX}Ribbon')  # for older shader version "support"
                 skirt_material = bpy.data.materials.get(f'{self.material_names.SKIRT}')
                 star_cloak_material = bpy.data.materials.get(f'{self.material_names.STAR_CLOAK}')
                 stockings_material = bpy.data.materials.get(f'{self.material_names.STOCKINGS}')
@@ -571,7 +572,11 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_body_hair_output_on_face_shader(face_material, img)
                     self.set_diffuse_texture(TextureType.BODY, leather_material, img) if leather_material else None
                     self.set_diffuse_texture(TextureType.BODY, pupil_material, img) if pupil_material else None
-                    self.set_diffuse_texture(TextureType.BODY, ribbon_material, img, texture_node_names=[V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE]) if ribbon_material else None
+                    self.set_diffuse_texture(TextureType.BODY, ribbon_material, img, texture_node_names=[
+                        V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE, 
+                        V1_HoYoToonGenshinImpactTextureNodeNames.BODY_DIFFUSE_UV0, 
+                        V1_HoYoToonGenshinImpactTextureNodeNames.BODY_DIFFUSE_UV1
+                    ]) if ribbon_material else None
                     self.set_diffuse_texture(TextureType.BODY, glass_material, img, texture_node_names=[V1_HoYoToonGenshinImpactTextureNodeNames.VFX_DIFFUSE]) if glass_material else None
                     if star_cloak_material and self.star_cloak_uses_body_texture(file):
                         self.set_diffuse_texture(TextureType.BODY, star_cloak_material, img)
@@ -588,6 +593,10 @@ class GenshinAvatarTextureImporter(GenshinTextureImporter):
                     self.set_lightmap_texture(TextureType.BODY, selected_body_material, img)
                     self.set_lightmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
                     self.set_lightmap_texture(TextureType.BODY, pupil_material, img) if pupil_material else None
+                    self.set_lightmap_texture(TextureType.BODY, ribbon_material, img, texture_node_names=[
+                        V1_HoYoToonGenshinImpactTextureNodeNames.BODY_LIGHTMAP_UV0, 
+                        V1_HoYoToonGenshinImpactTextureNodeNames.BODY_LIGHTMAP_UV1
+                    ]) if ribbon_material else None  # ONLY FOR OLDER VERSION SUPPORT, was told Columbina's Ribbon is not supposed to have Lightmap set up - b86c72dce5b754bf3ea4953582c962c6b77ccc53
                 elif self.is_texture_identifiers_in_texture_name([ShaderMaterialNameKeywords.BODY, ShaderMaterialNameKeywords.NORMAL_MAP], file):
                     self.set_normalmap_texture(TextureType.BODY, body_material, img)
                     self.set_normalmap_texture(TextureType.BODY, leather_material, img) if leather_material else None
