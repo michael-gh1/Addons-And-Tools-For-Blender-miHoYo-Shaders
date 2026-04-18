@@ -93,6 +93,7 @@ gi_meshes_to_create_outlines_on = [
     'Handcuffs',
     'Hat',
     'Helmet',
+    'Headwear',
     'SkillObj_Mavuika_Glass_Model',
     'Skirt',
     'Wriothesley_Gauntlet_L_Model',
