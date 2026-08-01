@@ -512,9 +512,10 @@ def rig_character(
     except:
         pass
     x = original_name.split("_")
-    bpy.data.objects["rigify"].users_collection[0].name = x[-2]
-    bpy.data.objects["rigify"].name = x[-2] + "Rig"
-
+    if len(x) > 1:
+        bpy.data.objects["rigify"].users_collection[0].name = x[-2]
+        bpy.data.objects["rigify"].name = x[-2] + "Rig"
+    
 try:
     bpy.context.scene.objects["Head Forward"].hide_viewport = True
     bpy.context.scene.objects["Head Up"].hide_viewport = True
