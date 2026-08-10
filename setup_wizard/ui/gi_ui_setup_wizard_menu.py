@@ -58,7 +58,7 @@ class GI_PT_Setup_Wizard_UI_Layout(Panel, GenshinImpactUIRenderChecker):
         )
 
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx') or bpy.context.preferences.addons.get('bl_ext.user_default.better_fbx')
         rigify_installed = bpy.context.preferences.addons.get('rigify')
 
         if not expy_kit_installed or not betterfbx_installed or not rigify_installed:
@@ -438,7 +438,7 @@ class OperatorFactory:
         ui_object: UILayout,
     ):
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx') or bpy.context.preferences.addons.get('bl_ext.user_default.better_fbx')
         rigify_installed = bpy.context.preferences.addons.get('rigify')
 
         column = ui_object.column()

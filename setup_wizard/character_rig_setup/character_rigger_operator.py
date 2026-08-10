@@ -53,7 +53,7 @@ class GI_OT_CharacterRiggerOperator(Operator, ImportHelper, CustomOperatorProper
             self.high_level_step_name != 'HONKAI_STAR_RAIL_OT_setup_wizard_ui_no_outlines'
         rigging_enabled = is_advanced_setup or \
             (bpy.context.window_manager.setup_wizard_full_run_rigging_enabled and self.game_type in self.GAME_TYPES_FULL_SETUP_RIGGING_ENABLED)
-        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx')
+        betterfbx_installed = bpy.context.preferences.addons.get('better_fbx') or bpy.context.preferences.addons.get('bl_ext.user_default.better_fbx')
         expy_kit_installed = bpy.context.preferences.addons.get('Expy-Kit-main')
         rigify_installed = bpy.context.preferences.addons.get('rigify')
 
